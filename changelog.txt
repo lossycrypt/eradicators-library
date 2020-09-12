@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------------------------------
+Version: 9.9.9
+Date: 2020-09-11
+  Todo:
+    - Make pure lua parts of the library seperately loadable.
+    - Make the library loadable in a "static" manner where it does not configure itself.
+    - Add auto-config function to set up the full library at once inside a mod. Including dev-flags.
+---------------------------------------------------------------------------------------------------
+Version: 4.0.1
+Date: 2020-09-12
+  Internal:
+    - Include official api doc in release for proper offline linking.
+    - Creation of github repository and documentation page.
+  Documentation:
+    - Finished documenting Debug.
+---------------------------------------------------------------------------------------------------
+Version: 4.0.0
+Date: 2020-09-12
+  Internal:
+    - Start of complete rebuild.
+    - Setup automatic documentation configuration.
+---------------------------------------------------------------------------------------------------
+Version: 3.1.0
+Date: 2020-03-10
+  Internal:
+    - Added the Vector() module to handle all future position and area needs.
+---------------------------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2020-03-10
+  Internal:
+    - Split into seperate mod to make it easier to update when future factorio versions start breaking stuff again.

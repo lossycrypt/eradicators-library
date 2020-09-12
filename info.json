@@ -1,0 +1,14 @@
+{
+  "title"            : "Eradicator's C.O.R.E. Library",
+  "name"             : "eradicators-library",
+  "author"           : "eradicator",
+  "version"          : "4.0.3",
+  "factorio_version" : "1.0",
+  "contact"          : "Check the mod portal \"Discussions\" tab (link below).",
+  "license"          : "Creative Commons Attribution-NoDerivatives 4.0 International License",
+  "description"      : "Contains code required by all of my mods.",
+  "dependencies"     : [
+    "(?) zz-universal-locale >= 0.0.1",
+    "base >= 1.0.0"
+  ]
+}
