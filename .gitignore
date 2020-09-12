@@ -27,10 +27,6 @@
 !*.ogg
 
 # Keep documentation
-#!**/html/*.html
-#!**/html/*.js
-#!**/html/*.css
-
 !/html/**/*.html
 !/html/**/*.js
 !/html/**/*.css
