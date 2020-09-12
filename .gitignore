@@ -32,6 +32,8 @@
 #!**/html/*.css
 
 !/html/**/*.html
+!/html/**/*.js
+!/html/**/*.css
 
 # Block underscore prefixed files
 _*
