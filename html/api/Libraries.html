@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang="en"><head ><title >Libraries and functions</title><meta charset="UTF-8"/><link rel="stylesheet" type="text/css" href="lua-doc.css"/><script rel="stylesheet" type="text/javascript" src="lua-doc.js"></script></head><body ><div class="navigation-bar"><span class="navigation"><a href="index.html">Factorio</a> &raquo; Libraries and functions</span><span class="version">Factorio 1.0.0</span></div><h1 >Libraries and functions</h1><p ></p><p >
+Factorio provides the Lua environment several functions and libraries that cannot be found in standard <a href="https://www.lua.org/manual/5.2/"> Lua 5.2.1</a>. Furthermore, it modifies some functions to be deterministic, notably <code >pairs()</code> and <code >math.random()</code>.</p> <h2>1. Libraries</h2>  <h3>serpent</h3> <p >
+  Factorio provides the <a href="https://github.com/pkulchenko/serpent"> serpent library</a> as a global variable <code >serpent</code> for all mods to use.
+  This is done because Factorio uses serpent for the serialization of the <code >global</code> table. It also allows for easy debugging of tables, because serpent makes it trivial to print them, for example by using <code >serpent.block()</code>.
+  However, serpent cannot pretty-print LuaObjects such as <a href="LuaEntity.html">LuaEntity</a>.
+  The serpent library was modified to improve determinism, e.g. comments are turned off by default to avoid returning table addresses.</p> <h2>2. New functions</h2>  <h3>log()</h3> <p >
+  This function allows to log <a href="Concepts.html#LocalisedString"> LocalisedStrings</a> to the Factorio <a href="https://wiki.factorio.com/Log_file"> log file</a>.
+  This, in combination with serpent, makes debugging in the data stage easier, because it allows to simply inspect entire prototype tables. For example, this allows to see all properties of the sulfur item prototype: <code >log(serpent.block(data.raw["item"]["sulfur"]))</code></p> <h3>localised_print()</h3> <p >
+  This function allows printing <a href="Concepts.html#LocalisedString"> LocalisedStrings</a> to stdout without polluting the logfile.
+  This is primarily useful for communicating with external tools that launch Factorio as a child process.</p> <h3>table_size()</h3> <p >
+  Factorio provides the function <code >table_size()</code> as a simple way to find the size of tables with non-continuous keys, because the standard <code >#</code> does not work correctly for these.
+  The function is a C++-side implementation of the following Lua code, thus it is faster than using this code in Lua:
+  <div class="block-code-container"><code class="block">  &nbsp;&nbsp;local&nbsp;function&nbsp;size(t)<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;local&nbsp;count&nbsp;=&nbsp;0<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;k,v&nbsp;in&nbsp;pairs(t)&nbsp;do<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count&nbsp;=&nbsp;count&nbsp;+&nbsp;1<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;end<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;count<br/>
+  &nbsp;&nbsp;end</code></div></p><p >  Note that <code >table_size()</code> does not work correctly for <a href="LuaCustomTable.html"> LuaCustomTables</a>, their size has to be determined with <a href="LuaCustomTable.html#LuaCustomTable.operator #">LuaCustomTable::operator #</a> instead.</p> <h2>3. Modified functions</h2> <p >Some modules that are part of standard Lua are not accessible in Factorio&#x27;s Lua environment, mostly to ensure determinism.
+These inaccessible modules are: <code >loadfile()</code>, <code >dofile()</code>, <code >coroutine</code>, <code >io</code> and <code >os</code>. Factorio provides its own version of <code >package</code>.</p> <h3>pairs()</h3> <p >
+  In standard Lua, the order of iteration when using <code >pairs()</code> is arbitrary. Because Factorio has to be deterministic, this was changed in Factorio&#x27;s version of Lua.
+  Factorio&#x27;s iteration order when using <code >next()</code>, which <code >pairs()</code> uses for iteration, depends on the insertion order: Keys inserted first are iterated first.
+  However, Factorio also guarantees that the first 1024 numbered keys are iterated from 1-1024, regardless of insertion order.
+  This means that in usual usage, <code >pairs()</code> does not have any drawbacks compared to <code >ipairs()</code>.</p> <h3>print()</h3> <p >
+  <code >print()</code> outputs to the stdout. For Factorio, this means that it does not end up in the log file, so it can only be read when starting Factorio from the command line.
+  Because of this, it is often easier to use <code >log()</code> or <a href="LuaGameScript.html#LuaGameScript.print">LuaGameScript::print</a> for debugging.</p> <h3>require()</h3> <p >
+  Due to the changes to <code >package</code>, the functionality of <code >require()</code> changes.
+  When using absolute paths, the path starts at the mod root, additionally <code >..</code> is disabled as a path variable. This means that it is not possible to load arbitrary files from outside the mod directory.
+  However, Factorio provides two ways to load files from other mods:
+  </p><ul ><li > The lualib directory of the core mod is included in the paths to be checked for files, so it is possible to require files directly from there, such as the util file: <code >require("util")</code>.</li><li > Furthermore, it is possible to require files from other mods by using <code >require("__mod-name__.file")</code>.</li></ul><p >
+  <code >require()</code> can not be used in the console, in event listeners or during a <code >remote.call()</code>. The function expects any file to end with the <code >.lua</code> extension.</p> <h3><a id="math.random"></a>math.random()</h3> <p >
+  <code >math.random()</code> is implemented within Factorio so that it is deterministic, in both the data stage and during runtime scripting.
+  In the data stage, it is seeded with a constant number.
+  During runtime scripting, it uses the map&#x27;s global random generator which is seeded with the map seed. The map&#x27;s global random generator is shared between all mods and the core game, so they can affect the random number that is generated.
+  If that behaviour is not desired, <a href="LuaRandomGenerator.html">LuaRandomGenerator</a> can be used to create a random generator that is completely separated from the core game and other mods.
+  In the runtime stage, <code >math.random()</code> cannot be used outside of events or during loading.</p> <h3>math.randomseed()</h3> <p >
+  Using <code >math.randomseed()</code> in Factorio has no effect on the random generator, the function does nothing.
+  If custom seeding or re-seeding is desired, <a href="LuaRandomGenerator.html">LuaRandomGenerator</a> can be used instead of <code >math.random()</code>.
+</p><div class="brief-listing"></div></body></html>
