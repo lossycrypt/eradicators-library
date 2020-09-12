@@ -1,0 +1,497 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Raw_stack_trace_information">Raw stack trace information </a></li>
+<li><a href="#Factorio_paths">Factorio paths </a></li>
+<li><a href="#Main">Main </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/_DocTest.html">_DocTest</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><strong>Debug</strong></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Debug</code></h1>
+<p>Does automatic mod-name and load-stage/phase detection.</p>
+<p>
+
+</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local Debug = require(&apos;__eradicators-library_/erlib/factorio/Debug&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#Raw_stack_trace_information">Raw stack trace information </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#get_info">get_info (j)</a></td>
+	<td class="summary">Retrieves debug info from the top of the stack or at the given level.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_level">get_level (j)</a></td>
+	<td class="summary">Retrieves debug info from j levels below the top of the stack.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_pos">get_pos (j)</a></td>
+	<td class="summary">Gets the file:line spec at the given stack level.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_rel_pos">get_rel_pos (j)</a></td>
+	<td class="summary">Gets the file:line spec at <a href="../modules/Debug.html#get_level">Debug.get_level</a>(j)-1.</td>
+	</tr>
+</table>
+<h2><a href="#Factorio_paths">Factorio paths </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#get_src">get_src (j)</a></td>
+	<td class="summary"></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_mod_name">get_mod_name (j)</a></td>
+	<td class="summary"></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_mod_root">get_mod_root (j)</a></td>
+	<td class="summary"></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_cur_dir">get_cur_dir (j)</a></td>
+	<td class="summary"></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#path2name">path2name (path)</a></td>
+	<td class="summary"></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#name2root">name2root (name)</a></td>
+	<td class="summary"></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#unsafe_stage_and_phase">unsafe_stage_and_phase ()</a></td>
+	<td class="summary">Retrieves the current load stage and phase from the filenames on the stack.</td>
+	</tr>
+</table>
+<h2><a href="#Main">Main </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#get_load_stage">get_load_stage ()</a></td>
+	<td class="summary">Gets the current <a href="../modules/Types.html#LoadStageName">LoadStageName</a>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_load_phase">get_load_phase ()</a></td>
+	<td class="summary">Gets the current <a href="../modules/Types.html#LoadPhaseTable">LoadPhaseTable</a>.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header has-description"><a name="Raw_stack_trace_information"></a>Raw stack trace information </h2>
+
+          <div class="section-description">
+
+ You shouldn't be using these unless you *really* know what you're doing.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "get_info"></a>
+    <strong>get_info (j)</strong>
+    </dt>
+    <dd>
+    Retrieves debug info from the top of the stack or at the given level.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">j</span>
+            <span class="types"><span class="type">integer</span></span>
+         The stack level at which to get the source. (default: max level)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">{short_src=,...}</span></span>
+        The output of debug.getinfo at the given level.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_level"></a>
+    <strong>get_level (j)</strong>
+    </dt>
+    <dd>
+    Retrieves debug info from j levels below the top of the stack.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">j</span>
+            <span class="types"><span class="type">integer</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">{short_src=,...}</span></span>
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_pos"></a>
+    <strong>get_pos (j)</strong>
+    </dt>
+    <dd>
+    Gets the file:line spec at the given stack level.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">j</span>
+            <span class="types"><span class="type">integer</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        string "path:number"
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_rel_pos"></a>
+    <strong>get_rel_pos (j)</strong>
+    </dt>
+    <dd>
+    Gets the file:line spec at <a href="../modules/Debug.html#get_level">Debug.get_level</a>(j)-1.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">j</span>
+            <span class="types"><span class="type">integer</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        string "path:number"
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Factorio_paths"></a>Factorio paths </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "get_src"></a>
+    <strong>get_src (j)</strong>
+    </dt>
+    <dd>
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">j</span>
+            <span class="types"><span class="type">integer</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        file path at level j
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_mod_name"></a>
+    <strong>get_mod_name (j)</strong>
+    </dt>
+    <dd>
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">j</span>
+            <span class="types"><span class="type">integer</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        name of the current mod: "my-mod"
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_mod_root"></a>
+    <strong>get_mod_root (j)</strong>
+    </dt>
+    <dd>
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">j</span>
+            <span class="types"><span class="type">integer</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        "__my-mod__" root of the mod at level j
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_cur_dir"></a>
+    <strong>get_cur_dir (j)</strong>
+    </dt>
+    <dd>
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">j</span>
+            <span class="types"><span class="type">integer</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        "__my-mod__/sub/folder" directory of the mod at level j
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "path2name"></a>
+    <strong>path2name (path)</strong>
+    </dt>
+    <dd>
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">path</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+         "__my-mod__/sub/folder" any path
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        "my-mod" the undecorated name of the mod
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "name2root"></a>
+    <strong>name2root (name)</strong>
+    </dt>
+    <dd>
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+         "my-mod" the undecorated name of a mod
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        "__my-mod__" the absolute root of the mod
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "unsafe_stage_and_phase"></a>
+    <strong>unsafe_stage_and_phase ()</strong>
+    </dt>
+    <dd>
+    Retrieves the current load stage and phase from the filenames on the stack.
+ In some situations like scenarios, cross loading, or metatable methods
+ the stage/phase can not be correctly determined. In these cases nil,nil
+ is returned. Be aware that the returned strings use _ underscore instead
+ of - dash.
+
+ Should only be used when the error throwing behavior of <a href="../modules/Debug.html#get_load_stage">Debug.get_load_stage</a>
+ or <a href="../modules/Debug.html#get_load_phase">Debug.get_load_phase</a> is undesired.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><a class="type" href="../modules/Types.html#LoadStageName">LoadStageName</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        </li>
+        <li>
+           <span class="types"><a class="type" href="../modules/Types.html#LoadPhaseName">LoadPhaseName</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        </li>
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> stage,phase = Debug.unsafe_stage_and_phase()</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Main"></a>Main </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "get_load_stage"></a>
+    <strong>get_load_stage ()</strong>
+    </dt>
+    <dd>
+    Gets the current <a href="../modules/Types.html#LoadStageName">LoadStageName</a>.  The stage is internally cached so these
+ are quite fast.
+
+
+
+
+    <h3>Raises:</h3>
+     It is an error if the stage could not be detected. I.e. when calling from
+        inside a scenario or a data stage metatable.
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_load_phase"></a>
+    <strong>get_load_phase ()</strong>
+    </dt>
+    <dd>
+    Gets the current <a href="../modules/Types.html#LoadPhaseTable">LoadPhaseTable</a>.  The phase is internally cached so these
+ are quite fast.
+
+
+
+
+    <h3>Raises:</h3>
+     It is an error if the phase could not be detected. I.e. when calling from
+        inside a scenario or a data stage metatable.
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-09-12 23:17:12 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

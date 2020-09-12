@@ -27,9 +27,11 @@
 !*.ogg
 
 # Keep documentation
-!/html/*.html
-!/html/*.js
-!/html/*.css
+#!**/html/*.html
+#!**/html/*.js
+#!**/html/*.css
+
+!/html/**/*.html
 
 # Block underscore prefixed files
 _*
