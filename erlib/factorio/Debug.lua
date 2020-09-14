@@ -9,17 +9,17 @@
   
   
 
--- ---------------------------------------------------------------------------- --
--- Module                                                                       --
--- ---------------------------------------------------------------------------- --
+-- -------------------------------------------------------------------------- --
+-- Module                                                                     --
+-- -------------------------------------------------------------------------- --
 
 local Debug = {}
 
 
 
--- ---------------------------------------------------------------------------- --
--- Locals / Init                                                                --
--- ---------------------------------------------------------------------------- --
+-- -------------------------------------------------------------------------- --
+-- Locals / Init                                                              --
+-- -------------------------------------------------------------------------- --
 
 local debug_getinfo = _ENV .debug .get_info
 
@@ -30,20 +30,20 @@ local function _error(msg)
   end
 
  
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Raw stack trace information.
 -- You shouldn't be using these unless you *really* know what you're doing.
 -- @section
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ----------
 -- Retrieves debug info from the top of the stack or at the given level.
--- @tparam integer j The stack level at which to get the source. (default: max level)
+-- @tparam integer j The stack level at which to get the source. (default: topmost)
 -- @treturn {short_src=,...} The output of debug.getinfo at the given level.
 function Debug.get_info(j)
   local i=0; if not j then repeat i=i+1 until not debug_getinfo(i,'S') end
   return debug_getinfo(j or i-1,'Sl') or {} end
-  
+
 ----------
 -- Retrieves debug info from j levels below the top of the stack.
 -- @tparam integer j
@@ -70,10 +70,10 @@ function Debug.get_rel_pos(j) -- <file:line>
 
   
   
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Factorio paths.
 -- @section
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ----------
 --@tparam integer j
@@ -83,17 +83,17 @@ local function get_src (j) return Debug.get_info(j).short_src or '?' end
 ----------
 --@tparam integer j
 --@treturn string name of the current mod: "my-mod"
-function Debug.get_mod_name   (j) return get_src(j):match('^__(.+)__/?')                 end
+function Debug.get_mod_name   (j) return get_src(j):match('^__(.+)__/?') end
 
 ----------
 --@tparam integer j
 --@treturn string "__my-mod__" root of the mod at level j
-function Debug.get_mod_root   (j) return get_src(j):match('^(__.+__)/?')                 end
+function Debug.get_mod_root   (j) return get_src(j):match('^(__.+__)/?') end
 
 ----------
 --@tparam integer j
 --@treturn string "__my-mod__/sub/folder" directory of the mod at level j
-function Debug.get_cur_dir    (j) return get_src(j):match('^(.*)/')                      end
+function Debug.get_cur_dir    (j) return get_src(j):match('^(.*)/') end
 
 ----------
 --@string path "__my-mod__/sub/folder" any path
@@ -107,21 +107,25 @@ function Debug.name2root(name) return '__'..name..'__'  end
 
 
 
--- --------------------------------------------------------------------------- --
--- Factorio stage + phase (dynamic)                                            --
--- --------------------------------------------------------------------------- --
+-- -------------------------------------------------------------------------- --
+-- Factorio stage + phase (dynamic)                                           --
+-- -------------------------------------------------------------------------- --
 
 --phase with *underscores*: "settings_updates", "data_final_fixes", etc...
-function Debug._get_raw_load_phase ( ) return (get_src( ):match('([^/]+)%.lua$') or '?'):gsub('-','_') end
+function Debug._get_raw_load_phase ( )
+  return (get_src( ):match('([^/]+)%.lua$') or '?'):gsub('-','_')
+  end
 
 --stage: "settings", "data" or "control"
-function Debug._get_raw_load_stage ( ) return Debug .get_load_phase():gsub('_.*$','')         end
+function Debug._get_raw_load_stage ( )
+  return Debug .get_load_phase():gsub('_.*$','')
+  end
 
 
 
--- --------------------------------------------------------------------------- --
--- Factorio stage + phase (pre-calculate + closurize)                          --
--- --------------------------------------------------------------------------- --
+-- -------------------------------------------------------------------------- --
+-- Factorio stage + phase (pre-calculate + closurize)                         --
+-- -------------------------------------------------------------------------- --
 
 ----------
 -- Retrieves the current load stage and phase from the filenames on the stack.
@@ -130,8 +134,8 @@ function Debug._get_raw_load_stage ( ) return Debug .get_load_phase():gsub('_.*$
 -- is returned. Be aware that the returned strings use _ underscore instead
 -- of - dash.
 -- 
--- Should only be used when the error throwing behavior of @{Debug.get_load_stage}
--- or @{Debug.get_load_phase} is undesired.
+-- Should only be used when the error throwing behavior of
+-- @{Debug.get_load_stage} or @{Debug.get_load_phase} is undesired.
 --
 -- @usage local stage,phase = Debug.unsafe_stage_and_phase()
 -- @treturn LoadStageName|nil
@@ -154,20 +158,20 @@ function Debug.unsafe_stage_and_phase()
   end
   
 
---Load Stage/Phase can not change during runtime so it's cheaper to cache the result.
---but it's safer if returned tables are unique per call anyway
+-- Load Stage/Phase can not change during runtime so it's cheaper to cache the
+-- result. but it's safer if returned tables are unique per call anyway
 local _load_stage, _load_phase = Debug. unsafe_stage_and_phase()
 
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Main.
 -- @section
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ----------
 -- Gets the current @{LoadStageName}. The stage is internally cached so these
 -- are quite fast.
--- @raise It is an error if the stage could not be detected. I.e. when calling from
---        inside a scenario or a data stage metatable.
+-- @raise It is an error if the stage could not be detected. I.e. when calling
+--        from inside a scenario or a data stage metatable.
 --
 function Debug.get_load_stage()
   if not _load_stage then _error('Load stage detection failed.') end
@@ -177,8 +181,8 @@ function Debug.get_load_stage()
 ----------
 -- Gets the current @{LoadPhaseTable}. The phase is internally cached so these
 -- are quite fast.
--- @raise It is an error if the phase could not be detected. I.e. when calling from
---        inside a scenario or a data stage metatable.
+-- @raise It is an error if the phase could not be detected. I.e. when calling
+--        from inside a scenario or a data stage metatable.
 --
 function Debug.get_load_phase()
   if not _load_phase then _error('Load phase detection failed.') end
@@ -187,8 +191,8 @@ function Debug.get_load_phase()
 
 
   
--- --------------------------------------------------------------------------- --
--- End                                                                         --
--- --------------------------------------------------------------------------- --
+-- -------------------------------------------------------------------------- --
+-- End                                                                        --
+-- -------------------------------------------------------------------------- --
 
 return function() return Debug,nil,nil end

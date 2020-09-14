@@ -42,14 +42,14 @@
 <ul class="nowrap">
   <li><a href="../modules/_DocTest.html">_DocTest</a></li>
   <li><a href="../modules/Types.html">Types</a></li>
-  <li><strong>Debug</strong></li>
+  <li><strong>Debug2</strong></li>
 </ul>
 
 </div>
 
 <div id="content">
 
-<h1>Module <code>Debug</code></h1>
+<h1>Module <code>Debug2</code></h1>
 <p>Does automatic mod-name and load-stage/phase detection.</p>
 <p>
 
@@ -64,20 +64,20 @@
 <h2><a href="#Raw_stack_trace_information">Raw stack trace information </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#get_info">get_info (j)</a></td>
+	<td class="name" nowrap><a href="#Debug.get_info">Debug.get_info (j)</a></td>
 	<td class="summary">Retrieves debug info from the top of the stack or at the given level.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#get_level">get_level (j)</a></td>
+	<td class="name" nowrap><a href="#Debug.get_level">Debug.get_level (j)</a></td>
 	<td class="summary">Retrieves debug info from j levels below the top of the stack.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#get_pos">get_pos (j)</a></td>
+	<td class="name" nowrap><a href="#Debug.get_pos">Debug.get_pos (j)</a></td>
 	<td class="summary">Gets the file:line spec at the given stack level.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#get_rel_pos">get_rel_pos (j)</a></td>
-	<td class="summary">Gets the file:line spec at <a href="../modules/Debug.html#get_level">Debug.get_level</a>(j)-1.</td>
+	<td class="name" nowrap><a href="#Debug.get_rel_pos">Debug.get_rel_pos (j)</a></td>
+	<td class="summary">Gets the file:line spec at ???(j)-1.</td>
 	</tr>
 </table>
 <h2><a href="#Factorio_paths">Factorio paths </a></h2>
@@ -87,38 +87,38 @@
 	<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#get_mod_name">get_mod_name (j)</a></td>
+	<td class="name" nowrap><a href="#Debug.get_mod_name">Debug.get_mod_name (j)</a></td>
 	<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#get_mod_root">get_mod_root (j)</a></td>
+	<td class="name" nowrap><a href="#Debug.get_mod_root">Debug.get_mod_root (j)</a></td>
 	<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#get_cur_dir">get_cur_dir (j)</a></td>
+	<td class="name" nowrap><a href="#Debug.get_cur_dir">Debug.get_cur_dir (j)</a></td>
 	<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#path2name">path2name (path)</a></td>
+	<td class="name" nowrap><a href="#Debug.path2name">Debug.path2name (path)</a></td>
 	<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#name2root">name2root (name)</a></td>
+	<td class="name" nowrap><a href="#Debug.name2root">Debug.name2root (name)</a></td>
 	<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#unsafe_stage_and_phase">unsafe_stage_and_phase ()</a></td>
+	<td class="name" nowrap><a href="#Debug.unsafe_stage_and_phase">Debug.unsafe_stage_and_phase ()</a></td>
 	<td class="summary">Retrieves the current load stage and phase from the filenames on the stack.</td>
 	</tr>
 </table>
 <h2><a href="#Main">Main </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#get_load_stage">get_load_stage ()</a></td>
+	<td class="name" nowrap><a href="#Debug.get_load_stage">Debug.get_load_stage ()</a></td>
 	<td class="summary">Gets the current <a href="../modules/Types.html#LoadStageName">LoadStageName</a>.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#get_load_phase">get_load_phase ()</a></td>
+	<td class="name" nowrap><a href="#Debug.get_load_phase">Debug.get_load_phase ()</a></td>
 	<td class="summary">Gets the current <a href="../modules/Types.html#LoadPhaseTable">LoadPhaseTable</a>.</td>
 	</tr>
 </table>
@@ -135,8 +135,8 @@
           </div>
     <dl class="function">
     <dt>
-    <a name = "get_info"></a>
-    <strong>get_info (j)</strong>
+    <a name = "Debug.get_info"></a>
+    <strong>Debug.get_info (j)</strong>
     </dt>
     <dd>
     Retrieves debug info from the top of the stack or at the given level.
@@ -146,7 +146,7 @@
     <ul>
         <li><span class="parameter">j</span>
             <span class="types"><span class="type">integer</span></span>
-         The stack level at which to get the source. (default: topmost)
+         The stack level at which to get the source. (default: max level)
         </li>
     </ul>
 
@@ -162,8 +162,8 @@
 
 </dd>
     <dt>
-    <a name = "get_level"></a>
-    <strong>get_level (j)</strong>
+    <a name = "Debug.get_level"></a>
+    <strong>Debug.get_level (j)</strong>
     </dt>
     <dd>
     Retrieves debug info from j levels below the top of the stack.
@@ -189,8 +189,8 @@
 
 </dd>
     <dt>
-    <a name = "get_pos"></a>
-    <strong>get_pos (j)</strong>
+    <a name = "Debug.get_pos"></a>
+    <strong>Debug.get_pos (j)</strong>
     </dt>
     <dd>
     Gets the file:line spec at the given stack level.
@@ -215,11 +215,11 @@
 
 </dd>
     <dt>
-    <a name = "get_rel_pos"></a>
-    <strong>get_rel_pos (j)</strong>
+    <a name = "Debug.get_rel_pos"></a>
+    <strong>Debug.get_rel_pos (j)</strong>
     </dt>
     <dd>
-    Gets the file:line spec at <a href="../modules/Debug.html#get_level">Debug.get_level</a>(j)-1.
+    Gets the file:line spec at ???(j)-1.
 
 
     <h3>Parameters:</h3>
@@ -272,8 +272,8 @@
 
 </dd>
     <dt>
-    <a name = "get_mod_name"></a>
-    <strong>get_mod_name (j)</strong>
+    <a name = "Debug.get_mod_name"></a>
+    <strong>Debug.get_mod_name (j)</strong>
     </dt>
     <dd>
 
@@ -299,8 +299,8 @@
 
 </dd>
     <dt>
-    <a name = "get_mod_root"></a>
-    <strong>get_mod_root (j)</strong>
+    <a name = "Debug.get_mod_root"></a>
+    <strong>Debug.get_mod_root (j)</strong>
     </dt>
     <dd>
 
@@ -326,8 +326,8 @@
 
 </dd>
     <dt>
-    <a name = "get_cur_dir"></a>
-    <strong>get_cur_dir (j)</strong>
+    <a name = "Debug.get_cur_dir"></a>
+    <strong>Debug.get_cur_dir (j)</strong>
     </dt>
     <dd>
 
@@ -353,8 +353,8 @@
 
 </dd>
     <dt>
-    <a name = "path2name"></a>
-    <strong>path2name (path)</strong>
+    <a name = "Debug.path2name"></a>
+    <strong>Debug.path2name (path)</strong>
     </dt>
     <dd>
 
@@ -380,8 +380,8 @@
 
 </dd>
     <dt>
-    <a name = "name2root"></a>
-    <strong>name2root (name)</strong>
+    <a name = "Debug.name2root"></a>
+    <strong>Debug.name2root (name)</strong>
     </dt>
     <dd>
 
@@ -407,8 +407,8 @@
 
 </dd>
     <dt>
-    <a name = "unsafe_stage_and_phase"></a>
-    <strong>unsafe_stage_and_phase ()</strong>
+    <a name = "Debug.unsafe_stage_and_phase"></a>
+    <strong>Debug.unsafe_stage_and_phase ()</strong>
     </dt>
     <dd>
     Retrieves the current load stage and phase from the filenames on the stack.
@@ -417,8 +417,8 @@
  is returned. Be aware that the returned strings use _ underscore instead
  of - dash.
 
- Should only be used when the error throwing behavior of
- <a href="../modules/Debug.html#get_load_stage">Debug.get_load_stage</a> or <a href="../modules/Debug.html#get_load_phase">Debug.get_load_phase</a> is undesired.
+ Should only be used when the error throwing behavior of ???
+ or ??? is undesired.
 
 
 
@@ -446,8 +446,8 @@
 
     <dl class="function">
     <dt>
-    <a name = "get_load_stage"></a>
-    <strong>get_load_stage ()</strong>
+    <a name = "Debug.get_load_stage"></a>
+    <strong>Debug.get_load_stage ()</strong>
     </dt>
     <dd>
     Gets the current <a href="../modules/Types.html#LoadStageName">LoadStageName</a>.  The stage is internally cached so these
@@ -457,16 +457,16 @@
 
 
     <h3>Raises:</h3>
-     It is an error if the stage could not be detected. I.e. when calling
-        from inside a scenario or a data stage metatable.
+     It is an error if the stage could not be detected. I.e. when calling from
+        inside a scenario or a data stage metatable.
 
 
 
 
 </dd>
     <dt>
-    <a name = "get_load_phase"></a>
-    <strong>get_load_phase ()</strong>
+    <a name = "Debug.get_load_phase"></a>
+    <strong>Debug.get_load_phase ()</strong>
     </dt>
     <dd>
     Gets the current <a href="../modules/Types.html#LoadPhaseTable">LoadPhaseTable</a>.  The phase is internally cached so these
@@ -476,8 +476,8 @@
 
 
     <h3>Raises:</h3>
-     It is an error if the phase could not be detected. I.e. when calling
-        from inside a scenario or a data stage metatable.
+     It is an error if the phase could not be detected. I.e. when calling from
+        inside a scenario or a data stage metatable.
 
 
 
@@ -490,7 +490,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-14 05:59:08 </i>
+<i style="float:right;">Last updated 2020-09-14 02:14:29 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

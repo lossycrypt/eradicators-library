@@ -34,9 +34,9 @@
 <ul>
 <li><a href="#Tables">Tables </a></li>
 <li><a href="#Numbers">Numbers </a></li>
-<li><a href="#Mixed">Mixed </a></li>
 <li><a href="#Boolean">Boolean </a></li>
 <li><a href="#Load_Stage___Phase">Load Stage / Phase </a></li>
+<li><a href="#Misc">Misc </a></li>
 </ul>
 
 
@@ -62,15 +62,12 @@
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#Table">Table</a></td>
-	<td class="summary">A basic LuaTable without further classification.</td>
+	<td class="summary">Every Lua table maps <a href="../modules/Types.html#NotNil">NotNil</a> keys to NotNil values.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Set">Set</a></td>
-	<td class="summary">A <a href="https://en.wikipedia.org/wiki/Set_(mathematics)">Set</a> is a table in which all values are <a href="../modules/Types.html#true">true</a> and the keys are the actual
- A <a href="https://en.wikipedia.org/wiki/Set_(mathematics)">Set</a>
- A <a href="https://en.wikipedia.org/wiki/Set_(mathematics)">Set</a>
- <a href="https://en.wikipedia.org/wiki/PhysX">PhysX</a>
- values.</td>
+	<td class="summary">A <a href="https://en.wikipedia.org/wiki/Set_(mathematics)">Set</a> is a table in which all values are <a href="../modules/Types.html#true">true</a> and
+ the keys are the actual values.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Array">Array</a></td>
@@ -90,30 +87,15 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#float">float</a></td>
-	<td class="summary">A Float is is any <a href="https://www.lua.org/pil/2.3.html">number</a> that has a non-zero decimal fraction.</td>
+	<td class="summary">A <a href="https://www.lua.org/pil/2.3.html">number</a> that has a non-zero decimal fraction.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Integer">Integer</a></td>
-	<td class="summary">Any <a href="https://www.lua.org/pil/2.3.html">number</a> that does not have a decimal fraction.</td>
+	<td class="summary">A <a href="https://www.lua.org/pil/2.3.html">number</a> that does not have a decimal fraction.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#NaturalNumber">NaturalNumber</a></td>
-	<td class="summary">Any <a href="../modules/Types.html#Integer">Integer</a> >= 0.</td>
-	</tr>
-</table>
-<h2><a href="#Mixed">Mixed </a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#NotNil">NotNil</a></td>
-	<td class="summary">Any string, <a href="https://www.lua.org/pil/2.3.html">number</a>, boolean, <a href="https://www.lua.org/pil/2.5.html">table</a>, function or userdata.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#AnyValue">AnyValue</a></td>
-	<td class="summary">Any string, <a href="https://www.lua.org/pil/2.3.html">number</a>, boolean, <a href="https://www.lua.org/pil/2.5.html">table</a>, function, userdata or nil.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#TruthyValue">TruthyValue</a></td>
-	<td class="summary">Any value that when negated twice evaluates to <a href="../modules/Types.html#true">true</a>.</td>
+	<td class="summary">An <a href="../modules/Types.html#Integer">Integer</a> >= 0.</td>
 	</tr>
 </table>
 <h2><a href="#Boolean">Boolean </a></h2>
@@ -142,6 +124,21 @@
 	<td class="summary">A <a href="../modules/Types.html#Table">Table</a> that contains three (key → value) mappings.</td>
 	</tr>
 </table>
+<h2><a href="#Misc">Misc </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#NotNil">NotNil</a></td>
+	<td class="summary">Any string, <a href="https://www.lua.org/pil/2.3.html">number</a>, boolean, <a href="https://www.lua.org/pil/2.5.html">table</a>, function or userdata.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#AnyValue">AnyValue</a></td>
+	<td class="summary">Any string, <a href="https://www.lua.org/pil/2.3.html">number</a>, boolean, <a href="https://www.lua.org/pil/2.5.html">table</a>, function, userdata or nil.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TruthyValue">TruthyValue</a></td>
+	<td class="summary">Any value that when negated twice evaluates to <a href="../modules/Types.html#true">true</a>.</td>
+	</tr>
+</table>
 
 <br/>
 <br/>
@@ -155,8 +152,9 @@
     <strong>Table</strong>
     </dt>
     <dd>
-    A basic LuaTable without further classification.  Every specialized table can
- also be considered a normal Table. It maps <a href="../modules/Types.html#NotNil">NotNil</a> keys to <a href="../modules/Types.html#NotNil">NotNil</a> values.
+    Every Lua table maps <a href="../modules/Types.html#NotNil">NotNil</a> keys to NotNil values.
+ Every specialized table can also be used as a standard Table.
+
 
 
     <h3>Fields:</h3>
@@ -180,11 +178,10 @@
     <strong>Set</strong>
     </dt>
     <dd>
-    A <a href="https://en.wikipedia.org/wiki/Set_(mathematics)">Set</a> is a table in which all values are <a href="../modules/Types.html#true">true</a> and the keys are the actual
- A <a href="https://en.wikipedia.org/wiki/Set_(mathematics)">Set</a>
- A <a href="https://en.wikipedia.org/wiki/Set_(mathematics)">Set</a>
- <a href="https://en.wikipedia.org/wiki/PhysX">PhysX</a>
- values.  This is useful to quickly test if a given key is in the Set or not.
+    A <a href="https://en.wikipedia.org/wiki/Set_(mathematics)">Set</a> is a table in which all values are <a href="../modules/Types.html#true">true</a> and
+ the keys are the actual values.  This is useful to quickly test if a given key
+ is in a Set or not.
+
 
 
     <h3>Fields:</h3>
@@ -220,22 +217,27 @@
  key n in the array there must also be a key n-1, except for n=1.
 
 
+
     <h3>Fields:</h3>
     <ul>
-        <li><span class="parameter">[1]</span>
-        <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>
+        <li><span class="parameter">1</span>
+         <a href="../modules/Types.html#NotNil">NotNil</a>
         </li>
-        <li><span class="parameter">[2]</span>
-        <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>
+        <li><span class="parameter">2</span>
+         <a href="../modules/Types.html#NotNil">NotNil</a>
         </li>
-        <li><span class="parameter">[3]</span>
-        <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>
+        <li><span class="parameter">3</span>
+         <a href="../modules/Types.html#NotNil">NotNil</a>
         </li>
     </ul>
 
 
 
 
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">for</span> i=<span class="number">1</span>,#Array <span class="keyword">do</span> <span class="global">print</span>(Array[i]) <span class="keyword">end</span></pre>
+    </ul>
 
 </dd>
     <dt>
@@ -246,20 +248,20 @@
     A SparseArray is also a <a href="../modules/Types.html#Table">Table</a> in which all keys are <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>s.
  Contrary to an <a href="../modules/Types.html#Array">Array</a> the sequence of keys may be discontinuous.
 
- These are often used tostore entities indexed by their
- unit_number.
+ These are often used to store entities indexed by their unit_number.
+
 
 
     <h3>Fields:</h3>
     <ul>
-        <li><span class="parameter">[1]</span>
-        <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>
+        <li><span class="parameter">1</span>
+          <a href="../modules/Types.html#NotNil">NotNil</a>
         </li>
-        <li><span class="parameter">[5]</span>
-        <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>
+        <li><span class="parameter">5</span>
+          <a href="../modules/Types.html#NotNil">NotNil</a>
         </li>
-        <li><span class="parameter">[42]</span>
-        <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>
+        <li><span class="parameter">42</span>
+         <a href="../modules/Types.html#NotNil">NotNil</a>
         </li>
     </ul>
 
@@ -290,13 +292,15 @@
 
 
 
+
 </dd>
     <dt>
     <a name = "float"></a>
     <strong>float</strong>
     </dt>
     <dd>
-    A Float is is any <a href="https://www.lua.org/pil/2.3.html">number</a> that has a non-zero decimal fraction.
+    A <a href="https://www.lua.org/pil/2.3.html">number</a> that has a non-zero decimal fraction.
+
 
 
 
@@ -314,7 +318,8 @@
     <strong>Integer</strong>
     </dt>
     <dd>
-    Any <a href="https://www.lua.org/pil/2.3.html">number</a> that does not have a decimal fraction.
+    A <a href="https://www.lua.org/pil/2.3.html">number</a> that does not have a decimal fraction.
+
 
 
 
@@ -332,7 +337,7 @@
     <strong>NaturalNumber</strong>
     </dt>
     <dd>
-    Any <a href="../modules/Types.html#Integer">Integer</a> >= 0.  Sometimes also called a PositiveInteger.
+    An <a href="../modules/Types.html#Integer">Integer</a> >= 0.  Also called a PositiveInteger.
 
 
 
@@ -340,57 +345,6 @@
 
 
 
-</dd>
-</dl>
-    <h2 class="section-header "><a name="Mixed"></a>Mixed </h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "NotNil"></a>
-    <strong>NotNil</strong>
-    </dt>
-    <dd>
-    Any string, <a href="https://www.lua.org/pil/2.3.html">number</a>, boolean, <a href="https://www.lua.org/pil/2.5.html">table</a>, function or userdata.
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "AnyValue"></a>
-    <strong>AnyValue</strong>
-    </dt>
-    <dd>
-    Any string, <a href="https://www.lua.org/pil/2.3.html">number</a>, boolean, <a href="https://www.lua.org/pil/2.5.html">table</a>, function, userdata or nil.
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "TruthyValue"></a>
-    <strong>TruthyValue</strong>
-    </dt>
-    <dd>
-    Any value that when negated twice evaluates to <a href="../modules/Types.html#true">true</a>.  In Lua this is
- any string, <a href="https://www.lua.org/pil/2.3.html">number</a>, <a href="../modules/Types.html#true">true</a>, <a href="https://www.lua.org/pil/2.5.html">table</a>, function or userdata.
-
-
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <li><pre class="example"><span class="keyword">local</span> yes = ((<span class="keyword">not</span> <span class="keyword">not</span> TruthyValue) == <span class="keyword">true</span>)</pre></li>
-        <li><pre class="example"><span class="keyword">local</span> yes = (TruthyValue <span class="keyword">and</span> <span class="keyword">true</span>)</pre></li>
-    </ul>
 
 </dd>
 </dl>
@@ -403,6 +357,7 @@
     </dt>
     <dd>
     A boolean that is always true, never false.
+
 
 
 
@@ -429,6 +384,7 @@
 
 
 
+
 </dd>
     <dt>
     <a name = "LoadPhaseName"></a>
@@ -440,8 +396,10 @@
    "settings", "settings_updates", "settings_final_fixes"
    "data", "data_updates", "data_final_fixes"
    or "control".
+
  Be aware that unlike the corresponding file names these strings
  use _ underscores instead of - dashes for ease of use.
+
 
 
 
@@ -459,16 +417,17 @@
  for stage based conditional code execution.
 
 
+
     <h3>Fields:</h3>
     <ul>
         <li><span class="parameter">LoadStageName</span>
-        <a href="../modules/Types.html#true">true</a>, maps the <a href="../modules/Types.html#LoadStageName">LoadStageName</a> to <a href="../modules/Types.html#true">true</a>
-        </li>
-        <li><span class="parameter">name</span>
-        string, the <a href="../modules/Types.html#LoadStageName">LoadStageName</a>
+         <a href="../modules/Types.html#true">true</a>, maps  <a href="../modules/Types.html#LoadStageName">LoadStageName</a> → <a href="../modules/Types.html#true">true</a>
         </li>
         <li><span class="parameter">any</span>
-        <a href="../modules/Types.html#true">true</a>, always maps the string "any" to <a href="../modules/Types.html#true">true</a>
+                   <a href="../modules/Types.html#true">true</a>, maps of the string "any" → <a href="../modules/Types.html#true">true</a>
+        </li>
+        <li><span class="parameter">name</span>
+                  string, the <a href="../modules/Types.html#LoadStageName">LoadStageName</a>
         </li>
     </ul>
 
@@ -492,16 +451,17 @@
     A <a href="../modules/Types.html#Table">Table</a> that contains three (key → value) mappings.
 
 
+
     <h3>Fields:</h3>
     <ul>
-        <li><span class="parameter">name</span>
-         <a href="../modules/Types.html#LoadPhaseName">LoadPhaseName</a>
-        </li>
         <li><span class="parameter">LoadPhaseName</span>
          <a href="../modules/Types.html#true">true</a>
         </li>
+        <li><span class="parameter">name</span>
+                  <a href="../modules/Types.html#LoadPhaseName">LoadPhaseName</a>
+        </li>
         <li><span class="parameter">any</span>
-         <a href="../modules/Types.html#true">true</a>
+                   <a href="../modules/Types.html#true">true</a>
         </li>
     </ul>
 
@@ -511,13 +471,69 @@
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="Misc"></a>Misc </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "NotNil"></a>
+    <strong>NotNil</strong>
+    </dt>
+    <dd>
+    Any string, <a href="https://www.lua.org/pil/2.3.html">number</a>, boolean, <a href="https://www.lua.org/pil/2.5.html">table</a>, function or userdata.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "AnyValue"></a>
+    <strong>AnyValue</strong>
+    </dt>
+    <dd>
+    Any string, <a href="https://www.lua.org/pil/2.3.html">number</a>, boolean, <a href="https://www.lua.org/pil/2.5.html">table</a>, function, userdata or nil.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TruthyValue"></a>
+    <strong>TruthyValue</strong>
+    </dt>
+    <dd>
+    Any value that when negated twice evaluates to <a href="../modules/Types.html#true">true</a>.  In Lua this is
+ any string, <a href="https://www.lua.org/pil/2.3.html">number</a>, <a href="../modules/Types.html#true">true</a>, <a href="https://www.lua.org/pil/2.5.html">table</a>, function or userdata. But not
+ boolean false or nil.
+
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example"><span class="keyword">local</span> yes = ((<span class="keyword">not</span> <span class="keyword">not</span> TruthyValue) == <span class="keyword">true</span>)</pre></li>
+        <li><pre class="example"><span class="keyword">local</span> yes = (TruthyValue <span class="keyword">and</span> <span class="keyword">true</span>)</pre></li>
+    </ul>
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-12 23:17:12 </i>
+<i style="float:right;">Last updated 2020-09-14 05:59:08 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
