@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Raiser">Raiser </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><strong>Error</strong></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Multiplex.html">Multiplex</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Error</code></h1>
+<p>Produces auto-formatted auto-serialized errors.</p>
+<p>
+
+</p>
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example">local Error = require(&apos;__eradicators-library__/erlib/factorio/Error&apos;)()
+</pre></li>
+        <li><pre class="example">Error.Error(&apos;MyModName&apos;,&apos;MyErrorName&apos;,&quot;Sorry, i can&apos;t do that Dave!&quot;,nil,nil,
+nil,&apos;shit&apos;,{&apos;is&apos;,&apos;hitting&apos;,{&apos;the&apos;,&apos;fence!&apos;}},{&apos;near&apos;,&apos;the&apos;,&apos;fox&apos;}, nil,nil,nil )
+</pre></li>
+        <li><pre class="example">&gt; ##### [MyModName : MyErrorName] #####
+&gt; I suspected this might happen. Please tell me how you got here.
+&gt;
+&gt; Sorry, i can&apos;t do that Dave!
+&gt; shit
+&gt; {&quot;is&quot;, &quot;hitting&quot;, {&quot;the&quot;, &quot;fence!&quot;}}
+&gt; {&quot;near&quot;, &quot;the&quot;, &quot;fox&quot;}
+&gt;
+&gt; (6 nil values removed.)
+&gt; control.lua:18 &gt; some_module.lua:67
+&gt; ############################
+</pre></li>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Error">Error([prefix[, postfix[, ...]]])</a></td>
+	<td class="summary">The raw error handler called by all Error instances.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#CustomStopper">CustomStopper([prefix[, postfix]])</a></td>
+	<td class="summary">Fabricates a customized <a href="../modules/Error.html#ErrorRaiser">ErrorRaiser</a>
+ with closurized prefix and postfix.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Stopper">Stopper([postfix])</a></td>
+	<td class="summary">Fabricates a customized <a href="../modules/Error.html#ErrorRaiser">ErrorRaiser</a>
+ with mod-name as prefix and closurized postfix.</td>
+	</tr>
+</table>
+<h2><a href="#Raiser">Raiser </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#ErrorRaiser">ErrorRaiser([...])</a></td>
+	<td class="summary">Raises an error with the given message.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Error"></a>
+    <strong>Error([prefix[, postfix[, ...]]])</strong>
+    </dt>
+    <dd>
+    The raw error handler called by all Error instances.
+ Will print an error message as shown above. All varargs will be serialized
+ if required and printed one per line.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">prefix</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         the prefix part of the error message header.
+         This should usually be the erroring mods name.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">postfix</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         the name of the module that caused the error.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         all the AnyValue you want in the message.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "CustomStopper"></a>
+    <strong>CustomStopper([prefix[, postfix]])</strong>
+    </dt>
+    <dd>
+    Fabricates a customized <a href="../modules/Error.html#ErrorRaiser">ErrorRaiser</a>
+ with closurized prefix and postfix.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">prefix</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">postfix</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">ErrorRaiser</span></span>
+
+    </ol>
+
+    <h3>Raises:</h3>
+    CustomError
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> MyError = Error.CustomStopper(<span class="string">'MyModName'</span>,<span class="string">'MyErrorName'</span>)
+<span class="keyword">if</span> <span class="keyword">not</span> is_everything_ok <span class="keyword">then</span>
+  MyError(<span class="string">'something is broken!'</span>)
+  <span class="keyword">end</span>
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Stopper"></a>
+    <strong>Stopper([postfix])</strong>
+    </dt>
+    <dd>
+    Fabricates a customized <a href="../modules/Error.html#ErrorRaiser">ErrorRaiser</a>
+ with mod-name as prefix and closurized postfix.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">postfix</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">ErrorRaiser</span></span>
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> MyError = Error.Stopper(<span class="string">'MyErrorName'</span>)
+<span class="keyword">if</span> <span class="keyword">not</span> is_everything_ok <span class="keyword">then</span>
+  MyError(<span class="string">'something is broken!'</span>)
+  <span class="keyword">end</span>
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Raiser"></a>Raiser </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "ErrorRaiser"></a>
+    <strong>ErrorRaiser([...])</strong>
+    </dt>
+    <dd>
+    Raises an error with the given message.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         Arbitrary values to be displayed in the error message.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+    <h3>Raises:</h3>
+    CustomError
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-09-15 20:36:28 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

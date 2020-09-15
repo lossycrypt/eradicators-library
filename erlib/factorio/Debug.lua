@@ -1,4 +1,4 @@
-﻿--erlib.Debug, (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
+﻿-- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
 -- Automatic mod-name and load-stage/phase detection.
@@ -9,7 +9,6 @@
 --
 -- @module Debug
 -- @usage local Debug = require('__eradicators-library__/erlib/factorio/Debug')()
---
 -- @usage
 --  An example stack. l=level
 --   l  l
@@ -26,7 +25,6 @@
 local Debug = {}
 
 
-
 -- -------------------------------------------------------------------------- --
 -- Locals / Init                                                              --
 -- -------------------------------------------------------------------------- --
@@ -41,7 +39,7 @@ local function _error(msg)
 
  
 --------------------------------------------------------------------------------
--- Raw stack trace information.
+-- raw.
 -- You shouldn't be using these unless you *really* know what you're doing.
 -- @section 2
 --------------------------------------------------------------------------------
@@ -85,9 +83,19 @@ local function _get_info(l)
 -- @treturn {short_src=,...} The output of @{debug.getinfo} at the given level.
 --
 function Debug.get_info(l)
-  return _get_info(l) -- wrapping ensures correct stack level!
+  local info = _get_info(l) -- tail-call would alter the stack height!
+  return info -- wrapping ensures correct stack level!
   end
   
+----------
+-- Retrieves info for the whole stack.
+--
+-- @treturn Array info for each level of the stack. Starting at 0.
+--
+function Debug.get_all_info()
+  local info = _get_info('all') -- tail-call would alter the stack height!
+  return info -- wrapping ensures correct stack level!
+  end
   
 ----------
 -- Gets file:line at stack level l.
@@ -104,17 +112,9 @@ function Debug.get_pos(l)
   end
 
 
-----------
--- Retrieves info for the whole stack.
---
--- @treturn Array info for each level of the stack. Starting at 0.
---
-function Debug.get_info_stack()
-  return _get_info('all') -- wrapping ensures correct stack level!
-  end
   
 --------------------------------------------------------------------------------
--- Factorio paths.
+-- factorio.
 -- @section 3
 --------------------------------------------------------------------------------
 
@@ -233,15 +233,15 @@ local phases = {
 -- Should only be used when the error throwing behavior of
 -- @{Debug.get_load_stage} or @{Debug.get_load_phase} is undesired.
 --
--- @usage local stage,phase = Debug.unsafe_stage_and_phase()
+-- @usage local stage,phase = Debug.unsafe_get_stage_and_phase()
 --
 -- @treturn LoadStageName|nil
 -- @treturn LoadPhaseName|nil
 --
-function Debug.unsafe_stage_and_phase()
+function Debug.unsafe_get_stage_and_phase()
 
-    local _stage = Debug._get_raw_load_stage()
-    local _phase = Debug._get_raw_load_phase()
+    local _stage = Debug._get_raw_load_stage(-1)
+    local _phase = Debug._get_raw_load_phase(-1)
   
     if phases[_stage] and phases[_phase]then
       return _stage, _phase
@@ -252,10 +252,10 @@ function Debug.unsafe_stage_and_phase()
 
 -- Load Stage/Phase can not change during runtime so it's cheaper to cache the
 -- result. but it's safer if returned tables are unique per call anyway
-local _load_stage, _load_phase = Debug. unsafe_stage_and_phase()
+local _load_stage, _load_phase = Debug. unsafe_get_stage_and_phase()
 
 --------------------------------------------------------------------------------
--- Main.
+-- !Main.
 -- @section 1
 --------------------------------------------------------------------------------
 
@@ -285,7 +285,7 @@ function Debug.get_load_phase()
 
 
 
--- Easier to index?
+-- Easier to index? -> but "different syntax for same thing"
 -- @name Loading.is_phase.control
 -- do
 --   local ok = {name=true,any=true}
@@ -296,6 +296,7 @@ function Debug.get_load_phase()
 --   Debug.is_stage = setmetatable({},magic('StageNameTable',Debug.get_load_stage))
 --   Debug.is_phase = setmetatable({},magic('PhaseNameTable',Debug.get_load_phase))
 --   end
+
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

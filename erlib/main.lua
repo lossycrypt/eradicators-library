@@ -49,19 +49,29 @@ local function EradicatorsLibraryMain(options)
   
   -- first load all libraries
   local Debug   = require 'erlib/factorio/Debug' ()
-  local StopLib = require 'erlib/lua/Stop' ()
-  local Stop    = StopLib.SimpleStopper('main')
+  local Error = require 'erlib/lua/Error' ()
+  local Stop    = Error.Stopper('main')
+  
+  local lib_root = Debug.get_cur_dir(1)
   
   -- lock global right away! so modules can't do shit either.
   
-  -- StopLib.Error('MyModName','MyScript',"Sorry, i can't do that Dave!")
-  Stop('Yes?','No!',nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,'what?',nil,nil,nil,nil,Debug.get_mod_name,Debug.get_mod_name(),Debug.get_mod_name(1))
+  if Debug.get_load_stage().control then
+  -- if Stacktrace.get_load_stage().control then
+
+    -- Error.Error()
+
+    require(lib_root.. '/test/test_Debug.lua')()
   
-  -- if Debug.load_phase.control then
-  -- if Loading.is_phase.control then -- metatable retrieval! --> seperate name + (Set any|name->true)?
-    -- end
-    
-    -- end
+    -- Error.Error('MyModName','MyScript',"Sorry, i can't do that Dave!")
+    Stop('Yes?','No!',nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,'what?',nil,nil,nil,nil,Debug.get_mod_name,Debug.get_mod_name(),Debug.get_mod_name(1))
+    -- Error.Error('MyModName','MyErrorName',
+      -- "Sorry, i can't do that Dave!",
+      -- nil,nil,nil,
+      -- 'shit',{'is','hitting',{'the','fence!'}},{'near','the','fox'},
+      -- nil,nil,nil
+      -- )
+    end
   
   
   -- put everything in place later
