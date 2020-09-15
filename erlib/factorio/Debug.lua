@@ -7,7 +7,7 @@
 -- Level  1 is the function that called any public Debug.* function.
 -- Level -1 is the bottom of the stack.
 --
--- @module Debug2
+-- @module Debug
 -- @usage local Debug = require('__eradicators-library__/erlib/factorio/Debug')()
 --
 -- @usage
@@ -57,6 +57,9 @@ local function _error(msg)
 --
 -- _get_info is *never* in the info that it returns
 --
+-- _get_info must be called only and directly by each function in Debug
+-- to ensure an exact additional stack height of +1 from calling it.
+--
 local function _get_info(l)
   local i,r = 1,{}
   repeat
@@ -82,7 +85,7 @@ local function _get_info(l)
 -- @treturn {short_src=,...} The output of @{debug.getinfo} at the given level.
 --
 function Debug.get_info(l)
-  return _get_info(l)
+  return _get_info(l) -- wrapping ensures correct stack level!
   end
   
   
@@ -107,7 +110,7 @@ function Debug.get_pos(l)
 -- @treturn Array info for each level of the stack. Starting at 0.
 --
 function Debug.get_info_stack()
-  return _get_info('all')
+  return _get_info('all') -- wrapping ensures correct stack level!
   end
   
 --------------------------------------------------------------------------------
@@ -128,9 +131,6 @@ local function _src_getter(pattern,fallback,substitutes)
     --no info *or* pattern mis-match
     if not r then return fallback, false
     else
-      -- if substitutes then for i=1,#substitutes do
-        -- r = r:gsub(substitutes[i][1],substitutes[i][2])
-        -- end end
       for _,s in ipairs(substitutes or {}) do
         r = r:gsub(s[1],s[2])
         end
@@ -140,8 +140,10 @@ local function _src_getter(pattern,fallback,substitutes)
   end
 
 ----------
+-- →　"my-mod-name"
+--
 -- @tparam[opt=1] integer l
--- @treturn string name of the mod at level l: "my-mod"
+-- @treturn string name of the mod at level l: "my-mod-name"
 --                or "unknown/scenario" if the check failed.
 -- @treturn boolean if the name was found.
 --
@@ -151,8 +153,10 @@ Debug.get_mod_name = _src_getter('^__(.+)__/?','unknown/scenario')
 
 
 ----------
+-- →　"__my-mod-name__"
+--
 -- @tparam[opt=1] integer l
--- @treturn string "__my-mod__" root of the mod at level l
+-- @treturn string "__my-mod-name__" root of the mod at level l
 --                or "__unknown/scenario__" if the check failed.
 -- @treturn boolean if the root was found.
 --
@@ -162,8 +166,10 @@ Debug.get_mod_root = _src_getter('^(__.+__)/?','__unknown/scenario__')
 
 
 ----------
+-- →　"__my-mod-name__/sub/directory"
+--
 -- @tparam[opt=1] integer l
--- @treturn string "__my-mod__/sub/folder" directory of the mod at level l
+-- @treturn string "__my-mod-name__/sub/directory" directory of the mod at level l
 --                or "__unknown/scenario__" if the check failed.
 -- @treturn boolean if the root was found.
 --
@@ -173,15 +179,21 @@ Debug.get_cur_dir  = _src_getter('^(.*)/','__unknown/scenario__')
 
 
 ----------
---@string path "__my-mod__/sub/folder" any path
---@treturn string "my-mod" the undecorated name of the mod
+-- "__my-mod-name__/sub/directory" →　"my-mod"
+--
+-- @string path "__my-mod-name__/sub/directory" any path
+-- @treturn string "my-mod" the undecorated name of the mod
+--
 function Debug.path2name(path)
   return path:match'^__([^_]+)__' -- probably has false negatives
   end
 
 ----------
---@string name "my-mod" the undecorated name of a mod
---@treturn string "__my-mod__" the absolute root of the mod
+-- "my-mod-name" → "__my-mod-name__"
+--
+-- @string name "my-mod-name" the undecorated name of a mod
+-- @treturn string "__my-mod-name__" the absolute root of the mod
+--
 function Debug.name2root(name)
   return '__'..name..'__'
   end
@@ -222,6 +234,7 @@ local phases = {
 -- @{Debug.get_load_stage} or @{Debug.get_load_phase} is undesired.
 --
 -- @usage local stage,phase = Debug.unsafe_stage_and_phase()
+--
 -- @treturn LoadStageName|nil
 -- @treturn LoadPhaseName|nil
 --
@@ -249,6 +262,7 @@ local _load_stage, _load_phase = Debug. unsafe_stage_and_phase()
 ----------
 -- Gets the current @{LoadStageName}. The stage is internally cached so these
 -- are quite fast.
+--
 -- @raise It is an error if the stage could not be detected. I.e. when calling
 --        from inside a scenario or a data stage metatable.
 --
@@ -260,6 +274,7 @@ function Debug.get_load_stage()
 ----------
 -- Gets the current @{LoadPhaseTable}. The phase is internally cached so these
 -- are quite fast.
+--
 -- @raise It is an error if the phase could not be detected. I.e. when calling
 --        from inside a scenario or a data stage metatable.
 --

@@ -26,9 +26,6 @@ Filter.TRUE  = function( ) return true end
 
 ----------
 -- Always returns boolean false.
--- Always returns @{number} false.
--- Always returns @{pairs} false.
--- Always returns @{print} false.
 Filter.FALSE = function( ) return false end
 
 ----------
@@ -38,7 +35,7 @@ Filter.FALSE = function( ) return false end
 --    for k,entity in Iter.filtered_pairs(entities,Filter.VALID) do
 --      print(entity,'is valid!')
 --      end
-Filter.f_VALID = function(obj) return not not obj.valid end
+Filter.VALID = function(obj) return not not obj.valid end
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

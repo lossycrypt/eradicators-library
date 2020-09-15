@@ -150,7 +150,7 @@ local Error = function(prefix,name,...)
   print(serpent.line((Debug.get_mod_name( )) )    )
   print(serpent.line((Debug.get_mod_root(0)) )    )
   print(serpent.line((Debug.get_cur_dir (1)) )     ) --bugged no dir
-
+  --asdf
 
 
   error(err,0) -- without built-in level info
@@ -167,7 +167,7 @@ Stop.Stopper = function(prefix,name)
   end
   
 Stop.SimpleStopper = function(name)
-  local prefix = Debug.get_mod_name( ) or 'unknown/scenario'
+  local prefix = Debug.get_mod_name( )
   return function(...) Error(prefix,name,...) end
   end
 
