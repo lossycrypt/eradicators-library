@@ -3,21 +3,18 @@
 --------------------------------------------------
 -- Automatic mod-name and load-stage/phase detection.
 --
--- Level  0 is any Debug.* function.
--- Level  1 is the function that called any public Debug.* function.
--- Level -1 is the bottom of the stack.
---
--- @module Debug2
+-- @module Debug
 -- @usage local Debug = require('__eradicators-library__/erlib/factorio/Debug')()
 --
 -- @usage
---  An example stack. l=level
---   l  l
---   0 -4 erlib/factorio/Debug.lua                -- top    (called last )
---   1 -3 core/lualib/util.lua (table.deepcopy)   --
---   2 -2 prototypes/entity/my-modded-entity.lua  --
---   3 -1 data.lua                                -- bottom (called first)
-
+--  An example stack. l=level, o=inverse level offset
+--   l  o
+--   0 -3 erlib/factorio/Debug.lua                -- top    (called last )
+--   1 -2 core/lualib/util.lua (table.deepcopy)   --
+--   2 -1 prototypes/entity/my-modded-entity.lua  --
+--   3  0 data.lua                                -- bottom (called first)
+  
+  
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -46,131 +43,113 @@ local function _error(msg)
 -- @section 2
 --------------------------------------------------------------------------------
 
--- Behavior of Lua:
--- level  0 is debug.getinfo itself, the top of the stack
--- level  1 is the function that called debug.getinfo
---
--- Behavior of _get_info:
--- level  0 is any Debug.* function
--- level  1 is the function that called any public Debug.* function
--- level -1 is the bottom of the stack
---
--- _get_info is *never* in the info that it returns
---
-local function _get_info(l)
-  local i,r = 1,{}
-  repeat
-    i=i+1 --starts at 2!
-    r[i-2] = debug_getinfo(i,'Sl') -- 0-indexed array!
-    until r[i-2] == nil
-  --
-  if     l ==  nil  then return r[1]
-  elseif l == 'all' then return r
-  elseif l >=  0    then return r[l]
-  -- minus 1 is the first element from the back of the Array
-  elseif l <   0    then return r[(#r+1)+l]
-  else _error('Invalid _get_info level.')
-    end
-  end
+-- ! IMPORTANT !
+-- To make *the calling file* appear as level 0 on the stack all 
+-- functions have to adjust the level to hide themselfs below 0.
 
-  
 ----------
--- Gets debug info of the function at stack level l.
+-- Retrieves debug info from the top of the stack or at the given level.
 -- l=0 the last file on the stack (the file containing this function).
 --
--- @tparam[opt=1] integer l The stack level at which to get the info.
--- @treturn {short_src=,...} The output of @{debug.getinfo} at the given level.
+-- @tparam[opt=bottom] integer l The stack level at which to get the source.
+-- @treturn {short_src=,...} The output of debug.getinfo at the given level.
 --
 function Debug.get_info(l)
-  return _get_info(l)
-  end
-  
-  
-----------
--- Gets file:line at stack level l.
---
--- @tparam[opt=1] integer l
--- @treturn string "filename:number"
---
-function Debug.get_pos(l)
-  local info = _get_info(l)
-  if info then
-    return info.short_src:match'[^/]+$':sub(1,50)
-      ..':' .. info.currentline
+  local i=0; if not l then repeat i=i+1 until not debug_getinfo(i,'S') end
+  if l then
+    return debug_getinfo(l+1,'Sl') or nil --compensate one call inside Debug
+  else
+    return debug_getinfo(i-1,'Sl') or nil --bottom-most
     end
   end
+  
+
+-- Nothing to do here. The non-reverse level does not need a function.
+function Debug.get_level(l)
+  return l
+  end
+  
+----------
+-- Retrieves the height of the stack o levels above the bottom.
+-- l=0 is the first file on the stack.
+--
+-- @tparam[opt=0] NegativeInteger o, the offset from the bottom
+-- @treturn NaturalNumber l, the level
+--
+function Debug.inverse_get_level(o)
+  local i=0; repeat i=i+1 until not debug_getinfo(i)
+  -- return (i-1) + (o or 0) --inverse does not need to compensate
+  return (i-1) + (o and (o-1) or -1) --inverse does not need to compensate
+  end
 
 
 ----------
--- Retrieves info for the whole stack.
+-- Gets the file:line spec at the given stack level l.
 --
--- @treturn Array info for each level of the stack. Starting at 0.
+-- @tparam integer l
+-- @treturn string "path:number"
 --
-function Debug.get_info_stack()
-  return _get_info('all')
+function Debug.get_pos(l)
+  -- l = l and (l+2) or 2
+  local x = Debug.get_info(l and (l+2) or 2) --compensate two calls inside Debug
+  return x and (x.short_src:match'[^/]+$':sub(1,50) ..':'.. x.currentline)
   end
+
+  
+----------
+-- Gets the file:line spec at the given inverse offset o.
+--
+-- @tparam NegativeInteger o
+-- @treturn string "path:number"
+--
+function Debug.inverse_get_pos(o) -- <file:line>
+  return Debug.get_pos(Debug.inverse_get_level(o)-1)
+  end
+  
+----------
+-- Retrieves info for the whole stack.
+-- @treturn Array debug_getinfo for each level of the stack. Starting at 0.
+function Debug.get_stack_info()
+  local i,stack = -1,{}
+  repeat i=i+1
+    stack[i] = debug_getinfo(i,'Sl')
+    until stack[i] == nil
+  return stack
+  end
+
   
 --------------------------------------------------------------------------------
 -- Factorio paths.
 -- @section 3
 --------------------------------------------------------------------------------
 
-
--- @tparam string pattern what to look for in short_src
--- @tparam string fallback what to return if the pattern returned nil
--- @tparam Array substitutes {pattern,replace} groups gsub'ed before return
-local function _src_getter(pattern,fallback,substitutes)
-  return function(l)
-    local info,r = _get_info(l),nil
-    if info then
-      r = info.short_src:match(pattern)
-      end
-    --no info *or* pattern mis-match
-    if not r then return fallback, false
-    else
-      -- if substitutes then for i=1,#substitutes do
-        -- r = r:gsub(substitutes[i][1],substitutes[i][2])
-        -- end end
-      for _,s in ipairs(substitutes or {}) do
-        r = r:gsub(s[1],s[2])
-        end
-      return r, true
-      end
-    end
+----------
+--@tparam[opt=0] integer l
+--@treturn string file path at level l
+local function get_src (l)
+  return Debug.get_info(l and (l+2) or 2).short_src or '?'
   end
 
 ----------
--- @tparam[opt=1] integer l
--- @treturn string name of the mod at level l: "my-mod"
---                or "unknown/scenario" if the check failed.
--- @treturn boolean if the name was found.
---
--- @function Debug.get_mod_name
---
-Debug.get_mod_name = _src_getter('^__(.+)__/?','unknown/scenario')
-
+--@tparam[opt=0] integer l
+--@treturn string name of the current mod: "my-mod"
+function Debug.get_mod_name (l)
+  return get_src(l and (l+3) or 3):match('^__(.+)__/?')
+  end
 
 ----------
--- @tparam[opt=1] integer l
--- @treturn string "__my-mod__" root of the mod at level l
---                or "__unknown/scenario__" if the check failed.
--- @treturn boolean if the root was found.
---
--- @function Debug.get_mod_root
---
-Debug.get_mod_root = _src_getter('^(__.+__)/?','__unknown/scenario__')
-
+--@tparam[opt=0] integer l
+--@treturn string "__my-mod__" root of the mod at level l
+function Debug.get_mod_root (l)
+  return get_src(l and (l+3) or 3):match('^(__.+__)/?')
+  end
 
 ----------
--- @tparam[opt=1] integer l
--- @treturn string "__my-mod__/sub/folder" directory of the mod at level l
---                or "__unknown/scenario__" if the check failed.
--- @treturn boolean if the root was found.
---
--- @function Debug.get_cur_dir
---
-Debug.get_cur_dir  = _src_getter('^(.*)/','__unknown/scenario__')
-
+--@tparam[opt=0] integer l
+--@treturn string "__my-mod__/sub/folder" directory of the mod at level l
+function Debug.get_cur_dir (l)
+  return get_src(l and (l+3) or 3):match('^(.*)/')
+  end
 
 ----------
 --@string path "__my-mod__/sub/folder" any path
@@ -192,13 +171,16 @@ function Debug.name2root(name)
 -- Factorio stage + phase (dynamic)                                           --
 -- -------------------------------------------------------------------------- --
 
---stage: "settings", "data" or "control"
-Debug._get_raw_load_stage = 
-  _src_getter('([^/]+)%.lua$','?',{{'-','_'},{'_.*$',''}})
-
 --phase with *underscores*: "settings_updates", "data_final_fixes", etc...
-Debug._get_raw_load_phase = 
-  _src_getter('([^/]+)%.lua$','?',{{'-','_'}})
+function Debug._get_raw_load_phase ( )
+  return (get_src( ):match('([^/]+)%.lua$') or '?'):gsub('-','_')
+  end
+
+--stage: "settings", "data" or "control"
+function Debug._get_raw_load_stage ( )
+  return Debug._get_raw_load_phase():gsub('_.*$','')
+  end
+
 
 
 -- -------------------------------------------------------------------------- --

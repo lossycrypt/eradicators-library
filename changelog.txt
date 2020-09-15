@@ -6,6 +6,11 @@ Date: 2020-09-11
     - Make the library loadable in a "static" manner where it does not configure itself.
     - Add auto-config function to set up the full library at once inside a mod. Including dev-flags.
 ---------------------------------------------------------------------------------------------------
+Version: 4.0.4
+Date: 2020-09-15
+  Internal:
+    - Fixed Debug module. Levels now behave as expected.
+---------------------------------------------------------------------------------------------------
 Version: 4.0.1
 Date: 2020-09-12
   Internal:
@@ -23,7 +28,7 @@ Date: 2020-09-12
 Version: 3.1.0
 Date: 2020-03-10
   Internal:
-    - Added the Vector() module to handle all future position and area needs.
+    - Added the Vector module to handle all future position and area needs.
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.0
 Date: 2020-03-10

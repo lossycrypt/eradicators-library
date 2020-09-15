@@ -48,14 +48,20 @@ local function EradicatorsLibraryMain(options)
   
   
   -- first load all libraries
-  local Debug = require 'erlib/factorio/Debug'
+  local Debug   = require 'erlib/factorio/Debug' ()
+  local StopLib = require 'erlib/lua/Stop' ()
+  local Stop    = StopLib.SimpleStopper('main')
   
   -- lock global right away! so modules can't do shit either.
   
+  -- StopLib.Error('MyModName','MyScript',"Sorry, i can't do that Dave!")
+  Stop('Yes?','No!',nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,'what?',nil,nil,nil,nil,Debug.get_mod_name,Debug.get_mod_name(),Debug.get_mod_name(1))
   
-  if Debug.load_phase.control then
+  -- if Debug.load_phase.control then
+  -- if Loading.is_phase.control then -- metatable retrieval! --> seperate name + (Set any|name->true)?
+    -- end
     
-    end
+    -- end
   
   
   -- put everything in place later
@@ -65,6 +71,10 @@ local function EradicatorsLibraryMain(options)
 if true then return EradicatorsLibraryMain end
 
 
+-- -----------------------------------------------------------------------------
+-- ###########################################################################--
+-- -----------------------------------------------------------------------------
+
 local function __init__(PublicENV,options)
 ----ENVIRONMENT------------------------------------------------------------------------------------
   --private global space in which the library lives
@@ -73,38 +83,6 @@ local function __init__(PublicENV,options)
   _LIB .PublicENV   = PublicENV
   _LIB .LibraryENV  = _LIB
   _LIB ._G          = _LIB
-
-----LibDebug (PHASE,NAME,PATH)---------------------------------------------------------------------
-  do
-    Debug = {}
-    --@j: The stack level at which to get the source. (default: max level)
-    function Debug.get_info(j)
-      local i=0; if not j then repeat i=i+1 until not debug.getinfo(i,'S') end
-      return debug.getinfo(j or i-1,'Sl') or {} end
-    function Debug.get_level(j) -- takes a negative level offset to go "up" from the caller
-      local i=0; repeat i=i+1 until not debug.getinfo(i)
-      return i-1-1-(j or 0) end --why is this minus *two*...
-    function Debug.get_pos(j) -- <file:line>
-      local x = Debug.get_info(j)
-      return x and (x.short_src:match'[^/]+$':sub(1,50) ..':'.. x.currentline) end
-    function Debug.get_rel_pos(j) -- <file:line>
-      return Debug.get_pos(Debug.get_level(j)-1) end
-
-    local function get_src (j) return Debug.get_info(j).short_src or '?' end
-    --phase with *underscores*: "settings_updates", "data_final_fixes", etc...
-    function Debug.get_load_phase ( ) return (get_src( ):match('([^/]+)%.lua$') or '?'):gsub('-','_') end
-    --stage: "settings", "data" or "control"
-    function Debug.get_load_stage ( ) return Debug .get_load_phase():gsub('_.*$','')         end
-    --name of the current mod: "mymod"
-    function Debug.get_mod_name   (j) return get_src(j):match('^__(.+)__/?')                 end
-    --root of the current mod: "__mymod__"
-    function Debug.get_mod_root   (j) return get_src(j):match('^(__.+__)/?')                 end
-    --directory of the current file: "__mymod__/sub/folder"
-    function Debug.get_cur_dir    (j) return get_src(j):match('^(.*)/')                      end
-    --convert between name and root
-    function Debug.root2name(root) return root:sub(a+2,b-2) end
-    function Debug.name2root(name) return '__'..name..'__'  end
-  end
 
 ----OPTIONS----------------------------------------------------------------------------------------
   options = options or {}
@@ -141,14 +119,7 @@ local function __init__(PublicENV,options)
   --debug.getinfo can actually see the full path to the scenario (engine bug).
   --if this ever breaks i should just scan for "/temp/currently-playing/control.lua"
 
-----Multiplex-------------------------------------------------------------------------------------
-  Duplex  = function(_) return _,_   end
-  Triplex = function(_) return _,_,_ end
-  
-----OneLine---------------------------------------------------------------------------------------
-  SKIP    = function( ) end
-  TRUE    = function( ) return true  end
-  FALSE   = function( ) return false end
+
 
 ----LibStop---------------------------------------------------------------------------------------
   do local preset
@@ -167,7 +138,7 @@ local function __init__(PublicENV,options)
         header,table.concat(args,'\n'),Debug.get_rel_pos(2),Debug.get_rel_pos(1))
       error(err,0) --print without built-in level info
       end
-    Stop = function(...) Error(_Mod_name,...) end
+    Stop = function(...) Error(_Mod_name,...) end --> Plugin Manager wrapping service? + Error.new('modname') -> return function
     preset = {
       "  [color=default]                                               " ,
       "  ##### [erlib : %s] #####                                      " ,

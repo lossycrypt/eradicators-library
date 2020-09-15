@@ -40,9 +40,14 @@
 
 <h2>Modules</h2>
 <ul class="nowrap">
-  <li><a href="../modules/_DocTest.html">_DocTest</a></li>
   <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/_DocTest.html">_DocTest</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
   <li><strong>Debug2</strong></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Multiplex.html">Multiplex</a></li>
+  <li><a href="../modules/Stop.html">Stop</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
 </ul>
 
 </div>
@@ -50,75 +55,78 @@
 <div id="content">
 
 <h1>Module <code>Debug2</code></h1>
-<p>Does automatic mod-name and load-stage/phase detection.</p>
+<p>Automatic mod-name and load-stage/phase detection.</p>
 <p>
+
+ Level  0 is any Debug.* function.
+ Level  1 is the function that called any public Debug.* function.
+ Level -1 is the bottom of the stack.
 
 </p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Debug = require(&apos;__eradicators-library_/erlib/factorio/Debug&apos;)()
-</pre>
+        <li><pre class="example">local Debug = require(&apos;__eradicators-library__/erlib/factorio/Debug&apos;)()
+</pre></li>
+        <li><pre class="example">An example stack. l=level
+ l  l
+ 0 -4 erlib/factorio/Debug.lua                -- top    (called last )
+ 1 -3 core/lualib/util.lua (table.deepcopy)   --
+ 2 -2 prototypes/entity/my-modded-entity.lua  --
+ 3 -1 data.lua                                -- bottom (called first)
+</pre></li>
     </ul>
 
 
 <h2><a href="#Raw_stack_trace_information">Raw stack trace information </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Debug.get_info">Debug.get_info (j)</a></td>
-	<td class="summary">Retrieves debug info from the top of the stack or at the given level.</td>
+	<td class="name" nowrap><a href="#Debug.get_info">Debug.get_info([l=1])</a></td>
+	<td class="summary">Gets debug info of the function at stack level l.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Debug.get_level">Debug.get_level (j)</a></td>
-	<td class="summary">Retrieves debug info from j levels below the top of the stack.</td>
+	<td class="name" nowrap><a href="#Debug.get_pos">Debug.get_pos([l=1])</a></td>
+	<td class="summary">Gets file:line at stack level l.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Debug.get_pos">Debug.get_pos (j)</a></td>
-	<td class="summary">Gets the file:line spec at the given stack level.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#Debug.get_rel_pos">Debug.get_rel_pos (j)</a></td>
-	<td class="summary">Gets the file:line spec at ???(j)-1.</td>
+	<td class="name" nowrap><a href="#Debug.get_info_stack">Debug.get_info_stack()</a></td>
+	<td class="summary">Retrieves info for the whole stack.</td>
 	</tr>
 </table>
 <h2><a href="#Factorio_paths">Factorio paths </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#get_src">get_src (j)</a></td>
+	<td class="name" nowrap><a href="#Debug.get_mod_name">Debug.get_mod_name([l=1])</a></td>
 	<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Debug.get_mod_name">Debug.get_mod_name (j)</a></td>
+	<td class="name" nowrap><a href="#Debug.get_mod_root">Debug.get_mod_root([l=1])</a></td>
 	<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Debug.get_mod_root">Debug.get_mod_root (j)</a></td>
+	<td class="name" nowrap><a href="#Debug.get_cur_dir">Debug.get_cur_dir([l=1])</a></td>
 	<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Debug.get_cur_dir">Debug.get_cur_dir (j)</a></td>
+	<td class="name" nowrap><a href="#Debug.path2name">Debug.path2name(path)</a></td>
 	<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Debug.path2name">Debug.path2name (path)</a></td>
+	<td class="name" nowrap><a href="#Debug.name2root">Debug.name2root(name)</a></td>
 	<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Debug.name2root">Debug.name2root (name)</a></td>
-	<td class="summary"></td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#Debug.unsafe_stage_and_phase">Debug.unsafe_stage_and_phase ()</a></td>
+	<td class="name" nowrap><a href="#Debug.unsafe_stage_and_phase">Debug.unsafe_stage_and_phase()</a></td>
 	<td class="summary">Retrieves the current load stage and phase from the filenames on the stack.</td>
 	</tr>
 </table>
 <h2><a href="#Main">Main </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Debug.get_load_stage">Debug.get_load_stage ()</a></td>
+	<td class="name" nowrap><a href="#Debug.get_load_stage">Debug.get_load_stage()</a></td>
 	<td class="summary">Gets the current <a href="../modules/Types.html#LoadStageName">LoadStageName</a>.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Debug.get_load_phase">Debug.get_load_phase ()</a></td>
+	<td class="name" nowrap><a href="#Debug.get_load_phase">Debug.get_load_phase()</a></td>
 	<td class="summary">Gets the current <a href="../modules/Types.html#LoadPhaseTable">LoadPhaseTable</a>.</td>
 	</tr>
 </table>
@@ -136,17 +144,20 @@
     <dl class="function">
     <dt>
     <a name = "Debug.get_info"></a>
-    <strong>Debug.get_info (j)</strong>
+    <strong>Debug.get_info([l=1])</strong>
     </dt>
     <dd>
-    Retrieves debug info from the top of the stack or at the given level.
+    Gets debug info of the function at stack level l.
+ l=0 the last file on the stack (the file containing this function).
+
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">j</span>
+        <li><span class="parameter">l</span>
             <span class="types"><span class="type">integer</span></span>
-         The stack level at which to get the source. (default: max level)
+         The stack level at which to get the info.
+         (<em>default</em> 1)
         </li>
     </ul>
 
@@ -154,34 +165,7 @@
     <ol>
 
            <span class="types"><span class="type">{short_src=,...}</span></span>
-        The output of debug.getinfo at the given level.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Debug.get_level"></a>
-    <strong>Debug.get_level (j)</strong>
-    </dt>
-    <dd>
-    Retrieves debug info from j levels below the top of the stack.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">j</span>
-            <span class="types"><span class="type">integer</span></span>
-
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">{short_src=,...}</span></span>
-
+        The output of <a href="https://www.lua.org/manual/5.3/manual.html#pdf-debug.getinfo">debug.getinfo</a> at the given level.
     </ol>
 
 
@@ -190,24 +174,27 @@
 </dd>
     <dt>
     <a name = "Debug.get_pos"></a>
-    <strong>Debug.get_pos (j)</strong>
+    <strong>Debug.get_pos([l=1])</strong>
     </dt>
     <dd>
-    Gets the file:line spec at the given stack level.
+    Gets file:line at stack level l.
+
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">j</span>
+        <li><span class="parameter">l</span>
             <span class="types"><span class="type">integer</span></span>
 
+         (<em>default</em> 1)
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        string "path:number"
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        "filename:number"
     </ol>
 
 
@@ -215,25 +202,20 @@
 
 </dd>
     <dt>
-    <a name = "Debug.get_rel_pos"></a>
-    <strong>Debug.get_rel_pos (j)</strong>
+    <a name = "Debug.get_info_stack"></a>
+    <strong>Debug.get_info_stack()</strong>
     </dt>
     <dd>
-    Gets the file:line spec at ???(j)-1.
+    Retrieves info for the whole stack.
 
 
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">j</span>
-            <span class="types"><span class="type">integer</span></span>
 
-        </li>
-    </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        string "path:number"
+           <span class="types"><a class="type" href="../modules/Types.html#Array">Array</a></span>
+        info for each level of the stack. Starting at 0.
     </ol>
 
 
@@ -245,35 +227,8 @@
 
     <dl class="function">
     <dt>
-    <a name = "get_src"></a>
-    <strong>get_src (j)</strong>
-    </dt>
-    <dd>
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">j</span>
-            <span class="types"><span class="type">integer</span></span>
-
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
-        file path at level j
-    </ol>
-
-
-
-
-</dd>
-    <dt>
     <a name = "Debug.get_mod_name"></a>
-    <strong>Debug.get_mod_name (j)</strong>
+    <strong>Debug.get_mod_name([l=1])</strong>
     </dt>
     <dd>
 
@@ -281,17 +236,22 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">j</span>
+        <li><span class="parameter">l</span>
             <span class="types"><span class="type">integer</span></span>
 
+         (<em>default</em> 1)
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
-
+        <li>
            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
-        name of the current mod: "my-mod"
+        name of the mod at level l: "my-mod"
+                or "unknown/scenario" if the check failed.</li>
+        <li>
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+        if the name was found.</li>
     </ol>
 
 
@@ -300,7 +260,7 @@
 </dd>
     <dt>
     <a name = "Debug.get_mod_root"></a>
-    <strong>Debug.get_mod_root (j)</strong>
+    <strong>Debug.get_mod_root([l=1])</strong>
     </dt>
     <dd>
 
@@ -308,17 +268,22 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">j</span>
+        <li><span class="parameter">l</span>
             <span class="types"><span class="type">integer</span></span>
 
+         (<em>default</em> 1)
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
-
+        <li>
            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
-        "__my-mod__" root of the mod at level j
+        "__my-mod__" root of the mod at level l
+                or "__unknown/scenario__" if the check failed.</li>
+        <li>
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+        if the root was found.</li>
     </ol>
 
 
@@ -327,7 +292,7 @@
 </dd>
     <dt>
     <a name = "Debug.get_cur_dir"></a>
-    <strong>Debug.get_cur_dir (j)</strong>
+    <strong>Debug.get_cur_dir([l=1])</strong>
     </dt>
     <dd>
 
@@ -335,17 +300,22 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">j</span>
+        <li><span class="parameter">l</span>
             <span class="types"><span class="type">integer</span></span>
 
+         (<em>default</em> 1)
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
-
+        <li>
            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
-        "__my-mod__/sub/folder" directory of the mod at level j
+        "__my-mod__/sub/folder" directory of the mod at level l
+                or "__unknown/scenario__" if the check failed.</li>
+        <li>
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+        if the root was found.</li>
     </ol>
 
 
@@ -354,7 +324,7 @@
 </dd>
     <dt>
     <a name = "Debug.path2name"></a>
-    <strong>Debug.path2name (path)</strong>
+    <strong>Debug.path2name(path)</strong>
     </dt>
     <dd>
 
@@ -381,7 +351,7 @@
 </dd>
     <dt>
     <a name = "Debug.name2root"></a>
-    <strong>Debug.name2root (name)</strong>
+    <strong>Debug.name2root(name)</strong>
     </dt>
     <dd>
 
@@ -408,7 +378,7 @@
 </dd>
     <dt>
     <a name = "Debug.unsafe_stage_and_phase"></a>
-    <strong>Debug.unsafe_stage_and_phase ()</strong>
+    <strong>Debug.unsafe_stage_and_phase()</strong>
     </dt>
     <dd>
     Retrieves the current load stage and phase from the filenames on the stack.
@@ -417,8 +387,8 @@
  is returned. Be aware that the returned strings use _ underscore instead
  of - dash.
 
- Should only be used when the error throwing behavior of ???
- or ??? is undesired.
+ Should only be used when the error throwing behavior of
+ <a href="../modules/Debug.html#get_load_stage">Debug.get_load_stage</a> or <a href="../modules/Debug.html#get_load_phase">Debug.get_load_phase</a> is undesired.
 
 
 
@@ -447,7 +417,7 @@
     <dl class="function">
     <dt>
     <a name = "Debug.get_load_stage"></a>
-    <strong>Debug.get_load_stage ()</strong>
+    <strong>Debug.get_load_stage()</strong>
     </dt>
     <dd>
     Gets the current <a href="../modules/Types.html#LoadStageName">LoadStageName</a>.  The stage is internally cached so these
@@ -457,8 +427,8 @@
 
 
     <h3>Raises:</h3>
-     It is an error if the stage could not be detected. I.e. when calling from
-        inside a scenario or a data stage metatable.
+     It is an error if the stage could not be detected. I.e. when calling
+        from inside a scenario or a data stage metatable.
 
 
 
@@ -466,7 +436,7 @@
 </dd>
     <dt>
     <a name = "Debug.get_load_phase"></a>
-    <strong>Debug.get_load_phase ()</strong>
+    <strong>Debug.get_load_phase()</strong>
     </dt>
     <dd>
     Gets the current <a href="../modules/Types.html#LoadPhaseTable">LoadPhaseTable</a>.  The phase is internally cached so these
@@ -476,8 +446,8 @@
 
 
     <h3>Raises:</h3>
-     It is an error if the phase could not be detected. I.e. when calling from
-        inside a scenario or a data stage metatable.
+     It is an error if the phase could not be detected. I.e. when calling
+        from inside a scenario or a data stage metatable.
 
 
 
@@ -490,7 +460,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-14 02:14:29 </i>
+<i style="float:right;">Last updated 2020-09-15 04:02:09 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
