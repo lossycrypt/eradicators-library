@@ -33,7 +33,7 @@ Filter.FALSE = function( ) return false end
 -- @tparam LuaObject obj
 -- @usage 
 --    for k,entity in Iter.filtered_pairs(entities,Filter.VALID) do
---      print(entity,'is valid!')
+--      print(entity.name,'is valid!')
 --      end
 Filter.VALID = function(obj) return not not obj.valid end
 
