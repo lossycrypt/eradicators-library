@@ -11,4 +11,4 @@ The original repository is [here][original].
 
 Has online [documentation].
 
-[documentation]: https://lossycrypt.github.io/erlib/index.html
+[documentation]: https://lossycrypt.github.io/eradicators-library/html/
