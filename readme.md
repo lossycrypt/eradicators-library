@@ -1,3 +1,5 @@
+This mod is pre-alpha.
+
 # Original
 
 The original repository is [here][original].
