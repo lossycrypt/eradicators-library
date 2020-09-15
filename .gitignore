@@ -31,6 +31,10 @@
 !/html/**/*.js
 !/html/**/*.css
 
+!/docs/**/*.html
+!/docs/**/*.js
+!/docs/**/*.css
+
 # Block underscore prefixed files
 _*
 
