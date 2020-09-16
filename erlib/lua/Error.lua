@@ -23,13 +23,22 @@
 --   > control.lua:18 > some_module.lua:67
 --   > ############################
 
+-- local elroot=(localised_print and table_size)and '__eradicators-library__/' or ''
+
+-- local elroot = (pcall('__eradicators-library__/'
+
+-- local elroot = '__eradicators-library__'; elroot = (pcall(elroot..'/erlib/empty')) and elroot or nil
+-- local r = '__eradicators-library__'; r = (pcall(elroot..'/erlib/empty')) and r or nil
+
 
 -- -------------------------------------------------------------------------- --
 -- Import                                                                     --
 -- -------------------------------------------------------------------------- --
+-- local elroot = (function(_) return (pcall(require,_..'erlib/empty')) and _ or '' end)('__eradicators-library__/')
+local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
 
-local Stacktrace = require('erlib/factorio/Stacktrace')()
-local Hydra    = require('erlib/lua/Coding/Hydra' )()
+local Stacktrace = require(elroot.. 'erlib/factorio/Stacktrace')()
+local Hydra      = require(elroot.. 'erlib/lua/Coding/Hydra'   )()
 
 local table,type,pairs = table,type,pairs
 

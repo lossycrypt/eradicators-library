@@ -42,20 +42,66 @@
     > return values that are not supported by require().
     
   ]]
+  
+-- local elroot = '__eradicators-library__/erlib'
+-- local erlibfile = function(path) return require('__eradicators-library__/erlib'..path) end
+
+-- local function require(path) return _ENV.require('__eradicators-library__/erlib'..path) end
+
+-- path = "H:\\factorio\\launcher\\f-np+\\7.5.1\\lua\\?.lua;H:\\factorio\\launcher\\f-np+\\7.5.1\\lua\\?\\init.lua;H:\\factorio\\launcher\\f-np+\\7.5.1\\?.lua;H:\\factorio\\launcher\\f-np+\\7.5.1\\?\\init.lua;H:\\factorio\\launcher\\f-np+\\7.5.1\\..\\share\\lua\\5.3\\?.lua;H:\\factorio\\launcher\\f-np+\\7.5.1\\..\\share\\lua\\5.3\\?\\init.lua;.\\?.lua;.\\?\\init.lua",
+
+-- package.path = (package.path or '')
+  -- .. '__eradicators-library__\\?.lua;'
+  -- .. '__eradicators-library__/?;'
+  -- .. '__eradicators-library__.?;'
+
+-- package.searchers = package.searchers or {}
+-- table.insert(package.searchers,function(name)
+  -- print('searched',name)
+  -- end)
+  
+-- local elroot = (function(_) return (pcall(require,_..'erlib/empty')) and _ or '' end)('__eradicators-library__/')
+-- local elroot = (function(_) return (pcall(require,'erlib/empty')) and '' or _ end)('__eradicators-library__/')
+
+local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
+
+-- print('can require empty?')
+-- print(serpent.line({require('__eradicators-library__/erlib/empty')}))
+-- print('yes')
+
+-- local elroot = (function(_) 
+  -- if (pcall(require,_..'erlib/empty')) then
+    -- print('DETECT ERLIB!')
+    -- return _
+  -- else
+    -- print('MISSING ERLIB!')
+    -- return ''
+    -- end
+  
+   -- end)('__eradicators-library__/')
+   
+
 
 local function EradicatorsLibraryMain(options)
 ----ENVIRONMENT------------------------------------------------------------------------------------
   assert(_ENV == debug.getregistry () [2],'[ER Library] Can not run with broken _ENV')
   
   -- lock global right away! so modules can't do shit either.
-  
-  
+  -- local elroot = (function(_) return (pcall(_..'erlib/empty')) and _ or '' end)('__eradicators-library__/')
+  print('ELROOT IS NOW:<',elroot,'>',type(elroot),#elroot)
 ----OPTIONS----------------------------------------------------------------------------------------
 
+  -- print('test')http://game-a1.granbluefantasy.jp/assets/img_low/sp/ui/icon/status/x64/status_6410.png
+  -- print(package.searchpath ('/lua/Stacktrace', '__eradicators-library__/erlib'))
+  -- print(serpent.block(package,{nocode=true}))
+  -- error()
+  for k,v in pairs(_ENV) do print(k) end
+  -- print(_VERSION)
+  
 
   -- first load all libraries locally
-  local Stacktrace = require 'erlib/factorio/Stacktrace' ()
-  local Error   = require 'erlib/lua/Error' ()
+  local Stacktrace = require (elroot.. 'erlib/factorio/Stacktrace') ()
+  local Error   = require (elroot.. 'erlib/lua/Error') ()
   local Stop    = Error.Stopper('Main')
   
   local Const   = {}
@@ -66,21 +112,27 @@ local function EradicatorsLibraryMain(options)
     Const.mod_name = Stacktrace.get_mod_name(-1)
     Const.mod_root = Stacktrace.get_mod_root(-1)
   
-  
+   
+  local Coding = require (elroot.. 'erlib/lua/Coding/init') ()
  
   
+  --STAGE DETECTION CAN FAIL
+  --and thus the library MUST NOT USE IT
+  --to stay lodable at all times (especially outside factorio)
   
   -- if Stacktrace.get_load_stage().control then
-  if Stacktrace.get_load_stage().control then
+  if false and Stacktrace.get_load_stage().control  then --
 
     -- Error.Error()
 
-    require('erlib/test/test_Stacktrace.lua')()
+    require(elroot.. 'erlib/test/test_Stacktrace.lua')()
   
     -- Error.Error('MyModName','MyScript',"Sorry, i can't do that Dave!")
     Stop('Yes?','No!',nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,'what?'
       ,nil,nil,nil,nil,Stacktrace.get_mod_name,Stacktrace.get_mod_name(),Stacktrace.get_mod_name(1)
-      ,true,false,Stacktrace.get_cur_dir,math.huge,50)
+      ,true,false,Stacktrace.get_cur_dir,math.huge,50
+      -- ,Coding.Base64.decode(Coding.Sha256([[-- "Sorry, i can't do that Dave!",]]))
+      )
     -- Error.Error('MyModName','MyErrorName',
       -- "Sorry, i can't do that Dave!",
       -- nil,nil,nil,
@@ -89,7 +141,7 @@ local function EradicatorsLibraryMain(options)
       -- )
     end
   
-  
+  return {Coding = Coding}
   -- put everything in place later
   -- EradicatorsLibrary = setmetatable({},{__index=_ENV}) --what about LOCK?
   end

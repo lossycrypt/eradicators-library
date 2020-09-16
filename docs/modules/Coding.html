@@ -33,6 +33,11 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Hydra">Hydra </a></li>
+<li><a href="#Base64">Base64 </a></li>
+<li><a href="#Json">Json </a></li>
+<li><a href="#Zip">Zip </a></li>
+<li><a href="#Crc32">Crc32 </a></li>
+<li><a href="#Sha256">Sha256 </a></li>
 </ul>
 
 
@@ -41,10 +46,15 @@
   <li><a href="../modules/Types.html">Types</a></li>
   <li><a href="../modules/Concepts.html">Concepts</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/lua.Coding.Sha256.html">lua.Coding.Sha256</a></li>
   <li><strong>Coding</strong></li>
   <li><a href="../modules/Error.html">Error</a></li>
   <li><a href="../modules/Filter.html">Filter</a></li>
   <li><a href="../modules/Multiplex.html">Multiplex</a></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/LibDeflate.lua.html">LibDeflate.lua</a></li>
 </ul>
 
 </div>
@@ -98,6 +108,69 @@
 	<tr>
 	<td class="name" nowrap><a href="#Hydra.decode">Hydra.decode()</a></td>
 	<td class="summary">Alias of Hydra.load</td>
+	</tr>
+</table>
+<h2><a href="#Base64">Base64 </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Base64.encode">Base64.encode(data)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Base64.decode">Base64.decode(data)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#Json">Json </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Json.encode">Json.encode(data)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Json.decode">Json.decode(data)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#Zip">Zip </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Zip.encode">Zip.encode(data)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Zip.decode">Zip.decode(data)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#Crc32">Crc32 </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Crc32.encode">Crc32.encode(data)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#Sha256">Sha256 </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Sha256.encode">Sha256.encode(data)</a></td>
+	<td class="summary">
+
+</td>
 	</tr>
 </table>
 
@@ -288,13 +361,300 @@
 
 </dd>
 </dl>
+    <h2 class="section-header has-description"><a name="Base64"></a>Base64 </h2>
+
+          <div class="section-description">
+           En-/Decodes to/from base64 encoding.
+ From this <a href="https://github.com/DaveMcW/blueprint-string/blob/master/blueprintstring/base64.lua">repository</a>.
+          </div>
+            <h3>Usage:</h3>
+            <pre class="example"><span class="keyword">local</span> Base64 = <span class="global">require</span>(<span class="string">'__eradicators-library__/erlib/lua/Coding/Base64'</span>)()
+</pre>
+    <dl class="function">
+    <dt>
+    <a name = "Base64.encode"></a>
+    <strong>Base64.encode(data)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">data</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+         the original string
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        the encoded string
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Base64.decode"></a>
+    <strong>Base64.decode(data)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">data</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+         encoded string
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        the original string
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Json"></a>Json </h2>
+
+          <div class="section-description">
+           En-/Decodes to/from json.
+ From this <a href="https://github.com/rxi/json.lua/blob/master/json.lua">repository</a>.
+          </div>
+            <h3>Usage:</h3>
+            <pre class="example"><span class="keyword">local</span> Json = <span class="global">require</span>(<span class="string">'__eradicators-library__/erlib/lua/Coding/Json'</span>)()
+</pre>
+    <dl class="function">
+    <dt>
+    <a name = "Json.encode"></a>
+    <strong>Json.encode(data)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">data</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+         the original string
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        the encoded string
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Json.decode"></a>
+    <strong>Json.decode(data)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">data</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+         the encoded string
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        the original string
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Zip"></a>Zip </h2>
+
+          <div class="section-description">
+           En-/Decompresses to/from zip deflate.
+ From this <a href="https://github.com/DaveMcW/blueprint-string/tree/master/blueprintstring">repository</a>.
+          </div>
+            <h3>Usage:</h3>
+            <pre class="example"><span class="keyword">local</span> Zip = <span class="global">require</span>(<span class="string">'__eradicators-library__/erlib/lua/Coding/Zip'</span>)()
+</pre>
+    <dl class="function">
+    <dt>
+    <a name = "Zip.encode"></a>
+    <strong>Zip.encode(data)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">data</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+         the original string
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        the compressed string
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Zip.decode"></a>
+    <strong>Zip.decode(data)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">data</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+         the compressed string
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        the original string
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Crc32"></a>Crc32 </h2>
+
+          <div class="section-description">
+           Calculates the crc32 hash of the input string.
+ From this <a href="https://github.com/openresty/lua-nginx-module/blob/master/t/lib/CRC32.lua">repository</a>.
+          </div>
+            <h3>Usage:</h3>
+            <pre class="example"><span class="keyword">local</span> Crc32 = <span class="global">require</span>(<span class="string">'__eradicators-library__/erlib/lua/Coding/Crc32'</span>)()
+</pre>
+    <dl class="function">
+    <dt>
+    <a name = "Crc32.encode"></a>
+    <strong>Crc32.encode(data)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">data</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+         the original string
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+        the hash
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Sha256"></a>Sha256 </h2>
+
+          <div class="section-description">
+           Calculates the sha256 hash of the input string.
+ From this <a href="http://lua-users.org/wiki/SecureHashAlgorithm">page</a>.
+          </div>
+            <h3>Usage:</h3>
+            <pre class="example"><span class="keyword">local</span> Sha256 = <span class="global">require</span>(<span class="string">'__eradicators-library__/erlib/lua/Coding/Sha256'</span>)()
+</pre>
+    <dl class="function">
+    <dt>
+    <a name = "Sha256.encode"></a>
+    <strong>Sha256.encode(data)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">data</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+         the original string
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        the base64 encoded hash
+    </ol>
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-16 03:01:50 </i>
+<i style="float:right;">Last updated 2020-09-16 22:08:57 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
