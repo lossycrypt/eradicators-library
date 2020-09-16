@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Hydra">Hydra </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><strong>Coding</strong></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Multiplex.html">Multiplex</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Coding</code></h1>
+<p>En-/Decodes to/from various formats.</p>
+<p> You can require all sub-modules at once by requiring "!all".</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local Coding = require(&apos;__eradicators-library__/erlib/lua/Coding/!all&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#Hydra">Hydra </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#HydraOptions">HydraOptions</a></td>
+	<td class="summary">Hydra implements some new options that are not in serpent.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Hydra.lines">Hydra.lines(object, options)</a></td>
+	<td class="summary">Multi-line serialization.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Hydra.line">Hydra.line()</a></td>
+	<td class="summary">Single-line serialization</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Hydra.block">Hydra.block()</a></td>
+	<td class="summary">Pretty printable serialization.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Hydra.dump">Hydra.dump()</a></td>
+	<td class="summary">Raw serialize with recursive tables.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Hydra.load">Hydra.load()</a></td>
+	<td class="summary">Deserialization.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Hydra.serialize">Hydra.serialize()</a></td>
+	<td class="summary">Raw serpent.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Hydra.encode">Hydra.encode()</a></td>
+	<td class="summary">Alias of Hydra.dump</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Hydra.decode">Hydra.decode()</a></td>
+	<td class="summary">Alias of Hydra.load</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header has-description"><a name="Hydra"></a>Hydra </h2>
+
+          <div class="section-description">
+           See the <a href="https://github.com/pkulchenko/serpent">official repository</a>
+ for detailed usage instructions.</p>
+
+<p> This is a customized version of "serpent" - renamed to avoid confusion
+ with Factorios built-in serpent installation.
+ This page only documents changes compared to serpent.
+ Equal to factorios built-in serpent Hydra represents self-referenced sub-tables
+ by the number 0 zero (instead of <a href="https://www.lua.org/pil/2.1.html">nil</a> like normal serpent does).
+          </div>
+            <h3>Usage:</h3>
+            <pre class="example"><span class="keyword">local</span> Hydra = <span class="global">require</span>(<span class="string">'__eradicators-library__/erlib/lua/Coding/Hydra'</span>)()
+</pre>
+    <dl class="function">
+    <dt>
+    <a name = "HydraOptions"></a>
+    <strong>HydraOptions</strong>
+    </dt>
+    <dd>
+    Hydra implements some new options that are not in serpent.  These work for
+ all presets but are off by default, except for Hydra.lines, where they are on.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">indentlevel</span>
+         <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>, limits indentation of very deep sub-tables.
+        </li>
+        <li><span class="parameter">showref</span>
+         <a href="../api/Builtin-Types.html#boolean">boolean</a>, adds a comment to the output of self-referencing sub-tables.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Hydra.lines"></a>
+    <strong>Hydra.lines(object, options)</strong>
+    </dt>
+    <dd>
+    Multi-line serialization.  A more readable, more informative alternative to
+ Hydra.block(). Defaults to indentlevel = 1, showref = true, nocode = true.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">object</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">options</span>
+            <span class="types"><span class="type">HydraOptions</span></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> t = {<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="string">'c'</span>}; t = {t,{t,t},{t,t,t},[<span class="number">42</span>]={{{{{<span class="global">table</span>.insert}}}}}}
+<span class="keyword">local</span> opts={indentlevel=<span class="number">1</span>,showref=<span class="keyword">true</span>,nocode=<span class="keyword">true</span>} <span class="comment">--"lines" mode default
+</span><span class="global">print</span>(Hydra.lines(t,opts))
+
+&gt; {
+&gt;   {<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>},
+&gt;   {<span class="number">0</span> <span class="comment">--[[ self[1] ]]</span>, <span class="number">0</span> <span class="comment">--[[ self[1] ]]</span>},                    <span class="comment">--self-ref comment
+</span>&gt;   {<span class="number">0</span> <span class="comment">--[[ self[1] ]]</span>, <span class="number">0</span> <span class="comment">--[[ self[1] ]]</span>, <span class="number">0</span> <span class="comment">--[[ self[1] ]]</span>}, <span class="comment">--one level indented
+</span>&gt;   [<span class="number">42</span>] = {{{{{<span class="keyword">function</span>()<span class="keyword">end</span>}}}}}                            <span class="comment">--short code skip
+</span>&gt; }
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Hydra.line"></a>
+    <strong>Hydra.line()</strong>
+    </dt>
+    <dd>
+    Single-line serialization
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Hydra.block"></a>
+    <strong>Hydra.block()</strong>
+    </dt>
+    <dd>
+    Pretty printable serialization.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Hydra.dump"></a>
+    <strong>Hydra.dump()</strong>
+    </dt>
+    <dd>
+    Raw serialize with recursive tables.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Hydra.load"></a>
+    <strong>Hydra.load()</strong>
+    </dt>
+    <dd>
+    Deserialization.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Hydra.serialize"></a>
+    <strong>Hydra.serialize()</strong>
+    </dt>
+    <dd>
+    Raw serpent.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Hydra.encode"></a>
+    <strong>Hydra.encode()</strong>
+    </dt>
+    <dd>
+    Alias of Hydra.dump
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Hydra.decode"></a>
+    <strong>Hydra.decode()</strong>
+    </dt>
+    <dd>
+    Alias of Hydra.load
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-09-16 03:01:50 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

@@ -43,7 +43,9 @@
 <h2>Modules</h2>
 <ul class="nowrap">
   <li><strong>Types</strong></li>
-  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
   <li><a href="../modules/Error.html">Error</a></li>
   <li><a href="../modules/Filter.html">Filter</a></li>
   <li><a href="../modules/Multiplex.html">Multiplex</a></li>
@@ -56,6 +58,8 @@
 <h1>Module <code>Types</code></h1>
 <p>A general overview over the (custom) data types used throughout this documentation.</p>
 <p>
+
+
 
 </p>
 
@@ -101,7 +105,7 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#NegativeInteger">NegativeInteger</a></td>
-	<td class="summary">An <a href="../modules/Types.html#Integer">Integer</a> < 0.</td>
+	<td class="summary">An <a href="../modules/Types.html#Integer">Integer</a> &lt; 0.</td>
 	</tr>
 </table>
 <h2><a href="#Boolean">Boolean </a></h2>
@@ -162,7 +166,6 @@
  Every specialized table can also be used as a standard Table.
 
 
-
     <h3>Fields:</h3>
     <ul>
         <li><span class="parameter">key</span>
@@ -187,7 +190,6 @@
     A <a href="https://en.wikipedia.org/wiki/Set_(mathematics)">Set</a> is a table in which all values are <a href="../modules/Types.html#true">true</a> and
  the keys are the actual values.  This is useful to quickly test if a given key
  is in a Set or not.
-
 
 
     <h3>Fields:</h3>
@@ -221,12 +223,11 @@
  in which all keys are non-zero <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>s.  Additionally
  the sequence of numbers must be uninterrupted - for every
  key n in the array there must also be a key n-1, except for n=1 which
- must be the first key (or the Array is empty).
+ must be the first key (or the Array is empty).</p>
 
- Arrays are the ONLY type of Table for which the Lua length operator #
+<p> Arrays are the ONLY type of Table for which the Lua length operator #
  reports the correct number of elements. For all other types of Table
  <a href="../api/Libraries.html#table_size">table_size</a>() must be used.
-
 
 
     <h3>Fields:</h3>
@@ -262,10 +263,9 @@
     </dt>
     <dd>
     A SparseArray is also a <a href="../modules/Types.html#Table">Table</a> in which all keys are <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>s.
- Contrary to an <a href="../modules/Types.html#Array">Array</a> the sequence of keys may be discontinuous.
+ Contrary to an <a href="../modules/Types.html#Array">Array</a> the sequence of keys may be discontinuous.</p>
 
- These are often used to store entities indexed by their unit_number.
-
+<p> These are often used to store entities indexed by their unit_number.
 
 
     <h3>Fields:</h3>
@@ -307,7 +307,6 @@
 
 
 
-
 </dd>
     <dt>
     <a name = "float"></a>
@@ -315,7 +314,6 @@
     </dt>
     <dd>
     A <a href="https://www.lua.org/pil/2.3.html">number</a> that has a non-zero decimal fraction.
-
 
 
 
@@ -334,7 +332,6 @@
     </dt>
     <dd>
     A <a href="https://www.lua.org/pil/2.3.html">number</a> that does not have a decimal fraction.
-
 
 
 
@@ -360,15 +357,13 @@
 
 
 
-
 </dd>
     <dt>
     <a name = "NegativeInteger"></a>
     <strong>NegativeInteger</strong>
     </dt>
     <dd>
-    An <a href="../modules/Types.html#Integer">Integer</a> < 0.
-
+    An <a href="../modules/Types.html#Integer">Integer</a> &lt; 0.
 
 
 
@@ -394,7 +389,6 @@
 
 
 
-
 </dd>
 </dl>
     <h2 class="section-header "><a name="Misc"></a>Misc </h2>
@@ -406,7 +400,6 @@
     </dt>
     <dd>
     Any string, <a href="https://www.lua.org/pil/2.3.html">number</a>, boolean, <a href="https://www.lua.org/pil/2.5.html">table</a>, function or userdata.
-
 
 
 
@@ -428,7 +421,6 @@
 
 
 
-
 </dd>
     <dt>
     <a name = "TruthyValue"></a>
@@ -438,7 +430,6 @@
     Any value that when negated twice evaluates to <a href="../modules/Types.html#true">true</a>.  In Lua this is
  any string, <a href="https://www.lua.org/pil/2.3.html">number</a>, <a href="../modules/Types.html#true">true</a>, <a href="https://www.lua.org/pil/2.5.html">table</a>, function or userdata. But not
  boolean false or nil.
-
 
 
 
@@ -470,7 +461,6 @@
 
 
 
-
 </dd>
     <dt>
     <a name = "LoadPhaseName"></a>
@@ -479,13 +469,12 @@
     <dd>
     The name of a load phase.
  This is one of 7 strings:
-   "settings", "settings_updates", "settings_final_fixes"
-   "data", "data_updates", "data_final_fixes"
-   or "control".
+   "settings", "settings<em>updates", "settings</em>final<em>fixes"
+   "data", "data</em>updates", "data<em>final</em>fixes"
+   or "control".</p>
 
- Be aware that unlike the corresponding file names these strings
+<p> Be aware that unlike the corresponding file names these strings
  use _ underscores instead of - dashes for ease of use.
-
 
 
 
@@ -503,17 +492,22 @@
  for stage based conditional code execution.
 
 
-
     <h3>Fields:</h3>
     <ul>
         <li><span class="parameter">LoadStageName</span>
          <a href="../modules/Types.html#true">true</a>, maps  <a href="../modules/Types.html#LoadStageName">LoadStageName</a> → <a href="../modules/Types.html#true">true</a>
         </li>
         <li><span class="parameter">any</span>
-                   <a href="../modules/Types.html#true">true</a>, maps of the string "any" → <a href="../modules/Types.html#true">true</a>
+
+<pre><code>       &lt;a href="../modules/Types.html#true"&gt;true&lt;/a&gt;, maps of the string "any" → &lt;a href="../modules/Types.html#true"&gt;true&lt;/a&gt;
+</code></pre>
+
         </li>
         <li><span class="parameter">name</span>
-                  string, the <a href="../modules/Types.html#LoadStageName">LoadStageName</a>
+
+<pre><code>      string, the &lt;a href="../modules/Types.html#LoadStageName"&gt;LoadStageName&lt;/a&gt;
+</code></pre>
+
         </li>
     </ul>
 
@@ -537,17 +531,22 @@
     A <a href="../modules/Types.html#Table">Table</a> that contains three (key → value) mappings.
 
 
-
     <h3>Fields:</h3>
     <ul>
         <li><span class="parameter">LoadPhaseName</span>
          <a href="../modules/Types.html#true">true</a>
         </li>
         <li><span class="parameter">name</span>
-                  <a href="../modules/Types.html#LoadPhaseName">LoadPhaseName</a>
+
+<pre><code>      &lt;a href="../modules/Types.html#LoadPhaseName"&gt;LoadPhaseName&lt;/a&gt;
+</code></pre>
+
         </li>
         <li><span class="parameter">any</span>
-                   <a href="../modules/Types.html#true">true</a>
+
+<pre><code>       &lt;a href="../modules/Types.html#true"&gt;true&lt;/a&gt;
+</code></pre>
+
         </li>
     </ul>
 
@@ -563,7 +562,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-15 20:36:28 </i>
+<i style="float:right;">Last updated 2020-09-16 03:01:50 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

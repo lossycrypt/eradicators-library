@@ -33,14 +33,16 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Functions">Functions</a></li>
-<li><a href="#Raiser">Raiser </a></li>
+<li><a href="#ErrorRaiser">ErrorRaiser </a></li>
 </ul>
 
 
 <h2>Modules</h2>
 <ul class="nowrap">
   <li><a href="../modules/Types.html">Types</a></li>
-  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
   <li><strong>Error</strong></li>
   <li><a href="../modules/Filter.html">Filter</a></li>
   <li><a href="../modules/Multiplex.html">Multiplex</a></li>
@@ -53,6 +55,8 @@
 <h1>Module <code>Error</code></h1>
 <p>Produces auto-formatted auto-serialized errors.</p>
 <p>
+
+
 
 </p>
     <h3>Usage:</h3>
@@ -84,21 +88,16 @@ nil,&apos;shit&apos;,{&apos;is&apos;,&apos;hitting&apos;,{&apos;the&apos;,&apos;
 	<td class="summary">The raw error handler called by all Error instances.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#CustomStopper">CustomStopper([prefix[, postfix]])</a></td>
+	<td class="name" nowrap><a href="#Stopper">Stopper([prefix="YourModName"], postfix)</a></td>
 	<td class="summary">Fabricates a customized <a href="../modules/Error.html#ErrorRaiser">ErrorRaiser</a>
  with closurized prefix and postfix.</td>
 	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#Stopper">Stopper([postfix])</a></td>
-	<td class="summary">Fabricates a customized <a href="../modules/Error.html#ErrorRaiser">ErrorRaiser</a>
- with mod-name as prefix and closurized postfix.</td>
-	</tr>
 </table>
-<h2><a href="#Raiser">Raiser </a></h2>
+<h2><a href="#ErrorRaiser">ErrorRaiser </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#ErrorRaiser">ErrorRaiser([...])</a></td>
-	<td class="summary">Raises an error with the given message.</td>
+	<td class="summary">Raises an error with the given message and the closurized pre- and postfix.</td>
 	</tr>
 </table>
 
@@ -119,13 +118,12 @@ nil,&apos;shit&apos;,{&apos;is&apos;,&apos;hitting&apos;,{&apos;the&apos;,&apos;
  if required and printed one per line.
 
 
-
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">prefix</span>
             <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
          the prefix part of the error message header.
-         This should usually be the erroring mods name.
+ This should usually be the erroring mods name.
          (<em>optional</em>)
         </li>
         <li><span class="parameter">postfix</span>
@@ -146,13 +144,12 @@ nil,&apos;shit&apos;,{&apos;is&apos;,&apos;hitting&apos;,{&apos;the&apos;,&apos;
 
 </dd>
     <dt>
-    <a name = "CustomStopper"></a>
-    <strong>CustomStopper([prefix[, postfix]])</strong>
+    <a name = "Stopper"></a>
+    <strong>Stopper([prefix="YourModName"], postfix)</strong>
     </dt>
     <dd>
     Fabricates a customized <a href="../modules/Error.html#ErrorRaiser">ErrorRaiser</a>
  with closurized prefix and postfix.
-
 
 
     <h3>Parameters:</h3>
@@ -160,19 +157,24 @@ nil,&apos;shit&apos;,{&apos;is&apos;,&apos;hitting&apos;,{&apos;the&apos;,&apos;
         <li><span class="parameter">prefix</span>
             <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
 
-         (<em>optional</em>)
+
+
+         (<em>default</em> "YourModName")
         </li>
         <li><span class="parameter">postfix</span>
             <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
 
-         (<em>optional</em>)
+
+
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">ErrorRaiser</span></span>
+           <span class="types"><a class="type" href="../modules/Error.html#ErrorRaiser">ErrorRaiser</a></span>
+
+
 
     </ol>
 
@@ -182,54 +184,21 @@ nil,&apos;shit&apos;,{&apos;is&apos;,&apos;hitting&apos;,{&apos;the&apos;,&apos;
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example"><span class="keyword">local</span> MyError = Error.CustomStopper(<span class="string">'MyModName'</span>,<span class="string">'MyErrorName'</span>)
+        <li><pre class="example"><span class="keyword">local</span> MyError = Error.Stopper(<span class="string">'MyModName'</span>,<span class="string">'MyErrorName'</span>)
 <span class="keyword">if</span> <span class="keyword">not</span> is_everything_ok <span class="keyword">then</span>
   MyError(<span class="string">'something is broken!'</span>)
   <span class="keyword">end</span>
-</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "Stopper"></a>
-    <strong>Stopper([postfix])</strong>
-    </dt>
-    <dd>
-    Fabricates a customized <a href="../modules/Error.html#ErrorRaiser">ErrorRaiser</a>
- with mod-name as prefix and closurized postfix.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">postfix</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
-
-         (<em>optional</em>)
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">ErrorRaiser</span></span>
-
-    </ol>
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> MyError = Error.Stopper(<span class="string">'MyErrorName'</span>)
+</pre></li>
+        <li><pre class="example"><span class="keyword">local</span> MyError = Error.Stopper(<span class="string">'MyErrorName'</span>)
 <span class="keyword">if</span> <span class="keyword">not</span> is_everything_ok <span class="keyword">then</span>
   MyError(<span class="string">'something is broken!'</span>)
   <span class="keyword">end</span>
-</pre>
+</pre></li>
     </ul>
 
 </dd>
 </dl>
-    <h2 class="section-header "><a name="Raiser"></a>Raiser </h2>
+    <h2 class="section-header "><a name="ErrorRaiser"></a>ErrorRaiser </h2>
 
     <dl class="function">
     <dt>
@@ -237,8 +206,7 @@ nil,&apos;shit&apos;,{&apos;is&apos;,&apos;hitting&apos;,{&apos;the&apos;,&apos;
     <strong>ErrorRaiser([...])</strong>
     </dt>
     <dd>
-    Raises an error with the given message.
-
+    Raises an error with the given message and the closurized pre- and postfix.
 
 
     <h3>Parameters:</h3>
@@ -264,7 +232,7 @@ nil,&apos;shit&apos;,{&apos;is&apos;,&apos;hitting&apos;,{&apos;the&apos;,&apos;
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-15 20:36:28 </i>
+<i style="float:right;">Last updated 2020-09-16 03:01:50 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

@@ -46,13 +46,13 @@ Part III. Seperately licensed third-party assets and code.
   these files may have been modified by the mod author. Modification details
   are logged within the respective module files.
   
-  sha2.lua         - MIT License , Roberto Ierusalimschy, 2014     
-  crc32.lua        - MIT License , Neil Richardson      , 2007-2008
-  serpent.lua      - MIT License , Paul Kulchenko       , 2012-2018
-  json.lua         - MIT License , rxi                  , 2020
-  zlib-deflate.lua - zlib License, David McWilliams     , 2014
-  /docs/lua-5.2/*  - Lua license , Lua.org PUC-Rio      , 2015–2018
-  /docs/api/*      - owned by Wube Software Ltd.        , 2020
+  sha2.lua         - MIT License , Roberto Ierusalimschy, 2014     , http://lua-users.org/wiki/SecureHashAlgorithm
+  crc32.lua        - MIT License , Neil Richardson      , 2007-2008, https://github.com/openresty/lua-nginx-module/blob/master/t/lib/CRC32.lua
+  serpent.lua      - MIT License , Paul Kulchenko       , 2012-2018, https://github.com/pkulchenko/serpent
+  json.lua         - MIT License , rxi                  , 2020     , https://github.com/rxi/json.lua
+  zlib-deflate.lua - zlib License, David McWilliams     , 2014     , https://github.com/DaveMcW/blueprint-string/blob/master/blueprintstring/crc32lua.lua
+  /docs/lua-5.2/*  - Lua license , Lua.org PUC-Rio      , 2015–2018, http://www.lua.org/manual/5.2/
+  /docs/api/*      - owned by Wube Software Ltd.        , 2020     , https://lua-api.factorio.com/latest/
   
 
 Part IV. Full text of the license.

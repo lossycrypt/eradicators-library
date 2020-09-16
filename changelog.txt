@@ -6,6 +6,30 @@ Date: 2020-09-11
     - Make the library loadable in a "static" manner where it does not configure itself.
     - Add auto-config function to set up the full library at once inside a mod. Including dev-flags.
 ---------------------------------------------------------------------------------------------------
+Version: 4.0.8
+Date: 2020-09-x
+  Internal:
+    - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.0.7
+Date: 2020-09-x
+  Internal:
+    - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.0.6
+Date: 2020-09-16
+  Internal:
+    - Added showref to Serpent.
+    - Renamed Serpent to Hydra to avoid future confusion.
+    - Renamed Debug to Stacktrace.
+    - Improved Error message serialization.
+    - Fixed wrong Stacktrace level due to tail-call.
+---------------------------------------------------------------------------------------------------
+Version: 4.0.5
+Date: 2020-09-15
+  Internal:
+    - Added Error module.
+---------------------------------------------------------------------------------------------------
 Version: 4.0.4
 Date: 2020-09-15
   Internal:

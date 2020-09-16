@@ -28,7 +28,8 @@
 -- Import                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Debug = require('erlib/factorio/Debug')()
+local Stacktrace = require('erlib/factorio/Stacktrace')()
+local Hydra    = require('erlib/lua/Coding/Hydra' )()
 
 local table,type,pairs = table,type,pairs
 
@@ -75,21 +76,24 @@ local function to_dense_array(...)
   return r
   end
   
-  
--- Replaces all values given that are not natively stringifiable with a 
--- serpent.line representation.
+
+-- Replaces all values given with a string representation.
 -- @tparam Table tbl, containing AnyValue
--- @treturn an Array of strings and numbers
+-- @treturn an Array of strings
 local simplify; do
-  local keep  = {['string']=true,['number']=true}
-  local sline = serpent.line
+  local _simplify = {
+    ['nil'     ] = function( ) return 'nil'          end,
+    ['boolean' ] = function(x) return tostring(x)    end,
+    ['number'  ] = function(x) return tostring(x)    end,
+    ['string'  ] = function(x) return x              end,
+    ['function'] = function( ) return '<function>'   end,
+    ['userdata'] = function( ) return '{<userdata>}' end,
+    ['thread'  ] = function( ) return '{<thread>}'   end,
+    ['table'   ] = function(x) return Hydra.line(x,{nocode=true}) end,
+    }
   function simplify(tbl)
     for k,v in pairs(tbl) do
-      if not keep[type(v)] then
-        tbl[k] = sline(v,{nocode=true})
-          --make serpent function serialization nicer
-          :gsub('function%(%) %-%-%[%[..skipped..%]%] end','<function>')
-        end
+      tbl[k] = _simplify[type(v)](v)
       end
     return tbl
     end
@@ -121,7 +125,7 @@ local function shorten(arr,n)
 -- if required and printed one per line.
 --
 -- @tparam[opt] AnyValue prefix the prefix part of the error message header.
---         This should usually be the erroring mods name.
+-- This should usually be the erroring mods name.
 -- @tparam[opt] AnyValue postfix the name of the module that caused the error.
 -- @tparam[opt] AnyValue ... all the AnyValue you want in the message.
 --
@@ -138,8 +142,8 @@ local _error = function(prefix,postfix,...)
     args[2],
     table.concat({table.unpack(args,3)},'\n'),
     select('#',...) - #args + 2,
-    Debug.get_pos(4),
-    Debug.get_pos(3) --this must be *exactly* 2 above the outside caller
+    Stacktrace.get_pos(4),
+    Stacktrace.get_pos(3) --this must be *exactly* 2 above the outside caller
     )
 
   error(err,0) -- without built-in level info
@@ -156,25 +160,10 @@ Error.Error = function(prefix,postfix,...)
 -- with closurized prefix and postfix.
 --
 -- @usage
---   local MyError = Error.CustomStopper('MyModName','MyErrorName')
+--   local MyError = Error.Stopper('MyModName','MyErrorName')
 --   if not is_everything_ok then
 --     MyError('something is broken!')
 --     end
--- 
--- @tparam[opt] AnyValue prefix 
--- @tparam[opt] AnyValue postfix
---
--- @raise CustomError
--- 
--- @treturn ErrorRaiser
--- 
-Error.CustomStopper = function(prefix,postfix)
-  return function(...) _error(prefix,postfix,...) end
-  end
-  
-----------
--- Fabricates a customized @{Error.ErrorRaiser|ErrorRaiser}
--- with mod-name as prefix and closurized postfix.
 --
 -- @usage
 --   local MyError = Error.Stopper('MyErrorName')
@@ -182,29 +171,34 @@ Error.CustomStopper = function(prefix,postfix)
 --     MyError('something is broken!')
 --     end
 -- 
--- @tparam[opt] AnyValue postfix
+-- @tparam[opt="YourModName"] AnyValue prefix 
+-- @tparam AnyValue postfix
+--
+-- @raise CustomError
 -- 
 -- @treturn ErrorRaiser
 -- 
-Error.Stopper = function(postfix)
-  local prefix = Debug.get_mod_name( )
+Error.Stopper = function(prefix,postfix)
+  if postfix == nil then
+    postfix = prefix
+    prefix  = Stacktrace.get_mod_name(2)
+    end
   return function(...) _error(prefix,postfix,...) end
   end
 
 --------------------------------------------------------------------------------
--- Raiser
+-- ErrorRaiser
 -- @section
 --------------------------------------------------------------------------------
   
 ----------
--- Raises an error with the given message.
+-- Raises an error with the given message and the closurized pre- and postfix.
 --
 -- @tparam[opt] AnyValue ... Arbitrary values to be displayed in the error message.
 --
 -- @raise CustomError
 --
 -- @function ErrorRaiser
---
   
   
 -- -------------------------------------------------------------------------- --

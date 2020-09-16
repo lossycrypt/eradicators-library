@@ -7,9 +7,9 @@
 
 local function Test()
   
-  local Debug = require('__eradicators-library__/erlib/factorio/Debug')()
+  local Stacktrace = require('__eradicators-library__/erlib/factorio/Stacktrace')()
   
-  local stack = Debug.get_all_info()
+  local stack = Stacktrace.get_all_info()
   
   local ok = {data=true,settings=true,control=true}
   
@@ -22,22 +22,22 @@ local function Test()
      (A.what            == B.what           )
     end
 
-  -- print('  TESTR  erlib.Debug -> testing...')
+  -- print('  TESTR  erlib.Stacktrace -> testing...')
   
   -- for i=1,#stack do print(i,serpent.line(stack[i])) end
   
-  assert(_equ(Debug.get_info( 1),stack[1]     ))
-  assert(_equ(Debug.get_info(-1),stack[#stack]))
+  assert(_equ(Stacktrace.get_info( 1),stack[1]     ))
+  assert(_equ(Stacktrace.get_info(-1),stack[#stack]))
   
-  assert(Debug.get_pos     ( 1) == 'test_Debug.lua:32'      ) --do not move this line!
-  assert(Debug.get_mod_name(-1) == 'eradicators-library'    )
-  assert(Debug.get_mod_root(-1) == '__eradicators-library__')
-  assert(Debug.get_cur_dir ( 1) == '__eradicators-library__/erlib/test')
+  assert(Stacktrace.get_pos     ( 1) == 'test_Stacktrace.lua:32'      ) --do not move this line!
+  assert(Stacktrace.get_mod_name(-1) == 'eradicators-library'    )
+  assert(Stacktrace.get_mod_root(-1) == '__eradicators-library__')
+  assert(Stacktrace.get_cur_dir ( 1) == '__eradicators-library__/erlib/test')
   
-  assert(Debug.path2name(Debug.get_cur_dir(-1)) == 'eradicators-library')
-  assert(Debug.name2root(Debug.get_mod_name(0)) == Debug.get_mod_root(0))
+  assert(Stacktrace.path2name(Stacktrace.get_cur_dir(-1)) == 'eradicators-library')
+  assert(Stacktrace.name2root(Stacktrace.get_mod_name(0)) == Stacktrace.get_mod_root(0))
   
-  print('  TESTR  erlib.Debug -> Ok')
+  print('  TESTR  erlib.Stacktrace -> Ok')
   end
 
 

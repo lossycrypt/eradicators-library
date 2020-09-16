@@ -44,27 +44,43 @@
   ]]
 
 local function EradicatorsLibraryMain(options)
+----ENVIRONMENT------------------------------------------------------------------------------------
   assert(_ENV == debug.getregistry () [2],'[ER Library] Can not run with broken _ENV')
-  
-  
-  -- first load all libraries
-  local Debug   = require 'erlib/factorio/Debug' ()
-  local Error = require 'erlib/lua/Error' ()
-  local Stop    = Error.Stopper('main')
-  
-  local lib_root = Debug.get_cur_dir(1)
   
   -- lock global right away! so modules can't do shit either.
   
-  if Debug.get_load_stage().control then
+  
+----OPTIONS----------------------------------------------------------------------------------------
+
+
+  -- first load all libraries locally
+  local Stacktrace = require 'erlib/factorio/Stacktrace' ()
+  local Error   = require 'erlib/lua/Error' ()
+  local Stop    = Error.Stopper('Main')
+  
+  local Const   = {}
+    --mod that contains this file
+    Const.lib_name = Stacktrace.get_mod_name( 1)
+    Const.lib_root = Stacktrace.get_mod_root( 1)
+    --mod that required this file
+    Const.mod_name = Stacktrace.get_mod_name(-1)
+    Const.mod_root = Stacktrace.get_mod_root(-1)
+  
+  
+ 
+  
+  
   -- if Stacktrace.get_load_stage().control then
+  if Stacktrace.get_load_stage().control then
 
     -- Error.Error()
 
-    require(lib_root.. '/test/test_Debug.lua')()
+    require('erlib/test/test_Stacktrace.lua')()
   
     -- Error.Error('MyModName','MyScript',"Sorry, i can't do that Dave!")
-    Stop('Yes?','No!',nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,'what?',nil,nil,nil,nil,Debug.get_mod_name,Debug.get_mod_name(),Debug.get_mod_name(1))
+    Stop('Yes?','No!',nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,'what?'
+      ,nil,nil,nil,nil,Stacktrace.get_mod_name,Stacktrace.get_mod_name(),Stacktrace.get_mod_name(1)
+      ,true,false,Stacktrace.get_cur_dir,math.huge,50)
     -- Error.Error('MyModName','MyErrorName',
       -- "Sorry, i can't do that Dave!",
       -- nil,nil,nil,
@@ -108,24 +124,14 @@ local function __init__(PublicENV,options)
   COLLECT_ULOCALE   = nil --seperate this from DEBUG_MODE
   -- print('\n\n\nOPTIONS (lib line ~71) \n\n\n'.. serpent.block(options))
   
-----PHASE,STAGE------------------------------------------------------------------------------------
-  do local phases = {
-    settings             = true, data             = true, control             = true ,
-    settings_updates     = true, data_updates     = true, control_updates     = false,
-    settings_final_fixes = true, data_final_fixes = true, control_final_fixes = false, }
-    Load_phase = {[Debug .get_load_phase()] = true, name = Debug .get_load_phase(), any = true}
-    Load_stage = {[Debug .get_load_stage()] = true, name = Debug .get_load_stage(), any = true}
-    if not phases[Load_phase.name] then error'[ER Library] Failed to detect load phase.' end
-    --> Load_phase == "runtime" after on_load @ event-manager
-    end
 
 ----NAME,PATH-------------------------------------------------------------------------------------
   --mod that contains this file
-  _Lib_name = Debug .get_mod_name(1)
-  _Lib_root = Debug .get_cur_dir (1) 
+  _Lib_name = Stacktrace .get_mod_name(1)
+  _Lib_root = Stacktrace .get_cur_dir (1) 
   --mod that required this file
-  _Mod_name = Debug .get_mod_name( ) or 'unknown/scenario'
-  _Mod_root = Debug .get_mod_root( ) or 'unknown/scenario'
+  _Mod_name = Stacktrace .get_mod_name( ) or 'unknown/scenario'
+  _Mod_root = Stacktrace .get_mod_root( ) or 'unknown/scenario'
   --debug.getinfo can actually see the full path to the scenario (engine bug).
   --if this ever breaks i should just scan for "/temp/currently-playing/control.lua"
 
@@ -145,7 +151,7 @@ local function __init__(PublicENV,options)
       for i,v in pairs{...} do args[#args+1]=serpent.line(v,{nocode=true}):sub(1,100) end
       for i,l in pairs(preset) do preset[i]=l:match' *(.-) *$' end --strip whitespace
       local err = table.concat(preset,'\n'):format(
-        header,table.concat(args,'\n'),Debug.get_rel_pos(2),Debug.get_rel_pos(1))
+        header,table.concat(args,'\n'),Stacktrace.get_rel_pos(2),Stacktrace.get_rel_pos(1))
       error(err,0) --print without built-in level info
       end
     Stop = function(...) Error(_Mod_name,...) end --> Plugin Manager wrapping service? + Error.new('modname') -> return function

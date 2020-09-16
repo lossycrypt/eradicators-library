@@ -1,14 +1,11 @@
-This mod is pre-alpha.
+# Introduction
 
-# Original
+  The official repository is [here](https://github.com/lossycrypt/eradicators-library).
 
-The original repository is [here][original].
+  This library is currently pre-alpha.
 
-[original]: https://github.com/lossycrypt/eradicators-library
+# Links
 
-
-# Documentation
-
-Has online [documentation].
-
-[documentation]: https://lossycrypt.github.io/eradicators-library/
+  Documentation is [here](https://lossycrypt.github.io/eradicators-library/).
+  
+  Latest builds are on the [ModPortal](https://mods.factorio.com/mod/eradicators-library).
