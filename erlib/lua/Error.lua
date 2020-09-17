@@ -34,7 +34,6 @@
 -- -------------------------------------------------------------------------- --
 -- Import                                                                     --
 -- -------------------------------------------------------------------------- --
--- local elroot = (function(_) return (pcall(require,_..'erlib/empty')) and _ or '' end)('__eradicators-library__/')
 local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
 
 local Stacktrace = require(elroot.. 'erlib/factorio/Stacktrace')()

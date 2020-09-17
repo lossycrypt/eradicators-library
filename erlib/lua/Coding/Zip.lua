@@ -88,11 +88,6 @@ Zip._LibDeflate = LibDeflate
 -- -------------------------------------------------------------------------- --
 
   
-Zip.examplebp = [[0eNqVmN1qg0AYRN/lu94Ed90f9VVKKUm6tEKyCbopDcF3r9qbQjPGuVTiyRlwcPQu++M1Xro2ZWnu0h7OqZfm5S59+5F2x+lcvl2iNNLmeBIlaXeajvoc43Fz+Ix9lkFJm97jtzR6eFUSU25zG38x88HtLV1P+9iNP3gIUHI59+M15zT938jZ6GLrlNykqbZuGNQ/jmE59WNOuZajl30sywE+biWnWtbxJAbYhJWYetmmIjHApl6J8cs2uiA5QEevvZfDEx9DcpDP2nvZPfGxJAf5OLajUzkekjzbLkgKtFMBSBXthEg1WVYUzhRkzyBIs0YgmjGsEQKVZGdhNEuWDYIca4SiedYIgQLZWxitYkHIqKbbVoLHdEG3DZHoBaINIBnaCZFKtm8onGX7hkDsDoHRPGuEQIHtG4pWsX1DIHaPoGi2YI0QSLPFBdGsYUHIqKTb5gCJXtiQxO8SC0j8LkGkwPYNhWO3NgTRqwREc/QqQSDN9g1Ec+zghiB6laBo9CpBIMcWF0XzLGg2Gt/+588EzZ+vCkq+YtfPl5hK22Dr4IMuvPPD8APPu0JQ]]
-Zip.example   =  [[eNqVmN1qg0AYRN/lu94Ed90f9VVKKUm6tEKyCbopDcF3r9qbQjPGuVTiyRlwcPQu++M1Xro2ZWnu0h7OqZfm5S59+5F2x+lcvl2iNNLmeBIlaXeajvoc43Fz+Ix9lkFJm97jtzR6eFUSU25zG38x88HtLV1P+9iNP3gIUHI59+M15zT938jZ6GLrlNykqbZuGNQ/jmE59WNOuZajl30sywE+biWnWtbxJAbYhJWYetmmIjHApl6J8cs2uiA5QEevvZfDEx9DcpDP2nvZPfGxJAf5OLajUzkekjzbLkgKtFMBSBXthEg1WVYUzhRkzyBIs0YgmjGsEQKVZGdhNEuWDYIca4SiedYIgQLZWxitYkHIqKbbVoLHdEG3DZHoBaINIBnaCZFKtm8onGX7hkDsDoHRPGuEQIHtG4pWsX1DIHaPoGi2YI0QSLPFBdGsYUHIqKTb5gCJXtiQxO8SC0j8LkGkwPYNhWO3NgTRqwREc/QqQSDN9g1Ec+zghiB6laBo9CpBIMcWF0XzLGg2Gt/+588EzZ+vCkq+YtfPl5hK22Dr4IMuvPPD8APPu0JQ]]
-  
-Zip.examplebp =  '0eNqVkc0KgzAQhN9lzlFM629epZSidmkDuoqJpSJ590Z7KVRKPc6y8+0wO6NqRuoHzRZqhq47NlCnGUbfuGyWmZ16goK21EKAy3ZRxhI1QX0nY+EENF/pCSXdWYDYaqvpjVnFdOGxrWjwC5sAgb4z3tPxcs9zAhmFicAElYeJc+KLc9jLKbY5x3858neeeC9nzePLWltVH08QeNBgVsshl3EWF1mayShNUudeOwqKiA=='
-Zip.example   =   'eNqVkc0KgzAQhN9lzlFM629epZSidmkDuoqJpSJ590Z7KVRKPc6y8+0wO6NqRuoHzRZqhq47NlCnGUbfuGyWmZ16goK21EKAy3ZRxhI1QX0nY+EENF/pCSXdWYDYaqvpjVnFdOGxrWjwC5sAgb4z3tPxcs9zAhmFicAElYeJc+KLc9jLKbY5x3858neeeC9nzePLWltVH08QeNBgVsshl3EWF1mayShNUudeOwqKiA=='
   
 --[[
 /sudo Z.decode(B.decode(Z.example)) == game.decode_string(Z.example)

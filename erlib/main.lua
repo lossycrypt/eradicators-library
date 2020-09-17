@@ -113,7 +113,7 @@ local function EradicatorsLibraryMain(options)
     Const.mod_root = Stacktrace.get_mod_root(-1)
   
    
-  local Coding = require (elroot.. 'erlib/lua/Coding/init') ()
+  local Coding = require (elroot.. 'erlib/lua/Coding/!init') ()
  
   
   --STAGE DETECTION CAN FAIL

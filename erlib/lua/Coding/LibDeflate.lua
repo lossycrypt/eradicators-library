@@ -6,7 +6,6 @@ Pure Lua compressor and decompressor with high compression ratio using
 DEFLATE/zlib format.
 
 @file LibDeflate.lua
-#submodule Coding
 @author Haoqian He (Github: SafeteeWoW; World of Warcraft: Safetyy-Illidan(US))
 @copyright LibDeflate <2018-2020> Haoqian He
 @license zlib License

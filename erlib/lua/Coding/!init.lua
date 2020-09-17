@@ -11,7 +11,6 @@
 -- -------------------------------------------------------------------------- --
 -- Locals / Init                                                              --
 -- -------------------------------------------------------------------------- --
--- local elroot = (function(_) return (pcall(require,_..'erlib/empty')) and _ or '' end)('__eradicators-library__/')  
 local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
 
 local import = function(path) return (require(elroot..path))() end
@@ -98,6 +97,48 @@ Coding.Hydra = import 'erlib/lua/Coding/Hydra'
 ----------
 -- Alias of Hydra.load
 -- @function Hydra.decode
+
+
+
+--------------------------------------------------------------------------------
+-- Bluestring.
+--
+-- En-/Decodes to/from factorio blueprint exchange string format.
+-- Warning: No verification of in or output is done. This is simply a shortcut
+-- for the required Json+Zip+Base64+VersionByte'0' function chain.
+--
+-- __Note:__ serpent serialization is only for json-incompatible
+-- mod data. The resulting string will not be blueprint comatible.
+--
+-- __Note:__ uses
+--   @{FOBJ LuaGameScript.encode_string} and
+--   @{FOBJ LuaGameScript.decode_string} and
+--   @{FOBJ LuaGameScript.table_to_json} and 
+--   @{FOBJ LuaGameScript.json_to_table} when available and native lua otherwise.
+--
+-- @section
+--
+-- @usage
+--  local Bluestring = require('__eradicators-library__/erlib/lua/Coding/Bluestring')()
+--------------------------------------------------------------------------------
+Coding.Bluestring = import 'erlib/lua/Coding/Bluestring'
+
+----------
+-- @tparam table|string data Tables will be serialized to strings before compression.
+-- @tparam[opt='json'] string|nil serializer, 'json' or 'serpent'.
+-- @tparam[opt='0'] string prefix, the version marker byte
+-- @treturn string|nil the encoded string, or nothing if encoding failed.
+-- @function Bluestring.encode
+-- @usage LuaItemStack.import_stack(Bluestring.encode(my_bp_table))
+
+----------
+-- @tparam string data an encoded string
+-- @tparam[opt='json'] string|nil|false deserializer, 'json' or 'serpent'.
+-- Set to false if you want to deserialize yourself
+-- @tparam[opt='0'] string prefix, the version marker byte
+-- @treturn table|nil a fresh lua table, or nothing if decoding failed.
+-- @function Bluestring.decode
+-- @usage local my_bp_table = Bluestring.decode(LuaItemStack.export_stack())
 
 
 

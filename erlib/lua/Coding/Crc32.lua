@@ -1,5 +1,7 @@
 -- https://github.com/openresty/lua-nginx-module/blob/master/t/lib/CRC32.lua
 
+---@submodule Coding
+
 --Copyright (c) 2007-2008 Neil Richardson (nrich@iinet.net.au)
 --
 --Permission is hereby granted, free of charge, to any person obtaining a copy 
@@ -176,7 +178,7 @@ end
 
 local Crc32 = {
   encode = Hash,
-  decode = function() error'Can not decode crc32.' end,
+  decode = function() error 'Can not decode crc32.' end,
   }
   
 --[[lossycrypt: add meta calling syntactic sugar]]

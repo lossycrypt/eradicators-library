@@ -33,6 +33,7 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Hydra">Hydra </a></li>
+<li><a href="#Bluestring">Bluestring </a></li>
 <li><a href="#Base64">Base64 </a></li>
 <li><a href="#Json">Json </a></li>
 <li><a href="#Zip">Zip </a></li>
@@ -46,8 +47,8 @@
   <li><a href="../modules/Types.html">Types</a></li>
   <li><a href="../modules/Concepts.html">Concepts</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
-  <li><a href="../modules/lua.Coding.Sha256.html">lua.Coding.Sha256</a></li>
   <li><strong>Coding</strong></li>
+  <li><a href="../modules/Bluestring.html">Bluestring</a></li>
   <li><a href="../modules/Error.html">Error</a></li>
   <li><a href="../modules/Filter.html">Filter</a></li>
   <li><a href="../modules/Multiplex.html">Multiplex</a></li>
@@ -108,6 +109,21 @@
 	<tr>
 	<td class="name" nowrap><a href="#Hydra.decode">Hydra.decode()</a></td>
 	<td class="summary">Alias of Hydra.load</td>
+	</tr>
+</table>
+<h2><a href="#Bluestring">Bluestring </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Bluestring.encode">Bluestring.encode(data[, serializer='json'[, prefix='0']])</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Bluestring.decode">Bluestring.decode(data[, deserializer='json'[, prefix='0']])</a></td>
+	<td class="summary">
+
+</td>
 	</tr>
 </table>
 <h2><a href="#Base64">Base64 </a></h2>
@@ -358,6 +374,114 @@
 
 
 
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Bluestring"></a>Bluestring </h2>
+
+          <div class="section-description">
+           En-/Decodes to/from factorio blueprint exchange string format.
+ Warning: No verification of in or output is done. This is simply a shortcut
+ for the required Json+Zip+Base64+VersionByte'0' function chain.</p>
+
+<p> <strong>Note:</strong> serpent serialization is only for json-incompatible
+ mod data. The resulting string will not be blueprint comatible.</p>
+
+<p> <strong>Note:</strong> uses
+   <a href="../api/LuaGameScript.html#LuaGameScript.encode_string">LuaGameScript.encode_string</a> and
+   <a href="../api/LuaGameScript.html#LuaGameScript.decode_string">LuaGameScript.decode_string</a> and
+   <a href="../api/LuaGameScript.html#LuaGameScript.table_to_json">LuaGameScript.table_to_json</a> and
+   <a href="../api/LuaGameScript.html#LuaGameScript.json_to_table">LuaGameScript.json_to_table</a> when available and native lua otherwise.
+          </div>
+            <h3>Usage:</h3>
+            <pre class="example"><span class="keyword">local</span> Bluestring = <span class="global">require</span>(<span class="string">'__eradicators-library__/erlib/lua/Coding/Bluestring'</span>)()
+</pre>
+    <dl class="function">
+    <dt>
+    <a name = "Bluestring.encode"></a>
+    <strong>Bluestring.encode(data[, serializer='json'[, prefix='0']])</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">data</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.5.html">table</a> or <a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+         Tables will be serialized to strings before compression.
+        </li>
+        <li><span class="parameter">serializer</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        , 'json' or 'serpent'.
+         (<em>default</em> 'json')
+        </li>
+        <li><span class="parameter">prefix</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        , the version marker byte
+         (<em>default</em> '0')
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        the encoded string, or nothing if encoding failed.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">LuaItemStack.import_stack(Bluestring.encode(my_bp_table))</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Bluestring.decode"></a>
+    <strong>Bluestring.decode(data[, deserializer='json'[, prefix='0']])</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">data</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+         an encoded string
+        </li>
+        <li><span class="parameter">deserializer</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a>, <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a> or <span class="type">false</span></span>
+        , 'json' or 'serpent'.
+ Set to false if you want to deserialize yourself
+         (<em>default</em> 'json')
+        </li>
+        <li><span class="parameter">prefix</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+        , the version marker byte
+         (<em>default</em> '0')
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.5.html">table</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        a fresh lua table, or nothing if decoding failed.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> my_bp_table = Bluestring.decode(LuaItemStack.export_stack())</pre>
+    </ul>
 
 </dd>
 </dl>
@@ -654,7 +778,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-16 22:08:57 </i>
+<i style="float:right;">Last updated 2020-09-17 17:19:15 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

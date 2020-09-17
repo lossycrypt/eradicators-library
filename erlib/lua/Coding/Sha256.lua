@@ -16,6 +16,7 @@
     
   edits by lossycrypt, 2020
     + convert to erlib functional return style
+    + changed division lines from "----" to "-- -" to not confuse LDoc
   ]]
 
 local band, rrotate, bxor, rshift, bnot =
@@ -193,7 +194,7 @@ local function finalresult256 (H)
 end
 
 
-----------------------------------------------------------------------
+-- -------------------------------------------------------------------
 local HH = {}    -- to reuse
 --[[
 local function hash224 (msg)
@@ -220,7 +221,7 @@ local function hash256 (msg)
 
   return finalresult256(H)
 end
-----------------------------------------------------------------------
+-- -------------------------------------------------------------------
 --[[
 local mt = {}
 local function new256 ()
@@ -247,7 +248,7 @@ function mt:close ()
   self:add("")
   return finalresult256(self.H)
 end
-----------------------------------------------------------------------
+-- -------------------------------------------------------------------
 
 return {
   hash224 = hash224,
@@ -258,7 +259,7 @@ return {
 
 local Sha256 = {
   encode = hash256,
-  decode = function() error'Can not decode sha256.' end,
+  decode = function() error 'Can not decode sha256.' end,
   }
 
 --[[lossycrypt: add meta calling syntactic sugar]]

@@ -3,6 +3,7 @@
 
     Source:
       https://github.com/DaveMcW/blueprint-string/blob/master/blueprintstring/base64.lua
+      https://forums.factorio.com/viewtopic.php?p=467035#p467035
   
     Changes:
       + wrapped the original file in a "do end" block
