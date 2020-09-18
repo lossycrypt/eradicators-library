@@ -6,14 +6,18 @@
 --
 -- @module Coding
 -- @usage
---  local Coding = require('__eradicators-library__/erlib/lua/Coding/!all')()
+--  local Coding = require('__eradicators-library__/erlib/lua/Coding/!init')()
+
+-- -------------------------------------------------------------------------- --
+-- Built-In                                                                   --
+-- -------------------------------------------------------------------------- --
+local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
+local say,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
   
 -- -------------------------------------------------------------------------- --
 -- Locals / Init                                                              --
 -- -------------------------------------------------------------------------- --
-local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
-
-local import = function(path) return (require(elroot..path))() end
+local import = function(path) return (require(elroot..path))() end --unpacking
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -30,9 +34,9 @@ local Coding,_Coding,_uLocale = {},{},{}
 --
 -- This is a customized version of "serpent" - renamed to avoid confusion
 -- with Factorios built-in serpent installation.
--- This page only documents changes compared to serpent.
--- Equal to factorios built-in serpent Hydra represents self-referenced sub-tables
--- by the number 0 zero (instead of @{nil} like normal serpent does).
+-- This page only documents __changes__ compared to serpent.
+-- Equal to Factorios built-in serpent, Hydra represents redundant sub-tables
+-- references by the number 0 zero (instead of @{nil} like normal serpent does).
 --
 -- @section
 --
@@ -50,7 +54,7 @@ Coding.Hydra = import 'erlib/lua/Coding/Hydra'
 -- @table HydraOptions
   
 ----------
--- Multi-line serialization. A more readable, more informative alternative to
+-- Multi-line serialization preset. A more readable, more informative alternative to
 -- Hydra.block(). Defaults to indentlevel = 1, showref = true, nocode = true.
 --
 -- @function Hydra.lines
@@ -71,15 +75,15 @@ Coding.Hydra = import 'erlib/lua/Coding/Hydra'
 --   > }
 
 ----------
--- Single-line serialization
+-- Single-line serialization preset.
 -- @function Hydra.line
 
 ----------
--- Pretty printable serialization.
+-- Pretty printable serialization preset.
 -- @function Hydra.block
 
 ----------
--- Raw serialize with recursive tables.
+-- Raw serialize with recursive tables preset.
 -- @function Hydra.dump
 
 ----------
@@ -95,7 +99,11 @@ Coding.Hydra = import 'erlib/lua/Coding/Hydra'
 -- @function Hydra.encode
 
 ----------
--- Alias of Hydra.load
+-- Similar to Hydra.load, but only has one return value.
+-- @tparam string data a serialized table
+-- @treturn AnyValue|nil the value that was encoded or nil if decode failed.
+-- If @{nil} is a valid return value for your data then this is ambiguous and
+-- you should consider handling Hydra.load directly.
 -- @function Hydra.decode
 
 
@@ -106,6 +114,9 @@ Coding.Hydra = import 'erlib/lua/Coding/Hydra'
 -- En-/Decodes to/from factorio blueprint exchange string format.
 -- Warning: No verification of in or output is done. This is simply a shortcut
 -- for the required Json+Zip+Base64+VersionByte'0' function chain.
+--
+-- See [blueprint string format](https://wiki.factorio.com/Blueprint_string_format)
+-- on the wiki for further information.
 --
 -- __Note:__ serpent serialization is only for json-incompatible
 -- mod data. The resulting string will not be blueprint comatible.
@@ -134,7 +145,7 @@ Coding.Bluestring = import 'erlib/lua/Coding/Bluestring'
 ----------
 -- @tparam string data an encoded string
 -- @tparam[opt='json'] string|nil|false deserializer, 'json' or 'serpent'.
--- Set to false if you want to deserialize yourself
+-- If set to false the data is decompressed but not deserialized.
 -- @tparam[opt='0'] string prefix, the version marker byte
 -- @treturn table|nil a fresh lua table, or nothing if decoding failed.
 -- @function Bluestring.decode
@@ -203,10 +214,7 @@ Coding.Json = import 'erlib/lua/Coding/Json'
 -- @usage
 --  local Zip = require('__eradicators-library__/erlib/lua/Coding/Zip')()
 --------------------------------------------------------------------------------
-Coding.Zip = (_ENV.bit32) and import 'erlib/lua/Coding/Zip' or nil
-
-
--- Coding.LibDeflate = require (elroot.. 'erlib/lua/Coding/LibDeflate')
+Coding.Zip = import 'erlib/lua/Coding/Zip'
 
 ----------
 -- @tparam string data the original string
@@ -234,7 +242,7 @@ Coding.Crc32 = import 'erlib/lua/Coding/Crc32'
 
 ----------
 -- @tparam string data the original string
--- @treturn NaturalNumber the hash
+-- @treturn NaturalNumber|nil the hash, or nothing if it failed
 -- @function Crc32.encode
 
 
@@ -250,15 +258,16 @@ Coding.Crc32 = import 'erlib/lua/Coding/Crc32'
 -- @usage
 --  local Sha256 = require('__eradicators-library__/erlib/lua/Coding/Sha256')()
 --------------------------------------------------------------------------------
-Coding.Sha256 = (_ENV.bit32) and import 'erlib/lua/Coding/Sha256' or nil
+-- Coding.Sha256 = (_ENV.bit32) and import 'erlib/lua/Coding/Sha256' or nil
+Coding.Sha256 = import 'erlib/lua/Coding/Sha2'
 
 ----------
 -- @tparam string data the original string
--- @treturn string the base64 encoded hash
+-- @treturn string|nil the hash, or nothing if it failed
 -- @function Sha256.encode
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-(STDOUT or log or print)('Loaded → erlib.Coding')
+do (STDOUT or log or print)('  Loaded → erlib.Coding.!init') end
 return function() return Coding,_Coding,_uLocale end

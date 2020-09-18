@@ -15,7 +15,7 @@ local flag = pcall(require,'__zz-toggle-to-enable-dev-mode__/empty')
 
 
 -- collective loading of all modules without changing _ENV
-local EradicatorsLibrary = require '__eradicators-library__/erlib/main'()
+local EradicatorsLibrary = require '__eradicators-library__/erlib/Core'()
 
 
 

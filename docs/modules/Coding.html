@@ -48,13 +48,14 @@
   <li><a href="../modules/Concepts.html">Concepts</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
   <li><strong>Coding</strong></li>
-  <li><a href="../modules/Bluestring.html">Bluestring</a></li>
   <li><a href="../modules/Error.html">Error</a></li>
   <li><a href="../modules/Filter.html">Filter</a></li>
   <li><a href="../modules/Multiplex.html">Multiplex</a></li>
+  <li><a href="../modules/test.test_Sha2.html">test.test_Sha2</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
+  <li><a href="../source/Core.html">Core</a></li>
   <li><a href="../source/LibDeflate.lua.html">LibDeflate.lua</a></li>
 </ul>
 
@@ -67,7 +68,7 @@
 <p> You can require all sub-modules at once by requiring "!all".</p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Coding = require(&apos;__eradicators-library__/erlib/lua/Coding/!all&apos;)()
+        <pre class="example">local Coding = require(&apos;__eradicators-library__/erlib/lua/Coding/!init&apos;)()
 </pre>
     </ul>
 
@@ -80,19 +81,19 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Hydra.lines">Hydra.lines(object, options)</a></td>
-	<td class="summary">Multi-line serialization.</td>
+	<td class="summary">Multi-line serialization preset.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Hydra.line">Hydra.line()</a></td>
-	<td class="summary">Single-line serialization</td>
+	<td class="summary">Single-line serialization preset.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Hydra.block">Hydra.block()</a></td>
-	<td class="summary">Pretty printable serialization.</td>
+	<td class="summary">Pretty printable serialization preset.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Hydra.dump">Hydra.dump()</a></td>
-	<td class="summary">Raw serialize with recursive tables.</td>
+	<td class="summary">Raw serialize with recursive tables preset.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Hydra.load">Hydra.load()</a></td>
@@ -107,8 +108,8 @@
 	<td class="summary">Alias of Hydra.dump</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Hydra.decode">Hydra.decode()</a></td>
-	<td class="summary">Alias of Hydra.load</td>
+	<td class="name" nowrap><a href="#Hydra.decode">Hydra.decode(data)</a></td>
+	<td class="summary">Similar to Hydra.load, but only has one return value.</td>
 	</tr>
 </table>
 <h2><a href="#Bluestring">Bluestring </a></h2>
@@ -202,9 +203,9 @@
 
 <p> This is a customized version of "serpent" - renamed to avoid confusion
  with Factorios built-in serpent installation.
- This page only documents changes compared to serpent.
- Equal to factorios built-in serpent Hydra represents self-referenced sub-tables
- by the number 0 zero (instead of <a href="https://www.lua.org/pil/2.1.html">nil</a> like normal serpent does).
+ This page only documents <strong>changes</strong> compared to serpent.
+ Equal to Factorios built-in serpent, Hydra represents redundant sub-tables
+ references by the number 0 zero (instead of <a href="https://www.lua.org/pil/2.1.html">nil</a> like normal serpent does).
           </div>
             <h3>Usage:</h3>
             <pre class="example"><span class="keyword">local</span> Hydra = <span class="global">require</span>(<span class="string">'__eradicators-library__/erlib/lua/Coding/Hydra'</span>)()
@@ -239,7 +240,7 @@
     <strong>Hydra.lines(object, options)</strong>
     </dt>
     <dd>
-    Multi-line serialization.  A more readable, more informative alternative to
+    Multi-line serialization preset.  A more readable, more informative alternative to
  Hydra.block(). Defaults to indentlevel = 1, showref = true, nocode = true.
 
 
@@ -283,7 +284,7 @@
     <strong>Hydra.line()</strong>
     </dt>
     <dd>
-    Single-line serialization
+    Single-line serialization preset.
 
 
 
@@ -297,7 +298,7 @@
     <strong>Hydra.block()</strong>
     </dt>
     <dd>
-    Pretty printable serialization.
+    Pretty printable serialization preset.
 
 
 
@@ -311,7 +312,7 @@
     <strong>Hydra.dump()</strong>
     </dt>
     <dd>
-    Raw serialize with recursive tables.
+    Raw serialize with recursive tables preset.
 
 
 
@@ -364,13 +365,28 @@
 </dd>
     <dt>
     <a name = "Hydra.decode"></a>
-    <strong>Hydra.decode()</strong>
+    <strong>Hydra.decode(data)</strong>
     </dt>
     <dd>
-    Alias of Hydra.load
+    Similar to Hydra.load, but only has one return value.
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">data</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
+         a serialized table
+        </li>
+    </ul>
 
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+         the value that was encoded or nil if decode failed.
+ If <a href="https://www.lua.org/pil/2.1.html">nil</a> is a valid return value for your data then this is ambiguous and
+ you should consider handling Hydra.load directly.
+    </ol>
 
 
 
@@ -383,6 +399,9 @@
            En-/Decodes to/from factorio blueprint exchange string format.
  Warning: No verification of in or output is done. This is simply a shortcut
  for the required Json+Zip+Base64+VersionByte'0' function chain.</p>
+
+<p> See <a href="https://wiki.factorio.com/Blueprint_string_format">blueprint string format</a>
+ on the wiki for further information.</p>
 
 <p> <strong>Note:</strong> serpent serialization is only for json-incompatible
  mod data. The resulting string will not be blueprint comatible.</p>
@@ -459,7 +478,7 @@
         <li><span class="parameter">deserializer</span>
             <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a>, <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a> or <span class="type">false</span></span>
         , 'json' or 'serpent'.
- Set to false if you want to deserialize yourself
+ If set to false the data is decompressed but not deserialized.
          (<em>default</em> 'json')
         </li>
         <li><span class="parameter">prefix</span>
@@ -723,8 +742,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
-        the hash
+           <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        the hash, or nothing if it failed
     </ol>
 
 
@@ -740,6 +759,8 @@
           </div>
             <h3>Usage:</h3>
             <pre class="example"><span class="keyword">local</span> Sha256 = <span class="global">require</span>(<span class="string">'__eradicators-library__/erlib/lua/Coding/Sha256'</span>)()
+
+oding.Sha256 = (_ENV.bit32) <span class="keyword">and</span> import <span class="string">'erlib/lua/Coding/Sha256'</span> <span class="keyword">or</span> <span class="keyword">nil</span>
 </pre>
     <dl class="function">
     <dt>
@@ -763,8 +784,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
-        the base64 encoded hash
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        the hash, or nothing if it failed
     </ol>
 
 
@@ -778,7 +799,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-17 17:19:15 </i>
+<i style="float:right;">Last updated 2020-09-18 16:42:09 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

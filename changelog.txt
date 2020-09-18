@@ -1,15 +1,27 @@
 ---------------------------------------------------------------------------------------------------
 Version: 9.9.9
 Date: 2020-09-11
-  Todo:
+  Roadmap:
     - Make pure lua parts of the library seperately loadable.
     - Make the library loadable in a "static" manner where it does not configure itself.
     - Add auto-config function to set up the full library once inside a mod. Including dev-flags.
 ---------------------------------------------------------------------------------------------------
-Version: 4.0.9
+Version: 4.0.11
 Date: 2020-09-x
   Internal:
     - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.0.10
+Date: 2020-09-x
+  Features:
+    - Added assets/empty.ogg
+---------------------------------------------------------------------------------------------------
+Version: 4.0.9
+Date: 2020-09-x
+  Internal:
+    - Invented "shared" boot-strapper
+    - Overhauled Core
+    - Added basic integrated testing
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.8
 Date: 2020-09-x

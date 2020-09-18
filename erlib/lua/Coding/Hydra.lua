@@ -1,29 +1,34 @@
--- (c) Paul Kulchenko, 2012-2018, MIT License
--- https://github.com/pkulchenko/serpent
+--[[ lossycrypt, 2020
 
---[[ Modifications (eradicator, 2020)
+    Modified to work with factorio and erlib.
+
+    Source:
+      https://github.com/pkulchenko/serpent     
   
-  Modified to work with factorio and erlib
-
-  + shortend string representation of skipped functions (too cluttery to read)
-  + new option: "indentlevel", changes how many subtables are indented
-    for pretty-printing
-  + new preset: "serpent.lines", includes {indentlevel=1,nocode=true}
-  + removed looking at _G first (_ENV may be locked)
-  + removed setfenv check (_ENV may be locked, factorio has no setfenv)
-  + change placeholder for redundant tables from nil to 0 to fix determinism
-    (https://factorio.com/blog/post/fff-340)
-  + new option: "showref", adds comments to otherwise skipped self-references
-  + renamed "Hydra" to avoid confusion with factorio "serpent".
-
-  local test_input = {
-    x = { x = { x = { x = { x = { x = { 'a' }}}}}},
-    y = { x = { x = { x = { x = { x = { 'b' }}}}}},
-    }
-
+    Changes:
+      + wrapped the original file in a "do end" block
+      + shortend string representation of skipped functions (too cluttery to read)
+      + new option: "indentlevel", changes how many subtables are indented
+        for pretty-printing
+      + new preset: "serpent.lines", includes {indentlevel=1,nocode=true}
+      + removed looking at _G first (_ENV may be meta-locked)
+      + removed setfenv check (_ENV may be meta-locked, factorio has no setfenv)
+      + change placeholder for redundant tables from nil to 0 to fix determinism
+        (https://factorio.com/blog/post/fff-340)
+      + new option: "showref", adds comments to otherwise skipped self-references
+      + renamed to "Hydra" to avoid confusion with factorio built-in "serpent"
+      + added Hydra.encode and Hydra.decode single-return function
+      + changed module return value to be erlib compatible
+      
+      local test_input = {
+        x = { x = { x = { x = { x = { x = { 'a' }}}}}},
+        y = { x = { x = { x = { x = { x = { 'b' }}}}}},
+        }
+        
   ]]
+  
 
-
+-- (c) Paul Kulchenko, 2012-2018, MIT License
 
 do
   local n, v = "serpent", "0.302" -- (C) 2012-18 Paul Kulchenko; MIT License
@@ -209,10 +214,18 @@ do
       }, opts)) end,
     }
   
-  --[[lossycrypt: erlib Coding compatible aliases]]  
+  --[[lossycrypt: erlib Coding.Bluestring compatible aliases]]
   Hydra.encode = Hydra.dump
-  Hydra.decode = Hydra.load
+  -- Hydra.decode = Hydra.load
+  
+  --[[lossycrypt: Bluestring compatible (nil or data) return loader]]
+  -- does not allow disabling safety like raw Hydra.load
+  Hydra.decode = function(data)
+    local ok, obj = Hydra.load(data)
+    if ok == true then return obj end
+    end
 
   --[[lossycrypt: erlib expects a function to be returned]]
+  do (STDOUT or log or print)('  Loaded → erlib.Coding.Hydra') end
   return function() return Hydra,nil,nil end
   end

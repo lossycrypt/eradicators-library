@@ -17,6 +17,11 @@
 --   2 -2 prototypes/entity/my-modded-entity.lua  --
 --   3 -1 data.lua                                -- bottom (called first)
 
+-- -------------------------------------------------------------------------- --
+-- Built-In                                                                   --
+-- -------------------------------------------------------------------------- --
+local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
+local say,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -24,13 +29,11 @@
 
 local Stacktrace = {}
 
-
 -- -------------------------------------------------------------------------- --
 -- Locals / Init                                                              --
 -- -------------------------------------------------------------------------- --
 
 local debug_getinfo = _ENV .debug .getinfo
-
 
 --@tparam string msg the message
 local function _error(msg)
@@ -118,7 +121,7 @@ function Stacktrace.get_pos(l)
 -- @tparam[opt=1] integer l
 --
 function Stacktrace.print_info(l)
-  (STDOUT or log or print)(debug.traceback(l and (l+1) or 2))
+  do (STDOUT or log or print)(debug.traceback(l and (l+1) or 2)) end
   end
 
 --------------------------------------------------------------------------------
@@ -312,5 +315,5 @@ function Stacktrace.get_load_phase()
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-
+do (STDOUT or log or print)('  Loaded → erlib.Stacktrace') end
 return function() return Stacktrace,nil,nil end

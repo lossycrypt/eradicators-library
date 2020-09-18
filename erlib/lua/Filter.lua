@@ -7,7 +7,15 @@
 -- @usage
 --  local Filter = require('__eradicators-library__.erlib.lua.Filter')()
   
-  
+-- -------------------------------------------------------------------------- --
+-- Built-In                                                                   --
+-- -------------------------------------------------------------------------- --
+local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
+local say,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
+
+-- -------------------------------------------------------------------------- --
+-- Locals / Init                                                              --
+-- -------------------------------------------------------------------------- --
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -40,4 +48,5 @@ Filter.VALID = function(obj) return not not obj.valid end
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-return function() return Template,_Template,_uLocale end
+do (STDOUT or log or print)('  Loaded → erlib.Filter') end
+return function() return Filter,_Filter,_uLocale end

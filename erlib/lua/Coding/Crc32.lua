@@ -1,4 +1,16 @@
--- https://github.com/openresty/lua-nginx-module/blob/master/t/lib/CRC32.lua
+--[[ lossycrypt, 2020
+
+    Source:
+      https://github.com/openresty/lua-nginx-module/blob/master/t/lib/CRC32.lua
+  
+    Changes:
+      + changed module return value to be erlib compatible
+      + moved final usage explanation comment to top (below the license)
+      + add __call meta function
+      + changed function to return nil for invalid input data
+      
+  ]]
+
 
 ---@submodule Coding
 
@@ -176,12 +188,17 @@ local function Hash(str)
     return crc
 end
 
+
+--[[lossycrypt: add return table]]
 local Crc32 = {
-  encode = Hash,
+  encode = function(data) 
+    if type(data) == 'string' then return Hash(data) end
+    end,
   decode = function() error 'Can not decode crc32.' end,
   }
-  
+
 --[[lossycrypt: add meta calling syntactic sugar]]
 setmetatable(Crc32,{__call=function(_,data) return Crc32.encode(data) end})
-
+--
+do (STDOUT or log or print)('  Loaded → erlib.Coding.Crc32') end
 return function() return Crc32, nil, nil end

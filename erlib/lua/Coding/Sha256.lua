@@ -15,9 +15,14 @@
     + commented out unused sha256 stream cypher sections
     
   edits by lossycrypt, 2020
-    + convert to erlib functional return style
+    + changed module return value to be erlib compatible
     + changed division lines from "----" to "-- -" to not confuse LDoc
+    + add __call meta function
+
   ]]
+  
+local _LIB = _ENV --[[lossycrypt: i still need that for later!]]
+  
 
 local band, rrotate, bxor, rshift, bnot =
   bit32.band, bit32.rrotate, bit32.bxor, bit32.rshift, bit32.bnot
@@ -259,10 +264,11 @@ return {
 
 local Sha256 = {
   encode = hash256,
-  decode = function() error 'Can not decode sha256.' end,
+  decode = function() _LIB.error 'Can not decode sha256.' end,
   }
 
 --[[lossycrypt: add meta calling syntactic sugar]]
-setmetatable(Sha256,{__call=function(_,data) return Sha256.encode(data) end})
+_LIB.setmetatable(Sha256,{__call=function(_,data) return Sha256.encode(data) end})
 
+do (_LIB.STDOUT or _LIB.log or _LIB.print)('  Loaded → erlib.Coding.Sha256') end
 return function() return Sha256, nil, nil end

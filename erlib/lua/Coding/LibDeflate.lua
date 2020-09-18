@@ -3524,4 +3524,5 @@ if io and os and debug and _G.arg then
 	end
 end
 
+do (STDOUT or log or print)('  Loaded → erlib.Coding.LibDeflate') end
 return LibDeflate

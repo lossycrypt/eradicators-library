@@ -1,5 +1,14 @@
--- https://github.com/rxi/json.lua/blob/master/json.lua
---
+--[[ lossycrypt, 2020
+
+    Source:
+      https://github.com/rxi/json.lua
+  
+    Changes:
+      + changed module return value to be erlib compatible
+      
+  ]]
+
+
 -- json.lua
 --
 -- Copyright (c) 2020 rxi
@@ -387,5 +396,5 @@ end
 
 
 -- return json
-
+do (STDOUT or log or print)('  Loaded → erlib.Coding.Json') end
 return function() return json, nil, nil end

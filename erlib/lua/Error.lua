@@ -23,18 +23,15 @@
 --   > control.lua:18 > some_module.lua:67
 --   > ############################
 
--- local elroot=(localised_print and table_size)and '__eradicators-library__/' or ''
-
--- local elroot = (pcall('__eradicators-library__/'
-
--- local elroot = '__eradicators-library__'; elroot = (pcall(elroot..'/erlib/empty')) and elroot or nil
--- local r = '__eradicators-library__'; r = (pcall(elroot..'/erlib/empty')) and r or nil
-
-
 -- -------------------------------------------------------------------------- --
--- Import                                                                     --
+-- Built-In                                                                   --
 -- -------------------------------------------------------------------------- --
 local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
+local say,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
+
+-- -------------------------------------------------------------------------- --
+-- Locals / Init                                                              --
+-- -------------------------------------------------------------------------- --
 
 local Stacktrace = require(elroot.. 'erlib/factorio/Stacktrace')()
 local Hydra      = require(elroot.. 'erlib/lua/Coding/Hydra'   )()
@@ -212,4 +209,5 @@ Error.Stopper = function(prefix,postfix)
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
+do (STDOUT or log or print)('  Loaded → erlib.Error') end
 return function() return Error,_Error,_uLocale end

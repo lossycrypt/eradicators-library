@@ -1,12 +1,12 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
---------------------------------------------------
--- Inline replication of object references.
+-- -----------------------------------------------
+-- Runs all available tests. (Don't forget to re-generate the test list.)
 --
--- @module Multiplex
+-- @module TestInit
 -- @usage
---  local Multiplex = require('__eradicators-library__/erlib/lua/Multiplex')()
-  
+--  local TestInit = require('__eradicators-library__/erlib/test/TestInit')()
+
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
 -- -------------------------------------------------------------------------- --
@@ -16,45 +16,41 @@ local say,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
 -- -------------------------------------------------------------------------- --
 -- Locals / Init                                                              --
 -- -------------------------------------------------------------------------- --
+local Stacktrace = elreq('erlib/factorio/Stacktrace')()
+
+local Tests = elreq('erlib/test/!list')
+
+local phase = flag.IS_FACTORIO and Stacktrace.get_load_phase().name or 'lua'
+
+local toset = function(arr) local r = {} for _,v in pairs(arr) do r[v]=true end return r end
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Multiplex,_Multiplex,_uLocale = {},{},{}
+-- The log is easier to read if "Loaded" and "Test ok" messages
+-- are in seperate blocks. To achieve this the Test list is iterated
+-- once for loading and once for testing.
 
+say('  Test   → Init.')
 
-----------
--- Returns two references to the given object.
--- @tparam AnyValue v
--- @usage local A,B = Duplex(f)
-Multiplex.Duplex  = function(v) return v,v   end
-
-
-----------
--- Returns three references to the given object.
--- @tparam AnyValue v
--- @usage local A,B,C = Triplex({})
-Multiplex.Triplex = function(v) return v,v,v end
-
-----------
--- Returns n references to the given object.
--- @tparam NaturalNumber n
--- @tparam AnyValue v
--- @usage local A,B,C,E,F,G = Multiplex(6,LuaEntity)
-Multiplex.Multiplex = function(n,v)
-  local r = {}; for i=1,n do r[#r+1] = v end
-  return unpack(r)
-  -- @future use memoized lambda sub-function for speed?
-  -- local f = Memoize.one_arg(function(n) return L('_1'..string.rep(',_1',n)) end)
-  -- return f(n)(v)
+-- load all test files
+local n = #Tests
+for i=1,n do
+  -- does not preserve import order (and that's ok)
+  Tests[Tests[i]] = {elreq('erlib/test/'..Tests[i])()}
+  Tests[i] = nil
   end
 
+-- execute all test files
+for name,this in pairs(Tests) do
+  if toset(this[2])[phase] then this[1]() end
+  end
   
   
-
+  
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-do (STDOUT or log or print)('  Loaded → erlib.Multiplex') end
-return function() return Multiplex,_Multiplex,_uLocale end
+do (STDOUT or log or print)('  Loaded → erlib.TestInit') end
+return function() return TestInit,_TestInit,_uLocale end
