@@ -19,10 +19,10 @@ local say,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
 
 -- Hydra might become outdated if built-in serpent changes but
 -- i need the Hydra.decode single-return-value interface.
-local Hydra  = (require(elroot.. 'erlib/lua/Coding/Hydra' ))()
-local Zip    = (require(elroot.. 'erlib/lua/Coding/Zip'   ))()
 local Base64 = (require(elroot.. 'erlib/lua/Coding/Base64'))()
+local Hydra  = (require(elroot.. 'erlib/lua/Coding/Hydra' ))()
 local Json   = (require(elroot.. 'erlib/lua/Coding/Json'  ))()
+local Zip    = (require(elroot.. 'erlib/lua/Coding/Zip'   ))()
 
 --blueprint exchange string version byte
 local VERSION_BYTE = {

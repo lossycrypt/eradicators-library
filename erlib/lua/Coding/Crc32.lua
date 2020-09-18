@@ -1,198 +1,202 @@
---[[ lossycrypt, 2020
+-- https://gist.github.com/SafeteeWoW/080e784e5ebfda42cad486c58e6d26e4
 
-    Source:
-      https://github.com/openresty/lua-nginx-module/blob/master/t/lib/CRC32.lua
-  
-    Changes:
-      + changed module return value to be erlib compatible
-      + moved final usage explanation comment to top (below the license)
-      + add __call meta function
-      + changed function to return nil for invalid input data
-      
-  ]]
+local LibDeflate = {}
+local string_byte = string.byte
 
+-- Calculate xor for two unsigned 8bit numbers (0 <= a,b <= 255)
+local function Xor8(a, b)
+	local ret = 0
+	local fact = 128
+	while fact > a and fact > b do
+		fact = fact / 2
+	end
+	while fact >= 1 do
+        ret = ret + (((a >= fact or b >= fact)
+			and (a < fact or b < fact)) and fact or 0)
+        a = a - ((a >= fact) and fact or 0)
+        b = b - ((b >= fact) and fact or 0)
+	    fact = fact / 2
+	end
+	return ret
+end
 
----@submodule Coding
+-- table to cache the result of uint8 xor(x, y)  (0<=x,y<=255)
+local _xor8_table
 
---Copyright (c) 2007-2008 Neil Richardson (nrich@iinet.net.au)
---
---Permission is hereby granted, free of charge, to any person obtaining a copy 
---of this software and associated documentation files (the "Software"), to deal
---in the Software without restriction, including without limitation the rights 
---to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
---copies of the Software, and to permit persons to whom the Software is 
---furnished to do so, subject to the following conditions:
---
---The above copyright notice and this permission notice shall be included in all
---copies or substantial portions of the Software.
---
---THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
---IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
---FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
---AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
---LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
---OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
---IN THE SOFTWARE.
-
---
--- CRC32.lua
---
--- A pure Lua implementation of a CRC32 hashing algorithm. Slower than using a
--- C implemtation, but useful having no other dependencies.
---
---
--- Synopsis
---
--- require('CRC32')
---
--- crchash = CRC32.Hash('a string')
---
--- Methods:
---
--- hashval = CRC32.Hash(val)
---    Calculates and returns (as an integer) the CRC32 hash of the parameter 'val'. 
+local function GenerateXorTable()
+	assert(not _xor8_table)
+	_xor8_table = {}
+	for i = 0, 255 do
+		local t = {}
+		_xor8_table[i] = t
+		for j = 0, 255 do
+			t[j] = Xor8(i, j)
+		end
+	end
+end
 
 
---[[lossycrypt: adapt to erlib package format]]
--- module('CRC32', package.seeall)
-
-local max = 2^32 -1
-
-local CRC32 = {
-    0,79764919,159529838,222504665,319059676,
-    398814059,445009330,507990021,638119352,
-    583659535,797628118,726387553,890018660,
-    835552979,1015980042,944750013,1276238704,
-    1221641927,1167319070,1095957929,1595256236,
-    1540665371,1452775106,1381403509,1780037320,
-    1859660671,1671105958,1733955601,2031960084,
-    2111593891,1889500026,1952343757,2552477408,
-    2632100695,2443283854,2506133561,2334638140,
-    2414271883,2191915858,2254759653,3190512472,
-    3135915759,3081330742,3009969537,2905550212,
-    2850959411,2762807018,2691435357,3560074640,
-    3505614887,3719321342,3648080713,3342211916,
-    3287746299,3467911202,3396681109,4063920168,
-    4143685023,4223187782,4286162673,3779000052,
-    3858754371,3904687514,3967668269,881225847,
-    809987520,1023691545,969234094,662832811,
-    591600412,771767749,717299826,311336399,
-    374308984,453813921,533576470,25881363,
-    88864420,134795389,214552010,2023205639,
-    2086057648,1897238633,1976864222,1804852699,
-    1867694188,1645340341,1724971778,1587496639,
-    1516133128,1461550545,1406951526,1302016099,
-    1230646740,1142491917,1087903418,2896545431,
-    2825181984,2770861561,2716262478,3215044683,
-    3143675388,3055782693,3001194130,2326604591,
-    2389456536,2200899649,2280525302,2578013683,
-    2640855108,2418763421,2498394922,3769900519,
-    3832873040,3912640137,3992402750,4088425275,
-    4151408268,4197601365,4277358050,3334271071,
-    3263032808,3476998961,3422541446,3585640067,
-    3514407732,3694837229,3640369242,1762451694,
-    1842216281,1619975040,1682949687,2047383090,
-    2127137669,1938468188,2001449195,1325665622,
-    1271206113,1183200824,1111960463,1543535498,
-    1489069629,1434599652,1363369299,622672798,
-    568075817,748617968,677256519,907627842,
-    853037301,1067152940,995781531,51762726,
-    131386257,177728840,240578815,269590778,
-    349224269,429104020,491947555,4046411278,
-    4126034873,4172115296,4234965207,3794477266,
-    3874110821,3953728444,4016571915,3609705398,
-    3555108353,3735388376,3664026991,3290680682,
-    3236090077,3449943556,3378572211,3174993278,
-    3120533705,3032266256,2961025959,2923101090,
-    2868635157,2813903052,2742672763,2604032198,
-    2683796849,2461293480,2524268063,2284983834,
-    2364738477,2175806836,2238787779,1569362073,
-    1498123566,1409854455,1355396672,1317987909,
-    1246755826,1192025387,1137557660,2072149281,
-    2135122070,1912620623,1992383480,1753615357,
-    1816598090,1627664531,1707420964,295390185,
-    358241886,404320391,483945776,43990325,
-    106832002,186451547,266083308,932423249,
-    861060070,1041341759,986742920,613929101,
-    542559546,756411363,701822548,3316196985,
-    3244833742,3425377559,3370778784,3601682597,
-    3530312978,3744426955,3689838204,3819031489,
-    3881883254,3928223919,4007849240,4037393693,
-    4100235434,4180117107,4259748804,2310601993,
-    2373574846,2151335527,2231098320,2596047829,
-    2659030626,2470359227,2550115596,2947551409,
-    2876312838,2788305887,2733848168,3165939309,
-    3094707162,3040238851,2985771188,
-}
-
-local function xor(a, b)
-    local calc = 0    
-
-    for i = 32, 0, -1 do
-	local val = 2 ^ i
-	local aa = false
-	local bb = false
-
-	if a == 0 then
-	    calc = calc + b
-	    break
+-- 4 CRC tables.
+-- Each table one byte of the value in the traditional crc32 table.
+-- _crc_table0 stores the least significant byte.
+-- _crc_table3 stores the most significant byte.
+-- These tables are generated by the following script.
+--[[
+for n = 0, 255 do
+	local c = n
+	for k = 0, 7 do
+		local m = c % 2
+		local d = (c-m)/2
+		if m > 0 then
+			c = xor32(0xedb88320, d)
+		else
+			c = d
+		end
 	end
 
-	if b == 0 then
-	    calc = calc + a
-	    break
-	end
+	local c0, c1, c2, c3
 
-	if a >= val then
-	    aa = true
-	    a = a - val
-	end
+	c0 = c % 256
+	c = (c - c0) / 256
+	c1 = c % 256
+	c = (c - c1) / 256
+	c2 = c % 256
+	c = (c - c2) / 256
+	c3 = c % 256
+	_crc_table0[n] = c0
+	_crc_table1[n] = c1
+	_crc_table2[n] = c2
+	_crc_table3[n] = c3
+end
+]]
+local _crc_table0 = {
+	[0]=0,150,44,186,25,143,53,163,50,164,30,136,43,189,7,145,100,242,72,222,
+	125,235,81,199,86,192,122,236,79,217,99,245,200,94,228,114,209,71,253,107,
+	250,108,214,64,227,117,207,89,172,58,128,22,181,35,153,15,158,8,178,36,135,
+	17,171,61,144,6,188,42,137,31,165,51,162,52,142,24,187,45,151,1,244,98,216,
+	78,237,123,193,87,198,80,234,124,223,73,243,101,88,206,116,226,65,215,109,
+	251,106,252,70,208,115,229,95,201,60,170,16,134,37,179,9,159,14,152,34,180,
+	23,129,59,173,32,182,12,154,57,175,21,131,18,132,62,168,11,157,39,177,68,
+	210,104,254,93,203,113,231,118,224,90,204,111,249,67,213,232,126,196,82,241,
+	103,221,75,218,76,246,96,195,85,239,121,140,26,160,54,149,3,185,47,190,
+	40,146,4,167,49,139,29,176,38,156,10,169,63,133,19,130,20,174,56,155,13,183,
+	33,212,66,248,110,205,91,225,119,230,112,202,92,255,105,211,69,120,238,84,
+	194,97,247,77,219,74,220,102,240,83,197,127,233,28,138,48,166,5,147,41,191,
+	46,184,2,148,55,161,27,141}
+local _crc_table1 = {
+	[0]=0,48,97,81,196,244,165,149,136,184,233,217,76,124,45,29,16,32,113,65,
+	212,228,181,133,152,168,249,201,92,108,61,13,32,16,65,113,228,212,133,181,
+	168,152,201,249,108,92,13,61,48,0,81,97,244,196,149,165,184,136,217,233,124,
+	76,29,45,65,113,32,16,133,181,228,212,201,249,168,152,13,61,108,92,81,97,48,
+	0,149,165,244,196,217,233,184,136,29,45,124,76,97,81,0,48,165,149,196,244,
+	233,217,136,184,45,29,76,124,113,65,16,32,181,133,212,228,249,201,152,168,
+	61,13,92,108,131,179,226,210,71,119,38,22,11,59,106,90,207,255,174,158,147,
+	163,242,194,87,103,54,6,27,43,122,74,223,239,190,142,163,147,194,242,103,87,
+	6,54,43,27,74,122,239,223,142,190,179,131,210,226,119,71,22,38,59,11,90,106,
+	255,207,158,174,194,242,163,147,6,54,103,87,74,122,43,27,142,190,239,223,
+	210,226,179,131,22,38,119,71,90,106,59,11,158,174,255,207,226,210,131,179,
+	38,22,71,119,106,90,11,59,174,158,207,255,242,194,147,163,54,6,87,103,122,
+	74,27,43,190,142,223,239}
+local _crc_table2 = {
+	[0]=0,7,14,9,109,106,99,100,219,220,213,210,182,177,184,191,183,176,185,190,
+	218,221,212,211,108,107,98,101,1,6,15,8,110,105,96,103,3,4,13,10,181,178,
+	187,188,216,223,214,209,217,222,215,208,180,179,186,189,2,5,12,11,111,104,
+	97,102,220,219,210,213,177,182,191,184,7,0,9,14,106,109,100,99,107,108,101,
+	98,6,1,8,15,176,183,190,185,221,218,211,212,178,181,188,187,223,216,209,214,
+	105,110,103,96,4,3,10,13,5,2,11,12,104,111,102,97,222,217,208,215,179,180,
+	189,186,184,191,182,177,213,210,219,220,99,100,109,106,14,9,0,7,15,8,1,6,98,
+	101,108,107,212,211,218,221,185,190,183,176,214,209,216,223,187,188,181,178,
+	13,10,3,4,96,103,110,105,97,102,111,104,12,11,2,5,186,189,180,179,215,208,
+	217,222,100,99,106,109,9,14,7,0,191,184,177,182,210,213,220,219,211,212,221,
+	218,190,185,176,183,8,15,6,1,101,98,107,108,10,13,4,3,103,96,105,110,209,
+	214,223,216,188,187,178,181,189,186,179,180,208,215,222,217,102,97,104,111,
+	11,12,5,2}
+local _crc_table3 = {
+	[0]=0,119,238,153,7,112,233,158,14,121,224,151,9,126,231,144,29,106,243,132,
+	26,109,244,131,19,100,253,138,20,99,250,141,59,76,213,162,60,75,210,165,53,
+	66,219,172,50,69,220,171,38,81,200,191,33,86,207,184,40,95,198,177,47,88,
+	193,182,118,1,152,239,113,6,159,232,120,15,150,225,127,8,145,230,107,28,133,
+	242,108,27,130,245,101,18,139,252,98,21,140,251,77,58,163,212,74,61,164,211,
+	67,52,173,218,68,51,170,221,80,39,190,201,87,32,185,206,94,41,176,199,89,46,
+	183,192,237,154,3,116,234,157,4,115,227,148,13,122,228,147,10,125,240,135,
+	30,105,247,128,25,110,254,137,16,103,249,142,23,96,214,161,56,79,209,166,63,
+	72,216,175,54,65,223,168,49,70,203,188,37,82,204,187,34,85,197,178,43,92,
+	194,181,44,91,155,236,117,2,156,235,114,5,149,226,123,12,146,229,124,11,134,
+	241,104,31,129,246,111,24,136,255,102,17,143,248,97,22,160,215,78,57,167,
+	208,73,62,174,217,64,55,169,222,71,48,189,202,83,36,186,205,84,35,179,196,
+	93,42,180,195,90,45}
 
-	if b >= val then
-	    bb = true
-	    b = b - val
-	end
+--[[lossycrypt: hide docstring "---" -> "--"]]
 
-	if not (aa and bb) and (aa or bb) then
-	    calc = calc + val
+-- Calculate the CRC-32 checksum of the string.
+-- @param str [string] the input string to calculate its CRC-32 checksum.
+-- @param init_value [nil/integer] The initial crc32 value. If nil, use 0
+-- @return [integer] The CRC-32 checksum, which is greater or equal to 0,
+-- and less than 2^32 (4294967296).
+function LibDeflate:Crc32(str, init_value)
+	-- TODO: Check argument
+	local crc = (init_value or 0) % 4294967296
+	if not _xor8_table then
+		GenerateXorTable()
 	end
+    -- The value of bytes of crc32
+	-- crc0 is the least significant byte
+	-- crc3 is the most significant byte
+    local crc0 = crc % 256
+    crc = (crc - crc0) / 256
+    local crc1 = crc % 256
+    crc = (crc - crc1) / 256
+    local crc2 = crc % 256
+    local crc3 = (crc - crc2) / 256
+
+	local _xor_vs_255 = _xor8_table[255]
+	crc0 = _xor_vs_255[crc0]
+	crc1 = _xor_vs_255[crc1]
+	crc2 = _xor_vs_255[crc2]
+	crc3 = _xor_vs_255[crc3]
+    for i=1, #str do
+		local byte = string_byte(str, i)
+		local k = _xor8_table[crc0][byte]
+		crc0 = _xor8_table[_crc_table0[k] ][crc1]
+		crc1 = _xor8_table[_crc_table1[k] ][crc2]
+		crc2 = _xor8_table[_crc_table2[k] ][crc3]
+		crc3 = _crc_table3[k]
     end
-
-    return calc
-end
-
-local function lshift(num, left)
-    local res = num * (2 ^ left)
-    return res % (2 ^ 32)
-end
-
-local function rshift(num, right)
-    local res = num / (2 ^ right)
-    return math.floor(res)
-end
-
-local function Hash(str)
-    local count = string.len(tostring(str))
-    local crc = max
-    
-    local i = 1
-    while count > 0 do
-	local byte = string.byte(str, i)
-
-	crc = xor(lshift(crc, 8), CRC32[xor(rshift(crc, 24), byte) + 1])
-
-	i = i + 1
-	count = count - 1
-    end
-
+	crc0 = _xor_vs_255[crc0]
+	crc1 = _xor_vs_255[crc1]
+	crc2 = _xor_vs_255[crc2]
+	crc3 = _xor_vs_255[crc3]
+    crc = crc0 + crc1*256 + crc2*65536 + crc3*16777216
     return crc
 end
+
+--[[lossycrypt: removed benchmark]]
+-- s=""
+-- t={}
+-- local table_insert = table.insert
+-- for i=1,10000 do
+-- 	table_insert(t, "12313213213jojelasdfj;askljfldasgfjd;sajf")
+-- end
+-- 
+-- s = table.concat(t)
+-- 
+-- print("string len: ", #s)
+-- t = os.clock()
+-- 
+-- crc32 = LibDeflate:Crc32(s, 0)
+-- 
+-- print("time took for crc32: ", os.clock() - t)
+-- 
+-- print("crc32: "..crc32)
+-- 
+-- print("---------------------------------------------")
+
 
 
 --[[lossycrypt: add return table]]
 local Crc32 = {
-  encode = function(data) 
-    if type(data) == 'string' then return Hash(data) end
+  encode = function(data)
+    if type(data) == 'string' then return LibDeflate:Crc32(data,0) end
     end,
   decode = function() error 'Can not decode crc32.' end,
   }

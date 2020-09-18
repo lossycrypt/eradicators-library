@@ -30,17 +30,13 @@
   <li><a href="../index.html">Index</a></li>
 </ul>
 
-<h2>Contents</h2>
-<ul>
-<li><a href="#Concepts">Concepts </a></li>
-</ul>
 
 
 <h2>Modules</h2>
 <ul class="nowrap">
-  <li><a href="../modules/Core.html">Core</a></li>
+  <li><strong>Core</strong></li>
   <li><a href="../modules/Types.html">Types</a></li>
-  <li><strong>Concepts</strong></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
   <li><a href="../modules/Error.html">Error</a></li>
@@ -57,52 +53,24 @@
 
 <div id="content">
 
-<h1>Module <code>Concepts</code></h1>
-<p>Abstract programming and behavioral concepts used by the library.</p>
-<p>
-
-
-
-</p>
-
-
-<h2><a href="#Concepts">Concepts </a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#STDOUT">STDOUT</a></td>
-	<td class="summary">When an environment variable _ENV.STDOUT is truthy then any compatible
- function will call STDOUT(...) instead of log(...).</td>
-	</tr>
-</table>
-
-<br/>
-<br/>
-
-
-    <h2 class="section-header "><a name="Concepts"></a>Concepts </h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "STDOUT"></a>
-    <strong>STDOUT</strong>
-    </dt>
-    <dd>
-    When an environment variable _ENV.STDOUT is truthy then any compatible
- function will call STDOUT(...) instead of log(...).  If a function is
- compatible is mentioned in each functions description.
-
-
-
-
-
-
+<h1>Module <code>Core</code></h1>
+<p>Instead of requiring each component of the library seperately you can
+  instead require this Core file which fill automatically loads all modules.</p>
+<p>  The Core also has some special features like installing all modules directly
+  into your environment. If you only want to use a selected few modules that's
+  probably a waste of RAM though.</p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">_ENV.STDOUT = _ENV.<span class="global">print</span></pre>
+        <pre class="example">local erlib = require(&apos;__eradicators-library__/erlib/Core&apos;)()
+</pre>
     </ul>
 
-</dd>
-</dl>
+
+
+<br/>
+<br/>
+
+
 
 
 </div> <!-- id="content" -->

@@ -7,43 +7,7 @@
   into your environment. If you only want to use a selected few modules that's
   probably a waste of RAM though.
  
-  Architecture:
-     + ErLib is fully self contained inside it's subfolder.
-     + ErLib knows which mod it is loaded from and when.
-     + ErLib uses local files if remote files can't be found. (not per-file)
-     + ErLib is built to be scenario compatible. Though some features
-       like the default linked hotkeys can not be used in that mode.
-     + The Core is completely passive by default.
-     + Normal modules on require return a function that when called returns
-       *up to* three objects: ModuleTable, StrictWrapper, uLocale.
-     + Test modules return exactly two objects: TestFunction, PhaseTable
-     + Except for Core no module ever changes _ENV.
-       And even Core only does so on request.
-     + All modules are stand-alone. (requirements will be auto-loaded)
- 
-  Features:
-     + ErLib can be used in a non-factorio environment for testing. Obviously
-       factorio features don't work in that mode (they will throw errors).
-     + ErLib has several advanced features like the EventManager,
-       PluginManager, HotkeyManager and more that automate common tasks
-       at a much higher level than other factorio libraries do.
- 
-  Todo:
-     + More control flow logging
-     + Port and document all old modules
-     + Core loads all modules outside of Core Function so the output can
-       dynamically be rebuilt.
-     + Add global flags (devmode, strictmode, etc)
-     + use Sha2.lua instead of Sha256.lua?
-     + Remove unused functions from LibDeflate
- 
-  Future:
-     + Runtime dis/enable of STRICT_MODE
- 
-  @file Core
-  @author lossycrypt (factorio: eradicator)
-  @copyright Eradicators Library, lossycrypt, 2017-2020
-  @license CC Attribution-NoDerivatives 4.0 International
+  @module Core
   @usage local erlib = require('__eradicators-library__/erlib/Core')()
 ]]
 
@@ -180,12 +144,51 @@ local function EradicatorsLibraryMain(options)
       end
     end
   
-  -- for k,v in pairs(erlib.Coding) do erlib[k] = v end
   
-  -- continuous testing
-  if flag.DO_TESTS then
-    elreq('erlib/test/!init')
+  local Core = {}
+  
+  
+  
+  
+  
+  
+  Core.RunTests = function()
+    -- continuous testing
+    
+    if flag.DO_TESTS then
+      local is_library, is_control
+      if flag.IS_FACTORIO then
+        is_library = ('eradicators-library' == erlib.Stacktrace.get_mod_name(-1))
+        is_control = erlib.Stacktrace.get_load_stage().control      
+        end
+      
+      
+      local Tester = elreq('erlib/test/!init')()
+      
+      
+      if (not flag.IS_FACTORIO) or (is_library and not is_control) then
+        Tester()
+      
+
+      -- "on_load" hack. desync-safe if game-state is not touched
+      elseif (is_library and is_control) then
+        local only_once; function only_once(); only_once = (function()end)
+          Tester()
+          end
+        --> event manager internal event "on_debug_once_per_session"
+        script.on_nth_tick(61,function()only_once()end) --must be identical function
+
+
+        end
+      
+      end
     end
+    
+    
+  Core.RunTests() --move this somewhere safe!
+    
+  package_reset()
+    
   -- print('what')
   return erlib
   -- put everything in place later

@@ -48,7 +48,7 @@ Part III. Seperately licensed third-party assets and code.
   are logged within the respective module files.
   
   Base64.lua       - LGPL2        , Alex Kloss           , 2009     , http://lua-users.org/wiki/BaseSixtyFour
-  Crc32.lua        - MIT License  , Neil Richardson      , 2007-2008, https://github.com/openresty/lua-nginx-module/blob/master/t/lib/CRC32.lua
+  Crc32.lua        - Unkown/Public, Haoqian He           , 2019     , https://gist.github.com/SafeteeWoW/080e784e5ebfda42cad486c58e6d26e4
   Json.lua         - MIT License  , rxi                  , 2020     , https://github.com/rxi/json.lua
   LibDeflate.lua   - zlib License , Haoqian He           , 2018-2020, https://github.com/SafeteeWoW/LibDeflate
   Serpent.lua      - MIT License  , Paul Kulchenko       , 2012-2018, https://github.com/pkulchenko/serpent

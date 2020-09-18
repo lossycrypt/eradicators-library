@@ -13,15 +13,18 @@ Date: 2020-09-x
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.10
 Date: 2020-09-x
-  Features:
-    - Added assets/empty.ogg
+  Internal:
+    - ?
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.9
 Date: 2020-09-x
+  Features:
+    - Added assets/empty.ogg
   Internal:
     - Invented "shared" boot-strapper
     - Overhauled Core
     - Added basic integrated testing
+    - Replaced old sha256 with more compatible one and added Test
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.8
 Date: 2020-09-x

@@ -2505,6 +2505,7 @@ local function sha256ext(width, message)
 
 end
 
+--[====[ lossycrypt: remove non-sha256 functionality
 
 local function sha512ext(width, message)
 
@@ -2973,8 +2974,11 @@ block_size_for_HMAC = {
    [sha.sha3_512]   = (1600 - 2 * 512) / 8,
 }
 
+  return sha
 
--- return sha
+--]====]
+-- lossycrypt: end of non-sha256 removal (~500 lines)
+
 -- -------------------------------------------------------------------------- --
 -- end of sha2.lua                                                            --
 -- -------------------------------------------------------------------------- --
@@ -2983,7 +2987,8 @@ block_size_for_HMAC = {
 --[[lossycrypt: return  erlib compatible encode/decode object]]
 local Sha256 = {
   encode = function(data) 
-    if type(data) == 'string' then return sha.sha256(data) end
+    -- if type(data) == 'string' then return sha.sha256(data) end
+    if type(data) == 'string' then return sha256ext(256, data) end
     end,
   decode = function() error 'Can not decode sha256.' end,
   }

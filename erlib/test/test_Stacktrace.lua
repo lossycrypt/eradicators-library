@@ -9,7 +9,9 @@ local say,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
 
 -- -------------------------------------------------------------------------- --
 -- Locals / Init                                                              --
+-- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
+local Stacktrace = elreq('erlib/factorio/Stacktrace')()
 
 -- -------------------------------------------------------------------------- --
 -- Tests                                                                      --
@@ -17,7 +19,6 @@ local say,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
 
 local function Test()
   
-  local Stacktrace = elreq('erlib/factorio/Stacktrace')()
   
   local stack = Stacktrace.get_all_info()
   
@@ -39,7 +40,7 @@ local function Test()
   assert(_equ(Stacktrace.get_info( 1),stack[1]     ))
   assert(_equ(Stacktrace.get_info(-1),stack[#stack]))
   
-  assert(Stacktrace.get_pos     ( 1) == 'test_Stacktrace.lua:42' ) --do not move this line!
+  assert(Stacktrace.get_pos     ( 1) == 'test_Stacktrace.lua:43' ) --do not move this line!
   
   if flag.IS_FACTORIO then
     assert(Stacktrace.get_mod_name(-1) == 'eradicators-library'    )
@@ -50,7 +51,7 @@ local function Test()
     assert(Stacktrace.name2root(Stacktrace.get_mod_name(0)) == Stacktrace.get_mod_root(0))
   
     end
-  say('  TESTR  @　erlib.Stacktrace → Ok')
+  say('  TESTR  @  erlib.Stacktrace → Ok')
   end
 
 

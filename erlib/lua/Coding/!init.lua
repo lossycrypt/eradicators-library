@@ -157,7 +157,7 @@ Coding.Bluestring = import 'erlib/lua/Coding/Bluestring'
 -- Base64.
 --
 -- En-/Decodes to/from base64 encoding.
--- From this [repository](https://github.com/DaveMcW/blueprint-string/blob/master/blueprintstring/base64.lua).
+-- ([Source](http://lua-users.org/wiki/BaseSixtyFour))
 --
 -- @section
 --
@@ -182,7 +182,7 @@ Coding.Base64 = import 'erlib/lua/Coding/Base64'
 -- Json.
 --
 -- En-/Decodes to/from json.
--- From this [repository](https://github.com/rxi/json.lua/blob/master/json.lua).
+-- ([Source](https://github.com/rxi/json.lua))
 --
 -- @section
 --
@@ -207,7 +207,7 @@ Coding.Json = import 'erlib/lua/Coding/Json'
 -- Zip.
 --
 -- En-/Decompresses to/from zip deflate.
--- From this [repository](https://github.com/DaveMcW/blueprint-string/tree/master/blueprintstring).
+-- ([Source](https://github.com/SafeteeWoW/LibDeflate))
 --
 -- @section
 --
@@ -231,7 +231,7 @@ Coding.Zip = import 'erlib/lua/Coding/Zip'
 -- Crc32.
 --
 -- Calculates the crc32 hash of the input string.
--- From this [repository](https://github.com/openresty/lua-nginx-module/blob/master/t/lib/CRC32.lua).
+-- ([Source](https://gist.github.com/SafeteeWoW/080e784e5ebfda42cad486c58e6d26e4))
 --
 -- @section
 --
@@ -240,9 +240,10 @@ Coding.Zip = import 'erlib/lua/Coding/Zip'
 --------------------------------------------------------------------------------
 Coding.Crc32 = import 'erlib/lua/Coding/Crc32'
 
+
 ----------
 -- @tparam string data the original string
--- @treturn NaturalNumber|nil the hash, or nothing if it failed
+-- @treturn uint|nil 0 < n < 2^32 (4294967296), or nil if it failed.
 -- @function Crc32.encode
 
 
@@ -251,7 +252,7 @@ Coding.Crc32 = import 'erlib/lua/Coding/Crc32'
 -- Sha256.
 --
 -- Calculates the sha256 hash of the input string.
--- From this [page](http://lua-users.org/wiki/SecureHashAlgorithm).
+-- ([Source](https://github.com/Egor-Skriptunoff/pure_lua_SHA))
 --
 -- @section
 --

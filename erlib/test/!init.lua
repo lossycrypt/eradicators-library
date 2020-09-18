@@ -34,23 +34,33 @@ local toset = function(arr) local r = {} for _,v in pairs(arr) do r[v]=true end 
 
 say('  Test   → Init.')
 
--- load all test files
-local n = #Tests
-for i=1,n do
-  -- does not preserve import order (and that's ok)
-  Tests[Tests[i]] = {elreq('erlib/test/'..Tests[i])()}
-  Tests[i] = nil
+-- Factorio does not allow require() at runtime. So to run tests with
+-- LuaGameScript available they have to be loaded before any events.
+local function TestPreload()
+  -- load all test files
+  local n = #Tests
+  for i=1,n do
+    -- does not preserve import order (and that should be ok)
+    -- Tests[Tests[i]] = {elreq('erlib/test/'..Tests[i])()}
+    Tests[i] = {elreq('erlib/test/'..Tests[i])()}
+    -- Tests[i] = nil
+    end
   end
 
--- execute all test files
-for name,this in pairs(Tests) do
-  if toset(this[2])[phase] then this[1]() end
-  end
+TestPreload() --right now before it's too late! ;)
   
+local function TestRun()
+  -- execute all test files
+  for i,this in ipairs(Tests) do
+    if toset(this[2])[phase] then this[1]() end
+    end
+  say('  TESTR  → All green!')
+  end
+
   
   
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
 do (STDOUT or log or print)('  Loaded → erlib.TestInit') end
-return function() return TestInit,_TestInit,_uLocale end
+return function() return TestRun end
