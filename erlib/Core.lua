@@ -53,7 +53,11 @@ local Modules = {
   Coding     = 'erlib/lua/Coding/!init',
   Multiplex  = 'erlib/lua/Multiplex',
   Filter     = 'erlib/lua/Filter',
-  -- Test       = 'erlib/test/!init',
+  Debug      = 'erlib/lua/Debug',
+  
+  
+  
+  -- Test       = 'erlib/test/!init', --special treatment
   }
   
 for name,path in pairs(Modules) do

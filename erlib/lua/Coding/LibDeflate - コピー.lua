@@ -3524,32 +3524,5 @@ if io and os and debug and _G.arg then
 	end
 end
 
---[[lossycrypt: (hopefully) garbage-collect unused functions]]
---[[Zlib De-/Compress both need Adler32]]
-
--- LibDeflate.Adler32                   = nil
-LibDeflate.CompressDeflate           = nil
-LibDeflate.CompressDeflateWithDict   = nil
--- LibDeflate.CompressZlib              = nil
-LibDeflate.CompressZlibWithDict      = nil
-LibDeflate.CreateCodec               = nil
-LibDeflate.CreateDictionary          = nil
-LibDeflate.DecodeForPrint            = nil
-LibDeflate.DecodeForWoWAddonChannel  = nil
-LibDeflate.DecodeForWoWChatChannel   = nil
-LibDeflate.DecompressDeflate         = nil
-LibDeflate.DecompressDeflateWithDict = nil
--- LibDeflate.DecompressZlib            = nil
-LibDeflate.DecompressZlibWithDict    = nil
-LibDeflate.EncodeForPrint            = nil
-LibDeflate.EncodeForWoWAddonChannel  = nil
-LibDeflate.EncodeForWoWChatChannel   = nil
--- LibDeflate._COPYRIGHT                = nil
--- LibDeflate._MAJOR                    = nil
--- LibDeflate._MINOR                    = nil
--- LibDeflate._VERSION                  = nil
-LibDeflate.internals                 = nil
-
-
 do (STDOUT or log or print)('  Loaded → erlib.Coding.LibDeflate') end
 return LibDeflate

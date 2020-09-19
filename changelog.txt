@@ -25,6 +25,9 @@ Date: 2020-09-x
     - Overhauled Core
     - Added basic integrated testing
     - Replaced old sha256 with more compatible one and added Test
+    - Added (at least some) tests for each Coding sub-module.
+    - Coding is functionally complete.
+    - Added Debug.get_upvalue_tree() draft
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.8
 Date: 2020-09-x

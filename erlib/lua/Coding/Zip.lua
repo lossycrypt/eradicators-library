@@ -23,7 +23,7 @@ local say,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
 -- -------------------------------------------------------------------------- --
 
 local LibDeflate = require (elroot.. 'erlib/lua/Coding/LibDeflate')
-Zip._LibDeflate = LibDeflate
+-- Zip._LibDeflate = LibDeflate --Debug: expose table
 
 local config = {level=9,strategy= nil          }
 -- local config = {level=9,strategy='fixed'       }

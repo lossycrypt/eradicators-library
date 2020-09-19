@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Section">Section </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Core.html">Core</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><strong>Debug</strong></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/lua.Iter.deep_pairs.html">lua.Iter.deep_pairs</a></li>
+  <li><a href="../modules/Multiplex.html">Multiplex</a></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/Introduction.html">Introduction</a></li>
+  <li><a href="../source/LibDeflate.lua.html">LibDeflate.lua</a></li>
+  <li><a href="../source/LibDeflate.lua.html">LibDeflate.lua</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Debug</code></h1>
+<p>Description</p>
+<p>
+
+</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local Debug = require(&apos;__eradicators-library__/erlib/lua/Debug&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#Section">Section </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#TOO_DEEP">TOO_DEEP</a></td>
+	<td class="summary">This unique empty table is used as a value by <a href="../modules/Debug.html#get_upvalue_tree">Debug.get_upvalue_tree</a> to signal
+ that the real value was not retrieved because the depth limit has been reached.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_upvalue_tree">get_upvalue_tree(obj[, depth=2[, include_everything=true]])</a></td>
+	<td class="summary">__!WARNING! Unfinished.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Section"></a>Section </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "TOO_DEEP"></a>
+    <strong>TOO_DEEP</strong>
+    </dt>
+    <dd>
+    This unique empty table is used as a value by <a href="../modules/Debug.html#get_upvalue_tree">Debug.get_upvalue_tree</a> to signal
+ that the real value was not retrieved because the depth limit has been reached.
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">if</span> value == Debug.TOO_DEEP <span class="keyword">then</span> <span class="comment">--[[ignore value]]</span> <span class="keyword">end</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "get_upvalue_tree"></a>
+    <strong>get_upvalue_tree(obj[, depth=2[, include_everything=true]])</strong>
+    </dt>
+    <dd>
+    <strong>!WARNING! Unfinished.  Only use for testing.</strong></p>
+
+<p> Recursively explores the upvalues of a <a href="https://www.lua.org/pil/2.6.html">function</a> or <a href="https://www.lua.org/pil/2.5.html">table</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">obj</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a> or <a class="type" href="https://www.lua.org/pil/2.5.html">table</a></span>
+         the starting point of the exploration
+        </li>
+        <li><span class="parameter">depth</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         The maximum deepth to explore. Any values
+ deeper than this will instead be replaced with <a href="../modules/Debug.html#TOO_DEEP">Debug.TOO_DEEP</a>. There is no
+ protection against infinite loops so be careful not to set it too high.
+         (<em>default</em> 2)
+        </li>
+        <li><span class="parameter">include_everything</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         Should numbers, strings etc be
+ in the output table? If false then only functions and tables will be included.
+         (<em>default</em> true)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.5.html">table</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        A table of upvalues. Any value that would be a function is
+ replaced by a table {__f=TheFunction,__up={The,Up,Values}}.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> a,b,three = <span class="string">'a'</span>,<span class="string">'b'</span>,<span class="number">3</span>
+<span class="keyword">local</span> d = {a,b}
+<span class="keyword">local</span> f1 = <span class="keyword">function</span>() <span class="keyword">return</span> a,b <span class="keyword">end</span>
+<span class="keyword">local</span> f2 = <span class="keyword">function</span>() <span class="keyword">return</span> f1,three,d <span class="keyword">end</span>
+<span class="global">print</span>(
+  erlib.Hydra.lines(
+    erlib.Debug.get_upvalue_tree({k1=f1,k2=f2},<span class="number">3</span>,<span class="keyword">false</span>)
+    ,{indentlevel=<span class="number">5</span>}
+    )
+  )
+
+&gt; {
+&gt;   k1 = {
+&gt;     __f = <span class="keyword">function</span>()<span class="keyword">end</span>,
+&gt;     __up = {
+&gt;       a = <span class="string">"a"</span>,
+&gt;       b = <span class="string">"b"</span>
+&gt;     }
+&gt;   },
+&gt;   k2 = {
+&gt;     __f = <span class="keyword">function</span>()<span class="keyword">end</span>,
+&gt;     __up = {
+&gt;       d = {
+&gt;         {}, <span class="comment">-- Debug.TOO_DEEP
+</span>&gt;         <span class="number">0</span> <span class="comment">--[[ self.k2.__up.d[1] ]]</span>
+&gt;       },
+&gt;       f1 = {
+&gt;         __f = <span class="number">0</span> <span class="comment">--[[ self.k1.__f ]]</span>,
+&gt;         __up = {
+&gt;           a = <span class="number">0</span> <span class="comment">--[[ self.k2.__up.d[1] ]]</span>,
+&gt;           b = <span class="number">0</span> <span class="comment">--[[ self.k2.__up.d[1] ]]</span>
+&gt;         }
+&gt;       },
+&gt;       three = <span class="number">3</span>
+&gt;     }
+&gt;   }
+&gt; }
+</pre>
+    </ul>
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-09-19 04:10:16 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
