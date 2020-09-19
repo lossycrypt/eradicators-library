@@ -33,6 +33,7 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Issues">Issues</a></li>
+<li><a href="#Lambda">Lambda </a></li>
 </ul>
 
 
@@ -49,6 +50,7 @@
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><strong>Lambda</strong></li>
   <li><a href="../modules/Multiplex.html">Multiplex</a></li>
+  <li><a href="../modules/String.html">String</a></li>
   <li><a href="../modules/Tool.html">Tool</a></li>
 </ul>
 <h2>Source</h2>
@@ -61,11 +63,15 @@
 <div id="content">
 
 <h1>Module <code>Lambda</code></h1>
-<p>Short in-line definition of functions.</p>
-<p> Similar to Python.</p>
+<p>Short in-line definition of functions, similar to Python.</p>
+<p>
+
+
+
+</p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Lambda = require(&apos;__eradicators-library__/erlib/factorio/Lambda&apos;)()
+        <pre class="example">local Lambda = require(&apos;__eradicators-library__/erlib/lua/Lambda&apos;)()
 </pre>
     </ul>
 
@@ -74,15 +80,22 @@
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#Lambda-todo3">Lambda-todo3</a></td>
-	<td class="summary">use erlib.Logger</td>
+	<td class="summary">implement multi-argument say()</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Lambda-todo3-todo4">Lambda-todo3-todo4</a></td>
-	<td class="summary">
-<p>implement proper Memoize and apply to upvalued loaders?</p>
-<pre><code>  upvalued loaders need to be cached on the user side anyway though.
-</code></pre>
-</td>
+	<td class="summary">implmenent and use Memoize for get_loader and __index</td>
+	</tr>
+</table>
+<h2><a href="#Lambda">Lambda </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Lambda">Lambda(spec[, ...])</a></td>
+	<td class="summary">The only function of Lambda is itself.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#LambdaFunctionSpecification">LambdaFunctionSpecification</a></td>
+	<td class="summary">A <a href="../api/Builtin-Types.html#string">string</a> that <a href="../modules/Lambda.html#">Lambda</a> parses into a function.</td>
 	</tr>
 </table>
 
@@ -98,7 +111,7 @@
     <strong>Lambda-todo3</strong>
     </dt>
     <dd>
-    use erlib.Logger
+    implement multi-argument say()
 
 
 
@@ -112,11 +125,7 @@
     <strong>Lambda-todo3-todo4</strong>
     </dt>
     <dd>
-
-<p>implement proper Memoize and apply to upvalued loaders?</p>
-<pre><code>  upvalued loaders need to be cached on the user side anyway though.
-</code></pre>
-
+    implmenent and use Memoize for get_loader and __index
 
 
 
@@ -126,13 +135,140 @@
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="Lambda"></a>Lambda </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Lambda"></a>
+    <strong>Lambda(spec[, ...])</strong>
+    </dt>
+    <dd>
+    The only function of Lambda is itself.  Calling it will generate the
+ specified function. If any upvalues are given they will be available
+ from within the lambda function via the capital letter A,B,..,Z in
+ the order they were given. No other functions or values are otherwise
+ usable from within a Lambda function.</p>
+
+<p> Lambda function <strong>without</strong> upvalues are only generated <strong>once</strong> for every
+ <a href="../modules/Lambda.html#LambdaFunctionSpecification">LambdaFunctionSpecification</a>
+ after which the result is cached forever. You can directly call the
+ cached function by indexing Lambda instead of calling it. It will be
+ transparently generated if it's the first time you call it. This is
+ the fastest and most readable way to use Lambda functions, but you can
+ not supply custom upvalues this way.</p>
+
+<p> If you want to use a Lambda function <strong>with</strong> upvalues you should store
+ it somewhere. Lambda does cache some intermediate generation steps but
+ the final resulting closure is unique for each call.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">spec</span>
+            <span class="types"><span class="type">LambdaFunctionSpecification</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         Upvalues. Accessible as A,B,...,Z
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example"><span class="comment">-- Let's say you want to multiply a number.
+</span><span class="keyword">local</span> f = <span class="keyword">function</span>(x) <span class="keyword">return</span> <span class="number">2</span>*x <span class="keyword">end</span>
+<span class="comment">-- You can now write that shorter.
+</span><span class="keyword">local</span> f = Lambda(<span class="string">'x: return 2*x'</span>)
+<span class="comment">-- And shorter.
+</span><span class="keyword">local</span> f = Lambda[<span class="string">'x-&gt;2*x'</span>]
+</pre></li>
+        <li><pre class="example"><span class="comment">-- You can use multiple arguments.
+</span><span class="keyword">local</span> f = Lambda[<span class="string">'x,y,z-&gt;2*x+y*z'</span>]
+</pre></li>
+        <li><pre class="example"><span class="comment">-- Or fixed upvalues.
+</span><span class="keyword">local</span> f = Lambda(<span class="string">'str-&gt;str..A..B'</span>,<span class="string">'wordA'</span>,<span class="string">'wordB'</span>)
+<span class="keyword">local</span> s = f(<span class="string">'wordC'</span>)
+<span class="global">print</span>(s)
+&gt; wordCwordAwordB
+</pre></li>
+        <li><pre class="example"><span class="comment">-- Use it when you don't want to store the function.
+</span><span class="global">print</span>(Lambda<span class="string">'x-&gt;x..x'</span>(<span class="string">'once'</span>))
+&gt; onceonce
+</pre></li>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LambdaFunctionSpecification"></a>
+    <strong>LambdaFunctionSpecification</strong>
+    </dt>
+    <dd>
+    A <a href="../api/Builtin-Types.html#string">string</a> that <a href="../modules/Lambda.html#">Lambda</a> parses into a function.  It consists of
+ three parts.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">head</span>
+         A comma seperated list of arguments that the Lambda should take.
+        </li>
+        <li><span class="parameter">divider</span>
+         A ":" colon marking the end of the list of arguments or a
+ "->" single arrow marking the end of arguments and simultaenously the
+ beginning of the return values.
+        </li>
+        <li><span class="parameter">body</span>
+         Everything after the divider. If the body contains a "=>"
+ double arrow then everything after that arrow is considered to be
+ <em>another</em> Lambda function call.</p>
+
+<p> <strong>Note</strong>: Lambda-nesting with "=>" is an experimental feature subject to change.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example"><span class="comment">-- When you make a call...
+</span>Lambda(<span class="string">'head: return body+A+B'</span>,UpValA,UpValB)
+Lambda(<span class="string">'head-&gt;       body+A+B'</span>,UpValA,UpValB)
+<span class="comment">-- ...this is the closure that Lambda will return to you.
+</span><span class="keyword">local</span> A,B = UpValA,UpValB
+<span class="keyword">return</span> <span class="keyword">function</span>(head)
+   <span class="keyword">return</span> body+A+B
+   <span class="keyword">end</span>
+</pre></li>
+        <li><pre class="example"><span class="comment">-- Nested Lambdas are a bit more complicated...
+</span>Lambda(<span class="string">'head: head = head+1 =&gt; "hair -&gt; hair + A ",UpValA2'</span>,UpValB)
+<span class="comment">-- ...and produce this.
+</span><span class="keyword">local</span> A = UpValB
+<span class="keyword">return</span> <span class="keyword">function</span>(head)
+  head=head+<span class="number">1</span>
+  <span class="keyword">return</span> Lambda(<span class="string">"hair -&gt; hair + A"</span>,UpValA2)
+  <span class="keyword">end</span>
+<span class="comment">-- Beware that the second Lambda function will *never* see
+</span><span class="comment">-- the upvalues of the first one. Even if it has no upvalues itself.
+</span><span class="comment">-- You can pass them on manually of course.</span></pre></li>
+    </ul>
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-19 19:04:54 </i>
+<i style="float:right;">Last updated 2020-09-19 22:52:28 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

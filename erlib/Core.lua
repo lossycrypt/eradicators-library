@@ -16,7 +16,7 @@
 -- -------------------------------------------------------------------------- --
 -- Outside of factorio '__eradicators-library__' is not a valid absolute path!
 local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
-local say,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
+local say,warn,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
 
 -- -------------------------------------------------------------------------- --
 -- Flags                                                                      --
@@ -54,7 +54,7 @@ local Modules = {
   Multiplex  = 'erlib/lua/Multiplex',
   Filter     = 'erlib/lua/Filter',
   Debug      = 'erlib/lua/Debug',
-  Debug      = 'erlib/lua/Lambda',
+  Lambda     = 'erlib/lua/Lambda',
   
   
   
@@ -153,7 +153,10 @@ local function EradicatorsLibraryMain(options)
   local Core = {}
   
   
-  
+  Core.HijackPublicModules = function()
+    --inject some methods directly into public modules
+    string.f = string.format
+    end
   
   
   
@@ -192,7 +195,7 @@ local function EradicatorsLibraryMain(options)
     
   Core.RunTests() --move this somewhere safe!
     
-  package_reset()
+  -- package_reset()
     
   -- print('what')
   return erlib

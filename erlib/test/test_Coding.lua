@@ -5,7 +5,7 @@
 -- Built-In                                                                   --
 -- -------------------------------------------------------------------------- --
 local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
-local say,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
+local say,warn,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
 
 -- -------------------------------------------------------------------------- --
 -- Locals / Init                                                              --
@@ -59,22 +59,21 @@ local function Test()
   local recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(OKBP))
   assert(#recompress > 100) --not a nil value
   
-  assert( recompress == 
-  Coding.Bluestring.encode(Coding.Bluestring.decode(
-  Coding.Bluestring.encode(Coding.Bluestring.decode(
-  recompress)))) )
-  
   -- Quirk/Bug? The resulting Base64 representation fluctuates
   -- between exactly TWO different states for infinite en/decode loops
   -- in NP++, but stabilizes after the first cycle in Factorio.
   -- 
-  -- recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) print(recompress) 
-  -- recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) print(recompress) 
-  -- recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) print(recompress) 
-  -- recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) print(recompress) 
-  -- recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) print(recompress) 
-  -- recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) print(recompress) 
+  -- recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) -- print(recompress) 
+  -- recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) -- print(recompress) 
+  -- recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) -- print(recompress) 
+  -- recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) -- print(recompress) 
+  recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) -- print(recompress) 
+  recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) -- print(recompress) 
   
+  assert( recompress == 
+  Coding.Bluestring.encode(Coding.Bluestring.decode(
+  Coding.Bluestring.encode(Coding.Bluestring.decode(
+  recompress)))) )
   
   -- alter test: deflate ist nicht stabil in np++
   -- assert( Coding.Bluestring.encode(Coding.Bluestring.decode(OKBP))

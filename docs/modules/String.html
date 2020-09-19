@@ -32,7 +32,7 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Concepts">Concepts </a></li>
+<li><a href="#Section">Section </a></li>
 </ul>
 
 
@@ -40,7 +40,7 @@
 <ul class="nowrap">
   <li><a href="../modules/Core.html">Core</a></li>
   <li><a href="../modules/Types.html">Types</a></li>
-  <li><strong>Concepts</strong></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
   <li><a href="../modules/Debug.html">Debug</a></li>
@@ -49,7 +49,7 @@
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
   <li><a href="../modules/Multiplex.html">Multiplex</a></li>
-  <li><a href="../modules/String.html">String</a></li>
+  <li><strong>String</strong></li>
   <li><a href="../modules/Tool.html">Tool</a></li>
 </ul>
 <h2>Source</h2>
@@ -61,21 +61,27 @@
 
 <div id="content">
 
-<h1>Module <code>Concepts</code></h1>
-<p>Abstract programming and behavioral concepts used by the library.</p>
+<h1>Module <code>String</code></h1>
+<p>Description</p>
 <p>
 
-
-
 </p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local String = require(&apos;__eradicators-library__/erlib/factorio/String&apos;)()
+</pre>
+    </ul>
 
 
-<h2><a href="#Concepts">Concepts </a></h2>
+<h2><a href="#Section">Section </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#STDOUT">STDOUT</a></td>
-	<td class="summary">When an environment variable _ENV.STDOUT is truthy then any compatible
- function will call STDOUT(...) instead of log(...).</td>
+	<td class="name" nowrap><a href="#Foo">Foo</a></td>
+	<td class="summary">Foo</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#splice">splice(str, pattern, length, seperator)</a></td>
+	<td class="summary">Puts a seperator between every $pattern of the input string.</td>
 	</tr>
 </table>
 
@@ -83,17 +89,15 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Concepts"></a>Concepts </h2>
+    <h2 class="section-header "><a name="Section"></a>Section </h2>
 
     <dl class="function">
     <dt>
-    <a name = "STDOUT"></a>
-    <strong>STDOUT</strong>
+    <a name = "Foo"></a>
+    <strong>Foo</strong>
     </dt>
     <dd>
-    When an environment variable _ENV.STDOUT is truthy then any compatible
- function will call STDOUT(...) instead of log(...).  If a function is
- compatible is mentioned in each functions description.
+    Foo
 
 
 
@@ -102,8 +106,45 @@
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">_ENV.STDOUT = _ENV.<span class="global">print</span></pre>
+        <pre class="example"></pre>
     </ul>
+
+</dd>
+    <dt>
+    <a name = "splice"></a>
+    <strong>splice(str, pattern, length, seperator)</strong>
+    </dt>
+    <dd>
+    Puts a seperator between every $pattern of the input string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+
+
+
+        </li>
+        <li><span class="parameter">pattern</span>
+
+
+
+        </li>
+        <li><span class="parameter">length</span>
+
+
+
+        </li>
+        <li><span class="parameter">seperator</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
 
 </dd>
 </dl>

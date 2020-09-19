@@ -7,6 +7,9 @@
       and remove newlines msg:gsub('\n','')
       > does that mean it needs to be a fully fledged serializer?
         or is it ok to load Hydra?
+        
+    + Why is shared log-spamming when used instead of empty for the path test?
+      is it because of pcall?
   ]]
 
 -- do (STDOUT or log or print)('  Loaded → erlib.shared') end
@@ -22,15 +25,17 @@ local does_file_exist = function(path) return (pcall(require,path)) end
 local shared = {
   --say
   [1] = function(msg ) return (STDOUT or log or print)(msg) end, --log can't vararg
+  --warn
+  [2] = function(msg ) return (STDOUT or log or print)(msg) end, --log can't vararg
   --err
-  [2] = function(msg ) return (STDERR or error       )(msg) end,
+  [3] = function(msg ) return (STDERR or error       )(msg) end,
   --elreq
-  [3] = function(path) return require(elroot..path)         end,
+  [4] = function(path) return require(elroot..path)         end,
   --flag
-  [4] = {},
+  [5] = {},
   }
   
-local flag = shared[4]
+local flag = shared[5]
 
   flag.IS_FACTORIO =
     not (_ENV.os and _ENV.io)

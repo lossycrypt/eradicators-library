@@ -22,7 +22,7 @@
 -- Built-In                                                                   --
 -- -------------------------------------------------------------------------- --
 local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
-local say,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
+local say,warn,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
 
 -- -------------------------------------------------------------------------- --
 -- Locals / Init                                                              --
