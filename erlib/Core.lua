@@ -54,6 +54,7 @@ local Modules = {
   Multiplex  = 'erlib/lua/Multiplex',
   Filter     = 'erlib/lua/Filter',
   Debug      = 'erlib/lua/Debug',
+  Debug      = 'erlib/lua/Lambda',
   
   
   

@@ -1,25 +1,39 @@
---------------------------------------------------------------------------------
+---
+-- @module Iter
+
+-- -----------------------------------------------------------------------------
 -- RECURSIVE PAIRS (tested and confirmed WORKING!)                            --
+
 --------------------------------------------------------------------------------
+--
+-- A for-loop compatible depth-first non-recursive STATEFUL iterator.
+-- The iterator does not take any input and always returns the next items.
+-- Key finding uses next(). When a loop is encoutered with verbose_loop_logging != nil
+-- then any later found entrance points to the loop will be ignored.
+--
+-- LUA MANUAL about next():
+--   The behavior of next is undefined if, during the traversal, you assign any value
+--   to a non-existent field in the table. You may however modify existing fields. In
+--   particular, you may clear existing fields.
+--
+--
+-- @tparam table tbl the table to be iterated.
+-- @tparam deep_pair_options|nil opt
+-- @function Iter.deep_pairs
 
----recursive_pairs implements a for-loop compatible depth-first STATEFUL iterator.
----The iterator does not take any input and always returns the next items.
----Key finding uses next(). When a loop is encoutered with verbose_loop_logging != nil
----then any later found entrance points to the loop will be ignored.
 
----LUA MANUAL on next():
----  The behavior of next is undefined if, during the traversal, you assign any value
----  to a non-existent field in the table. You may however modify existing fields. In
----  particular, you may clear existing fields.
+----
+-- @tfield  int|nil max_depth 10000, paranoia option to prevent freezing on very large objects
+-- @tfield boolean|nil verbose_loop_logging nil:error,true:logging,false:silent
+-- @tfield boolean|nil include_subtables_in_output false
+-- @tfield boolean|nil return_path false (include copy of path table in output? slower.)
+-- @table deep_pair_options
 
---@opt.max_recursion_depth         = 10000
---@opt.verbose_loop_logging        = nil:error,true:logging,false:silent
---@opt.include_subtables_in_output = false
---@opt.return_path                 = false (include copy of path table in output? slower.)
 
-local function recursive_pairs(tbl,opt) -- no actual recursion involved!
+---
+local function deep_pairs(tbl,opt) -- no actual recursion involved!
   --sanitize
-  if type(tbl) ~= 'table' then error('Recursive pairs: first argument must be a table') end
+  if type(tbl) ~= 'table' then error('deep_pairs: first argument must be a table') end
   if type(opt) ~= 'table' then opt = {} end
   --helper functions
   local function array_copy(arr); local r = {}; for i=1,#arr do r[#r+1] = arr[i]  end; return r end
@@ -30,11 +44,13 @@ local function recursive_pairs(tbl,opt) -- no actual recursion involved!
   --iterator
   local function _iter()
     while #current_path_tbls ~= 0 do
+      ---@todo add "skip redundant tables" -> never parse the same unique table twice
       local depth = #current_path_tbls
-      if depth > (opt.max_recursion_depth or 10000) then
-        error('Recursive pairs: too deep recursion at: '..table.concat(current_path_keys,'.'))
+      if depth > (opt.max_depth or 10000) then
+        error('deep_pairs: too deep recursion at: '..table.concat(current_path_keys,'.'))
         end
       local tbl = current_path_tbls[depth]
+      ---@fixme use pairs() to get the correct iterator instaed of hardcoded next()?
       local key,value = next(tbl,current_path_keys[depth])
       current_path_keys[depth] = key
       if key ~= nil then
@@ -47,11 +63,11 @@ local function recursive_pairs(tbl,opt) -- no actual recursion involved!
             if opt.verbose_loop_logging ~= false then
               if opt.verbose_loop_logging == true then
                 -- the first key from inside the loop is already on the stack!
-                print('Recursive pairs: Ignoring loop at:'..
+                print('deep_pairs: Ignoring loop at:'..
                   '__self__.'..table.concat(current_path_keys,'.')..' -> '..
                   table.concat({'__self__',unpack(current_parents[value])},'.',1,#current_parents[value]))
               else
-                error('Recursive pairs: Loop at: __self__.'..table.concat(current_path_keys,'.'))
+                error('deep_pairs: Loop at: __self__.'..table.concat(current_path_keys,'.'))
                 end
               end
           else
@@ -84,9 +100,9 @@ local function recursive_pairs(tbl,opt) -- no actual recursion involved!
   return _iter,nil,nil
   end
 
---------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Drafts                                                                     --
---------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 
 
 
