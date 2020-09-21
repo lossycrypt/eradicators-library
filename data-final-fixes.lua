@@ -6,16 +6,12 @@
 
   ]]
 
-  
--- local StopLib = require 'erlib/lua/Stop' ()
--- StopLib.Error('MyModName','MyScript',"Sorry, i can't do that Dave!")
+
+local _ENV = require '__eradicators-library__/erlib/Core'().Core.InstallToEnv()
+
+Core.RunTests()
 
 
-local flag = pcall(require,'__zz-toggle-to-enable-dev-mode__/empty')
-
-
--- collective loading of all modules without changing _ENV
-local EradicatorsLibrary = require '__eradicators-library__/erlib/Core'()
 
 
 
@@ -30,14 +26,6 @@ EradicatorsLibrary.install_into_environment(_ENV)
 
 
 
-
-
-local erlib = require '__eradicators-library__/erlib/library.lua' (_ENV,{
-  is_dev_build = flag,
-  debug_mode   = flag,
-  strict_mode  = flag,
-  verbose      = flag,
-  })
 
   
 --to create [custom inputs] the library needs to run at least once in [data stage]

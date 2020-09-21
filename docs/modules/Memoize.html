@@ -33,6 +33,8 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Functions">Functions</a></li>
+<li><a href="#Local_Functions">Local Functions</a></li>
+<li><a href="#Section">Section </a></li>
 </ul>
 
 
@@ -48,7 +50,8 @@
   <li><a href="../modules/Filter.html">Filter</a></li>
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
-  <li><strong>Multiplex</strong></li>
+  <li><strong>Memoize</strong></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/String.html">String</a></li>
   <li><a href="../modules/Tool.html">Tool</a></li>
 </ul>
@@ -61,16 +64,14 @@
 
 <div id="content">
 
-<h1>Module <code>Multiplex</code></h1>
-<p>Inline replication of object references.</p>
+<h1>Module <code>Memoize</code></h1>
+<p>Description</p>
 <p>
-
-
 
 </p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Multiplex = require(&apos;__eradicators-library__/erlib/lua/Multiplex&apos;)()
+        <pre class="example">local Memoize = require(&apos;__eradicators-library__/erlib/factorio/Memoize&apos;)()
 </pre>
     </ul>
 
@@ -78,16 +79,26 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Duplex">Duplex(v)</a></td>
-	<td class="summary">Returns two references to the given object.</td>
+	<td class="name" nowrap><a href="#_Memo1">_Memo1(constructor)</a></td>
+	<td class="summary">Simple one-argument Memoizer</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Triplex">Triplex(v)</a></td>
-	<td class="summary">Returns three references to the given object.</td>
+	<td class="name" nowrap><a href="#_MemoN">_MemoN(n, constructor)</a></td>
+	<td class="summary">N-Argument constructor</td>
 	</tr>
+</table>
+<h2><a href="#Local_Functions">Local Functions</a></h2>
+<table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Multiplex">Multiplex(n, v)</a></td>
-	<td class="summary">Returns n references to the given object.</td>
+	<td class="name" nowrap><a href="#Memoize">Memoize(n, constructor)</a></td>
+	<td class="summary">Simple argument splitter 1&lt;>N</td>
+	</tr>
+</table>
+<h2><a href="#Section">Section </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Foo">Foo</a></td>
+	<td class="summary">Foo</td>
 	</tr>
 </table>
 
@@ -99,17 +110,16 @@
 
     <dl class="function">
     <dt>
-    <a name = "Duplex"></a>
-    <strong>Duplex(v)</strong>
+    <a name = "_Memo1"></a>
+    <strong>_Memo1(constructor)</strong>
     </dt>
     <dd>
-    Returns two references to the given object.
+    Simple one-argument Memoizer
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">v</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        <li><span class="parameter">constructor</span>
 
 
 
@@ -119,57 +129,53 @@
 
 
 
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> A,B = Duplex(f)</pre>
-    </ul>
 
 </dd>
     <dt>
-    <a name = "Triplex"></a>
-    <strong>Triplex(v)</strong>
+    <a name = "_MemoN"></a>
+    <strong>_MemoN(n, constructor)</strong>
     </dt>
     <dd>
-    Returns three references to the given object.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">v</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> A,B,C = Triplex({})</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "Multiplex"></a>
-    <strong>Multiplex(n, v)</strong>
-    </dt>
-    <dd>
-    Returns n references to the given object.
+    N-Argument constructor
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">n</span>
-            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
 
 
 
         </li>
-        <li><span class="parameter">v</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        <li><span class="parameter">constructor</span>
+        this'll need automatic sub-table construction to <em>exactly</em> n depth. only the final index needs to know all arguments but how does it get them?
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Local_Functions"></a>Local Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Memoize"></a>
+    <strong>Memoize(n, constructor)</strong>
+    </dt>
+    <dd>
+    Simple argument splitter 1&lt;>N
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">n</span>
+
+
+
+        </li>
+        <li><span class="parameter">constructor</span>
 
 
 
@@ -179,9 +185,27 @@
 
 
 
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Section"></a>Section </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Foo"></a>
+    <strong>Foo</strong>
+    </dt>
+    <dd>
+    Foo
+
+
+
+
+
+
     <h3>Usage:</h3>
     <ul>
-        <pre class="example"><span class="keyword">local</span> A,B,C,E,F,G = Multiplex(<span class="number">6</span>,LuaEntity)</pre>
+        <pre class="example"></pre>
     </ul>
 
 </dd>
@@ -192,7 +216,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-19 22:52:28 </i>
+<i style="float:right;">Last updated 2020-09-21 14:40:26 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

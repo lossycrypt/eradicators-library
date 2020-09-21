@@ -32,7 +32,7 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Section">Section </a></li>
+<li><a href="#Functions">Functions</a></li>
 </ul>
 
 
@@ -49,8 +49,8 @@
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
   <li><a href="../modules/Memoize.html">Memoize</a></li>
-  <li><a href="../modules/Replicate.html">Replicate</a></li>
-  <li><strong>String</strong></li>
+  <li><strong>Replicate</strong></li>
+  <li><a href="../modules/String.html">String</a></li>
   <li><a href="../modules/Tool.html">Tool</a></li>
 </ul>
 <h2>Source</h2>
@@ -62,31 +62,33 @@
 
 <div id="content">
 
-<h1>Module <code>String</code></h1>
-<p>Description</p>
+<h1>Module <code>Replicate</code></h1>
+<p>Inline replication of object references.</p>
 <p>
+
+
 
 </p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local String = require(&apos;__eradicators-library__/erlib/factorio/String&apos;)()
+        <pre class="example">local Replicate = require(&apos;__eradicators-library__/erlib/lua/Replicate&apos;)()
 </pre>
     </ul>
 
 
-<h2><a href="#Section">Section </a></h2>
+<h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Foo">Foo</a></td>
-	<td class="summary">Foo</td>
+	<td class="name" nowrap><a href="#Twice">Twice(v)</a></td>
+	<td class="summary">Returns two references to the given object.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#splice">splice(str, pattern, length, seperator)</a></td>
-	<td class="summary">Puts a seperator between every $pattern of the input string.</td>
+	<td class="name" nowrap><a href="#Thrice">Thrice(v)</a></td>
+	<td class="summary">Returns three references to the given object.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#f">f(str)</a></td>
-	<td class="summary"><strong>EXPERIMENTAL</strong>.</td>
+	<td class="name" nowrap><a href="#Replicate">Replicate(n, v)</a></td>
+	<td class="summary">Returns n references to the given object.</td>
 	</tr>
 </table>
 
@@ -94,78 +96,24 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Section"></a>Section </h2>
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
     <dt>
-    <a name = "Foo"></a>
-    <strong>Foo</strong>
+    <a name = "Twice"></a>
+    <strong>Twice(v)</strong>
     </dt>
     <dd>
-    Foo
-
-
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"></pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "splice"></a>
-    <strong>splice(str, pattern, length, seperator)</strong>
-    </dt>
-    <dd>
-    Puts a seperator between every $pattern of the input string.
+    Returns two references to the given object.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">str</span>
+        <li><span class="parameter">v</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
 
 
 
-        </li>
-        <li><span class="parameter">pattern</span>
-
-
-
-        </li>
-        <li><span class="parameter">length</span>
-
-
-
-        </li>
-        <li><span class="parameter">seperator</span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "f"></a>
-    <strong>f(str)</strong>
-    </dt>
-    <dd>
-    <strong>EXPERIMENTAL</strong>.  <strong>SLOW</strong>. Do not use in production. <br/>
- Python-esque string formatting from locals and upvalues.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">str</span>
-            <span class="types"><a class="type" href="../api/Builtin-Types.html#string">string</a></span>
-         the formatting pattern
         </li>
     </ul>
 
@@ -174,13 +122,67 @@
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example"><span class="keyword">local</span> f = String.f
-<span class="keyword">function</span> test(name,surname)
-  <span class="global">print</span>(f<span class="string">'Hi. My name is {name} {surname}!'</span>)
-  <span class="keyword">end</span>
-test(<span class="string">'E.R.'</span>,<span class="string">'Adicator'</span>)
-&gt; Hi. My name is E.R. Adicator!
-</pre>
+        <pre class="example"><span class="keyword">local</span> A,B = Twice(f)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Thrice"></a>
+    <strong>Thrice(v)</strong>
+    </dt>
+    <dd>
+    Returns three references to the given object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> A,B,C = Thrice({})</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Replicate"></a>
+    <strong>Replicate(n, v)</strong>
+    </dt>
+    <dd>
+    Returns n references to the given object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">n</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">v</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> A,B,C,E,F,G = Replicate(<span class="number">6</span>,LuaEntity)</pre>
     </ul>
 
 </dd>

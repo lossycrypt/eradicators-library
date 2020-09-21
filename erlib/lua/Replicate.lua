@@ -3,9 +3,9 @@
 --------------------------------------------------
 -- Inline replication of object references.
 --
--- @module Multiplex
+-- @module Replicate
 -- @usage
---  local Multiplex = require('__eradicators-library__/erlib/lua/Multiplex')()
+--  local Replicate = require('__eradicators-library__/erlib/lua/Replicate')()
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -21,28 +21,28 @@ local say,warn,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Multiplex,_Multiplex,_uLocale = {},{},{}
+local Replicate,_Replicate,_uLocale = {},{},{}
 
 
 ----------
 -- Returns two references to the given object.
 -- @tparam AnyValue v
--- @usage local A,B = Duplex(f)
-Multiplex.Duplex  = function(v) return v,v   end
+-- @usage local A,B = Twice(f)
+Replicate.Twice  = function(v) return v,v   end
 
 
 ----------
 -- Returns three references to the given object.
 -- @tparam AnyValue v
--- @usage local A,B,C = Triplex({})
-Multiplex.Triplex = function(v) return v,v,v end
+-- @usage local A,B,C = Thrice({})
+Replicate.Thrice = function(v) return v,v,v end
 
 ----------
 -- Returns n references to the given object.
 -- @tparam NaturalNumber n
 -- @tparam AnyValue v
--- @usage local A,B,C,E,F,G = Multiplex(6,LuaEntity)
-Multiplex.Multiplex = function(n,v)
+-- @usage local A,B,C,E,F,G = Replicate(6,LuaEntity)
+Replicate.Replicate = function(n,v)
   local r = {}; for i=1,n do r[#r+1] = v end
   return unpack(r)
   -- @future use memoized lambda sub-function for speed?
@@ -50,11 +50,10 @@ Multiplex.Multiplex = function(n,v)
   -- return f(n)(v)
   end
 
-  
-  
+
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-do (STDOUT or log or print)('  Loaded → erlib.Multiplex') end
-return function() return Multiplex,_Multiplex,_uLocale end
+do (STDOUT or log or print)('  Loaded → erlib.Replicate') end
+return function() return Replicate,_Replicate,_uLocale end

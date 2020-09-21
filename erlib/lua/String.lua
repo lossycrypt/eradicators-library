@@ -48,6 +48,47 @@ function String.splice(str,pattern,length,seperator)
     :sub(1,-2)                 --no comma after last
   end
 
+  
+  
+----------
+-- __EXPERIMENTAL__. __SLOW__. Do not use in production.   
+-- Python-esque string formatting from locals and upvalues.
+-- @tparam string str the formatting pattern
+-- @usage
+--   local f = String.f
+--   function test(name,surname)
+--     print(f'Hi. My name is {name} {surname}!')
+--     end
+--   test('E.R.','Adicator')
+--   > Hi. My name is E.R. Adicator!
+function String.f(str)
+  -- [1] http://lua-users.org/lists/lua-l/2004-01/msg00075.html
+  -- Identifiers in Lua can be any string of letters, digits, and
+  -- underscores, not beginning with a digit.  
+  local caller = debug.getinfo(2,'f').func
+  local values = {} 
+  --upvalues
+  local i=0; while true do i=i+1
+    local k,v = debug.getupvalue(caller,i)
+    if k == nil then break end
+    values[k]=v
+    end
+  --locals (overshadow upvalues)
+  local i=0; while true do i=i+1
+    local k,v = debug.getlocal(2,i)
+    if k == nil then break end
+    values[k]=v
+    end
+  --string replace
+  for match,key,tail in string.gmatch(str,'({([_%a][_%w]*):?(.-)})') do
+    local value = values[key]
+    if value ~= nil then
+      if tail == '' then tail = 's' end
+      str = str:gsub(match,'%%'..tail):format(value)
+      end
+    end  
+  return str
+  end
 
 
 -- -------------------------------------------------------------------------- --

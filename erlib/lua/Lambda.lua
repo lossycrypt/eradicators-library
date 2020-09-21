@@ -24,7 +24,6 @@ local Lambda,_Lambda,_uLocale = {},{},{}
 
 local select, rawget, load, setmetatable = select, rawget, load, setmetatable
 
--- local _ENV = nil
 
 -- This will catch the upvalues of a Lambda function. Because functions do not
 -- "see" upvalues they do not use this can be used for all functions regardless
@@ -56,14 +55,13 @@ local LambdaEnv = setmetatable({
   })
   
 
-
 -- Throws formatted errors.
 local function lambda_err(msg,spec)
   --@todo use erlib.Logger
   local template = '%s\n  Function: %s.'
   error(template:format(msg,Hydra.line(spec)))
   end
-  
+
   
 -- Converts a LambdaFunctionSpecification into a lodable string
 -- Example 1: L('v,k,tbl:tbl[v]=true') → "return function(v,k,tbl) tbl[v]=true end"
@@ -155,6 +153,7 @@ setmetatable(Lambda,{
 -- Lambda
 -- @section
 --------------------------------------------------------------------------------
+
 -- (documentation only section)
 
 -----------
@@ -202,10 +201,6 @@ setmetatable(Lambda,{
 -- @tparam LambdaFunctionSpecification spec
 -- @tparam[opt] AnyValue ... Upvalues. Accessible as A,B,...,Z
 -- @function Lambda
--- 
-
-
-
 
 
 -----------
@@ -250,12 +245,6 @@ setmetatable(Lambda,{
 --   -- the upvalues of the first one. Even if it has no upvalues itself.
 --   -- You can pass them on manually of course.
 
-
-
-
-print('Debug Lambda mode')
-_ENV.L = Lambda --debug
-_ENV.Lambda = Lambda --debug
 
 
 -- -------------------------------------------------------------------------- --

@@ -281,8 +281,12 @@ local _load_stage, _load_phase = Stacktrace. unsafe_get_stage_and_phase()
 --        from inside a scenario or a data stage metatable.
 --
 function Stacktrace.get_load_stage()
-  if not _load_stage then _error('Load stage detection failed.') end
-  return {[_load_stage] = true, name = _load_stage, any = true}
+  if flag.IS_FACTORIO then
+    if not _load_stage then _error('Load stage detection failed.') end
+    return {[_load_stage] = true, name = _load_stage, any = true}
+  else
+    return {['not_factorio'] = true, name = 'not_factorio', any = false}
+    end    
   end
 
 ----------
@@ -293,8 +297,12 @@ function Stacktrace.get_load_stage()
 --        from inside a scenario or a data stage metatable.
 --
 function Stacktrace.get_load_phase()
-  if not _load_phase then _error('Load phase detection failed.') end
-  return {[_load_phase] = true, name = _load_phase, any = true}
+  if flag.IS_FACTORIO then
+    if not _load_phase then _error('Load phase detection failed.') end
+    return {[_load_phase] = true, name = _load_phase, any = true}
+  else
+    return {['not_factorio'] = true, name = 'not_factorio', any = false}
+    end
   end
 
 

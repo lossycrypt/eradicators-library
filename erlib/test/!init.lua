@@ -43,7 +43,6 @@ local function TestPreload()
     -- does not preserve import order (and that should be ok)
     -- Tests[Tests[i]] = {elreq('erlib/test/'..Tests[i])()}
     Tests[i] = {elreq('erlib/test/'..Tests[i])()}
-    -- Tests[i] = nil
     end
   end
 

@@ -2,7 +2,7 @@
 
 --[[------------------------------------------------
   Instead of requiring each component of the library seperately you can
-  instead require this Core file which fill automatically loads all modules.
+  require this Core file which fill automatically loads all modules.
   The Core also has some special features like installing all modules directly
   into your environment. If you only want to use a selected few modules that's
   probably a waste of RAM though.
@@ -19,20 +19,18 @@ local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__
 local say,warn,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
 
 -- -------------------------------------------------------------------------- --
--- Flags                                                                      --
+-- Greeting                                                                   --
 -- -------------------------------------------------------------------------- --
-
--- Mute low-level logging
-STDOUT = flag.IS_DEV_MODE and print or function()end
-
--- 挨拶
 say('>>> Erlib Core Boot Sequence Started  >>>')
 
+-- -------------------------------------------------------------------------- --
+-- Log Header                                                                 --
+-- -------------------------------------------------------------------------- --
+if flag.IS_DEV_MODE then
 
--- Header
-say('  Flag   → IS_DEV_MODE → '..tostring(flag.IS_DEV_MODE))
+  say('  Flag   → IS_DEV_MODE → '..tostring(flag.IS_DEV_MODE))
 
-
+  end
 -- -------------------------------------------------------------------------- --
 -- Locals / Init                                                              --
 -- -------------------------------------------------------------------------- --
@@ -43,31 +41,87 @@ local package_reset = function()
   end
 
 -- -------------------------------------------------------------------------- --
--- Modules                                                                    --
+-- Module Init                                                                --
 -- -------------------------------------------------------------------------- --
 
 local Modules = {
-  --must be in load order!
+  --determines load order
   Stacktrace = 'erlib/factorio/Stacktrace',
   Error      = 'erlib/lua/Error',
   Coding     = 'erlib/lua/Coding/!init',
-  Multiplex  = 'erlib/lua/Multiplex',
+  Replicate  = 'erlib/lua/Replicate',
   Filter     = 'erlib/lua/Filter',
   Debug      = 'erlib/lua/Debug',
   Lambda     = 'erlib/lua/Lambda',
-  
-  
-  
-  -- Test       = 'erlib/test/!init', --special treatment
+  -- Memoize    = 'erlib/lua/Memoize',
+
   }
   
+-- require() does not support multiple return values. So every module
+-- returns a parameterless function that returns {Module,Strict,uLocale}.
 for name,path in pairs(Modules) do
-  -- say('Trying to load module '..' '..name..' '..path)
-  -- say('Loaded → erlib.Coding.Hydra')
   say('  File   → '..path)
-  Modules[name] = {elreq(path)()} --all three return values
+  Modules[name] = {elreq(path)()} --
   end
 
+-- -------------------------------------------------------------------------- --
+-- Module Assembly                                                            --
+-- -------------------------------------------------------------------------- --
+
+-- Non-strict version
+-- Preliminary. Will become unsupported once all type checks have been written.
+-- 
+local erlib = {}; do
+  for k,v in pairs(Modules) do
+    erlib[k] = v[1]
+    end
+  end
+  
+  
+-- Strict version
+-- Checks input to supported functions before calling.
+--
+local erlib_strict = {}; do
+  for k,v in pairs(Modules) do
+    ---@todo: implement strict wrapping (Verificate.wrap?)
+    -- erlib_strict[k] = UnknownMagic(v[2],v[1])
+    end
+  end
+
+  
+-- Pulls functions from sub-paths directly
+-- into the main table.
+-- @usage uplift(erlib,{'Coding','Replicate','Filter'})
+--
+local function uplift(target,names)
+  for _,name in pairs(names        ) do
+  for k,v    in pairs(target[names]) do
+  if type(v) == 'function'          then
+    target[k] = v
+    end
+    end
+    end
+  end
+
+
+  
+-- -------------------------------------------------------------------------- --
+-- Constants                                                                  --
+-- -------------------------------------------------------------------------- --
+local Const = {}
+  erlib.Const = Const
+  --mod that contains this file
+  Const.lib_name = erlib.Stacktrace.get_mod_name( 1)
+  Const.lib_root = erlib.Stacktrace.get_mod_root( 1)
+  --mod that required this file
+  Const.mod_name = erlib.Stacktrace.get_mod_name(-1)
+  Const.mod_root = erlib.Stacktrace.get_mod_root(-1)
+  --load stage/phase
+  Const.load_stage = erlib.Stacktrace.get_load_stage()
+  Const.load_phase = erlib.Stacktrace.get_load_phase()
+
+local Stop = erlib .Error .Stopper 'Core' -- local to each plugin in the future
+  
 -- -------------------------------------------------------------------------- --
 -- Main                                                                       --
 -- -------------------------------------------------------------------------- --
@@ -78,129 +132,77 @@ say('<<< Erlib Core Boot Sequence Finished <<<')
 local function EradicatorsLibraryMain(options)
 ----ENVIRONMENT------------------------------------------------------------------------------------
   assert(_ENV == debug.getregistry () [2],'[ER Library] Can not run with broken _ENV')
-  
-  -- lock global right away! so modules can't do shit either.
-  -- local elroot = (function(_) return (pcall(_..'erlib/empty')) and _ or '' end)('__eradicators-library__/')
-  -- print('ELROOT IS NOW:<',elroot,'>',type(elroot),#elroot)
+  local PublicENV = debug.getregistry () [2]
+
+  -- EradicatorsLibrary = setmetatable({},{__index=_ENV}) --what about LOCK?
 ----OPTIONS----------------------------------------------------------------------------------------
 
-  -- print('test')http://game-a1.granbluefantasy.jp/assets/img_low/sp/ui/icon/status/x64/status_6410.png
-  -- print(package.searchpath ('/lua/Stacktrace', '__eradicators-library__/erlib'))
-  -- print(serpent.block(package,{nocode=true}))
-  -- error()
-  -- for k,v in pairs(_ENV) do print(k) end
-  -- print(_VERSION)
-  
 
-  -- first load all libraries locally
-  -- local Stacktrace = require (elroot.. 'erlib/factorio/Stacktrace') ()
-  -- local Error   = require (elroot.. 'erlib/lua/Error') ()
-  -- local Stop    = Error.Stopper('Main')
+-- -------------------------------------------------------------------------- --
+-- Core                                                                       --
+-- -------------------------------------------------------------------------- --
   
---   local Const   = {}
---     --mod that contains this file
---     Const.lib_name = Stacktrace.get_mod_name( 1)
---     Const.lib_root = Stacktrace.get_mod_root( 1)
---     --mod that required this file
---     Const.mod_name = Stacktrace.get_mod_name(-1)
---     Const.mod_root = Stacktrace.get_mod_root(-1)
+  local Core = {}; erlib .Core = Core
+
   
-   
---   local Coding = require (elroot.. 'erlib/lua/Coding/!init') ()
- 
-  
-  --STAGE DETECTION CAN FAIL
-  --and thus the library MUST NOT USE IT
-  --to stay lodable at all times (especially outside factorio)
-  
-  -- if Stacktrace.get_load_stage().control then
---   if false and Stacktrace.get_load_stage().control  then --
--- 
---     -- Error.Error()
--- 
---     require(elroot.. 'erlib/test/test_Stacktrace.lua')()
---   
---     -- Error.Error('MyModName','MyScript',"Sorry, i can't do that Dave!")
---     Stop('Yes?','No!',nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,'what?'
---       ,nil,nil,nil,nil,Stacktrace.get_mod_name,Stacktrace.get_mod_name(),Stacktrace.get_mod_name(1)
---       ,true,false,Stacktrace.get_cur_dir,math.huge,50
---       -- ,Coding.Base64.decode(Coding.Sha256([[-- "Sorry, i can't do that Dave!",]]))
---       )
---     -- Error.Error('MyModName','MyErrorName',
---       -- "Sorry, i can't do that Dave!",
---       -- nil,nil,nil,
---       -- 'shit',{'is','hitting',{'the','fence!'}},{'near','the','fox'},
---       -- nil,nil,nil
---       -- )
---     end
---   
-  -- return {Coding = Coding}
-  
-  
-  local erlib = {}
-  for k,v in pairs(Modules) do erlib[k] = v[1] end
-  
-  erlib .Stop = erlib .Error.Stopper 'Main'
-  
-  -- uplift submodules
-  for _,name in pairs{'Coding','Multiplex','Filter'} do
-    for k,v in pairs(erlib[name]) do
-      erlib[k] = v
+  ----------
+  -- Injects some methods directly into public modules like string, table, etc.
+  -- @tparam table ENV the environment in which to carry out the operation
+  Core.HijackPublicModules = function(ENV)
+    -- in data/settings disturbing other mods is rude
+    if not Const.load_stage.control then
+      Stop('Public Hijacking is illegal during startup.')
       end
+    -- so only allow this in control
+    ENV.string.f = ENV.string.format
+    end 
+  
+  ----------
+  -- Makes all erlib modules available directly in ENV.
+  -- 
+  Core.InstallToEnv = function(ENV,opt)
+    if (not Const.load_stage.control)
+    and (ENV == PublicENV)
+    and flag.IS_FACTORIO
+    then
+      Stop('Please use a private environment to install erlib.')
+      end
+    opt = opt or {}
+    if ENV == nil then --make a new env for the caller
+      ENV = {} ---@todo: write lock? read lookup?
+      ENV.PublicENV = PublicENV
+      for k,v in pairs(PublicENV) do ENV[k] = v end
+      end
+    for k,v in pairs(erlib) do
+      ---@todo implement strict wrapping
+      ENV[k] = opt.strict and erlib_strict[k] or erlib[k]
+      end
+    return ENV
     end
   
-  
-  local Core = {}
-  
-  
-  Core.HijackPublicModules = function()
-    --inject some methods directly into public modules
-    string.f = string.format
-    end
-  
-  
-  
+  ----------
+  -- Runs all unit tests included in erlib.
   Core.RunTests = function()
-    -- continuous testing
-    
     if flag.DO_TESTS then
-      local is_library, is_control
-      if flag.IS_FACTORIO then
-        is_library = ('eradicators-library' == erlib.Stacktrace.get_mod_name(-1))
-        is_control = erlib.Stacktrace.get_load_stage().control      
-        end
-      
-      
+      -- print('here',erlib.Stacktrace.get_pos())
       local Tester = elreq('erlib/test/!init')()
-      
-      
-      if (not flag.IS_FACTORIO) or (is_library and not is_control) then
+      if not Const.load_stage.control then
         Tester()
-      
-
-      -- "on_load" hack. desync-safe if game-state is not touched
-      elseif (is_library and is_control) then
-        local only_once; function only_once(); only_once = (function()end)
+      else
+        ---@fixme on_nth_tick calls this *twice* in the same tick....why?
+        local only_once; do function only_once(); only_once = (function()end)
           Tester()
-          end
+          end end
         --> event manager internal event "on_debug_once_per_session"
         script.on_nth_tick(61,function()only_once()end) --must be identical function
-
-
         end
-      
       end
     end
     
     
-  Core.RunTests() --move this somewhere safe!
+  
     
-  -- package_reset()
-    
-  -- print('what')
   return erlib
-  -- put everything in place later
-  -- EradicatorsLibrary = setmetatable({},{__index=_ENV}) --what about LOCK?
   end
 
 if true then return EradicatorsLibraryMain end

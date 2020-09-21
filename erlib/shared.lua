@@ -9,10 +9,14 @@
         or is it ok to load Hydra?
         
     + Why is shared log-spamming when used instead of empty for the path test?
-      is it because of pcall?
+      is pcall interfering with registering the package after load?
   ]]
 
--- do (STDOUT or log or print)('  Loaded → erlib.shared') end
+-- -------------------------------------------------------------------------- --
+-- Locals / Init                                                              --
+-- -------------------------------------------------------------------------- --
+  
+-- This is the first thing the library will say.
 do (STDOUT or log or print)('ErLib is booting now.') end
 
 -- Outside of factorio '__eradicators-library__' is not a valid absolute path!
@@ -20,6 +24,16 @@ local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__
 
 --@treturn boolean
 local does_file_exist = function(path) return (pcall(require,path)) end
+
+
+-- a sufficiently unlikely to collide but save/load stable unique value
+-- Sha256 of the empty string.
+local Nil = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+
+
+-- -------------------------------------------------------------------------- --
+-- Built-In                                                                   --
+-- -------------------------------------------------------------------------- --
 
 -- this array must be correctly ordered for unpack in modules to work!
 local shared = {
@@ -33,21 +47,57 @@ local shared = {
   [4] = function(path) return require(elroot..path)         end,
   --flag
   [5] = {},
+  --ercfg
+  [6] = {
+    Nil = Nil,
+    }
   }
   
+  
+  
+-- -------------------------------------------------------------------------- --
+-- Flags                                                                      --
+-- -------------------------------------------------------------------------- --
+
 local flag = shared[5]
 
-  flag.IS_FACTORIO =
+  flag.IS_FACTORIO = -- is this a non-factorio lua environment?
     not (_ENV.os and _ENV.io)
 
-  flag.IS_DEV_MODE =
+  flag.IS_DEV_MODE = -- spam the log with garbage, etcpp
     does_file_exist('__zz-toggle-to-enable-dev-mode__/empty')
     or (not flag.IS_FACTORIO)
 
   flag.VERBOSE_LOGGING = --todo: decided how/what to do with this
     flag.IS_DEV_MODE
   
-  flag.DO_TESTS = 
+  flag.DO_TESTS = -- run unit tests 
     flag.IS_DEV_MODE
+  
+  flag.IS_LIBRARY_MOD = -- am i running inside the original factorio mod?
+    (flag.IS_FACTORIO   -- or is this a cross require from another mod?
+    and
+    -- filename of bottom of manual stacktrace
+    (function(i,dgi) while dgi(i) do i=i+1 end return not not dgi(i-1)
+     .short_src:match'^__eradicators%-library__' end)(1,debug.getinfo)
+     and
+    -- last line of automatic stacktrace
+    (not not (debug.traceback():gsub('^.*\n%s*',''))
+     :match'^__eradicators%-library__')
+    )
+
+    
+
+  
+  
+-- -------------------------------------------------------------------------- --
+-- Log Level                                                                  --
+-- (@todo implement this properly...)
+-- -------------------------------------------------------------------------- --
+
+  -- Mute low-level logging
+  STDOUT = flag.IS_DEV_MODE and print or function()end
+ 
+ 
   
 return shared
