@@ -1,11 +1,11 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- Some simple filter functions.
+-- This module is not factorio compatible.
 --
--- @module Filter
+-- @module Time
 -- @usage
---  local Filter = require('__eradicators-library__.erlib.lua.Filter')()
+--  local Time = require('__eradicators-library__/erlib/factorio/Time')()
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -15,38 +15,44 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 
 -- -------------------------------------------------------------------------- --
 -- Locals / Init                                                              --
+-- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
+if flag.IS_FACTORIO then return function()end, function()end, nil end
+
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Filter = {}
+local Time,_Time,_uLocale = {},{},{}
+
+
 
 
 ----------
--- No-Op, does nothing at all.
-Filter.SKIP  = function( ) end
+-- Waits until the time it up.
+-- @tparam int ms milliseconds.
+-- @function Time.wait
+  do
+  local os_clock = os.clock
+function Time.wait(ms)
+  local _end = os_clock() + (ms/1000)
+  repeat until os_clock() > _end
+  end end
 
-----------
--- Always returns boolean true.
-Filter.TRUE  = function( ) return true end
 
-----------
--- Always returns boolean false.
-Filter.FALSE = function( ) return false end
 
-----------
--- Returns obj.valid, the validity of factorio LuaObjects.
--- @tparam LuaObject obj
--- @usage 
---    for k,entity in Iter.filtered_pairs(entities,Filter.VALID) do
---      print(entity.name,'is valid!')
---      end
-Filter.VALID = function(obj) return not not obj.valid end
+
+
+
+--------------------------------------------------------------------------------
+-- Section
+-- @section
+--------------------------------------------------------------------------------
+
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-do (STDOUT or log or print)('  Loaded → erlib.Filter') end
-return function() return Filter,_Filter,_uLocale end
+do (STDOUT or log or print)('  Loaded → erlib.Time') end
+return function() return Time,_Time,_uLocale end

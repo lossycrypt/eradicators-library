@@ -25,10 +25,10 @@ local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__
 --@treturn boolean
 local does_file_exist = function(path) return (pcall(require,path)) end
 
-
--- a sufficiently unlikely to collide but save/load stable unique value
--- Sha256 of the empty string.
-local Nil = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+-- A sufficiently unlikely to collide but save/load stable unique value.
+-- Used to represent nil in table values and keys where Lua can not.
+-- local sha = '' for i=1,5 do sha = erlib.Coding.Sha256(sha) print(sha) end
+local Nil = '2a132dbfe4784627b86aa3807cd19cfeff487aab3dd7a60d0ab119a72e736936'
 
 
 -- -------------------------------------------------------------------------- --

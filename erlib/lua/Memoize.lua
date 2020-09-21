@@ -5,18 +5,21 @@
 --
 -- @module Memoize
 -- @usage
---  local Memoize = require('__eradicators-library__/erlib/factorio/Memoize')()
+--  local Memoize = require('__eradicators-library__/erlib/lua/Memoize')()
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
 -- -------------------------------------------------------------------------- --
 local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
-local say,warn,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
+local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
+
+local Nil = ercfg.Nil
 
 -- -------------------------------------------------------------------------- --
 -- Locals / Init                                                              --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
+
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -24,19 +27,55 @@ local say,warn,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
 
 local Memoize,_Memoize,_uLocale = {},{},{}
 
-local Memo1, MemoN
+local _Memo1, _MemoN
 
---- Simple argument splitter 1<>N
-local function Memoize(n,constructor)
-  if (type(n) == 'function') and (constructor==nil)then 
-    n,constructor = 1,n
+
+
+-- Simple argument splitter 1<>N
+local function Memoize(constructor,n,max_cache_size)
+  -- if (type(n) == 'function') and (constructor==nil)then 
+    -- n,constructor = 1,n
+    -- end
+  if type(constructor) ~= 'function' then
+    err('Constructor must be a function')
     end
-  if n == 1 then return _Memo1(constructor)
-  else           return _MemoN(constructor)
+  if (n or 1) == 1 then
+    -- does not check max_cache_size because it would be too expensive to
+    -- check on every call.
+    return _Memo1(constructor)
+  else
+    return _MemoN(n,constructor,max_cache_size)
     end
   end
 
---- Simple one-argument Memoizer
+
+----------
+-- A single-argument-function memory-table. Very fast.
+--
+-- __NOTE:__ if the result of calling a memoized function is a table then
+-- a **reference** to the cached table is returned. You must therefore copy
+-- any returned table before you alter them, or you will alter the cached
+-- table, and therefore all future results.
+-- 
+-- @tparam function constructor
+-- @treturn table a function-like indexable MemoTable.
+-- @function Memoize
+--
+-- @usage
+--   -- Simply call Memoize() with the function you want to memoize.
+--   local doubleup = function(a) return 2*a end
+--   local memodoubleup = Memoize(doubleup)
+--   -- You can use the memoized function exactly as before.
+--   -- But for very simple and fast operations like this example
+--   -- The function call overhead would outweight the performance gains.
+--   local four = memodoubleup(2)
+--   -- Instead you can also access the result like a table. This is actually
+--   -- a real native table lookup for every call after the first. So it
+--   -- is really fast! Even for this simple 2*a example it only takes 1/3rd
+--   -- of the time it would to call the un-memoized function.
+--   local four = memodoubleup[2]
+  
+-- Simple one-argument Memoizer
 function _Memo1(constructor)
   local mt = {}
   function mt.__index(self,key)
@@ -45,149 +84,106 @@ function _Memo1(constructor)
     return value
     end
   function mt.__call(self,key)
-    return self[key] --implicitly call index -> constructor
+    return self[key] --implicitly calls index -> constructor
+                     --@todo: copy value? performance? can't copy table access anyway.
+    end
+  function mt.__pairs(self)
+    err('Memoized function is not iterable.')
     end
   return setmetatable({},mt)
   end
 
 
   
-  
-  
---- N-Argument constructor
-function _MemoN(n,constructor)
-
-  -- this'll need automatic sub-table construction to *exactly* n depth.
-
-  -- only the final index needs to know all arguments
-  -- but how does it get them?
-  local function make__index(depth,args)
-    local _index function (self,key)
-      
-      end
-    return
-    end
-  
-  function _index (self,key)
-    if depth == n then
-      local value = constructor(unpack(keys))
-      self[key] = value
-      return value
-    else
-      return setmetatable({},{__index=_index})
-      end
-    end
-  
-  
-  local function a(n)
-    
-    return setmetatable({},a(n-1))
-    
-    end
-  
-  
-  return setmetatable({},a(n))
-  
-  end
-
-  
-function _MemoN(n,constructor)
-  local cache_size=0
-  return function(a,b,c,d,e,f,g)
-    -- if it can be assumed that either the full path exists
-    -- or no part of the path exists... 
-    -- then can a temporary index meta return a stack of empty
-    -- tables that only exists to make this not crash?
-    
-    --> investigate how fast or slow pcall() "if index a nil value" is.
-    local test = "Console:1: attempt to index a nil value (field '?')"
-    
-    --> can a precise pregenerated function use an actual table-indexing approach?
-    --> nil parameters must still be converted to Nil
-    
-    if a == nil then a = Nil end --can be auto-generated
-    if b == nil then a = Nil end
-    if c == nil then a = Nil end
-    if d == nil then a = Nil end
-    if e == nil then a = Nil end
-    -- return cache[a][b][c][d][e][f][g]
-    local ok,msg = pcall(function() return cache[a][b][c][d][e][f][g] end)
-    if ok==true then
-      return msg
-    elseif msg:match"attempt to index a nil value (field '?')" then --equal compare exact message
-      local value = constructor(a,b,c,d,e,f,g)
-      _set(cache,{a,b,c,d,e,f,g},value,7)
-      cache_size = cache_size+7
-      return value
-    else
-      error(msg)
-      end
-    end
-  end
-  
-  
-  
---- N-Argument constructor DRAFT
-
--- a sufficiently unlikely to collide but save/load stable unique value
--- Sha256 of the empty string.
-local Nil = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
--- local Nil = '__Nil__'
-
--- A fixed-depth nil-key-hardened variant of Table.set
-local function _set(tbl,path,value,depth)
-  for i=1,depth-1 do
-    local key = path[i] -- "nil"?
-    if key == nil then key = Nil end
-    if not tbl[key] then tbl[key] = {} end -- "false" is not a problem here
-    tbl = tbl[key]
-    end
-  tbl[path[depth]] = value
-  end
-
--- A fixed-depth nil-key-hardened variant of Table.get
-local function _get(tbl,path,depth)
-  for i=1,depth-1 do
-    local key = path[i] -- "nil"?
-    if key == nil then key = Nil end
-    tbl = tbl[key]
-    if tbl==nil then return nil end
-    end
-  return tbl[path[depth]]
-  end
-
-
-local final = {
-
-  a = auto{
-      [1] = {
-          stuf = {
-              data = {
-                -- table doesn't even need to auto-expand 
-                -- because [b][c][2][5] syntax is not desirable or transparent
-                [987] = result_of_constructor_call "c(a,1,stuf,data,987)"
-                }
-            }
-        }
-    }
-    
-  b = {
-    }
-
-  }
-  
-
-
---------------------------------------------------------------------------------
--- Section
--- @section
---------------------------------------------------------------------------------
-
 ----------
--- Foo
--- @table Foo
+-- __EXPERIMENTAL__ A multi-argument function memoizing wrapper.
+--
+-- __NOTE:__ Argument comparison is based on standard Lua identity. All arguments
+-- must be valid table keys or nil. There is 
+-- no magic that checks if the content of a table given as argument machtes
+-- the content of a table given in a previous function call. Therefore it is advisable
+-- to only memoize functions that take number and string arguments exclusively.
+--
+-- __NOTE:__ If the function returns tables you should copy them before use. See
+-- note above.
+--
+-- @tparam function constructor the function to be memoized
+-- @tparam[opt=1] int argcount the maximum number of positional arguments that the function takes.
+-- @tparam[opt=9000] int max_cache_size the maximum size of the set of possible argument
+-- combinations to cache. If the cache grows beyond this size it will be flushed.
+-- @treturn function the memoized wrapper that behaves like the original function
+-- except that it does not call the function if there is a known cached result
+-- for the given combination of arguments.
+--
+-- @function Memoize
+--
 -- @usage
+--   local g = function(a,b,c,d,e) return a*b*c*d*e end
+--   local f = Memoize(g,5)
+--   print(f(1,2,3,4,5))
+--   > 120
 
+-- N-Argument Memoizer (Prototype 2)
+do
+  -- @future: 
+  --   By removing Nil argument support and load()'ing a custom made
+  --   function that simply uses pcall(load("function() return cache[a][b][c][d] end"))
+  --   for the indexing operation to catch nil results it should be
+  --   possible to make this significantly faster so that it becomes
+  --   a realistic option even for fast functions.
+  --
+  --   It'll have to be seen if that ever becomes nessecary.
+  --
+  local _set,_get
+  --closure with cache table
+  function _MemoN(n,constructor,max_cache_size)
+    local cache = {__size = 0}
+    return function(...)
+      return _get(cache,n,max_cache_size,constructor,...)
+      end
+    end
+  --getter
+  function _get(cache,n,max_cache_size,constructor,...)
+    local path = {...}
+    local value = cache
+    for i=1,n do
+      local key = path[i]
+      if key == nil then key = Nil end
+      value = value[key]
+      if value == nil then break end
+      end
+    if value == nil then --not cached yet
+      -- flush too large cache to safe memory
+      if cache.__size >= (max_cache_size or 9000) then
+        for k in pairs(cache) do cache[k] = nil end
+        warn('Memoize cache flushed.')
+        cache.__size = 0
+        end
+      cache.__size = cache.__size + 1
+      return _set(cache,n,path,constructor,...) -- constructor must get real nil
+    elseif value == Nil then --cached nil result
+      return nil
+    else
+      return value --@todo: copy value? performance?
+      end
+    end
+  --setter
+  function _set(cache,n,path,constructor,...)
+    local value = constructor(...)
+    if value == nil then value = Nil end
+    for i=1,n-1 do
+      local key = path[i]
+      if key == nil then key = Nil end
+      if cache[key] == nil then cache[key] = {} end -- "false" is not a problem here
+      cache = cache[key]
+      end
+    cache[path[n]] = value
+    return value
+    end
+  end
+  
+_ENV.Memo=Memoize
+  
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --

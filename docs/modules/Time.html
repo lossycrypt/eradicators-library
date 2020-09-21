@@ -32,7 +32,7 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Concepts">Concepts </a></li>
+<li><a href="#Functions">Functions</a></li>
 </ul>
 
 
@@ -40,7 +40,7 @@
 <ul class="nowrap">
   <li><a href="../modules/Core.html">Core</a></li>
   <li><a href="../modules/Types.html">Types</a></li>
-  <li><strong>Concepts</strong></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
   <li><a href="../modules/Debug.html">Debug</a></li>
@@ -51,7 +51,7 @@
   <li><a href="../modules/Memoize.html">Memoize</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/String.html">String</a></li>
-  <li><a href="../modules/Time.html">Time</a></li>
+  <li><strong>Time</strong></li>
   <li><a href="../modules/Tool.html">Tool</a></li>
 </ul>
 <h2>Source</h2>
@@ -63,21 +63,25 @@
 
 <div id="content">
 
-<h1>Module <code>Concepts</code></h1>
-<p>Abstract programming and behavioral concepts used by the library.</p>
+<h1>Module <code>Time</code></h1>
+<p>This module is not factorio compatible.</p>
 <p>
 
 
 
 </p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local Time = require(&apos;__eradicators-library__/erlib/factorio/Time&apos;)()
+</pre>
+    </ul>
 
 
-<h2><a href="#Concepts">Concepts </a></h2>
+<h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#STDOUT">STDOUT</a></td>
-	<td class="summary">When an environment variable _ENV.STDOUT is truthy then any compatible
- function will call STDOUT(...) instead of log(...).</td>
+	<td class="name" nowrap><a href="#wait">wait(ms)</a></td>
+	<td class="summary">Waits until the time it up.</td>
 	</tr>
 </table>
 
@@ -85,27 +89,28 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Concepts"></a>Concepts </h2>
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
     <dt>
-    <a name = "STDOUT"></a>
-    <strong>STDOUT</strong>
+    <a name = "wait"></a>
+    <strong>wait(ms)</strong>
     </dt>
     <dd>
-    When an environment variable _ENV.STDOUT is truthy then any compatible
- function will call STDOUT(...) instead of log(...).  If a function is
- compatible is mentioned in each functions description.
+    Waits until the time it up.
 
 
-
-
-
-
-    <h3>Usage:</h3>
+    <h3>Parameters:</h3>
     <ul>
-        <pre class="example">_ENV.STDOUT = _ENV.<span class="global">print</span></pre>
+        <li><span class="parameter">ms</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#int">int</a></span>
+         milliseconds.
+        </li>
     </ul>
+
+
+
+
 
 </dd>
 </dl>

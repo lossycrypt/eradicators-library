@@ -16,7 +16,7 @@
 -- -------------------------------------------------------------------------- --
 -- Outside of factorio '__eradicators-library__' is not a valid absolute path!
 local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
-local say,warn,err,elreq,flag = table.unpack(require(elroot..'erlib/shared'))
+local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
 
 -- -------------------------------------------------------------------------- --
 -- Greeting                                                                   --
@@ -53,7 +53,8 @@ local Modules = {
   Filter     = 'erlib/lua/Filter',
   Debug      = 'erlib/lua/Debug',
   Lambda     = 'erlib/lua/Lambda',
-  -- Memoize    = 'erlib/lua/Memoize',
+  Memoize    = 'erlib/lua/Memoize',
+  Time       = 'erlib/lua/Time',
 
   }
   
