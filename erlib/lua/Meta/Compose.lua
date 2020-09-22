@@ -1,11 +1,11 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- (This module is not factorio compatible.)
+-- Compose function chains.
 --
--- @module Time
+-- @submodule Meta
 -- @usage
---  local Time = require('__eradicators-library__/erlib/factorio/Time')()
+--  local Compose = require('__eradicators-library__/erlib/lua/Meta/Compose')()
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -17,42 +17,64 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Locals / Init                                                              --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
-if flag.IS_FACTORIO then return function()end, function()end, nil end
-
+local unpack = table.unpack
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Time,_Time,_uLocale = {},{},{}
-
-
-
-
-----------
--- Waits until the time it up.
--- @tparam int ms milliseconds.
--- @function Time.wait
-  do
-  local os_clock = os.clock
-function Time.wait(ms)
-  local _end = os_clock() + (ms/1000)
-  repeat until os_clock() > _end
-  end end
-
-
-
-
+-- local Compose,_Compose,_uLocale = {},{},{}
 
 
 --------------------------------------------------------------------------------
--- Section
+-- Compose
 -- @section
 --------------------------------------------------------------------------------
 
+----------
+-- Generates a closurized function chain.
+--
+-- Takes any number of functions and binds them into
+-- a single function that applies all functions in
+-- reverse order given.
+--
+-- Functions are applied "from right to left".
+-- Compose(a,b,c)(x) == a(b(c(x)))
+--
+-- @tparam function ... the functions you want to apply in reverse order.
+-- @treturn AnyValue the result of the final function call
+--
+-- @usage
+--   local a  = function(x) return 2+x end
+--   local b  = function(x) return 2*x end
+--   local c  = function(x) return 2/x end
+--   local fc = Compose(a,b,c)
+--   print(fc(10)) -- a(b(c(x)))
+--   > 2.4
+--
+-- @usage
+--   -- each function recieves all return values of the previous function
+--   local d  = function(z,y,x) return 2+x,z,y,x end
+--   local e  = function(  y,x) return 2*x,  y,x end
+--   local f  = function(    x) return 2/x,    x end
+--   local fc = Compose(d,e,f)
+--   local r,z,y,x = fc(10) -- d(e(f(x)))
+--   print(x,y,z,r) 
+--   > 10  0.2  20  12
+--
+local function Compose(...)
+  local funcs,n = {...}, select('#',...)
+  return function(...)
+    local r = {...}
+    for i=n,1,-1 do r = {funcs[i](unpack(r))} end
+    return unpack(r) 
+    end
+  end
+  
+  
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-do (STDOUT or log or print)('  Loaded → erlib.Time') end
-return function() return Time,_Time,_uLocale end
+do (STDOUT or log or print)('  Loaded → erlib.Compose') end
+return function() return Compose,_Compose,_uLocale end

@@ -1,7 +1,7 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- Produces auto-formatted auto-serialized errors.
+-- Produces auto-formatting auto-serializing errors handlers.
 --
 -- @module Error
 --

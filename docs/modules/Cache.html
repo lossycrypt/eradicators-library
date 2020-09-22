@@ -1,0 +1,462 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Class_TickedCache">Class TickedCache </a></li>
+<li><a href="#Todo">Todo</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Core.html">Core</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><strong>Cache</strong></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Array.html">Array</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Iter.html">Iter</a></li>
+  <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
+  <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
+  <li><a href="../modules/Time.html">Time</a></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/Introduction.html">Introduction</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Cache</code></h1>
+<p>Useful cache constructors.</p>
+<p> For when you don't want to spam
+ global savedata with lots of outdated junk.</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local Cache = require(&apos;__eradicators-library__/erlib/factorio/Cache&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#TickedCache">TickedCache()</a></td>
+	<td class="summary">A tick-volatile cache.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#AutoCache">AutoCache(constructor)</a></td>
+	<td class="summary">Creates a new AutoCache.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OnLoadCache">OnLoadCache()</a></td>
+	<td class="summary"><strong>Not implemented</strong>.</td>
+	</tr>
+</table>
+<h2><a href="#Class_TickedCache">Class TickedCache </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#TickedCache:insert">TickedCache:insert(value)</a></td>
+	<td class="summary">Standard table methods do not work for ticked caches.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TickedCache:remove">TickedCache:remove(key)</a></td>
+	<td class="summary">Standard table methods do not work for ticked caches.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TickedCache:map">TickedCache:map(func)</a></td>
+	<td class="summary">Standard table methods do not work for ticked caches.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TickedCache:size">TickedCache:size()</a></td>
+	<td class="summary">Standard table methods do not work for ticked caches.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TickedCache:is_empty">TickedCache:is_empty()</a></td>
+	<td class="summary">Standard table methods do not work for ticked caches.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TickedCache.__len">TickedCache.__len()</a></td>
+	<td class="summary">The length operator # works as it always does.</td>
+	</tr>
+</table>
+<h2><a href="#Todo">Todo</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#todo1">todo1</a></td>
+	<td class="summary">Rewrite TickedCache table functions to emulate exact behavior of lua.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#todo1">todo1</a></td>
+	<td class="summary">Nothing.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "TickedCache"></a>
+    <strong>TickedCache()</strong>
+    </dt>
+    <dd>
+
+<p>A tick-volatile cache.  Only contains values that were written during
+  the same tick. The main use-case for this is to correlate
+  data between events that happen sequentially in the same tick. This is
+  <strong>desync safe</strong> because it has no influence across tick boundaries.</p>
+
+<p>  A TickedCache table emulates normal Lua <a href="https://www.lua.org/pil/2.5.html">table</a> behavior as best as it can
+  but there are a few <strong>important differences</strong>.</p>
+
+<ul>
+    <li><p>You can not store a TickedCache in global savedata. It will just store
+    an empty table.</p></li>
+    <li><p>Storing the iterator from a pairs(TickedCache) call is not desync safe.
+    You should only use standard <code>for k,v in pairs(TickedCache)</code>
+    loops for iteration.</p></li>
+    <li><p>You can not use <a href="https://www.lua.org/pil/2.5.html">table</a> or <a href="../modules/Table.html#">Table</a> module functions on a TickedCache. Instead
+    you can use <code>TC:insert(value)</code>, <code>TC:remove(value)</code> and <code>TC:map(func)</code>.</p></li>
+    <li><p>table<em>size(TickedCache) is always 0. Use TC:size() or TC:is</em>empty() instead.
+    The # length operator works as usual, including the undefined behavior
+    that happens when you use it on non-<a href="https://www.lua.org/pil/11.1.html">array</a>s.</p></li>
+    <li><p>table<em>size can not be directly called on a tc.
+    instead use tc:size() or tc:is</em>empty(), the # operator
+    works as usual on the array part.</p></li>
+</ul>
+
+
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">TickedCache</span></span>
+        an empty ticked cache.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "AutoCache"></a>
+    <strong>AutoCache(constructor)</strong>
+    </dt>
+    <dd>
+    Creates a new AutoCache. </p>
+
+<p> A read-only table that fills itself on first access. This is intended to
+ store pre-processed prototype data at runtime without cluttering global
+ savedata with tons of garbage. Less garbage means faster save/load. It also
+ removes the need to migrate old data.</p>
+
+<p> The engine limits access to prototype data to inside events for no good
+ reason. AutoCache provides a comfortable way to transparently fetch the data
+ in the first event you need it.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">constructor</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         This is called exactly once with an empty table
+ as the only argument. Is must then fill that table with the desired values.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.5.html">table</a></span>
+        An AutoCache instance.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- First you need a data collector.
+</span><span class="keyword">local</span> <span class="keyword">function</span> get_entity_types (data)
+  <span class="keyword">for</span> k,v <span class="keyword">in</span> <span class="global">pairs</span>(game.prototypes) <span class="keyword">do</span>
+    data[v.name] = v.<span class="global">type</span> <span class="comment">-- You must store your data in the given table.
+</span>    <span class="keyword">end</span>
+  <span class="keyword">return</span> <span class="keyword">nil</span> <span class="comment">-- The return value is not used.
+</span>  <span class="keyword">end</span>
+
+<span class="comment">-- Then you tell AutoCache to handle the collection for you.
+</span><span class="keyword">local</span> MyData = AutoCache(get_entity_types)
+
+<span class="comment">-- The collected data can only be used in events.
+</span>script.on_event(defines.events.on_stuff_happend,<span class="keyword">function</span>(event)
+  <span class="keyword">if</span> MyData[event.entity.name] == <span class="string">'assembling-machine'</span> <span class="keyword">then</span>
+    DoStuff()
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>)
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "OnLoadCache"></a>
+    <strong>OnLoadCache()</strong>
+    </dt>
+    <dd>
+    <strong>Not implemented</strong>.  Similar to an AutoCache but self-constructs when a
+ savegame is loaded. Using <code>on_debug_once_per_session</code>.
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Class_TickedCache"></a>Class TickedCache </h2>
+
+          <div class="section-description">
+          When you call <code>TickedCache()</code> you get a new TickCache object.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "TickedCache:insert"></a>
+    <strong>TickedCache:insert(value)</strong>
+    </dt>
+    <dd>
+    Standard table methods do not work for ticked caches.
+ Insert at the end.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TickedCache:remove"></a>
+    <strong>TickedCache:remove(key)</strong>
+    </dt>
+    <dd>
+    Standard table methods do not work for ticked caches.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TickedCache:map"></a>
+    <strong>TickedCache:map(func)</strong>
+    </dt>
+    <dd>
+    Standard table methods do not work for ticked caches.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">func</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TickedCache:size"></a>
+    <strong>TickedCache:size()</strong>
+    </dt>
+    <dd>
+    Standard table methods do not work for ticked caches.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#int">int</a></span>
+        the total number of NotNil keys in the cache.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TickedCache:is_empty"></a>
+    <strong>TickedCache:is_empty()</strong>
+    </dt>
+    <dd>
+    Standard table methods do not work for ticked caches.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TickedCache.__len"></a>
+    <strong>TickedCache.__len()</strong>
+    </dt>
+    <dd>
+    The length operator # works as it always does.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#int">int</a></span>
+        The length of the array part. Undefined behavior if not an <a href="https://www.lua.org/pil/11.1.html">array</a>.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Todo"></a>Todo</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "todo1"></a>
+    <strong>todo1</strong>
+    </dt>
+    <dd>
+    Rewrite TickedCache table functions to emulate exact behavior of lua.
+ I.e. TC:remove() should return the removed value, etc.
+
+
+    <ul>
+        <li><span class="parameter">todo1</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "todo1"></a>
+    <strong>todo1</strong>
+    </dt>
+    <dd>
+    Nothing.
+
+
+    <ul>
+        <li><span class="parameter">todo1</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-09-22 04:59:11 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

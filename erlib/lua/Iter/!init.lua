@@ -1,11 +1,11 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- (This module is not factorio compatible.)
+-- Specialized iteration of tables and other objects.
 --
--- @module Time
+-- @module Iter
 -- @usage
---  local Time = require('__eradicators-library__/erlib/factorio/Time')()
+--  local Iter = require('__eradicators-library__/erlib/factorio/Iter')()
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -17,28 +17,18 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Locals / Init                                                              --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
-if flag.IS_FACTORIO then return function()end, function()end, nil end
+local import = function(path) return (require(elroot..path))() end --unpacking
 
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Time,_Time,_uLocale = {},{},{}
+local Iter,_Iter,_uLocale = {},{},{}
 
 
 
-
-----------
--- Waits until the time it up.
--- @tparam int ms milliseconds.
--- @function Time.wait
-  do
-  local os_clock = os.clock
-function Time.wait(ms)
-  local _end = os_clock() + (ms/1000)
-  repeat until os_clock() > _end
-  end end
+Iter.deep_pairs = import('erlib/lua/Iter/deep_pairs')
 
 
 
@@ -51,8 +41,14 @@ function Time.wait(ms)
 --------------------------------------------------------------------------------
 
 
+----------
+-- Find out how to make LDoc obey custom names for
+-- sections and iterators.
+-- @within Todo
+-- @field todo-1
+
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-do (STDOUT or log or print)('  Loaded → erlib.Time') end
-return function() return Time,_Time,_uLocale end
+do (STDOUT or log or print)('  Loaded → erlib.Iter') end
+return function() return Iter,_Iter,_uLocale end

@@ -1,7 +1,7 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- Description
+-- A bunch of small utilities. Factorio already has "util" so this is Tool.
 --
 -- @module Tool
 -- @usage
@@ -32,7 +32,7 @@ local Tool,_Tool,_uLocale = {},{},{}
 --------------------------------------------------------------------------------
 
 ----------
--- In-Line definition and usage of new tables.
+-- In-Line definition and simultaenous usage of new tables.
 -- @tparam function f
 -- @tparam AnyValue o
 -- @usage local prototype = Tool.fetch(SimpleHotkey,{'some','values'})

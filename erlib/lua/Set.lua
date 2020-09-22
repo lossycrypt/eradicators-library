@@ -1,11 +1,11 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- (This module is not factorio compatible.)
+-- Description
 --
--- @module Time
+-- @module Set
 -- @usage
---  local Time = require('__eradicators-library__/erlib/factorio/Time')()
+--  local Set = require('__eradicators-library__/erlib/lua/Set')()
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -17,32 +17,26 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Locals / Init                                                              --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
-if flag.IS_FACTORIO then return function()end, function()end, nil end
-
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Time,_Time,_uLocale = {},{},{}
+local Set,_Set,_uLocale = {},{},{}
 
 
+--@todo: Consider the pros and cons of using "~=nil" instead of "==true" 
+--       for ALL operations.
 
+-- Pro:
+--   + Easy use of Set.* operations on tables that store a useful value.
+--     ? Possibly reduced data storage because copying is not needed
+--     ? Possibly *increased* data storage by keeping outdated references.
+--   + No need to convert dictionaries. Only arrays need conversion.
 
-----------
--- Waits until the time it up.
--- @tparam int ms milliseconds.
--- @function Time.wait
-  do
-  local os_clock = os.clock
-function Time.wait(ms)
-  local _end = os_clock() + (ms/1000)
-  repeat until os_clock() > _end
-  end end
-
-
-
-
+-- Contra:
+--   - Ambigious situations might arise in other peoples code.
+--     ? Providing a Set.enforce_true could remedy this.
 
 
 --------------------------------------------------------------------------------
@@ -50,9 +44,13 @@ function Time.wait(ms)
 -- @section
 --------------------------------------------------------------------------------
 
+----------
+-- Nothing.
+-- @within Todo
+-- @field todo1
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-do (STDOUT or log or print)('  Loaded → erlib.Time') end
-return function() return Time,_Time,_uLocale end
+do (STDOUT or log or print)('  Loaded → erlib.Set') end
+return function() return Set,_Set,_uLocale end

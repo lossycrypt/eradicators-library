@@ -45,18 +45,24 @@
   <li><a href="../modules/Core.html">Core</a></li>
   <li><strong>Types</strong></li>
   <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
   <li><a href="../modules/Debug.html">Debug</a></li>
   <li><a href="../modules/Error.html">Error</a></li>
   <li><a href="../modules/Filter.html">Filter</a></li>
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
-  <li><a href="../modules/Memoize.html">Memoize</a></li>
+  <li><a href="../modules/Meta.html">Meta</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
   <li><a href="../modules/Time.html">Time</a></li>
   <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -79,22 +85,22 @@
 <h2><a href="#Tables">Tables </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Table">Table</a></td>
+	<td class="name" nowrap><a href="#table">table</a></td>
 	<td class="summary">Every Lua table maps <a href="../modules/Types.html#NotNil">NotNil</a> keys to NotNil values.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Set">Set</a></td>
+	<td class="name" nowrap><a href="#set">set</a></td>
 	<td class="summary">A <a href="https://en.wikipedia.org/wiki/Set_(mathematics)">Set</a> is a table in which all values are <a href="../modules/Types.html#true">true</a> and
  the keys are the actual values.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Array">Array</a></td>
-	<td class="summary">An Array - sometimes also called a DenseArray - is a table
+	<td class="name" nowrap><a href="#array">array</a></td>
+	<td class="summary">An array - sometimes also called a DenseArray - is a table
  in which all keys are non-zero <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>s.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#SparseArray">SparseArray</a></td>
-	<td class="summary">A SparseArray is also a <a href="../modules/Types.html#Table">Table</a> in which all keys are <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>s.</td>
+	<td class="summary">A SparseArray is also a <a href="../modules/Table.html#">Table</a> in which all keys are <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>s.</td>
 	</tr>
 </table>
 <h2><a href="#Numbers">Numbers </a></h2>
@@ -154,11 +160,11 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#LoadStageTable">LoadStageTable</a></td>
-	<td class="summary">A <a href="../modules/Types.html#Table">Table</a> that contains three keys->value mappings.</td>
+	<td class="summary">A <a href="../modules/Table.html#">Table</a> that contains three keys->value mappings.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#LoadPhaseTable">LoadPhaseTable</a></td>
-	<td class="summary">A <a href="../modules/Types.html#Table">Table</a> that contains three (key → value) mappings.</td>
+	<td class="summary">A <a href="../modules/Table.html#">Table</a> that contains three (key → value) mappings.</td>
 	</tr>
 </table>
 
@@ -170,8 +176,8 @@
 
     <dl class="function">
     <dt>
-    <a name = "Table"></a>
-    <strong>Table</strong>
+    <a name = "table"></a>
+    <strong>table</strong>
     </dt>
     <dd>
     Every Lua table maps <a href="../modules/Types.html#NotNil">NotNil</a> keys to NotNil values.
@@ -190,13 +196,13 @@
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example"><span class="keyword">local</span> Table = {key = value}</pre>
+        <pre class="example"><span class="keyword">local</span> <span class="global">table</span> = {key = value}</pre>
     </ul>
 
 </dd>
     <dt>
-    <a name = "Set"></a>
-    <strong>Set</strong>
+    <a name = "set"></a>
+    <strong>set</strong>
     </dt>
     <dd>
     A <a href="https://en.wikipedia.org/wiki/Set_(mathematics)">Set</a> is a table in which all values are <a href="../modules/Types.html#true">true</a> and
@@ -216,26 +222,26 @@
 
     <h3>Usage:</h3>
     <ul>
-        <li><pre class="example"><span class="keyword">local</span> Set = {}
+        <li><pre class="example"><span class="keyword">local</span> set = {}
 <span class="keyword">for</span> _,value <span class="keyword">in</span> <span class="global">pairs</span>(Table) <span class="keyword">do</span>
-  Set[value] = <span class="keyword">true</span>
+  set[value] = <span class="keyword">true</span>
   <span class="keyword">end</span>
 </pre></li>
-        <li><pre class="example"><span class="keyword">if</span> Set[key] <span class="keyword">then</span> f() <span class="keyword">end</span></pre></li>
-        <li><pre class="example"><span class="keyword">for</span> value,_ <span class="keyword">in</span> <span class="global">pairs</span>(Set) <span class="keyword">do</span> <span class="global">print</span>(value) <span class="keyword">end</span></pre></li>
+        <li><pre class="example"><span class="keyword">if</span> set[key] <span class="keyword">then</span> f() <span class="keyword">end</span></pre></li>
+        <li><pre class="example"><span class="keyword">for</span> value,_ <span class="keyword">in</span> <span class="global">pairs</span>(set) <span class="keyword">do</span> <span class="global">print</span>(value) <span class="keyword">end</span></pre></li>
     </ul>
 
 </dd>
     <dt>
-    <a name = "Array"></a>
-    <strong>Array</strong>
+    <a name = "array"></a>
+    <strong>array</strong>
     </dt>
     <dd>
-    An Array - sometimes also called a DenseArray - is a table
+    An array - sometimes also called a DenseArray - is a table
  in which all keys are non-zero <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>s.  Additionally
  the sequence of numbers must be uninterrupted - for every
  key n in the array there must also be a key n-1, except for n=1 which
- must be the first key (or the Array is empty).</p>
+ must be the first key (or the array is empty).</p>
 
 <p> Arrays are the ONLY type of Table for which the Lua length operator #
  reports the correct number of elements. For all other types of Table
@@ -260,7 +266,7 @@
 
     <h3>Usage:</h3>
     <ul>
-        <li><pre class="example"><span class="keyword">for</span> i=<span class="number">1</span>,#Array <span class="keyword">do</span> <span class="global">print</span>(Array[i]) <span class="keyword">end</span>
+        <li><pre class="example"><span class="keyword">for</span> i=<span class="number">1</span>,#array <span class="keyword">do</span> <span class="global">print</span>(array[i]) <span class="keyword">end</span>
 </pre></li>
         <li><pre class="example"><span class="keyword">local</span> A = {<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="string">'c'</span>,<span class="string">'d'</span>,<span class="string">'e'</span>}
 <span class="global">print</span>(#A)
@@ -274,8 +280,8 @@
     <strong>SparseArray</strong>
     </dt>
     <dd>
-    A SparseArray is also a <a href="../modules/Types.html#Table">Table</a> in which all keys are <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>s.
- Contrary to an <a href="../modules/Types.html#Array">Array</a> the sequence of keys may be discontinuous.</p>
+    A SparseArray is also a <a href="../modules/Table.html#">Table</a> in which all keys are <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>s.
+ Contrary to an <a href="../modules/Array.html#">Array</a> the sequence of keys may be discontinuous.</p>
 
 <p> These are often used to store entities indexed by their unit_number.
 
@@ -500,7 +506,7 @@
     <strong>LoadStageTable</strong>
     </dt>
     <dd>
-    A <a href="../modules/Types.html#Table">Table</a> that contains three keys->value mappings.  It is used
+    A <a href="../modules/Table.html#">Table</a> that contains three keys->value mappings.  It is used
  for stage based conditional code execution.
 
 
@@ -540,7 +546,7 @@
     <strong>LoadPhaseTable</strong>
     </dt>
     <dd>
-    A <a href="../modules/Types.html#Table">Table</a> that contains three (key → value) mappings.
+    A <a href="../modules/Table.html#">Table</a> that contains three (key → value) mappings.
 
 
     <h3>Fields:</h3>
@@ -574,7 +580,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-21 22:47:22 </i>
+<i style="float:right;">Last updated 2020-09-22 04:59:11 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

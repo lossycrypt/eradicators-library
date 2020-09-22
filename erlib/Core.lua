@@ -48,13 +48,19 @@ local Modules = {
   --determines load order
   Stacktrace = 'erlib/factorio/Stacktrace',
   Error      = 'erlib/lua/Error',
-  Coding     = 'erlib/lua/Coding/!init',
   Replicate  = 'erlib/lua/Replicate',
   Filter     = 'erlib/lua/Filter',
   Debug      = 'erlib/lua/Debug',
   Lambda     = 'erlib/lua/Lambda',
-  Memoize    = 'erlib/lua/Memoize',
   Time       = 'erlib/lua/Time',
+  String     = 'erlib/lua/String',
+  -- groups
+  Coding     = 'erlib/lua/Coding/!init',
+  Iter       = 'erlib/lua/Iter/!init',
+  Meta       = 'erlib/lua/Meta/!init',
+    -- Memoize    = 'erlib/lua/Memoize',
+    -- Compose    = 'erlib/lua/Compose',
+    -- Closurize  = 'erlib/lua/Closurize',
 
   }
   
@@ -95,11 +101,12 @@ local erlib_strict = {}; do
 -- @usage uplift(erlib,{'Coding','Replicate','Filter'})
 --
 local function uplift(target,names)
-  for _,name in pairs(names        ) do
-  for k,v    in pairs(target[names]) do
-  if type(v) == 'function'          then
+  for _,name in pairs(names       ) do
+  for k,v    in pairs(target[name]) do
+  -- if type(v) == 'function'          then --@think: are limits needed? Coding needs tables.
+    print('Uplifting',name,k)
     target[k] = v
-    end
+    -- end
     end
     end
   end
@@ -149,10 +156,10 @@ local function EradicatorsLibraryMain(options)
   ----------
   -- Injects some methods directly into public modules like string, table, etc.
   -- @tparam table ENV the environment in which to carry out the operation
-  Core.HijackPublicModules = function(ENV)
+  Core.InjectIntoPublicModules = function(ENV)
     -- in data/settings disturbing other mods is rude
     if not Const.load_stage.control then
-      Stop('Public Hijacking is illegal during startup.')
+      Stop('Public injection is not supported during startup.')
       end
     -- so only allow this in control
     ENV.string.f = ENV.string.format
@@ -169,15 +176,20 @@ local function EradicatorsLibraryMain(options)
       Stop('Please use a private environment to install erlib.')
       end
     opt = opt or {}
-    if ENV == nil then --make a new env for the caller
+    --make a new env for the caller?
+    if ENV == nil then
       ENV = {} ---@todo: write lock? read lookup?
       ENV.PublicENV = PublicENV
       for k,v in pairs(PublicENV) do ENV[k] = v end
       end
+    --install to env
     for k,v in pairs(erlib) do
       ---@todo implement strict wrapping
       ENV[k] = opt.strict and erlib_strict[k] or erlib[k]
       end
+    --uplift
+    -- uplift(ENV,{'Coding','Meta'})
+    uplift(ENV,{'Coding','Meta'})
     return ENV
     end
   
@@ -200,13 +212,35 @@ local function EradicatorsLibraryMain(options)
       end
     end
     
-    
-  
+
+
     
   return erlib
   end
 
 if true then return EradicatorsLibraryMain end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 -- -----------------------------------------------------------------------------

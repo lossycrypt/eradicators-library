@@ -3,9 +3,9 @@
 --------------------------------------------------
 -- Description
 --
--- @module Memoize
+-- @submodule Meta
 -- @usage
---  local Memoize = require('__eradicators-library__/erlib/lua/Memoize')()
+--  local Memoize = require('__eradicators-library__/erlib/lua/Meta/Memoize')()
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -74,6 +74,7 @@ local function Memoize(constructor,n,max_cache_size)
 --   -- is really fast! Even for this simple 2*a example it only takes 1/3rd
 --   -- of the time it would to call the un-memoized function.
 --   local four = memodoubleup[2]
+
   
 -- Simple one-argument Memoizer
 function _Memo1(constructor)
@@ -182,7 +183,7 @@ do
     end
   end
   
-_ENV.Memo=Memoize
+
   
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

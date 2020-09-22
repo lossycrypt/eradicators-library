@@ -32,6 +32,7 @@
 
 <h2>Contents</h2>
 <ul>
+<li><a href="#Todo">Todo</a></li>
 <li><a href="#Section">Section </a></li>
 </ul>
 
@@ -42,7 +43,7 @@
   <li><a href="../modules/Types.html">Types</a></li>
   <li><a href="../modules/Concepts.html">Concepts</a></li>
   <li><a href="../modules/Cache.html">Cache</a></li>
-  <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><strong>EventManager</strong></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
@@ -57,7 +58,7 @@
   <li><a href="../modules/String.html">String</a></li>
   <li><a href="../modules/Table.html">Table</a></li>
   <li><a href="../modules/Time.html">Time</a></li>
-  <li><strong>Tool</strong></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
 </ul>
 <h2>Source</h2>
@@ -69,21 +70,31 @@
 
 <div id="content">
 
-<h1>Module <code>Tool</code></h1>
-<p>A bunch of small utilities.</p>
-<p> Factorio already has "util" so this is Tool.</p>
+<h1>Module <code>EventManager</code></h1>
+<p>Description</p>
+<p>
+
+</p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Tool = require(&apos;__eradicators-library__/erlib/factorio/Tool&apos;)()
+        <pre class="example">local EventManager = require(&apos;__eradicators-library__/erlib/factorio/EventManager&apos;)()
 </pre>
     </ul>
 
 
+<h2><a href="#Todo">Todo</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#todo1">todo1</a></td>
+	<td class="summary">Nothing.</td>
+	</tr>
+</table>
 <h2><a href="#Section">Section </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#fetch">fetch(f, o)</a></td>
-	<td class="summary">In-Line definition and simultaenous usage of new tables.</td>
+	<td class="name" nowrap><a href="#InterceptLuaBootstrap">InterceptLuaBootstrap()</a></td>
+	<td class="summary">Redirects standard script calls to erlib.EventManager for easy
+ multi-handler events without rewriting the mod.</td>
 	</tr>
 </table>
 
@@ -91,40 +102,47 @@
 <br/>
 
 
+    <h2 class="section-header "><a name="Todo"></a>Todo</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "todo1"></a>
+    <strong>todo1</strong>
+    </dt>
+    <dd>
+    Nothing.
+
+
+    <ul>
+        <li><span class="parameter">todo1</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Section"></a>Section </h2>
 
     <dl class="function">
     <dt>
-    <a name = "fetch"></a>
-    <strong>fetch(f, o)</strong>
+    <a name = "InterceptLuaBootstrap"></a>
+    <strong>InterceptLuaBootstrap()</strong>
     </dt>
     <dd>
-    In-Line definition and simultaenous usage of new tables.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">f</span>
-            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
-
-
-
-        </li>
-        <li><span class="parameter">o</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
-
-
-
-        </li>
-    </ul>
+    Redirects standard script calls to erlib.EventManager for easy
+ multi-handler events without rewriting the mod.
 
 
 
 
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> prototype = Tool.fetch(SimpleHotkey,{<span class="string">'some'</span>,<span class="string">'values'</span>})</pre>
-    </ul>
+
+
 
 </dd>
 </dl>

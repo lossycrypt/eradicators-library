@@ -1,7 +1,7 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- Description
+--  
 --
 -- @module String
 -- @usage
@@ -29,6 +29,11 @@ local String,_String,_uLocale = {},{},{}
 -- Section
 -- @section
 --------------------------------------------------------------------------------
+
+String.UPPER_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+String.UPPER_ARGS    = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z'
+String.LOWER_LETTERS = 'abcdefghijklmnopqrstuvwxyz'
+String.LOWER_ARGS    = 'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
 
 ----------
 -- Foo

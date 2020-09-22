@@ -1,8 +1,21 @@
----
--- @module Iter
+-- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
+
+--------------------------------------------------
+-- Description
+--
+-- @submodule Iter
+-- @usage
+--  local deep_pairs = require('__eradicators-library__/erlib/lua/Iter/deep_pairs')()
+  
+-- -------------------------------------------------------------------------- --
+-- Built-In                                                                   --
+-- -------------------------------------------------------------------------- --
+-- local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
+-- local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
+
 
 -- -----------------------------------------------------------------------------
--- RECURSIVE PAIRS (tested and confirmed WORKING!)                            --
+-- DEEP PAIRS (tested and confirmed WORKING!)                                 --
 
 --------------------------------------------------------------------------------
 --
@@ -25,9 +38,9 @@
 ----
 -- @tfield  int|nil max_depth 10000, paranoia option to prevent freezing on very large objects
 -- @tfield boolean|nil verbose_loop_logging nil:error,true:logging,false:silent
--- @tfield boolean|nil include_subtables_in_output false
+-- @tfield boolean|nil include_subtables false
 -- @tfield boolean|nil return_path false (include copy of path table in output? slower.)
--- @table deep_pair_options
+-- @table Iter.deep_pair_options
 
 
 ---
@@ -77,7 +90,7 @@ local function deep_pairs(tbl,opt) -- no actual recursion involved!
             if opt.verbose_loop_logging then
               current_parents[tbl] = array_copy(current_path_keys) -- store path for debugging
               end
-            if opt.include_subtables_in_output then
+            if opt.include_subtables then
               RETURN = true
               end
             end
@@ -106,7 +119,7 @@ local function deep_pairs(tbl,opt) -- no actual recursion involved!
 
 
 
--- local function recursive_pairs_early_draft(tbl,opt)
+-- local function deep_pairs_early_draft(tbl,opt)
 -- 
 --   local function array_copy(arr); local r = {}; for i=1,#arr do r[#r+1] = arr[i]  end; return r end
 -- 
@@ -143,4 +156,8 @@ local function deep_pairs(tbl,opt) -- no actual recursion involved!
 --   return _iter end
   
 
-return recursive_pairs
+-- -------------------------------------------------------------------------- --
+-- End                                                                        --
+-- -------------------------------------------------------------------------- --
+do (STDOUT or log or print)('  Loaded → erlib.Iter.deep_pairs') end
+return function() return deep_pairs end

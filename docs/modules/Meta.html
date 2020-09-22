@@ -32,7 +32,9 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Functions">Functions</a></li>
+<li><a href="#lua_Meta_Closurize_Functions">lua.Meta.Closurize Functions</a></li>
+<li><a href="#lua_Meta_Compose_Functions">lua.Meta.Compose Functions</a></li>
+<li><a href="#lua_Meta_Memoize_Functions">lua.Meta.Memoize Functions</a></li>
 </ul>
 
 
@@ -41,18 +43,24 @@
   <li><a href="../modules/Core.html">Core</a></li>
   <li><a href="../modules/Types.html">Types</a></li>
   <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
   <li><a href="../modules/Debug.html">Debug</a></li>
   <li><a href="../modules/Error.html">Error</a></li>
   <li><a href="../modules/Filter.html">Filter</a></li>
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
-  <li><strong>Memoize</strong></li>
+  <li><strong>Meta</strong></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
   <li><a href="../modules/Time.html">Time</a></li>
   <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -63,19 +71,35 @@
 
 <div id="content">
 
-<h1>Module <code>Memoize</code></h1>
-<p>Description</p>
+<h1>Module <code>Meta</code></h1>
+<p>Produce function wrappers from other functions.</p>
 <p>
+
+
 
 </p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Memoize = require(&apos;__eradicators-library__/erlib/lua/Memoize&apos;)()
+        <pre class="example">local Meta = require(&apos;__eradicators-library__/erlib/lua/Meta/!init&apos;)()
 </pre>
     </ul>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#lua_Meta_Closurize_Functions">lua.Meta.Closurize Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Closurize">Closurize(f, ...)</a></td>
+	<td class="summary">Creates a function wrapper with partially fullfilled arguments.</td>
+	</tr>
+</table>
+<h2><a href="#lua_Meta_Compose_Functions">lua.Meta.Compose Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Compose">Compose(...)</a></td>
+	<td class="summary">Generates a closurized function chain.</td>
+	</tr>
+</table>
+<h2><a href="#lua_Meta_Memoize_Functions">lua.Meta.Memoize Functions</a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#Memoize">Memoize(constructor)</a></td>
@@ -91,7 +115,116 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="lua_Meta_Closurize_Functions"></a>lua.Meta.Closurize Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Closurize"></a>
+    <strong>Closurize(f, ...)</strong>
+    </dt>
+    <dd>
+    Creates a function wrapper with partially fullfilled arguments.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         the function to be wrapped
+        </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         the first k arguments of f(...) that the created
+ closure will store.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         the wrapper that takes the remaining arguments before
+ calling f.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- create a closure that will always use the same first three arguments
+</span><span class="keyword">local</span> f1 = <span class="keyword">function</span>(a,b,c,d,e,f,g) <span class="global">print</span>(a,b,c,d,e,f,g) <span class="keyword">end</span>
+<span class="keyword">local</span> f2 = Closurize(f1,<span class="string">'clo'</span>,<span class="string">'sur'</span>,<span class="string">'ized'</span>)
+
+<span class="comment">-- call it with the remaining 4
+</span><span class="global">print</span>(f2(<span class="string">'var'</span>,<span class="keyword">nil</span>,<span class="string">'iable'</span>,<span class="keyword">nil</span>))
+&gt; clo sur ized var <span class="keyword">nil</span> iable <span class="keyword">nil</span>
+
+<span class="comment">-- or call it with fewer, leaving the rest empty
+</span><span class="global">print</span>(f2(<span class="keyword">nil</span>,<span class="string">'variable'</span>))
+&gt; clo sur ized <span class="keyword">nil</span> variable <span class="keyword">nil</span> <span class="keyword">nil</span>
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="lua_Meta_Compose_Functions"></a>lua.Meta.Compose Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Compose"></a>
+    <strong>Compose(...)</strong>
+    </dt>
+    <dd>
+    Generates a closurized function chain. </p>
+
+<p> Takes any number of functions and binds them into
+ a single function that applies all functions in
+ reverse order given.</p>
+
+<p> Functions are applied "from right to left".
+ Compose(a,b,c)(x) == a(b(c(x)))
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         the functions you want to apply in reverse order.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        the result of the final function call
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example"><span class="keyword">local</span> a  = <span class="keyword">function</span>(x) <span class="keyword">return</span> <span class="number">2</span>+x <span class="keyword">end</span>
+<span class="keyword">local</span> b  = <span class="keyword">function</span>(x) <span class="keyword">return</span> <span class="number">2</span>*x <span class="keyword">end</span>
+<span class="keyword">local</span> c  = <span class="keyword">function</span>(x) <span class="keyword">return</span> <span class="number">2</span>/x <span class="keyword">end</span>
+<span class="keyword">local</span> fc = Compose(a,b,c)
+<span class="global">print</span>(fc(<span class="number">10</span>)) <span class="comment">-- a(b(c(x)))
+</span>&gt; <span class="number">2.4</span>
+</pre></li>
+        <li><pre class="example"><span class="comment">-- each function recieves all return values of the previous function
+</span><span class="keyword">local</span> d  = <span class="keyword">function</span>(z,y,x) <span class="keyword">return</span> <span class="number">2</span>+x,z,y,x <span class="keyword">end</span>
+<span class="keyword">local</span> e  = <span class="keyword">function</span>(  y,x) <span class="keyword">return</span> <span class="number">2</span>*x,  y,x <span class="keyword">end</span>
+<span class="keyword">local</span> f  = <span class="keyword">function</span>(    x) <span class="keyword">return</span> <span class="number">2</span>/x,    x <span class="keyword">end</span>
+<span class="keyword">local</span> fc = Compose(d,e,f)
+<span class="keyword">local</span> r,z,y,x = fc(<span class="number">10</span>) <span class="comment">-- d(e(f(x)))
+</span><span class="global">print</span>(x,y,z,r)
+&gt; <span class="number">10</span>  <span class="number">0.2</span>  <span class="number">20</span>  <span class="number">12</span>
+</pre></li>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="lua_Meta_Memoize_Functions"></a>lua.Meta.Memoize Functions</h2>
 
     <dl class="function">
     <dt>
@@ -208,7 +341,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-21 22:47:22 </i>
+<i style="float:right;">Last updated 2020-09-22 04:59:11 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

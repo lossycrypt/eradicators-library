@@ -1,11 +1,11 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- (This module is not factorio compatible.)
+-- Description
 --
--- @module Time
+-- @module EventManager
 -- @usage
---  local Time = require('__eradicators-library__/erlib/factorio/Time')()
+--  local EventManager = require('__eradicators-library__/erlib/factorio/EventManager')()
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -17,32 +17,12 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Locals / Init                                                              --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
-if flag.IS_FACTORIO then return function()end, function()end, nil end
-
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Time,_Time,_uLocale = {},{},{}
-
-
-
-
-----------
--- Waits until the time it up.
--- @tparam int ms milliseconds.
--- @function Time.wait
-  do
-  local os_clock = os.clock
-function Time.wait(ms)
-  local _end = os_clock() + (ms/1000)
-  repeat until os_clock() > _end
-  end end
-
-
-
-
+local EventManager,_EventManager,_uLocale = {},{},{}
 
 
 --------------------------------------------------------------------------------
@@ -50,9 +30,31 @@ function Time.wait(ms)
 -- @section
 --------------------------------------------------------------------------------
 
+  ----------
+  -- Redirects standard script calls to erlib.EventManager for easy
+  -- multi-handler events without rewriting the mod.
+  EventManager.InterceptLuaBootstrap = function()
+    --Can not do this in core because it requires EventManager access!?
+    --Also the EM kinda needs to do this by default anyway to be usable
+    --at all in i.e. /sudo etc. Otherwise script.on_event calls would 
+    --completely break it.
+    local _real_script = _ENV.script
+    local _CoreScript = {}
+    _ENV.script = setmetatable(_CoreScript,{__index=_real_script})
+
+    function _CoreScript.on_event(id,func)
+      -- EventManager redirect
+      end
+
+    end
+
+----------
+-- Nothing.
+-- @within Todo
+-- @field todo1
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-do (STDOUT or log or print)('  Loaded → erlib.Time') end
-return function() return Time,_Time,_uLocale end
+do (STDOUT or log or print)('  Loaded → erlib.EventManager') end
+return function() return EventManager,_EventManager,_uLocale end

@@ -6,15 +6,32 @@ Date: 2020-09-11
     - Make the library loadable in a "static" manner where it does not configure itself.
     - Add auto-config function to set up the full library once inside a mod. Including dev-flags.
 ---------------------------------------------------------------------------------------------------
-Version: 4.0.12
+Version: 4.0.14
 Date: 2020-09-x
   Internal:
+    - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.0.13
+Date: 2020-09-x
+  Internal:
+    - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.0.12
+Date: 2020-09-22
+  Internal:
     - New function String.f
+    - New module Compose
+    - New module Time
+    - New module Tool
+    - New module Memoize
+    - New module Closurize
+    - New module Cache
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.11
 Date: 2020-09-19
   Internal:
     - Lambda module is complete.
+    - New module String
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.9
 Date: 2020-09-18

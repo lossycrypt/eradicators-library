@@ -19,10 +19,10 @@
 -- Every specialized table can also be used as a standard Table.
 --
 -- @field key @{NotNil}
--- @table Table
+-- @table table
 --
 -- @usage
---   local Table = {key = value}
+--   local table = {key = value}
 
   
 ----------
@@ -31,23 +31,23 @@
 -- is in a Set or not.
 --
 -- @field key @{true}
--- @table Set
+-- @table set
 --
 -- @usage
---   local Set = {}
+--   local set = {}
 --   for _,value in pairs(Table) do
---     Set[value] = true
+--     set[value] = true
 --     end
--- @usage if Set[key] then f() end
--- @usage for value,_ in pairs(Set) do print(value) end
+-- @usage if set[key] then f() end
+-- @usage for value,_ in pairs(set) do print(value) end
 
 
 ----------
--- An Array - sometimes also called a DenseArray - is a table
+-- An array - sometimes also called a DenseArray - is a table
 -- in which all keys are non-zero @{NaturalNumber}s. Additionally
 -- the sequence of numbers must be uninterrupted - for every
 -- key n in the array there must also be a key n-1, except for n=1 which
--- must be the first key (or the Array is empty).
+-- must be the first key (or the array is empty).
 --
 -- Arrays are the ONLY type of Table for which the Lua length operator #
 -- reports the correct number of elements. For all other types of Table
@@ -56,10 +56,10 @@
 -- @field 1 @{NotNil}
 -- @field 2 @{NotNil}
 -- @field 3 @{NotNil}
--- @table Array
+-- @table array
 --
 -- @usage
---   for i=1,#Array do print(Array[i]) end
+--   for i=1,#array do print(array[i]) end
 --
 -- @usage
 --   local A = {'a','b','c','d','e'}

@@ -1,7 +1,7 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- Description
+-- Manipulation of upvalues and locals.
 --
 -- @module Debug
 -- @usage
