@@ -34,6 +34,8 @@
 <ul>
 <li><a href="#Todo">Todo</a></li>
 <li><a href="#lua_Iter_deep_pairs_Functions">lua.Iter.deep_pairs Functions</a></li>
+<li><a href="#lua_Iter_filter_pairs_Functions">lua.Iter.filter_pairs Functions</a></li>
+<li><a href="#lua_Iter_sync_tuples_Functions">lua.Iter.sync_tuples Functions</a></li>
 </ul>
 
 
@@ -43,6 +45,7 @@
   <li><a href="../modules/Types.html">Types</a></li>
   <li><a href="../modules/Concepts.html">Concepts</a></li>
   <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
@@ -53,6 +56,7 @@
   <li><strong>Iter</strong></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
   <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Logic.html">Logic</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
@@ -60,6 +64,7 @@
   <li><a href="../modules/Table.html">Table</a></li>
   <li><a href="../modules/Time.html">Time</a></li>
   <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Version.html">Version</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
 </ul>
 <h2>Source</h2>
@@ -73,14 +78,11 @@
 
 <h1>Module <code>Iter</code></h1>
 <p>Specialized iteration of tables and other objects.</p>
-<p>
-
-
-
-</p>
+<p> "pairs" methods take a single input table.
+ "touples" methods take an arbitrary number of tables.</p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Iter = require(&apos;__eradicators-library__/erlib/factorio/Iter&apos;)()
+        <pre class="example">local Iter = require(&apos;__eradicators-library__/erlib/lua/Iter&apos;)()
 </pre>
     </ul>
 
@@ -111,7 +113,23 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#deep_pair_options-todo5-fixme6">deep_pair_options-todo5-fixme6</a></td>
-	<td class="summary">use pairs() to get the correct iterator instaed of hardcoded next()?</td>
+	<td class="summary"> use pairs() to get the correct iterator instaed of hardcoded next()?
+ how does that affect the speed of tables without _<em>pairs metamethod?
+ local key,value = (pairs(tbl))(tbl,current</em>path_keys[depth])</td>
+	</tr>
+</table>
+<h2><a href="#lua_Iter_filter_pairs_Functions">lua.Iter.filter_pairs Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#filter_pairs">filter_pairs(tbl, f)</a></td>
+	<td class="summary">Returns only key->value pairs for which f(value,key,tbl) returns true.</td>
+	</tr>
+</table>
+<h2><a href="#lua_Iter_sync_tuples_Functions">lua.Iter.sync_tuples Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#sync_tuples">sync_tuples(parent, ...)</a></td>
+	<td class="summary">Iterates multiple tables in paralell.</td>
 	</tr>
 </table>
 
@@ -235,7 +253,9 @@
     <strong>deep_pair_options-todo5-fixme6</strong>
     </dt>
     <dd>
-    use pairs() to get the correct iterator instaed of hardcoded next()?
+     use pairs() to get the correct iterator instaed of hardcoded next()?
+ how does that affect the speed of tables without _<em>pairs metamethod?
+ local key,value = (pairs(tbl))(tbl,current</em>path_keys[depth])
 
 
 
@@ -245,13 +265,123 @@
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="lua_Iter_filter_pairs_Functions"></a>lua.Iter.filter_pairs Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "filter_pairs"></a>
+    <strong>filter_pairs(tbl, f)</strong>
+    </dt>
+    <dd>
+    Returns only key->value pairs for which f(value,key,tbl) returns true.
+ Other values in the table are simply skipped during iteration.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         The table to be iterated.
+        </li>
+        <li><span class="parameter">f</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         The filter function f(value,key,table).
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- For example if you've got stored LuaEntity references
+</span>script.on_event(defines.events.on_built_entity,<span class="keyword">function</span>(event)
+   <span class="keyword">if</span> event.entity.name == <span class="string">'MyEntity'</span> <span class="keyword">then</span>
+     global.MyEntityData[event.entity.unit_number] = {entity=event.entity}
+     <span class="keyword">end</span>
+   <span class="keyword">end</span>)
+
+<span class="comment">-- And want to remove the invalid ones. (Ignores key+tbl arguments)
+</span><span class="keyword">local</span> filter = <span class="keyword">function</span>(data,_,_) <span class="keyword">return</span> <span class="keyword">not</span> data.entity.valid <span class="keyword">end</span>
+
+<span class="keyword">for</span> unit_number,_ <span class="keyword">in</span> <span class="global">pairs</span>(global.MyEntityData,filter) <span class="keyword">do</span>
+   global.MyEntityData[unit_number] = <span class="keyword">nil</span>
+   <span class="keyword">end</span>
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="lua_Iter_sync_tuples_Functions"></a>lua.Iter.sync_tuples Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "sync_tuples"></a>
+    <strong>sync_tuples(parent, ...)</strong>
+    </dt>
+    <dd>
+    Iterates multiple tables in paralell. </p>
+
+<p> <strong>Note:</strong> Standard <a href="../lua-5.2/doc/manual.html#pdf-next">next</a> rules apply regarding in-loop manipulation
+ of the <strong>parent</strong> table.</p>
+
+<p> <strong>Note:</strong> If the parents has a __pairs metamethod its resulting
+ keys are used for all child tables.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">parent</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         This determines which keys are iterated.
+        </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+         Additional tables to be iterated.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        k,v1,v2,v3,... Each iteration return the key and the value for each
+ table in the order the tables were given.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- Keys not in the parent table won't be iterated.
+</span><span class="keyword">local</span> par = {<span class="keyword">nil</span>, <span class="string">'b'</span>, <span class="string">'c'</span>, <span class="string">'d'</span>, <span class="keyword">false</span>, [<span class="string">'x'</span>] = <span class="string">'f'</span>}
+<span class="comment">-- Other tables nil keys will just return nil.
+</span><span class="keyword">local</span> t1  = {<span class="string">'A'</span>, <span class="string">'B'</span>, <span class="string">'C'</span>, <span class="keyword">nil</span>, <span class="string">'E'</span>, [<span class="string">'x'</span>] = <span class="string">'F'</span>}
+<span class="keyword">local</span> t2  = {<span class="keyword">nil</span>, <span class="keyword">nil</span>,  <span class="number">3</span> ,  <span class="number">4</span> ,  <span class="number">5</span> , [<span class="string">'x'</span>] =  <span class="number">6</span> }
+<span class="comment">-- Empty arguments are assumed to be empty tables.
+</span><span class="keyword">local</span> t3  =  <span class="keyword">nil</span>
+
+<span class="keyword">for</span> k,vp,v1,v2,v3 <span class="keyword">in</span> Iter.sync_tuples(par,t1,t2,t3) <span class="keyword">do</span>
+  <span class="global">print</span>(k,<span class="string">':'</span>,vp,v1,v2,v3)
+  <span class="keyword">end</span>
+
+&gt; <span class="number">2</span> : b     B   <span class="keyword">nil</span> <span class="keyword">nil</span>
+&gt; <span class="number">3</span> : c     C   <span class="number">3</span>   <span class="keyword">nil</span>
+&gt; <span class="number">4</span> : d     <span class="keyword">nil</span> <span class="number">4</span>   <span class="keyword">nil</span>
+&gt; <span class="number">5</span> : <span class="keyword">false</span> E   <span class="number">5</span>   <span class="keyword">nil</span>
+&gt; x : f     F   <span class="number">6</span>   <span class="keyword">nil</span>
+
+</pre>
+    </ul>
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-23 02:35:11 </i>
+<i style="float:right;">Last updated 2020-09-23 23:04:02 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

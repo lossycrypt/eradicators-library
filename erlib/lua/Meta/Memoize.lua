@@ -91,6 +91,9 @@ function _Memo1(constructor)
   function mt.__pairs(self)
     err('Memoized function is not iterable.')
     end
+  function mt.__ipairs(self)
+    err('Memoized function is not iterable.')
+    end
   return setmetatable({},mt)
   end
 

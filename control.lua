@@ -1,10 +1,18 @@
---[[
 
-  The library automatically creates a number of linked-control custom inputs
-  that can be shared between mods. This makes it unnessecary for every mod
-  to create it's own links.
 
-  ]]
+  
+-- -------------------------------------------------------------------------- --
+-- Main                                                                       --
+-- -------------------------------------------------------------------------- --
+local _ENV = require '__eradicators-library__/erlib/Core'().Core.InstallToEnv()
+Core.RunTests()
+
+
+if true then return end
+-- -------------------------------------------------------------------------- --
+-- Draft                                                                      --
+-- -------------------------------------------------------------------------- --
+
 
   
 -- local StopLib = require 'erlib/lua/Stop' ()

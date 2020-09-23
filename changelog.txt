@@ -5,14 +5,44 @@ Date: 2020-09-11
     - Make pure lua parts of the library seperately loadable.
     - Make the library loadable in a "static" manner where it does not configure itself.
     - Add auto-config function to set up the full library once inside a mod. Including dev-flags.
+
 ---------------------------------------------------------------------------------------------------
-Version: 4.0.14
+Version: 4.0.19
 Date: 2020-09-x
   Internal:
     - ?
 ---------------------------------------------------------------------------------------------------
-Version: 4.0.13
+Version: 4.0.18
 Date: 2020-09-x
+  Internal:
+    - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.0.17
+Date: 2020-09-x
+  Internal:
+    - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.0.16
+Date: 2020-09-x
+  Internal:
+    - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.0.15
+Date: 2020-09-x
+  Internal:
+    - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.0.14
+Date: 2020-09-23
+  Internal:
+    - New function Iter.sync_tuples
+    - New function Iter.filter_pairs
+    - New test Assumptions
+    - New module Version
+    - New test Version
+---------------------------------------------------------------------------------------------------
+Version: 4.0.13
+Date: 2020-09-23
   Internal:
     - New module Cache
     - New module Lock

@@ -56,6 +56,9 @@ local Modules = {
   String     = 'erlib/lua/String',
   Table      = 'erlib/lua/Table',
   Lock       = 'erlib/lua/Lock',
+  Version    = 'erlib/lua/Version',
+  Logic      = 'erlib/lua/Logic',
+  Tool       = 'erlib/lua/Tool',
   
   -- groups
   Coding     = 'erlib/lua/Coding/!init',
@@ -65,8 +68,9 @@ local Modules = {
     -- Compose    = 'erlib/lua/Compose',
     -- Closurize  = 'erlib/lua/Closurize',
 
-  -- factorio
-  Cache      = 'erlib/factorio/Cache',
+  -- factorio --> @todo: only if control stage  
+  Cache       = 'erlib/factorio/Cache',
+  Entity      = 'erlib/factorio/Entity',
   }
   
 -- require() does not support multiple return values. So every module
@@ -194,7 +198,7 @@ local function EradicatorsLibraryMain(options)
       end
     --uplift
     -- uplift(ENV,{'Coding','Meta'})
-    uplift(ENV,{'Coding','Meta'})
+    uplift(ENV,{'Coding','Meta','Logic'})
     return ENV
     end
   

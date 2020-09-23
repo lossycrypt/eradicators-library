@@ -13,6 +13,7 @@
 -- local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
 -- local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
 
+local type,pairs,next = type,pairs,next
 
 -- -----------------------------------------------------------------------------
 -- DEEP PAIRS (tested and confirmed WORKING!)                                 --
@@ -64,6 +65,8 @@ local function deep_pairs(tbl,opt) -- no actual recursion involved!
         end
       local tbl = current_path_tbls[depth]
       ---@fixme use pairs() to get the correct iterator instaed of hardcoded next()?
+      -- how does that affect the speed of tables without __pairs metamethod?
+      -- local key,value = (pairs(tbl))(tbl,current_path_keys[depth])
       local key,value = next(tbl,current_path_keys[depth])
       current_path_keys[depth] = key
       if key ~= nil then

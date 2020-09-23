@@ -32,8 +32,8 @@
 
 <h2>Contents</h2>
 <ul>
+<li><a href="#Functions">Functions</a></li>
 <li><a href="#Todo">Todo</a></li>
-<li><a href="#Section">Section </a></li>
 </ul>
 
 
@@ -43,8 +43,8 @@
   <li><a href="../modules/Types.html">Types</a></li>
   <li><a href="../modules/Concepts.html">Concepts</a></li>
   <li><a href="../modules/Cache.html">Cache</a></li>
-  <li><a href="../modules/Entity.html">Entity</a></li>
-  <li><strong>EventManager</strong></li>
+  <li><strong>Entity</strong></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
@@ -74,18 +74,27 @@
 
 <div id="content">
 
-<h1>Module <code>EventManager</code></h1>
-<p>Description</p>
+<h1>Module <code>Entity</code></h1>
+<p>[Control Stage] LuaEntity manipulation.</p>
 <p>
+
+
 
 </p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local EventManager = require(&apos;__eradicators-library__/erlib/factorio/EventManager&apos;)()
+        <pre class="example">local Entity = require(&apos;__eradicators-library__/erlib/factorio/Entity&apos;)()
 </pre>
     </ul>
 
 
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#find_unit_number">find_unit_number(unit_number)</a></td>
+	<td class="summary">Brute force searches through all surfaces to find an entity.</td>
+	</tr>
+</table>
 <h2><a href="#Todo">Todo</a></h2>
 <table class="function_list">
 	<tr>
@@ -93,19 +102,44 @@
 	<td class="summary">Nothing.</td>
 	</tr>
 </table>
-<h2><a href="#Section">Section </a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#InterceptLuaBootstrap">InterceptLuaBootstrap()</a></td>
-	<td class="summary">Redirects standard script calls to erlib.EventManager for easy
- multi-handler events without rewriting the mod.</td>
-	</tr>
-</table>
 
 <br/>
 <br/>
 
 
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "find_unit_number"></a>
+    <strong>find_unit_number(unit_number)</strong>
+    </dt>
+    <dd>
+    Brute force searches through all surfaces to find an entity.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">unit_number</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#uint">uint</a></span>
+         The LuaEntity.unit_number of the target entity.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/LuaEntity.html#">LuaEntity</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Todo"></a>Todo</h2>
 
     <dl class="function">
@@ -124,25 +158,6 @@
 
         </li>
     </ul>
-
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="Section"></a>Section </h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "InterceptLuaBootstrap"></a>
-    <strong>InterceptLuaBootstrap()</strong>
-    </dt>
-    <dd>
-    Redirects standard script calls to erlib.EventManager for easy
- multi-handler events without rewriting the mod.
-
-
 
 
 

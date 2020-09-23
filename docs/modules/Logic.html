@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Basic">Basic </a></li>
+<li><a href="#Advanced">Advanced </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Core.html">Core</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/Entity.html">Entity</a></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Array.html">Array</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Iter.html">Iter</a></li>
+  <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><strong>Logic</strong></li>
+  <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
+  <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
+  <li><a href="../modules/Time.html">Time</a></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Version.html">Version</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/Introduction.html">Introduction</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Logic</code></h1>
+<p>N-Argument logic operators.</p>
+<p>
+
+
+
+</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local Logic = require(&apos;__eradicators-library__/erlib/factorio/Logic&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#Basic">Basic </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#And">And(...)</a></td>
+	<td class="summary">And-compares an arbitrary number of objects for <strong>truthyness</strong>..</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Or">Or(...)</a></td>
+	<td class="summary">Or-compares an arbitrary number of objects for <strong>truthyness</strong>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Xor">Xor(...)</a></td>
+	<td class="summary">Exclusive-Or-compares an arbitrary number of objects for <strong>truthyness</strong>.</td>
+	</tr>
+</table>
+<h2><a href="#Advanced">Advanced </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Andy">Andy(...)</a></td>
+	<td class="summary">And-compares an arbitrary number of objects for <strong>truthyness</strong>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Ory">Ory(...)</a></td>
+	<td class="summary">Or-compares an arbitrary number of objects for <strong>truthyness</strong>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Xory">Xory(...)</a></td>
+	<td class="summary">Exclusive-Or-compares two objects for <strong>truthyness</strong>.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Basic"></a>Basic </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "And"></a>
+    <strong>And(...)</strong>
+    </dt>
+    <dd>
+    And-compares an arbitrary number of objects for <strong>truthyness</strong>..
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+        True if <strong>all</strong> objects were truthy.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Or"></a>
+    <strong>Or(...)</strong>
+    </dt>
+    <dd>
+    Or-compares an arbitrary number of objects for <strong>truthyness</strong>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+        True if <strong>at least one</strong> object was truthy.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Xor"></a>
+    <strong>Xor(...)</strong>
+    </dt>
+    <dd>
+    Exclusive-Or-compares an arbitrary number of objects for <strong>truthyness</strong>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+        True if <strong>exactly one</strong> object was truthy.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Advanced"></a>Advanced </h2>
+
+          <div class="section-description">
+           Advanced functions return one of the objects instead of <a href="../api/Builtin-Types.html#boolean">boolean</a>.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "Andy"></a>
+    <strong>Andy(...)</strong>
+    </dt>
+    <dd>
+    And-compares an arbitrary number of objects for <strong>truthyness</strong>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a> or <span class="type">false</span></span>
+        The <strong>last</strong> truthy object if <code>Logic.And(...)</code>
+ would've been true.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Ory"></a>
+    <strong>Ory(...)</strong>
+    </dt>
+    <dd>
+    Or-compares an arbitrary number of objects for <strong>truthyness</strong>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a> or <span class="type">false</span></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        The <strong>first</strong> truthy object if <code>Logic.Or(...)</code> would've been true.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Xory"></a>
+    <strong>Xory(...)</strong>
+    </dt>
+    <dd>
+    Exclusive-Or-compares two objects for <strong>truthyness</strong>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a> or <span class="type">false</span></span>
+        The <strong>only</strong> truthy object if <code>Logic.Xor(...)</code>
+ would've been true.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-09-23 23:04:02 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

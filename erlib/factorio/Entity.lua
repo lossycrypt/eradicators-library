@@ -1,11 +1,11 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- Some simple filter functions.
+-- [Control Stage] LuaEntity manipulation.
 --
--- @module Filter
+-- @module Entity
 -- @usage
---  local Filter = require('__eradicators-library__.erlib.lua.Filter')()
+--  local Entity = require('__eradicators-library__/erlib/factorio/Entity')()
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -15,47 +15,46 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 
 -- -------------------------------------------------------------------------- --
 -- Locals / Init                                                              --
+-- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
+local pairs = pairs
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Filter = {}
+local Entity,_Entity,_uLocale = {},{},{}
+
+
 
 
 ----------
--- No-Op, does nothing at all.
-Filter.SKIP  = function( ) end
+-- Brute force searches through all surfaces to find an entity.
+-- 
+-- @tparam uint unit_number The LuaEntity.unit_number of the target entity.
+-- @treturn LuaEntity|nil
+-- 
+function Entity.find_unit_number(unit_number)
+  for _,surface in pairs(game.surfaces) do
+  for _,entity  in pairs(surface.find_entities()) do
+    if entity.unit_number == unit_number then return entity end
+    end
+    end
+  end
+
+
+--------------------------------------------------------------------------------
+-- Section
+-- @section
+--------------------------------------------------------------------------------
 
 ----------
--- Always returns boolean true.
-Filter.TRUE  = function( ) return true end
-
-----------
--- Always returns boolean false.
-Filter.FALSE = function( ) return false end
-
-----------
--- Returns obj.valid, the validity of factorio LuaObjects.
--- @tparam LuaObject obj
--- @usage 
---    for k,entity in Iter.filtered_pairs(entities,Filter.VALID) do
---      print(entity.name,'is valid!')
---      end
-Filter.VALID = function(obj) return not not obj.valid end
-
-----------
--- Returns true for factorio LuaObjects that are __not__ valid.
--- @tparam LuaObject obj
--- @usage 
---    for k,entity in Iter.filtered_pairs(entities,Filter.INVALID) do
---      print(k,'is not valid anymore!')
---      end
-Filter.INVALID = function(obj) return not obj.valid end
+-- Nothing.
+-- @within Todo
+-- @field todo1
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-do (STDOUT or log or print)('  Loaded → erlib.Filter') end
-return function() return Filter,_Filter,_uLocale end
+do (STDOUT or log or print)('  Loaded → erlib.Entity') end
+return function() return Entity,_Entity,_uLocale end

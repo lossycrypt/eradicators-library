@@ -6,16 +6,22 @@
 
   ]]
 
-
+  
+-- -------------------------------------------------------------------------- --
+-- Main                                                                       --
+-- -------------------------------------------------------------------------- --
 local _ENV = require '__eradicators-library__/erlib/Core'().Core.InstallToEnv()
-
 Core.RunTests()
 
 
-
-
-
 if true then return end
+-- -------------------------------------------------------------------------- --
+-- Draft                                                                      --
+-- -------------------------------------------------------------------------- --
+
+
+
+
 
 -- EradicatorsLibrary.Logging.override_logging_level ('ultra-verbose')
 EradicatorsLibrary.Logging.set_default_logging_level ('ultra-verbose')

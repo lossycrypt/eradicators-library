@@ -47,7 +47,8 @@ local table_insert, table_remove = table.insert, table.remove
   1. Lua @{table}, ErLib @{Table} or @{FAPI Libraries table_size} methods are not
      supported. You must use the equivalent methods mentioned on this page.
 
-  *  Lua @{next} is not supported, use standard for-loop @{pairs} instead.
+  *  Lua @{next} is not supported, use standard for-loop @{pairs} or @{ipairs}
+     instead.
     
   @function Cache.TickedCache
   @treturn TickedCache an empty ticked cache.
@@ -150,10 +151,11 @@ local table_insert, table_remove = table.insert, table.remove
 
 Cache.TickedCache = function()
   local mt = {}
-  mt .__index     = function(_,key      ) check(mt); return mt.cache[key]   end
-  mt .__newindex  = function(_,key,value) check(mt); mt.cache[key] = value  end
-  mt .__pairs     = function(           ) check(mt); return pairs(mt.cache) end
-  mt .__len       = function(           ) check(mt); return #mt.cache       end
+  mt .__index     = function(_,key      ) check(mt); return mt.cache[key]    end
+  mt .__newindex  = function(_,key,value) check(mt); mt.cache[key] = value   end
+  mt .__pairs     = function(           ) check(mt); return pairs(mt.cache)  end
+  mt .__ipairs    = function(           ) check(mt); return ipairs(mt.cache) end
+  mt .__len       = function(           ) check(mt); return #mt.cache        end
   mt .__metatable = false
   
   return setmetatable({

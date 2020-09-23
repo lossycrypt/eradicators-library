@@ -37,8 +37,19 @@ Replicate.Twice  = function(v) return v,v   end
 -- @usage local A,B,C = Thrice({})
 Replicate.Thrice = function(v) return v,v,v end
 
+
+----------
+-- Returns 42 references to the given object.
+-- That should be enough for everyone.
+-- @tparam AnyValue v
+-- @usage local A,B,C,D,E,F,G = FourtyTwo(LuaEntity) --You don't have to catch 'em all.
+Replicate.FourtyTwo = function(v)
+  return v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v
+  end
+
 ----------
 -- Returns n references to the given object.
+-- For when you need precision.
 -- @tparam NaturalNumber n
 -- @tparam AnyValue v
 -- @usage local A,B,C,E,F,G = Replicate(6,LuaEntity)

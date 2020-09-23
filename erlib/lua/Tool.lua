@@ -18,6 +18,8 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 
+local stop = elreq('erlib/lua/Error')().Stopper('Tool')
+
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
@@ -38,6 +40,20 @@ local Tool,_Tool,_uLocale = {},{},{}
 -- @usage local prototype = Tool.apply(SimpleHotkey,{'some','values'})
 function Tool.apply(f,o) return o,f(o) end
  
+----------
+-- Get the first non-nil value.
+-- For when you can't use `return a or b` because false is a valid return value.
+--
+-- @tparam AnyValue ... It is an error if not at least one value given is @{NotNil}.
+-- @treturn NotNil The first value that was not nil. Can return boolean false
+-- if that was the first applicable value.
+function Tool.first(...)
+  local args,n = {...},select('#',...)
+  for i=1,n do
+    if args[i] ~= nil then return args[i] end
+    end
+  stop('Tool.first','All given values were nil!') -- really useful?
+  end
  
  
 -- -------------------------------------------------------------------------- --
