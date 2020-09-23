@@ -29,6 +29,7 @@ local Meta,_Meta,_uLocale = {},{},{}
 Meta.Compose   = elreq('erlib/lua/Meta/Compose')()
 Meta.Closurize = elreq('erlib/lua/Meta/Closurize')()
 Meta.Memoize   = elreq('erlib/lua/Meta/Memoize')()
+Meta.SwitchCase = elreq('erlib/lua/Meta/SwitchCase')()
 
 
 -- -----------------------------------------------------------------------------

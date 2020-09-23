@@ -54,6 +54,9 @@ local Modules = {
   Lambda     = 'erlib/lua/Lambda',
   Time       = 'erlib/lua/Time',
   String     = 'erlib/lua/String',
+  Table      = 'erlib/lua/Table',
+  Lock       = 'erlib/lua/Lock',
+  
   -- groups
   Coding     = 'erlib/lua/Coding/!init',
   Iter       = 'erlib/lua/Iter/!init',
@@ -62,6 +65,8 @@ local Modules = {
     -- Compose    = 'erlib/lua/Compose',
     -- Closurize  = 'erlib/lua/Closurize',
 
+  -- factorio
+  Cache      = 'erlib/factorio/Cache',
   }
   
 -- require() does not support multiple return values. So every module

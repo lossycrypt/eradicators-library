@@ -57,12 +57,12 @@ local function selector(mode,data,serializer)
     local is_string = (type(data) == 'string')
     if not (is_string or sname) then return nil end
     return 
-        ((game) and 'runtime' or 'startup')
+        ((game and flag.IS_FACTORIO) and 'runtime' or 'startup')
       ..(is_string and '_string' or sname..'_table')
       ..'_to_zip'
   elseif mode == 'decode' then
     return 
-        ((game) and 'runtime' or 'startup')
+        ((game and flag.IS_FACTORIO) and 'runtime' or 'startup')
       ..'_zip_to'
       ..((not sname) and '_string' or sname..'_table')
     end

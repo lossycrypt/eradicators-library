@@ -66,7 +66,10 @@ local function Compose(...)
   local funcs,n = {...}, select('#',...)
   return function(...)
     local r = {...}
-    for i=n,1,-1 do r = {funcs[i](unpack(r))} end
+    for i=n,1,-1 do
+      ---@fixme: undetermined behavior if any of the functions returns a sparse array.
+      r = {funcs[i](unpack(r))}
+      end
     return unpack(r) 
     end
   end

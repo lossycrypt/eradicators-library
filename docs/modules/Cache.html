@@ -53,6 +53,7 @@
   <li><a href="../modules/Filter.html">Filter</a></li>
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/Lock.html">Lock</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
@@ -100,39 +101,39 @@
 <h2><a href="#Class_TickedCache">Class TickedCache </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#TickedCache:insert">TickedCache:insert(value)</a></td>
-	<td class="summary">Standard table methods do not work for ticked caches.</td>
+	<td class="name" nowrap><a href="#TickedCache.__len">TickedCache.__len()</a></td>
+	<td class="summary"><a href="../lua-5.2/doc/manual.html#3.4.6 ">The Length Operator #</a> works as it always does.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#TickedCache:remove">TickedCache:remove(key)</a></td>
-	<td class="summary">Standard table methods do not work for ticked caches.</td>
+	<td class="name" nowrap><a href="#TickedCache:insert">TickedCache:insert([pos], value)</a></td>
+	<td class="summary">Standard table methods do not work for ticked caches, use this instead.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TickedCache:remove">TickedCache:remove([pos])</a></td>
+	<td class="summary">Standard table methods do not work for ticked caches, use this instead.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#TickedCache:map">TickedCache:map(func)</a></td>
-	<td class="summary">Standard table methods do not work for ticked caches.</td>
+	<td class="summary">Standard table methods do not work for ticked caches, use this instead.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#TickedCache:size">TickedCache:size()</a></td>
-	<td class="summary">Standard table methods do not work for ticked caches.</td>
+	<td class="summary">Standard table methods do not work for ticked caches, use this instead.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#TickedCache:is_empty">TickedCache:is_empty()</a></td>
-	<td class="summary">Standard table methods do not work for ticked caches.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#TickedCache.__len">TickedCache.__len()</a></td>
-	<td class="summary">The length operator # works as it always does.</td>
+	<td class="summary">Standard table methods do not work for ticked caches, use this instead.</td>
 	</tr>
 </table>
 <h2><a href="#Todo">Todo</a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#todo1">todo1</a></td>
-	<td class="summary">Rewrite TickedCache table functions to emulate exact behavior of lua.</td>
+	<td class="summary">Use Table.map instead of custom local implementation.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#todo1">todo1</a></td>
-	<td class="summary">Nothing.</td>
+	<td class="summary">Implement OnLoadCache once the EventManager is ready.</td>
 	</tr>
 </table>
 
@@ -154,24 +155,14 @@
   data between events that happen sequentially in the same tick. This is
   <strong>desync safe</strong> because it has no influence across tick boundaries.</p>
 
-<p>  A TickedCache table emulates normal Lua <a href="https://www.lua.org/pil/2.5.html">table</a> behavior as best as it can
+<p>  A TickedCache table emulates normal Lua <a href="../lua-5.2/doc/manual.html#pdf-table">table</a> behavior as best as it can
   but there are a few <strong>important differences</strong>.</p>
 
-<ul>
-    <li><p>You can not store a TickedCache in global savedata. It will just store
-    an empty table.</p></li>
-    <li><p>Storing the iterator from a pairs(TickedCache) call is not desync safe.
-    You should only use standard <code>for k,v in pairs(TickedCache)</code>
-    loops for iteration.</p></li>
-    <li><p>You can not use <a href="https://www.lua.org/pil/2.5.html">table</a> or <a href="../modules/Table.html#">Table</a> module functions on a TickedCache. Instead
-    you can use <code>TC:insert(value)</code>, <code>TC:remove(value)</code> and <code>TC:map(func)</code>.</p></li>
-    <li><p>table<em>size(TickedCache) is always 0. Use TC:size() or TC:is</em>empty() instead.
-    The # length operator works as usual, including the undefined behavior
-    that happens when you use it on non-<a href="https://www.lua.org/pil/11.1.html">array</a>s.</p></li>
-    <li><p>table<em>size can not be directly called on a tc.
-    instead use tc:size() or tc:is</em>empty(), the # operator
-    works as usual on the array part.</p></li>
-</ul>
+<ol>
+    <li><p>Lua <a href="../lua-5.2/doc/manual.html#pdf-table">table</a>, ErLib <a href="../modules/Table.html#">Table</a> or <a href="../api/Libraries.html#table_size">table_size</a> methods are not
+     supported. You must use the equivalent methods mentioned on this page.</p></li>
+    <li><p>Lua <a href="../lua-5.2/doc/manual.html#pdf-next">next</a> is not supported, use standard for-loop <a href="../lua-5.2/doc/manual.html#pdf-pairs">pairs</a> instead.</p></li>
+</ol>
 
 
 
@@ -218,8 +209,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="https://www.lua.org/pil/2.5.html">table</a></span>
-        An AutoCache instance.
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        the AutoCache'ed table.
     </ol>
 
 
@@ -253,7 +244,9 @@
     </dt>
     <dd>
     <strong>Not implemented</strong>.  Similar to an AutoCache but self-constructs when a
- savegame is loaded. Using <code>on_debug_once_per_session</code>.
+ savegame is loaded. Using <code>on_debug_once_per_session</code>.</p>
+
+<p> <strong>Note:</strong> EventManager must be running <em>before</em> you can use this.
 
 
 
@@ -270,16 +263,43 @@
           </div>
     <dl class="function">
     <dt>
-    <a name = "TickedCache:insert"></a>
-    <strong>TickedCache:insert(value)</strong>
+    <a name = "TickedCache.__len"></a>
+    <strong>TickedCache.__len()</strong>
     </dt>
     <dd>
-    Standard table methods do not work for ticked caches.
- Insert at the end.
+    <a href="../lua-5.2/doc/manual.html#3.4.6 ">The Length Operator #</a> works as it always does.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#int">int</a></span>
+        The length of the array part.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TickedCache:insert"></a>
+    <strong>TickedCache:insert([pos], value)</strong>
+    </dt>
+    <dd>
+    Standard table methods do not work for ticked caches, use this instead.
+ Behaves the same as <a href="../lua-5.2/doc/manual.html#pdf-table.insert">table.insert</a>.
 
 
     <h3>Parameters:</h3>
     <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#uint64">uint64</a></span>
+
+
+
+         (<em>optional</em>)
+        </li>
         <li><span class="parameter">value</span>
             <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
 
@@ -295,19 +315,21 @@
 </dd>
     <dt>
     <a name = "TickedCache:remove"></a>
-    <strong>TickedCache:remove(key)</strong>
+    <strong>TickedCache:remove([pos])</strong>
     </dt>
     <dd>
-    Standard table methods do not work for ticked caches.
+    Standard table methods do not work for ticked caches, use this instead.
+ Behaves the same as <a href="../lua-5.2/doc/manual.html#pdf-table.remove">table.remove</a>.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">key</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        <li><span class="parameter">pos</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#uint64">uint64</a></span>
 
 
 
+         (<em>optional</em>)
         </li>
     </ul>
 
@@ -321,7 +343,9 @@
     <strong>TickedCache:map(func)</strong>
     </dt>
     <dd>
-    Standard table methods do not work for ticked caches.
+    Standard table methods do not work for ticked caches, use this instead.
+ The cache is altered <em>in-place</em>.
+ Behaves the same as <a href="../modules/Table.html#map">Table.map</a>.
 
 
     <h3>Parameters:</h3>
@@ -344,14 +368,14 @@
     <strong>TickedCache:size()</strong>
     </dt>
     <dd>
-    Standard table methods do not work for ticked caches.
+    Standard table methods do not work for ticked caches, use this instead.
 
 
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../api/Builtin-Types.html#int">int</a></span>
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#uint64">uint64</a></span>
         the total number of NotNil keys in the cache.
     </ol>
 
@@ -364,7 +388,8 @@
     <strong>TickedCache:is_empty()</strong>
     </dt>
     <dd>
-    Standard table methods do not work for ticked caches.
+    Standard table methods do not work for ticked caches, use this instead. <br/>
+ Equivalent to <code>(TC:size() == 0)</code>.
 
 
 
@@ -381,26 +406,6 @@
 
 
 </dd>
-    <dt>
-    <a name = "TickedCache.__len"></a>
-    <strong>TickedCache.__len()</strong>
-    </dt>
-    <dd>
-    The length operator # works as it always does.
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../api/Builtin-Types.html#int">int</a></span>
-        The length of the array part. Undefined behavior if not an <a href="https://www.lua.org/pil/11.1.html">array</a>.
-    </ol>
-
-
-
-
-</dd>
 </dl>
     <h2 class="section-header "><a name="Todo"></a>Todo</h2>
 
@@ -410,8 +415,7 @@
     <strong>todo1</strong>
     </dt>
     <dd>
-    Rewrite TickedCache table functions to emulate exact behavior of lua.
- I.e. TC:remove() should return the removed value, etc.
+    Use Table.map instead of custom local implementation.
 
 
     <ul>
@@ -432,7 +436,7 @@
     <strong>todo1</strong>
     </dt>
     <dd>
-    Nothing.
+    Implement OnLoadCache once the EventManager is ready.
 
 
     <ul>
@@ -455,7 +459,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-22 04:59:11 </i>
+<i style="float:right;">Last updated 2020-09-23 02:35:11 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

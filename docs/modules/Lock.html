@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Core.html">Core</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Array.html">Array</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Iter.html">Iter</a></li>
+  <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><strong>Lock</strong></li>
+  <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
+  <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
+  <li><a href="../modules/Time.html">Time</a></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/Introduction.html">Introduction</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Lock</code></h1>
+<p>Description</p>
+<p>
+
+</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local Lock = require(&apos;__eradicators-library__/erlib/factorio/Lock&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#AutoLock">AutoLock(tbl, name[, passphrase[, err_write[, err_read]]])</a></td>
+	<td class="summary">Prevents accidential writing to tables.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#RemoveLock">RemoveLock(tbl)</a></td>
+	<td class="summary">Removes any locks created by this module.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "AutoLock"></a>
+    <strong>AutoLock(tbl, name[, passphrase[, err_write[, err_read]]])</strong>
+    </dt>
+    <dd>
+    Prevents accidential writing to tables.  Intended mainly to detect leaking
+ global access when you forgot to type "local" again. It is called "Auto"-Lock
+ because it re-locks any key as soon as it becomes nil, even if it had a
+ value before.</p>
+
+<p> <strong>Note:</strong> You have to manually remove this after your done if you use it in
+ any of the shared loading stages (data, settings).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         The table to apply the lock to.
+        </li>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The table's name. Used for error messages.
+        </li>
+        <li><span class="parameter">passphrase</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         → usage examples are below.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">err_write</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         A custom error handler. f(tbl,key,value)
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">err_read</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         A custom error handler. f(tbl,key)
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- Apply the lock to any table.
+</span><span class="comment">-- For this example we'll apply it to the global environment.
+</span>AutoLockTable(_ENV,<span class="string">'Global Environment'</span>,<span class="string">'MyPassword'</span>)
+
+<span class="comment">-- Accidential writing of ney keys will fail.
+</span>_ENV.A_New_Key = <span class="string">'A new value!'</span>
+&gt; Error! Global Environment is write locked!
+
+<span class="comment">-- Accidential read will also fail.
+</span><span class="keyword">if</span> _ENV.A_New_Key <span class="keyword">then</span> <span class="global">print</span>(<span class="string">'not ok'</span>) <span class="keyword">end</span>
+&gt; Error! Global Environment is read locked!
+
+<span class="comment">-- Use __has_key instead.
+</span><span class="keyword">if</span> <span class="keyword">not</span> _ENV.__has_key(<span class="string">'A_New_Key'</span>) <span class="keyword">then</span> <span class="global">print</span>(<span class="string">'ok'</span>) <span class="keyword">end</span>
+&gt; ok
+
+<span class="comment">-- The passphrase function allows you to explicitly circumvent the lock.
+</span>MyPassword(<span class="string">'A_New_Key'</span>,<span class="string">'A new value!'</span>)
+<span class="global">print</span>(_ENV.A_New_Key)
+&gt; A new value!
+
+<span class="comment">-- Keys that become nil will become locked again.
+</span>_ENV.A_New_Key = <span class="keyword">nil</span>
+<span class="keyword">if</span> _ENV.A_New_Key <span class="keyword">then</span> <span class="global">print</span>(<span class="string">'not ok'</span>) <span class="keyword">end</span>
+&gt; Error! Global Environment is read locked!
+
+<span class="comment">-- You can declare a key global without assigning a value.
+</span>MyPassword(<span class="string">'Another_New_Key'</span>)
+<span class="keyword">if</span> <span class="keyword">not</span> Another_New_Key <span class="keyword">then</span> <span class="global">print</span>(<span class="string">'ok this time!'</span>) <span class="keyword">end</span>
+&gt; ok this time!
+
+<span class="comment">-- It'll have the default value of boolean false.
+</span><span class="keyword">if</span> (Another_New_Key == <span class="keyword">false</span>) <span class="keyword">then</span> <span class="global">print</span>(<span class="string">'i got it'</span>) <span class="keyword">end</span>
+&gt; i got it
+
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "RemoveLock"></a>
+    <strong>RemoveLock(tbl)</strong>
+    </dt>
+    <dd>
+    Removes any locks created by this module.  Will error if you try to remove
+ any other kind of lock or metatable.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-09-23 02:35:11 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

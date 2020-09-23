@@ -29,8 +29,11 @@ local unpack = table.unpack
 
 -- local Closurize,_Closurize,_uLocale = {},{},{}
 
-local String = elreq('erlib/lua/String')()
+-- local String = elreq('erlib/lua/String')()
 local Twice  = elreq('erlib/lua/Replicate')().Twice
+
+-- Hardcoded to resolve circular dependency Meta <-> String
+local String_UPPER_ARGS = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z'
 
 --------------------------------------------------------------------------------
 -- Closurize
@@ -84,7 +87,7 @@ local function Closurize(f,...)
     local f,%s=...
     return function(...) return f(%s,...) end
     ]])
-    :format(Twice(String.UPPER_ARGS:sub(1,2*n-1)))
+    :format(Twice(String_UPPER_ARGS:sub(1,2*n-1)))
   return load(g,nil,'t',{})(f,...)
   end
 

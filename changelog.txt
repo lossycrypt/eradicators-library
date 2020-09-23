@@ -14,7 +14,8 @@ Date: 2020-09-x
 Version: 4.0.13
 Date: 2020-09-x
   Internal:
-    - ?
+    - New module Cache
+    - New module Lock
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.12
 Date: 2020-09-22
@@ -25,7 +26,6 @@ Date: 2020-09-22
     - New module Tool
     - New module Memoize
     - New module Closurize
-    - New module Cache
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.11
 Date: 2020-09-19

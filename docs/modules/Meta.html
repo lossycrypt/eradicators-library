@@ -35,6 +35,7 @@
 <li><a href="#lua_Meta_Closurize_Functions">lua.Meta.Closurize Functions</a></li>
 <li><a href="#lua_Meta_Compose_Functions">lua.Meta.Compose Functions</a></li>
 <li><a href="#lua_Meta_Memoize_Functions">lua.Meta.Memoize Functions</a></li>
+<li><a href="#lua_Meta_SwitchCase_Functions">lua.Meta.SwitchCase Functions</a></li>
 </ul>
 
 
@@ -53,6 +54,7 @@
   <li><a href="../modules/Filter.html">Filter</a></li>
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/Lock.html">Lock</a></li>
   <li><strong>Meta</strong></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
@@ -98,6 +100,10 @@
 	<td class="name" nowrap><a href="#Compose">Compose(...)</a></td>
 	<td class="summary">Generates a closurized function chain.</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Compose-fixme9">Compose-fixme9</a></td>
+	<td class="summary">: undetermined behavior if any of the functions returns a sparse array.</td>
+	</tr>
 </table>
 <h2><a href="#lua_Meta_Memoize_Functions">lua.Meta.Memoize Functions</a></h2>
 <table class="function_list">
@@ -108,6 +114,13 @@
 	<tr>
 	<td class="name" nowrap><a href="#Memoize">Memoize(constructor[, argcount=1[, max_cache_size=9000]])</a></td>
 	<td class="summary"><strong>EXPERIMENTAL</strong> A multi-argument function memoizing wrapper.</td>
+	</tr>
+</table>
+<h2><a href="#lua_Meta_SwitchCase_Functions">lua.Meta.SwitchCase Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#SwitchCase">SwitchCase(analyzer, cases)</a></td>
+	<td class="summary">Input-dependant handler function switching.</td>
 	</tr>
 </table>
 
@@ -223,6 +236,20 @@
     </ul>
 
 </dd>
+    <dt>
+    <a name = "Compose-fixme9"></a>
+    <strong>Compose-fixme9</strong>
+    </dt>
+    <dd>
+    : undetermined behavior if any of the functions returns a sparse array.
+
+
+
+
+
+
+
+</dd>
 </dl>
     <h2 class="section-header "><a name="lua_Meta_Memoize_Functions"></a>lua.Meta.Memoize Functions</h2>
 
@@ -253,7 +280,7 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="https://www.lua.org/pil/2.5.html">table</a></span>
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
         a function-like indexable MemoTable.
     </ol>
 
@@ -335,13 +362,68 @@
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="lua_Meta_SwitchCase_Functions"></a>lua.Meta.SwitchCase Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "SwitchCase"></a>
+    <strong>SwitchCase(analyzer, cases)</strong>
+    </dt>
+    <dd>
+    Input-dependant handler function switching.
+ A switch case calls one of several functions depending on the output
+ of a given analyzer function. In case the output of the analyzer does
+ not match any case the <code>default</code> case will be returned instead.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">analyzer</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         The result of analyzer(...) will be used as
+ a key to cases to call <code>cases[analyzer(...)](...)</code>.
+        </li>
+        <li><span class="parameter">cases</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         A map {key -> function}. Where every possible output
+ of analyzer(...) is represented by a key.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> analyzer = <span class="keyword">function</span>(x) <span class="keyword">return</span> <span class="global">type</span>(x) <span class="keyword">end</span>
+<span class="keyword">local</span> cases    = {
+  <span class="global">table</span>   = <span class="keyword">function</span>(x) <span class="keyword">return</span> <span class="global">tostring</span>(x[<span class="number">1</span>]) <span class="keyword">end</span>,
+  number  = <span class="keyword">function</span>(x) <span class="keyword">return</span> <span class="global">tostring</span>(x-<span class="number">1</span> ) <span class="keyword">end</span>,
+  default = <span class="keyword">function</span>(x) <span class="keyword">return</span>          x..<span class="number">2</span>  <span class="keyword">end</span>,
+  }
+
+<span class="keyword">local</span> SC = SwitchCase(analyzer,cases)
+
+<span class="global">print</span>(SC({<span class="number">42</span>})) <span class="comment">--table
+</span>&gt; <span class="number">42</span>
+
+<span class="global">print</span>(SC(<span class="number">43</span>))   <span class="comment">--number
+</span>&gt; <span class="number">42</span>
+
+<span class="global">print</span>(SC(<span class="string">'4'</span>))  <span class="comment">--default
+</span>&gt; <span class="number">42</span>
+</pre>
+    </ul>
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-22 04:59:11 </i>
+<i style="float:right;">Last updated 2020-09-23 02:35:11 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

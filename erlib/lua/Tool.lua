@@ -35,8 +35,8 @@ local Tool,_Tool,_uLocale = {},{},{}
 -- In-Line definition and simultaenous usage of new tables.
 -- @tparam function f
 -- @tparam AnyValue o
--- @usage local prototype = Tool.fetch(SimpleHotkey,{'some','values'})
-function Tool.fetch(f,o) return o,f(o) end
+-- @usage local prototype = Tool.apply(SimpleHotkey,{'some','values'})
+function Tool.apply(f,o) return o,f(o) end
  
  
  

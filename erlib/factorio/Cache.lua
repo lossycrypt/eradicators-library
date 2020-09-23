@@ -26,6 +26,10 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 local Cache,_Cache,_uLocale = {},{},{}
 
 local Error = elreq('erlib/lua/Error')()
+local Table = elreq('erlib/lua/Table')()
+
+local table_size = Table.size -- factorio C-side if available
+local table_insert, table_remove = table.insert, table.remove
 
 -- -----------------------------------------------------------------------------
 -- TickedCache
@@ -40,25 +44,11 @@ local Error = elreq('erlib/lua/Error')()
   A TickedCache table emulates normal Lua @{table} behavior as best as it can
   but there are a few __important differences__.
  
-  * You can not store a TickedCache in global savedata. It will just store
-    an empty table.
- 
-  * Storing the iterator from a pairs(TickedCache) call is not desync safe.
-    You should only use standard `for k,v in pairs(TickedCache)`
-    loops for iteration.
- 
-  * You can not use @{table} or @{Table} module functions on a TickedCache. Instead
-    you can use `TC:insert(value)`, `TC:remove(value)` and `TC:map(func)`.
+  1. Lua @{table}, ErLib @{Table} or @{FAPI Libraries table_size} methods are not
+     supported. You must use the equivalent methods mentioned on this page.
 
-  * table_size(TickedCache) is always 0. Use TC:size() or TC:is_empty() instead.
-    The # length operator works as usual, including the undefined behavior
-    that happens when you use it on non-@{array}s.
-
+  *  Lua @{next} is not supported, use standard for-loop @{pairs} instead.
     
-  * table_size can not be directly called on a tc.
-    instead use tc:size() or tc:is_empty(), the # operator
-    works as usual on the array part.
-  
   @function Cache.TickedCache
   @treturn TickedCache an empty ticked cache.
   ]]
@@ -68,35 +58,41 @@ local Error = elreq('erlib/lua/Error')()
 -- @type TickedCache
 
 ----------
--- Standard table methods do not work for ticked caches.
--- Insert at the end.
+-- @{The Length Operator|The Length Operator #} works as it always does.
+-- @function TickedCache.__len
+-- @treturn int The length of the array part.
+
+----------
+-- Standard table methods do not work for ticked caches, use this instead.
+-- Behaves the same as @{table.insert}.
+-- @tparam[opt] uint64 pos
 -- @tparam AnyValue value
 -- @function TickedCache:insert
 
 ----------
--- Standard table methods do not work for ticked caches.
--- @tparam AnyValue key
+-- Standard table methods do not work for ticked caches, use this instead.
+-- Behaves the same as @{table.remove}.
+-- @tparam[opt] uint64 pos
 -- @function TickedCache:remove
 
 ----------
--- Standard table methods do not work for ticked caches.
+-- Standard table methods do not work for ticked caches, use this instead.
+-- The cache is altered *in-place*.
+-- Behaves the same as @{Table.map}.
 -- @tparam function func
 -- @function TickedCache:map
 
 ----------
--- Standard table methods do not work for ticked caches.
+-- Standard table methods do not work for ticked caches, use this instead.
 -- @function TickedCache:size
--- @treturn int the total number of NotNil keys in the cache.
+-- @treturn uint64 the total number of NotNil keys in the cache.
 
 ----------
--- Standard table methods do not work for ticked caches.
+-- Standard table methods do not work for ticked caches, use this instead.    
+-- Equivalent to `(TC:size() == 0)`.
 -- @function TickedCache:is_empty
 -- @treturn boolean
 
-----------
--- The length operator # works as it always does.
--- @function TickedCache.__len
--- @treturn int The length of the array part. Undefined behavior if not an @{array}.
 
 
 ----------
@@ -105,39 +101,72 @@ local Error = elreq('erlib/lua/Error')()
 ----------
 
   do 
-  --table {key -> value} -> new_table {new_key -> (f(value,key,table) -> new_value,new_key)}
-  local function Tmap (self,f)
-    -- local backup copy while Table is being reworked.
-    local r = {}; if not self then return r end
-    for k,v in pairs(self) do
-      local v2,k2 = f(v,k,self)
-      if k2 ~= nil then k = k2 end
-      r[k] = v2
+    --todo-> place by Table:map(mt.cache)
+
+    
+  -- Lua next():
+  -- The behavior of next is undefined if, during the traversal, you assign any
+  -- value to a non-existent field in the table. You may however modify existing
+  -- fields. In particular, you may clear existing fields. 
+    
+  
+  -- In-place table map
+  -- Old {key -> value} -> New {(f(value,key,table) -> {new_value <- (new_key|key)}}
+  local function _map (self,f)
+    local r = {}
+    if not self then return r end
+    -- Behavior of next means it's not possible to add new keys
+    -- during iteration. So the keys are first cached.
+    local keys = {}
+    for k in pairs(self) do
+      keys[#keys+1] = k
+      end
+    -- Undefined behavior if k2 was already in self. Depending on iteration
+    -- order it may be overwritten before being processed - or it may not.
+    for i=1,#keys do
+      local k1 = keys[i]
+      local v1 = self[k1]
+      if v1 ~= nil then -- might have been deleted in previous k2 assignment
+        local v2,k2 = f(v1,k1,self)
+        if k2 == nil then
+          r[k1] = v2
+        else
+          r[k1] = nil
+          r[k2] = v2
+          end
+        end
       end
     return r
     end
-
+    
+    
+  -- Clears/Initializes the cache if it is outdated.
   local function check(mt)
     if mt.tick ~= game.tick then
       mt.cache = {}
-      mt.tick = game.tick
+      mt.tick  = game.tick
       end
     end
--- local function ticked_cache()
+
 Cache.TickedCache = function()
   local mt = {}
   mt .__index     = function(_,key      ) check(mt); return mt.cache[key]   end
   mt .__newindex  = function(_,key,value) check(mt); mt.cache[key] = value  end
-  mt .__pairs     = function()            check(mt); return pairs(mt.cache) end
-  mt .__len       = function()            check(mt); return #mt.cache       end
+  mt .__pairs     = function(           ) check(mt); return pairs(mt.cache) end
+  mt .__len       = function(           ) check(mt); return #mt.cache       end
   mt .__metatable = false
   
   return setmetatable({
-    insert   = function(_,value) check(mt); mt.cache[#mt.cache+1] = value    end,
-    map      = function(_,f    ) check(mt); mt.cache = TMap(mt.cache,f)      end,
-    remove   = function(_,key  )          ; mt.cache[key] = nil              end,
-    is_empty = function()        check(mt); return table_size(mt.cache) == 0 end, --deprecate?, trivial operation
-    size     = function()        check(mt); return table_size(mt.cache)      end,
+    size     = function(       ) check(mt); return table_size(mt.cache)       end,
+    is_empty = function(       ) check(mt); return table_size(mt.cache) == 0  end,
+    insert   = function(_,...  ) check(mt); return table_insert(mt.cache,...) end,
+    remove   = function(_,...  ) check(mt); return table_remove(mt.cache,...) end,
+    
+    -- bulk-changing the cache any other way is impossible
+    -- so this has to work in-place. For creating a new map
+    -- Table.map works just fine.
+    map      = function(_,f    ) check(mt); mt.cache = _map(mt.cache,f)      end,
+
     },mt)
   end
   end
@@ -162,7 +191,7 @@ Cache.TickedCache = function()
 -- 
 -- @tparam function constructor This is called exactly once with an empty table
 -- as the only argument. Is must then fill that table with the desired values.
--- @treturn table An AutoCache instance.
+-- @treturn table the AutoCache'ed table.
 --
 -- @function Cache.AutoCache
 --
@@ -185,63 +214,50 @@ Cache.TickedCache = function()
 --        end
 --      end)
 do
-  local Stop  = Error.Stopper('AutoCache')
+  local Stop = Error.Stopper('AutoCache')
 
-  local function read_only_error() Stop('Auto Cache','all auto-caches are read-only') end
+  local function read_only_error()
+    Stop('Auto Cache','all auto-caches are read-only')
+    end
     
-  local function fill(self,cache_constructor)
+  local function fill(self,constructor)
     if not game then Stop('Auto Cache','not available outside events') end
     setmetatable(self,nil)
     -- The data has to be stored directly into self by the constructor
     -- to not invalidate external references to the cache table.
-    cache_constructor(self)
-    
+    constructor(self)
     -- allowing to read nil can make the cache significantly smaller
     -- respect metatable set by the constructor
-    local mt = (debug.getmetatable(self) or {});
+    local mt = (debug.getmetatable(self) or {})
     debug.setmetatable(self,mt)
     if not mt.__newindex then mt.__newindex = read_only_error end
-    
-    -- print(Slines(self))
     end
 
 --v4.0
-  -- local function auto_cache(cache_constructor)
-Cache.AutoCache = function(cache_constructor)
-  if type(cache_constructor) ~= 'function' then Stop('Auto Cache','invalid constructor') end
+Cache.AutoCache = function(constructor)
+  if type(constructor) ~= 'function' then
+    Stop('Auto Cache','invalid constructor')
+    end
   return setmetatable({},{
     -- This metatable is deleted when *either* __index or __pairs
-    -- are called for the first time.
+    -- are called for the first time. Thus *if* either is called
+    -- it is guaranteed that the cache is still empty.
 
     __index = function(self,key)
-      fill(self,cache_constructor)
+      fill(self,constructor)
       return self[key]
       end,
-    --v3.x, when would writing to the cache actually be needed? if ever?
+
+    -- Must block all writes before the cache is filled.
     __newindex = read_only_error,
     
     __pairs = function(self)
-      fill(self,cache_constructor)
+      fill(self,constructor)
       return pairs(self)
       end,
-    
     })
   end
   end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -253,6 +269,8 @@ Cache.AutoCache = function(cache_constructor)
 ----------
 -- __Not implemented__. Similar to an AutoCache but self-constructs when a
 -- savegame is loaded. Using `on_debug_once_per_session`.
+--
+-- __Note:__ EventManager must be running *before* you can use this.
 -- @function Cache.OnLoadCache
 
 
@@ -262,18 +280,19 @@ Cache.AutoCache = function(cache_constructor)
 
 
 ----------
--- Rewrite TickedCache table functions to emulate exact behavior of lua.
--- I.e. TC:remove() should return the removed value, etc.
+-- Use Table.map instead of custom local implementation.
 -- @within Todo
 -- @field todo1
 
-
 ----------
+-- Implement OnLoadCache once the EventManager is ready.
+-- @within Todo
+-- @field todo1
+
+-- -------
 -- Nothing.
 -- @within Todo
 -- @field todo1
-
-
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

@@ -2,6 +2,7 @@
   
 -- This list was automatically generated. 
 return { 
+  'test_Cache', 
   'test_Coding', 
   'test_Crc32', 
   'test_Hydra', 

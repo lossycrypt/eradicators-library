@@ -17,6 +17,13 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Locals / Init                                                              --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
+local type = type
+
+local real_tostring = _ENV.tostring
+
+local Hydra    = elreq ('erlib/lua/Coding/Hydra')()
+local Meta     = elreq ('erlib/lua/Meta/!init')()
+
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -53,7 +60,53 @@ function String.splice(str,pattern,length,seperator)
     :sub(1,-2)                 --no comma after last
   end
 
+
+
+----------
+-- Creates a pretty string representation of an object. Differs from native
+-- @{tostring} in that it knows about factorio userdata and can show
+-- the content of tables.
+--
+-- __Note:__ For pretty printing only. Result is not guaranteed to be loadable.
+--
+-- @tparam AnyValue object
+-- @treturn string
+-- @usage
+--   for _,v in pairs{nil,true,42,'test',LuaPlayer,LuaPosition,function()end} do
+--     print(String.tostring(v))
+--     end
+--
+--   > nil
+--   > true
+--   > 42
+--   > test
+--   > {<userdata>}
+--   > {x = -17.2109375, y = 14.265625}
+--   > <function>
+--
+-- @function String.tostring
+
+String.tostring = Meta.SwitchCase(type,{
+  ['default' ] = function( ) return '<unknown>'                 end,
+  ['nil'     ] = function( ) return 'nil'                       end,
+  ['boolean' ] = real_tostring                                     ,
+  ['number'  ] = real_tostring                                     ,
+  ['string'  ] = function(x) return  x                          end,
+  ['thread'  ] = function( ) return '<thread>'                  end,
+  ['function'] = function( ) return '<function>'                end,
+  ['userdata'] = function( ) return '{<userdata>}'              end,
+  ['table'   ] = function(x)
+    if type(x.__self) == 'userdata' then return '{<userdata>}' -- factorio object
+    else return Hydra.line(x,{nocode=true}) end
+    end,
+  })
+
   
+  
+-- -------------------------------------------------------------------------- --
+-- Proof of Concepts / Drafts / Other Garbage                                 --
+-- -------------------------------------------------------------------------- --
+
   
 ----------
 -- __PROOF OF CONCEPT__. __SLOW__. Do not use in production.   
