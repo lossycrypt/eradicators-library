@@ -1,0 +1,441 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Class_Creation">Class Creation</a></li>
+<li><a href="#SimpleClass_built_in_methods">SimpleClass built-in methods </a></li>
+<li><a href="#SwitchCaseClass_built_in_methods">SwitchCaseClass built-in methods </a></li>
+<li><a href="#TODO_TOMORROW">TODO TOMORROW</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Core.html">Core</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/Entity.html">Entity</a></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Array.html">Array</a></li>
+  <li><strong>Class</strong></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Iter.html">Iter</a></li>
+  <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Logic.html">Logic</a></li>
+  <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
+  <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
+  <li><a href="../modules/Time.html">Time</a></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Version.html">Version</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/Introduction.html">Introduction</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Class</code></h1>
+<p>Reusable class creation patterns.</p>
+<p>
+
+
+
+</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local Class = require(&apos;__eradicators-library__/erlib/lua/Class&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#Class_Creation">Class Creation</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#SimpleClass">SimpleClass(initializer[, finalizer])</a></td>
+	<td class="summary">Creates a new simple class with build in initialization-by-call.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#SwitchCaseClass">SwitchCaseClass(analyzer, cases)</a></td>
+	<td class="summary">A class initializer based on a <a href="../modules/Meta.html#SwitchCase">Meta.SwitchCase</a>.</td>
+	</tr>
+</table>
+<h2><a href="#SimpleClass_built_in_methods">SimpleClass built-in methods </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#SimpleClass">SimpleClass(...)</a></td>
+	<td class="summary">Instantiates a new object of the class by passing it
+ through the initializer and the finalizer.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#SimpleClass.reclassify">SimpleClass.reclassify(object)</a></td>
+	<td class="summary">Unconditionally attaches this classes metatable to an object.</td>
+	</tr>
+</table>
+<h2><a href="#SwitchCaseClass_built_in_methods">SwitchCaseClass built-in methods </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#SwitchCaseClass">SwitchCaseClass(...)</a></td>
+	<td class="summary">Instantiates a new object of the class by calling the
+ appropriate case function.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#SwitchCaseClass.reclassify">SwitchCaseClass.reclassify(object)</a></td>
+	<td class="summary">Unconditionally attaches this classes metatable to an object.</td>
+	</tr>
+</table>
+<h2><a href="#TODO_TOMORROW">TODO TOMORROW</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Check">Check</a></td>
+	<td class="summary">metatable compatiblity @ Belt Router</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Class_Creation"></a>Class Creation</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "SimpleClass"></a>
+    <strong>SimpleClass(initializer[, finalizer])</strong>
+    </dt>
+    <dd>
+    Creates a new simple class with build in initialization-by-call.
+ Can be easily extended after creation.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">initializer</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         When a SimpleClass(...) is called directly
+ then all arguments are passed to the initializer(...). The expected output
+ is an instantiated ClassObject<strong>Without</strong>Metatable or <a href="https://www.lua.org/pil/2.1.html">nil</a>. If an object
+ was return then the classes metatable will be automatically attached.
+        </li>
+        <li><span class="parameter">finalizer</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         If a finalizer is given and the initializer
+ did not return nil, then the finalizer will be called called with the
+ ClassObject<strong>With</strong>Metatable that was produced by the
+ initializer. The return value of the finalizer is irrelevant.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- First define a new class.
+</span><span class="keyword">local</span> MyClass = Class.SimpleClass(
+  <span class="comment">-- The initializer must return a table.
+</span>  <span class="keyword">function</span>(number,name)
+    <span class="keyword">return</span> {value = number, name = name}
+    <span class="keyword">end</span>,
+  <span class="comment">-- The finalizer can access all class methods.
+</span>  <span class="comment">-- Even if they're defined later!
+</span>  <span class="keyword">function</span>(object)
+    <span class="keyword">if</span> object.value &lt; <span class="number">5</span> <span class="keyword">then</span>
+      object:add(<span class="number">5</span>)
+      <span class="keyword">end</span>
+    <span class="keyword">end</span>)
+
+<span class="comment">-- Now you should add some methods to the class.
+</span><span class="keyword">function</span> MyClass:add (x)
+  self.value = self.value + x
+  <span class="keyword">end</span>
+<span class="keyword">function</span> MyClass:show()
+  <span class="global">print</span>((<span class="string">'You have %s %s.'</span>):format(self.value,self.name))
+  <span class="keyword">end</span>
+
+<span class="comment">-- And instantiate objects
+</span><span class="keyword">local</span> fruits = MyClass(<span class="number">42</span>,<span class="string">'bananas'</span>)
+fruits:show()
+&gt; You have <span class="number">42</span> bananas.
+
+<span class="comment">-- Notice how the finalizer will call :add()
+</span><span class="keyword">local</span> vegetables = MyClass(<span class="number">1</span>,<span class="string">'tomatos'</span>)
+vegetables:show()
+&gt; You have <span class="number">6</span> tomatos.
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "SwitchCaseClass"></a>
+    <strong>SwitchCaseClass(analyzer, cases)</strong>
+    </dt>
+    <dd>
+    A class initializer based on a <a href="../modules/Meta.html#SwitchCase">Meta.SwitchCase</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">analyzer</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">cases</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> MyClass = Class.SwitchCaseClass(
+  <span class="keyword">function</span>(input)
+    <span class="keyword">return</span> <span class="global">type</span>(input)
+    <span class="keyword">end</span>,
+  {
+    <span class="global">string</span>  = <span class="keyword">function</span>(x) <span class="keyword">return</span> {value = <span class="global">tostring</span>(x),source = <span class="string">'string '</span>} <span class="keyword">end</span>,
+    number  = <span class="keyword">function</span>(x) <span class="keyword">return</span> {value =          x ,source = <span class="string">'number '</span>} <span class="keyword">end</span>,
+    default = <span class="keyword">function</span>(x) <span class="keyword">return</span> {value =          <span class="number">0</span> ,source = <span class="string">'default'</span>} <span class="keyword">end</span>,
+  })
+
+<span class="keyword">function</span> MyClass:show()
+  <span class="global">print</span>((<span class="string">'This was a %s and now has value %s.'</span>):format(self.source,self.value))
+  <span class="keyword">end</span>
+
+<span class="keyword">local</span> MyObjectA = MyClass(<span class="string">'42'</span>)
+MyObjectA:show()
+&gt; This was a <span class="global">string</span>  <span class="keyword">and</span> now has value <span class="number">42.</span>
+
+<span class="keyword">local</span> MyObjectB = MyClass(<span class="number">24</span>)
+MyObjectB:show()
+&gt; This was a number  <span class="keyword">and</span> now has value <span class="number">24.</span>
+
+<span class="keyword">local</span> MyObjectC = MyClass(<span class="keyword">true</span>)
+MyObjectC:show()
+&gt; This was a default <span class="keyword">and</span> now has value <span class="number">0.</span>
+
+<span class="keyword">local</span> MyObjectD = MyClass.reclassify {value = <span class="number">17</span>, source = <span class="string">'secret operation'</span>}
+MyObjectD:show()
+&gt; This was a secret operation <span class="keyword">and</span> now has value <span class="number">17.</span>
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="SimpleClass_built_in_methods"></a>SimpleClass built-in methods </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "SimpleClass"></a>
+    <strong>SimpleClass(...)</strong>
+    </dt>
+    <dd>
+    Instantiates a new object of the class by passing it
+ through the initializer and the finalizer.  Finally it
+ returns the object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         Any data needed to initialize a ClassObject.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">ClassObjectWithMetatable</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SimpleClass.reclassify"></a>
+    <strong>SimpleClass.reclassify(object)</strong>
+    </dt>
+    <dd>
+    Unconditionally attaches this classes metatable to an object.
+ Allows you to skip the normalization process if you already
+ know that the object is a valid member of this class.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">object</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         A ClassObject that has lost it's metatable.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">ClassObjectWithMetatable</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="SwitchCaseClass_built_in_methods"></a>SwitchCaseClass built-in methods </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "SwitchCaseClass"></a>
+    <strong>SwitchCaseClass(...)</strong>
+    </dt>
+    <dd>
+    Instantiates a new object of the class by calling the
+ appropriate case function.  Finally it returns the object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         Any data needed to initialize a ClassObject.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">ClassObjectWithMetatable</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SwitchCaseClass.reclassify"></a>
+    <strong>SwitchCaseClass.reclassify(object)</strong>
+    </dt>
+    <dd>
+    Unconditionally attaches this classes metatable to an object.
+ Allows you to skip the normalization process if you already
+ know that the object is a valid member of this class.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">object</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         A ClassObject that has lost it's metatable.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">ClassObjectWithMetatable</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="TODO_TOMORROW"></a>TODO TOMORROW</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Check"></a>
+    <strong>Check</strong>
+    </dt>
+    <dd>
+    metatable compatiblity @ Belt Router
+
+
+    <ul>
+        <li><span class="parameter">Check</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-09-25 00:46:47 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

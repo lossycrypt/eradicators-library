@@ -33,8 +33,12 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Constants">Constants </a></li>
+<li><a href="#Analyze_strings">Analyze strings </a></li>
 <li><a href="#Create_strings">Create strings </a></li>
+<li><a href="#Create_tables">Create tables </a></li>
+<li><a href="#Manipulate_strings">Manipulate strings </a></li>
 <li><a href="#Factorio_specific">Factorio specific </a></li>
+<li><a href="#Proof_of_Concepts___Drafts___Other_Garbage">Proof of Concepts / Drafts / Other Garbage </a></li>
 </ul>
 
 
@@ -48,6 +52,7 @@
   <li><a href="../modules/EventManager.html">EventManager</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
+  <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
   <li><a href="../modules/Debug.html">Debug</a></li>
   <li><a href="../modules/Error.html">Error</a></li>
@@ -92,6 +97,10 @@
 <h2><a href="#Constants">Constants </a></h2>
 <table class="function_list">
 	<tr>
+	<td class="name" nowrap><a href="#UPPER_LETTERS">UPPER_LETTERS</a></td>
+	<td class="summary">'ABCDEFGHIJKLMNOPQRSTUVWXYZ'</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#UPPER_ARGS">UPPER_ARGS</a></td>
 	<td class="summary">'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z'</td>
 	</tr>
@@ -104,20 +113,22 @@
 	<td class="summary">'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'</td>
 	</tr>
 </table>
-<h2><a href="#Create_strings">Create strings </a></h2>
+<h2><a href="#Analyze_strings">Analyze strings </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#ltrim">ltrim(str)</a></td>
-	<td class="summary">Trims whitespace from left side of a string.</td>
+	<td class="name" nowrap><a href="#count">count(str, pattern)</a></td>
+	<td class="summary">Counts number of occurances of pattern in string.</td>
 	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#rtrim">rtrim(str)</a></td>
-	<td class="summary">Trims whitespace from right side of a string.</td>
-	</tr>
+</table>
+<h2><a href="#Create_strings">Create strings </a></h2>
+<table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#to_string">to_string(object)</a></td>
 	<td class="summary">Creates a pretty string representation of an object.</td>
 	</tr>
+</table>
+<h2><a href="#Create_tables">Create tables </a></h2>
+<table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#find_all">find_all(str, pattern[, multi_capture=false])</a></td>
 	<td class="summary">Find all occurances of a pattern in a string.</td>
@@ -125,6 +136,21 @@
 	<tr>
 	<td class="name" nowrap><a href="#split">split(str, pattern, raw)</a></td>
 	<td class="summary">Splits a string into an array of sub-strings.</td>
+	</tr>
+</table>
+<h2><a href="#Manipulate_strings">Manipulate strings </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#trim">trim(str)</a></td>
+	<td class="summary">Trims whitespace from both sides of a string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ltrim">ltrim(str)</a></td>
+	<td class="summary">Trims whitespace from left side of a string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rtrim">rtrim(str)</a></td>
+	<td class="summary">Trims whitespace from right side of a string.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#replace">replace(str, pattern, replacement[, n=inf[, raw=true]])</a></td>
@@ -146,6 +172,13 @@
 	<td class="summary">Removes the rich text tags from a string.</td>
 	</tr>
 </table>
+<h2><a href="#Proof_of_Concepts___Drafts___Other_Garbage">Proof of Concepts / Drafts / Other Garbage </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#_poc_format">_poc_format(str)</a></td>
+	<td class="summary"><strong>PROOF OF CONCEPT</strong>.</td>
+	</tr>
+</table>
 
 <br/>
 <br/>
@@ -154,6 +187,20 @@
     <h2 class="section-header "><a name="Constants"></a>Constants </h2>
 
     <dl class="function">
+    <dt>
+    <a name = "UPPER_LETTERS"></a>
+    <strong>UPPER_LETTERS</strong>
+    </dt>
+    <dd>
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+
+
+
+
+
+
+</dd>
     <dt>
     <a name = "UPPER_ARGS"></a>
     <strong>UPPER_ARGS</strong>
@@ -197,9 +244,243 @@
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="Analyze_strings"></a>Analyze strings </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "count"></a>
+    <strong>count(str, pattern)</strong>
+    </dt>
+    <dd>
+    Counts number of occurances of pattern in string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">pattern</span>
+            <span class="types"><a class="type" href="../modules/Types.html#Pattern">Pattern</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Create_strings"></a>Create strings </h2>
 
     <dl class="function">
+    <dt>
+    <a name = "to_string"></a>
+    <strong>to_string(object)</strong>
+    </dt>
+    <dd>
+    Creates a pretty string representation of an object.  Differs from native
+ <a href="../lua-5.2/doc/manual.html#pdf-tostring">tostring</a> in that it knows about factorio userdata and can show
+ the content of tables.</p>
+
+<p> See also <a href="../api/Common.html#Common.object_name">Common.object_name</a>.</p>
+
+<p> <strong>Note:</strong> For pretty printing only. Result is not guaranteed to be loadable.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">object</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">for</span> _,v <span class="keyword">in</span> <span class="global">pairs</span>{<span class="keyword">nil</span>,<span class="keyword">true</span>,<span class="number">42</span>,<span class="string">'test'</span>,LuaPlayer,LuaPosition,<span class="keyword">function</span>()<span class="keyword">end</span>} <span class="keyword">do</span>
+  <span class="global">print</span>(String.<span class="global">tostring</span>(v))
+  <span class="keyword">end</span>
+
+&gt; <span class="keyword">nil</span>
+&gt; <span class="keyword">true</span>
+&gt; <span class="number">42</span>
+&gt; test
+&gt; {&lt;LuaPlayer&gt;}
+&gt; {x = -<span class="number">17.2109375</span>, y = <span class="number">14.265625</span>}
+&gt; &lt;<span class="keyword">function</span>&gt;
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Create_tables"></a>Create tables </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "find_all"></a>
+    <strong>find_all(str, pattern[, multi_capture=false])</strong>
+    </dt>
+    <dd>
+    Find all occurances of a pattern in a string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">pattern</span>
+            <span class="types"><a class="type" href="../modules/Types.html#Pattern">Pattern</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">multi_capture</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         If the pattern can return more than
+ one capture at a time. If true the result will return a sub-table for every
+ group of captures. If false the result will be a plain array of strings.
+         (<em>default</em> false)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> test = <span class="string">'ABCDEFG'</span>
+<span class="global">print</span>(String.to_string(String.find_all(test,<span class="string">'(..)'</span>)))
+&gt; {<span class="string">"AB"</span>, <span class="string">"CD"</span>, <span class="string">"EF"</span>}
+
+<span class="global">print</span>(String.to_string(String.find_all(test,<span class="string">'(.)(.)'</span>)))
+&gt; {<span class="string">"A"</span>, <span class="string">"C"</span>, <span class="string">"E"</span>}
+
+<span class="global">print</span>(String.to_string(String.find_all(test,<span class="string">'(.)(.)'</span>,<span class="keyword">true</span>)))
+&gt; {{<span class="string">"A"</span>, <span class="string">"B"</span>}, {<span class="string">"C"</span>, <span class="string">"D"</span>}, {<span class="string">"E"</span>, <span class="string">"F"</span>}}
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "split"></a>
+    <strong>split(str, pattern, raw)</strong>
+    </dt>
+    <dd>
+    Splits a string into an array of sub-strings.  The pattern
+ is entirely removed from the result.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">pattern</span>
+            <span class="types"><a class="type" href="../modules/Types.html#Pattern">Pattern</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">raw</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         If the pattern should be treated as a raw string.
+ See <a href="../lua-5.2/doc/manual.html#pdf-string.find">string.find</a> "plain".
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> test = <span class="string">'AB12CD34EF56'</span>
+<span class="global">print</span>(String.to_string(String.split(test,<span class="string">'%d%d'</span>)))
+&gt; {<span class="string">"AB"</span>, <span class="string">"CD"</span>, <span class="string">"EF"</span>}
+
+<span class="global">print</span>(String.to_string(String.split(test,<span class="string">'%a%d'</span>)))
+&gt; {<span class="string">"A"</span>, <span class="string">"2C"</span>, <span class="string">"4E"</span>, <span class="string">"6"</span>}
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Manipulate_strings"></a>Manipulate strings </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "trim"></a>
+    <strong>trim(str)</strong>
+    </dt>
+    <dd>
+    Trims whitespace from both sides of a string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
     <dt>
     <a name = "ltrim"></a>
     <strong>ltrim(str)</strong>
@@ -260,159 +541,6 @@
 
 
 
-
-</dd>
-    <dt>
-    <a name = "to_string"></a>
-    <strong>to_string(object)</strong>
-    </dt>
-    <dd>
-    Creates a pretty string representation of an object.  Differs from native
- <a href="../lua-5.2/doc/manual.html#pdf-tostring">tostring</a> in that it knows about factorio userdata and can show
- the content of tables.</p>
-
-<p> See also <a href="../api/Common.html#Common.object_name">Common.object_name</a>.</p>
-
-<p> <strong>Note:</strong> For pretty printing only. Result is not guaranteed to be loadable.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">object</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
-
-
-
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-
-
-    </ol>
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">for</span> _,v <span class="keyword">in</span> <span class="global">pairs</span>{<span class="keyword">nil</span>,<span class="keyword">true</span>,<span class="number">42</span>,<span class="string">'test'</span>,LuaPlayer,LuaPosition,<span class="keyword">function</span>()<span class="keyword">end</span>} <span class="keyword">do</span>
-  <span class="global">print</span>(String.<span class="global">tostring</span>(v))
-  <span class="keyword">end</span>
-
-&gt; <span class="keyword">nil</span>
-&gt; <span class="keyword">true</span>
-&gt; <span class="number">42</span>
-&gt; test
-&gt; {&lt;LuaPlayer&gt;}
-&gt; {x = -<span class="number">17.2109375</span>, y = <span class="number">14.265625</span>}
-&gt; &lt;<span class="keyword">function</span>&gt;
-</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "find_all"></a>
-    <strong>find_all(str, pattern[, multi_capture=false])</strong>
-    </dt>
-    <dd>
-    Find all occurances of a pattern in a string.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">str</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-
-
-        </li>
-        <li><span class="parameter">pattern</span>
-            <span class="types"><a class="type" href="../modules/Types.html#Pattern">Pattern</a></span>
-
-
-
-        </li>
-        <li><span class="parameter">multi_capture</span>
-            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
-         If the pattern can return more than
- one capture at a time. If true the result will return a sub-table for every
- group of captures. If false the result will be a plain array of strings.
-         (<em>default</em> false)
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> test = <span class="string">'ABCDEFG'</span>
-<span class="global">print</span>(String.to_string(String.find_all(test,<span class="string">'(..)'</span>)))
-&gt; {<span class="string">"AB"</span>, <span class="string">"CD"</span>, <span class="string">"EF"</span>}
-
-<span class="global">print</span>(String.to_string(String.find_all(test,<span class="string">'(.)(.)'</span>)))
-&gt; {<span class="string">"A"</span>, <span class="string">"C"</span>, <span class="string">"E"</span>}
-
-<span class="global">print</span>(String.to_string(String.find_all(test,<span class="string">'(.)(.)'</span>,<span class="keyword">true</span>)))
-&gt; {{<span class="string">"A"</span>, <span class="string">"B"</span>}, {<span class="string">"C"</span>, <span class="string">"D"</span>}, {<span class="string">"E"</span>, <span class="string">"F"</span>}}
-</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "split"></a>
-    <strong>split(str, pattern, raw)</strong>
-    </dt>
-    <dd>
-    Splits a string into an array of sub-strings.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">str</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-
-
-        </li>
-        <li><span class="parameter">pattern</span>
-            <span class="types"><a class="type" href="../modules/Types.html#Pattern">Pattern</a></span>
-
-
-
-        </li>
-        <li><span class="parameter">raw</span>
-            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
-         If the pattern should be treated as a raw string.
- See <a href="../lua-5.2/doc/manual.html#pdf-string.find">string.find</a> "plain".
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
-
-
-
-    </ol>
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> test = <span class="string">'AB12CD34EF56'</span>
-<span class="global">print</span>(String.to_string(String.split(test,<span class="string">'%d%d'</span>)))
-&gt; {<span class="string">"AB"</span>, <span class="string">"CD"</span>, <span class="string">"EF"</span>}
-
-<span class="global">print</span>(String.to_string(String.split(test,<span class="string">'%a%d'</span>)))
-&gt; {<span class="string">"A"</span>, <span class="string">"2C"</span>, <span class="string">"4E"</span>, <span class="string">"6"</span>}
-</pre>
-    </ul>
 
 </dd>
     <dt>
@@ -637,13 +765,49 @@
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="Proof_of_Concepts___Drafts___Other_Garbage"></a>Proof of Concepts / Drafts / Other Garbage </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "_poc_format"></a>
+    <strong>_poc_format(str)</strong>
+    </dt>
+    <dd>
+    <strong>PROOF OF CONCEPT</strong>.  <strong>SLOW</strong>. Do not use in production. <br/>
+ Python-esque string formatting from locals and upvalues.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         the formatting pattern
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> f = String._poc_format
+<span class="keyword">function</span> test(name,surname)
+  <span class="global">print</span>(f<span class="string">'Hi. My name is {name} {surname}!'</span>)
+  <span class="keyword">end</span>
+test(<span class="string">'E.R.'</span>,<span class="string">'Adicator'</span>)
+&gt; Hi. My name is E.R. Adicator!
+</pre>
+    </ul>
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-24 20:02:26 </i>
+<i style="float:right;">Last updated 2020-09-25 00:46:47 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

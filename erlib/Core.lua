@@ -60,6 +60,7 @@ local Modules = {
   Logic      = 'erlib/lua/Logic',
   Tool       = 'erlib/lua/Tool',
   Set        = 'erlib/lua/Set',
+  Class      = 'erlib/lua/Class',
   
   -- groups
   Coding     = 'erlib/lua/Coding/!init',
@@ -114,7 +115,7 @@ local function uplift(target,names)
   for _,name in pairs(names       ) do
   for k,v    in pairs(target[name]) do
   -- if type(v) == 'function'          then --@think: are limits needed? Coding needs tables.
-    print('Uplifting',name,k)
+    say('  Uplifting',name,k)
     target[k] = v
     -- end
     end

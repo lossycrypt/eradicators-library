@@ -42,6 +42,7 @@ local stop = elreq('erlib/lua/Error')().Stopper('String')
 -- Constants.
 -- @section
 --------------------------------------------------------------------------------
+
 --- 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 String.UPPER_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 --- 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z'
@@ -56,6 +57,7 @@ String.LOWER_ARGS    = 'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
 -- Analyze strings.
 -- @section
 --------------------------------------------------------------------------------
+
 ----------
 -- Counts number of occurances of pattern in string.
 -- @tparam string str
@@ -72,19 +74,6 @@ function String.count(str,pattern)
 -- Create strings.
 -- @section
 --------------------------------------------------------------------------------
---- Trims whitespace from both sides of a string.
--- @tparam string str
--- @treturn string
-function String. trim(str) return str:match"^%s*(.-)%s*$" end
---- Trims whitespace from left side of a string.
--- @tparam string str
--- @treturn string
-function String.ltrim(str) return str:match"^%s*(.-)$"    end
---- Trims whitespace from right side of a string.
--- @tparam string str
--- @treturn string
-function String.rtrim(str) return str:match"^(.-)%s*$"    end
-
 
 ----------
 -- Creates a pretty string representation of an object. Differs from native
@@ -135,6 +124,13 @@ String.to_string = Meta.SwitchCase(type,{
   })
 
   
+  
+--------------------------------------------------------------------------------
+-- Create tables.
+-- @section
+--------------------------------------------------------------------------------
+
+
 ----------
 -- Find all occurances of a pattern in a string.
 -- @tparam string str
@@ -173,9 +169,10 @@ function String.find_all(str,pattern,multi_capture)
   return matches
   end
 
-  
+
 ----------
--- Splits a string into an array of sub-strings.
+-- Splits a string into an array of sub-strings. The pattern
+-- is entirely removed from the result.
 --
 -- @tparam string str
 -- @tparam Pattern pattern
@@ -206,8 +203,30 @@ function String.split(str,pattern,raw)
     r[#r+1] = str:sub(s) -- rest after the last find
     end
   return r
-  end
+  end  
 
+  
+--------------------------------------------------------------------------------
+-- Manipulate strings.
+-- @section
+--------------------------------------------------------------------------------
+
+--- Trims whitespace from both sides of a string.
+-- @tparam string str
+-- @treturn string
+function String. trim(str) return str:match"^%s*(.-)%s*$" end
+--- Trims whitespace from left side of a string.
+-- @tparam string str
+-- @treturn string
+function String.ltrim(str) return str:match"^%s*(.-)$"    end
+--- Trims whitespace from right side of a string.
+-- @tparam string str
+-- @treturn string
+function String.rtrim(str) return str:match"^(.-)%s*$"    end
+
+
+
+  
 ----------
 -- Replaces a raw substring with another raw substring.
 -- Similar to @{string.gsub}, but ignores all Lua @{Patterns}.
@@ -324,8 +343,8 @@ function String.enforce_length(str,length,left_pad)
     end
   end
   
-  
 
+  
 --------------------------------------------------------------------------------
 -- Factorio specific
 -- @section
@@ -356,6 +375,7 @@ function String.remove_rich_text_tags(str)
 -- Proof of Concepts / Drafts / Other Garbage
 -- @section
 --------------------------------------------------------------------------------
+
 ----------
 -- __PROOF OF CONCEPT__. __SLOW__. Do not use in production.   
 -- Python-esque string formatting from locals and upvalues.

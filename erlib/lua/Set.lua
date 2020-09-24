@@ -2,9 +2,12 @@
 
 --------------------------------------------------
 -- Manipulates key->value Sets. All functions in this module also work on 
--- @{PseudoSet}s. For further info  read @{wiki Set_(mathematics)|Wikipadia on Sets}
+-- @{PseudoSet}s. For further info read @{wiki Set_(mathematics)|Wikipadia on Sets}
 -- and @{wiki List_of_logic_symbols}. In unions and intersections of PseudoSets
 -- the values of Set B take precedence.
+--
+-- __Note:__ All methods of this module that return a set also set the metatable of 
+-- the result to this module.
 --
 -- @module Set
 -- @usage
@@ -77,7 +80,7 @@ do end
 ----------
 -- Creates a @{Set} that maps all values from the input table to @{true}.
 -- @tparam table tbl
--- @treturn set asd
+-- @treturn set
 function Set.from_values(tbl)
   local s = {}
   for _,v in pairs(tbl) do s[v] = true end

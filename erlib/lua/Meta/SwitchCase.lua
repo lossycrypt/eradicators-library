@@ -66,9 +66,9 @@ local _SwitchCase = function(analyzer,cases)
   Verify('non_empty_table',cases)
   end
 local function SwitchCase (analyzer,cases)
-  local default = cases.default or nil
+  local default = cases.default or Filter.SKIP
   return function(...)    
-    local f = cases[analyzer(...)] or default or Filter.SKIP
+    local f = cases[analyzer(...)] or default
     return f(...)
     end
   end

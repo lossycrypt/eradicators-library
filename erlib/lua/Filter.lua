@@ -54,6 +54,15 @@ Filter.VALID = function(obj) return not not obj.valid end
 --      end
 Filter.INVALID = function(obj) return not obj.valid end
 
+
+----------
+-- Returns the object given. For when the syntax requires a function but
+-- you don't want to actually change the object.
+-- @tparam AnyValue obj
+-- @treturn AnyValue obj
+Filter.PASS = function(obj) return obj end
+
+
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
