@@ -23,6 +23,10 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
+-- CONCEPT __MUTATE__ or __CREATE__ on every function, seperate sections
+-- + Table.apply as in-place variant of Table.map
+
+
 local Table,_Table,_uLocale = {},{},{}
 
 

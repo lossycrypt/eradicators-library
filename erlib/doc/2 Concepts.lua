@@ -28,7 +28,7 @@
 ----------
 -- In contexts where an @{AnyValue} is treated like a @{boolean} it is said
 -- to be truthy if it evaluates to true, and falsy if it evaluates to false.
--- In Lua all data types except @{nil} are truthy regardless of their content.
+-- In Lua all non-boolean data types except @{nil} are truthy regardless of their content.
 --
 -- @name truthy
 -- @class field
@@ -40,3 +40,14 @@
 --   > negation of falsy is true!
 
       
+----------
+-- Every Lua @{table} maps keys to values.
+-- @name key
+-- @class field
+-- @usage local my_table = {key = 'value'}
+
+----------
+-- Every Lua @{table} maps keys to values.
+-- @name value
+-- @class field
+-- @usage local my_table = {['key'] = value}

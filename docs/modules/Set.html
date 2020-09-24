@@ -32,7 +32,10 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Todo">Todo</a></li>
+<li><a href="#Conversion">Conversion </a></li>
+<li><a href="#Creation">Creation </a></li>
+<li><a href="#Comparison">Comparison </a></li>
+<li><a href="#Metamethods">Metamethods </a></li>
 </ul>
 
 
@@ -74,10 +77,11 @@
 <div id="content">
 
 <h1>Module <code>Set</code></h1>
-<p>Description</p>
-<p>
-
-</p>
+<p>Manipulates key->value Sets.</p>
+<p> All functions in this module also work on
+ <a href="../modules/Types.html#PseudoSet">PseudoSet</a>s. For further info  read <a href="https://en.wikipedia.org/wiki/Set_(mathematics)">Wikipadia on Sets</a>
+ and <a href="https://en.wikipedia.org/wiki/List_of_logic_symbols">List of logic symbols</a>. In unions and intersections of PseudoSets
+ the values of Set B take precedence.</p>
     <h3>Usage:</h3>
     <ul>
         <pre class="example">local Set = require(&apos;__eradicators-library__/erlib/lua/Set&apos;)()
@@ -85,11 +89,72 @@
     </ul>
 
 
-<h2><a href="#Todo">Todo</a></h2>
+<h2><a href="#Conversion">Conversion </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#todo1">todo1</a></td>
-	<td class="summary">Nothing.</td>
+	<td class="name" nowrap><a href="#Set">Set(tbl)</a></td>
+	<td class="summary">Attaches the Set modules metatable to the tbl.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_values">from_values(tbl)</a></td>
+	<td class="summary">Creates a <a href="../modules/Set.html#">Set</a> that maps all values from the input table to <a href="../modules/Types.html#true">true</a>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_keys">from_keys(tbl)</a></td>
+	<td class="summary">Creates a <a href="../modules/Set.html#">Set</a> that maps all keys from the input table to <a href="../modules/Types.html#true">true</a></td>
+	</tr>
+</table>
+<h2><a href="#Creation">Creation </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#union">union(A, B)</a></td>
+	<td class="summary">→∀x (Ax ∨ Bx)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#intersection">intersection(A, B)</a></td>
+	<td class="summary">→∀x (Ax ∧ Bx)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#complement">complement(A, B)</a></td>
+	<td class="summary">→∀x (Ax ∧ ¬Bx)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#difference">difference(A, B)</a></td>
+	<td class="summary">→∀x (¬(Ax ∧ Bx))</td>
+	</tr>
+</table>
+<h2><a href="#Comparison">Comparison </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#contains">contains(A, e)</a></td>
+	<td class="summary">→∃e (Ae)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_superset">is_superset(A, B)</a></td>
+	<td class="summary">A⊃B, ∀xBx (Ax), ∃xAx (¬Bx)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_subset">is_subset(A, B)</a></td>
+	<td class="summary">A⊂B, ∀xAx (Bx), ∃xBx (¬Ax)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_equal">is_equal(A, B)</a></td>
+	<td class="summary">A⇔B, ∀xAx (Bx), ∀xBx (Ax)</td>
+	</tr>
+</table>
+<h2><a href="#Metamethods">Metamethods </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#__concat">__concat</a></td>
+	<td class="summary">Concatenation with <code>..</code> is Set.union().</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#__add">__add</a></td>
+	<td class="summary">Addition with + is Set.union().</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#__sub">__sub</a></td>
+	<td class="summary">Substraction with - is Set.complement().</td>
 	</tr>
 </table>
 
@@ -97,24 +162,428 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Todo"></a>Todo</h2>
+    <h2 class="section-header "><a name="Conversion"></a>Conversion </h2>
 
     <dl class="function">
     <dt>
-    <a name = "todo1"></a>
-    <strong>todo1</strong>
+    <a name = "Set"></a>
+    <strong>Set(tbl)</strong>
     </dt>
     <dd>
-    Nothing.
+    Attaches the Set modules metatable to the tbl.
 
 
+    <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">todo1</span>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
 
 
 
         </li>
     </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#PseudoSet">PseudoSet</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_values"></a>
+    <strong>from_values(tbl)</strong>
+    </dt>
+    <dd>
+    Creates a <a href="../modules/Set.html#">Set</a> that maps all values from the input table to <a href="../modules/Types.html#true">true</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#set">set</a></span>
+        asd
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_keys"></a>
+    <strong>from_keys(tbl)</strong>
+    </dt>
+    <dd>
+    Creates a <a href="../modules/Set.html#">Set</a> that maps all keys from the input table to <a href="../modules/Types.html#true">true</a>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#set">set</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Creation"></a>Creation </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "union"></a>
+    <strong>union(A, B)</strong>
+    </dt>
+    <dd>
+    →∀x (Ax ∨ Bx)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">A</span>
+
+
+
+        </li>
+        <li><span class="parameter">B</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#set">set</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "intersection"></a>
+    <strong>intersection(A, B)</strong>
+    </dt>
+    <dd>
+    →∀x (Ax ∧ Bx)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">A</span>
+
+
+
+        </li>
+        <li><span class="parameter">B</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#set">set</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "complement"></a>
+    <strong>complement(A, B)</strong>
+    </dt>
+    <dd>
+    →∀x (Ax ∧ ¬Bx)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">A</span>
+
+
+
+        </li>
+        <li><span class="parameter">B</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#set">set</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "difference"></a>
+    <strong>difference(A, B)</strong>
+    </dt>
+    <dd>
+    →∀x (¬(Ax ∧ Bx))
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">A</span>
+
+
+
+        </li>
+        <li><span class="parameter">B</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#set">set</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Comparison"></a>Comparison </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "contains"></a>
+    <strong>contains(A, e)</strong>
+    </dt>
+    <dd>
+    →∃e (Ae)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">A</span>
+
+
+
+        </li>
+        <li><span class="parameter">e</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_superset"></a>
+    <strong>is_superset(A, B)</strong>
+    </dt>
+    <dd>
+    A⊃B, ∀xBx (Ax), ∃xAx (¬Bx)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">A</span>
+
+
+
+        </li>
+        <li><span class="parameter">B</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_subset"></a>
+    <strong>is_subset(A, B)</strong>
+    </dt>
+    <dd>
+    A⊂B, ∀xAx (Bx), ∃xBx (¬Ax)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">A</span>
+
+
+
+        </li>
+        <li><span class="parameter">B</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_equal"></a>
+    <strong>is_equal(A, B)</strong>
+    </dt>
+    <dd>
+    A⇔B, ∀xAx (Bx), ∀xBx (Ax)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">A</span>
+
+
+
+        </li>
+        <li><span class="parameter">B</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Metamethods"></a>Metamethods </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "__concat"></a>
+    <strong>__concat</strong>
+    </dt>
+    <dd>
+    Concatenation with <code>..</code> is Set.union().
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__add"></a>
+    <strong>__add</strong>
+    </dt>
+    <dd>
+    Addition with + is Set.union().
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__sub"></a>
+    <strong>__sub</strong>
+    </dt>
+    <dd>
+    Substraction with - is Set.complement().
+
+
 
 
 
@@ -128,7 +597,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-23 23:04:02 </i>
+<i style="float:right;">Last updated 2020-09-24 20:02:26 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

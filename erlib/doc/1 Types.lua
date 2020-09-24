@@ -43,6 +43,13 @@
 
 
 ----------
+-- Different from a strict @{set} a PseudoSet considers all keys with
+-- @{NotNil} values as elements of itself. Thus every Lua @{table} can be
+-- treated as a PseudoSet.
+-- @field key @{NotNil}
+-- @table PseudoSet
+
+----------
 -- An array - sometimes also called a DenseArray - is a table
 -- in which all keys are non-zero @{NaturalNumber}s. Additionally
 -- the sequence of numbers must be uninterrupted - for every
@@ -83,7 +90,7 @@
 
   
 --------------------------------------------------------------------------------
--- Numbers
+-- Numbers.
 -- @section
 --------------------------------------------------------------------------------
 
@@ -126,9 +133,22 @@
 -- @name NegativeInteger
 -- @class field
 
+--------------------------------------------------------------------------------
+-- String.
+-- @section
+--------------------------------------------------------------------------------
+
+----------
+-- An @{string} containing a Lua @{Patterns|Pattern}. __Not__ to be confused
+-- with Regular Expessions.
+--
+-- @name Pattern
+-- @class field
+
+
 
 --------------------------------------------------------------------------------
--- Boolean
+-- Boolean.
 -- @section
 --------------------------------------------------------------------------------
 
@@ -141,7 +161,7 @@
 
 
 --------------------------------------------------------------------------------
--- Misc
+-- Misc.
 -- @section
 --------------------------------------------------------------------------------
 
@@ -171,7 +191,7 @@
 
 
 --------------------------------------------------------------------------------
--- Load Stage / Phase
+-- Load Stage / Phase.
 -- @section
 --------------------------------------------------------------------------------
 

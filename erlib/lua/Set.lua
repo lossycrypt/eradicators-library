@@ -1,7 +1,10 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- Description
+-- Manipulates key->value Sets. All functions in this module also work on 
+-- @{PseudoSet}s. For further info  read @{wiki Set_(mathematics)|Wikipadia on Sets}
+-- and @{wiki List_of_logic_symbols}. In unions and intersections of PseudoSets
+-- the values of Set B take precedence.
 --
 -- @module Set
 -- @usage
@@ -17,6 +20,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Locals / Init                                                              --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
+local Table,_Table = elreq('erlib/lua/Table')()
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -38,17 +42,150 @@ local Set,_Set,_uLocale = {},{},{}
 --   - Ambigious situations might arise in other peoples code.
 --     ? Providing a Set.enforce_true could remedy this.
 
+-- Best:
+--   + Mixed approach. 
+--   + By default values are "true" but user can chose to keep real values.
+--   + The module itself always uses ~= nil so it doesn't care either way.
+
+
+-- -------------------------------------------------------------------------- --
+-- Metatable                                                                  --
+-- -------------------------------------------------------------------------- --
+
+-- Inherit all Table methods.
+for k,v in pairs( Table) do  Set[k] = v end
+for k,v in pairs(_Table) do _Set[k] = v end
+
+local _toSet = function(  tbl) return setmetatable(tbl,Set) end
+Set.__call   = function(_,tbl) return setmetatable(tbl,Set) end
+Set.__index = Set
+do setmetatable(Set,Set) end
 
 --------------------------------------------------------------------------------
--- Section
+-- Conversion
 -- @section
 --------------------------------------------------------------------------------
 
 ----------
--- Nothing.
--- @within Todo
--- @field todo1
+-- Attaches the Set modules metatable to the tbl.
+-- @tparam table tbl
+-- @treturn PseudoSet
+-- @function Set
+do end
 
+
+----------
+-- Creates a @{Set} that maps all values from the input table to @{true}.
+-- @tparam table tbl
+-- @treturn set asd
+function Set.from_values(tbl)
+  local s = {}
+  for _,v in pairs(tbl) do s[v] = true end
+  return _toSet(s)
+  end
+
+----------
+-- Creates a @{Set} that maps all keys from the input table to @{true} 
+-- @tparam table tbl
+-- @treturn set
+function Set.from_keys(tbl)
+  local s = {}
+  for k   in pairs(tbl) do s[k] = true end
+  return _toSet(s)
+  end
+
+--------------------------------------------------------------------------------
+-- Creation
+-- @section
+--------------------------------------------------------------------------------
+
+  
+  
+--- →∀x (Ax ∨ Bx)
+-- @treturn set
+function Set.union(A,B)
+  local s = {}
+  for k,v in pairs(A) do s[k]=v end
+  for k,v in pairs(B) do s[k]=v end
+  return _toSet(s)
+  end
+
+--- →∀x (Ax ∧ Bx)
+-- @treturn set
+function Set.intersection(A,B)
+  local s = {}
+  for k,v in pairs(B) do
+    if A[k] ~= nil then s[k]=v end
+    end
+  return _toSet(s)
+  end
+  
+--- →∀x (Ax ∧ ¬Bx)  
+-- @treturn set
+function Set.complement(A,B)
+  local s = {}
+  for k,v in pairs(A) do
+    if B[k] == nil then s[k]=v end
+    end
+  return _toSet(s)
+  end
+  
+--- →∀x (¬(Ax ∧ Bx))    
+-- @treturn set
+function Set.difference(A,B)
+  return Set.complement(A,B):union(Set.complement(B,A))
+  end
+
+--------------------------------------------------------------------------------
+-- Comparison
+-- @section
+--------------------------------------------------------------------------------
+
+  
+--- →∃e (Ae)
+-- @treturn boolean
+function Set.contains(A,e)
+  return A[e] ~= nil
+  end
+  
+--- A⊃B, ∀xBx (Ax), ∃xAx (¬Bx)
+-- @treturn boolean
+function Set.is_superset(A,B)
+  for k in pairs(B) do if A[k] == nil then return false end end
+  for k in pairs(A) do if B[k] == nil then return true  end end
+  return false -- A==B
+  end
+
+--- A⊂B, ∀xAx (Bx), ∃xBx (¬Ax)
+-- @treturn boolean
+function Set.is_subset(A,B)
+  return Set.is_superset(B,A)
+  end
+  
+--- A⇔B, ∀xAx (Bx), ∀xBx (Ax)
+-- @treturn boolean
+function Set.is_equal(A,B)
+  for k in pairs(B) do if A[k] == nil then return false end end
+  for k in pairs(A) do if B[k] == nil then return false end end
+  return true
+  end
+  
+  
+--------------------------------------------------------------------------------
+-- Metamethods  
+-- @section
+--------------------------------------------------------------------------------
+
+--- Concatenation with `\.\.` is Set.union().
+Set.__concat = Set.union
+
+--- Addition with + is Set.union().
+Set.__add    = Set.union
+
+--- Substraction with - is Set.complement().
+Set.__sub    = Set.complement
+
+  
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --

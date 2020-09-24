@@ -1,7 +1,7 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
---  
+--
 --
 -- @module String
 -- @usage
@@ -17,7 +17,12 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Locals / Init                                                              --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
-local type = type
+local type,string = type,string
+
+local string_gsub,string_gmatch,string_find,string_format,
+      table_concat,math_floor,math_ceil
+    = string.gsub,string.gmatch,string.find,string.format,
+      table.concat,math.floor,math.ceil
 
 local real_tostring = _ENV.tostring
 
@@ -31,41 +36,62 @@ local Meta     = elreq ('erlib/lua/Meta/!init')()
 
 local String,_String,_uLocale = {},{},{}
 
+local stop = elreq('erlib/lua/Error')().Stopper('String')
 
 --------------------------------------------------------------------------------
--- Section
+-- Constants.
 -- @section
 --------------------------------------------------------------------------------
-
+--- 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 String.UPPER_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+--- 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z'
 String.UPPER_ARGS    = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z'
+--- 'abcdefghijklmnopqrstuvwxyz'
 String.LOWER_LETTERS = 'abcdefghijklmnopqrstuvwxyz'
+--- 'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
 String.LOWER_ARGS    = 'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
 
+
+--------------------------------------------------------------------------------
+-- Analyze strings.
+-- @section
+--------------------------------------------------------------------------------
 ----------
--- Foo
--- @table Foo
--- @usage
+-- Counts number of occurances of pattern in string.
+-- @tparam string str
+-- @tparam Pattern pattern
+-- @treturn NaturalNumber 
+function String.count(str,pattern)
+  -- Empty gsub() replace is 7% faster than find() loop.
+  -- Local gsub is 2% faster than str:gsub().
+  local _,c = string_gsub(str,pattern,'')
+  return c end
 
-
-----------
--- Puts a seperator between every $pattern of the input string.
-function String.splice(str,pattern,length,seperator)
-  seperator = seperator or ','
-  pattern = pattern or '.'
-  i = length or #str
-  return str
-    :sub(1,i)                  --partial string
-    :gsub(pattern,'%1'..seperator) --comma seperate
-    :sub(1,-2)                 --no comma after last
-  end
-
+  
+--------------------------------------------------------------------------------
+-- Create strings.
+-- @section
+--------------------------------------------------------------------------------
+--- Trims whitespace from both sides of a string.
+-- @tparam string str
+-- @treturn string
+function String. trim(str) return str:match"^%s*(.-)%s*$" end
+--- Trims whitespace from left side of a string.
+-- @tparam string str
+-- @treturn string
+function String.ltrim(str) return str:match"^%s*(.-)$"    end
+--- Trims whitespace from right side of a string.
+-- @tparam string str
+-- @treturn string
+function String.rtrim(str) return str:match"^(.-)%s*$"    end
 
 
 ----------
 -- Creates a pretty string representation of an object. Differs from native
 -- @{tostring} in that it knows about factorio userdata and can show
 -- the content of tables.
+--
+-- See also @{FOBJ Common.object_name}.
 --
 -- __Note:__ For pretty printing only. Result is not guaranteed to be loadable.
 --
@@ -80,13 +106,13 @@ function String.splice(str,pattern,length,seperator)
 --   > true
 --   > 42
 --   > test
---   > {<userdata>}
+--   > {<LuaPlayer>}
 --   > {x = -17.2109375, y = 14.265625}
 --   > <function>
 --
--- @function String.tostring
+-- @function String.to_string
 
-String.tostring = Meta.SwitchCase(type,{
+String.to_string = Meta.SwitchCase(type,{
   ['default' ] = function( ) return '<unknown>'                 end,
   ['nil'     ] = function( ) return 'nil'                       end,
   ['boolean' ] = real_tostring                                     ,
@@ -96,23 +122,244 @@ String.tostring = Meta.SwitchCase(type,{
   ['function'] = function( ) return '<function>'                end,
   ['userdata'] = function( ) return '{<userdata>}'              end,
   ['table'   ] = function(x)
-    if type(x.__self) == 'userdata' then return '{<userdata>}' -- factorio object
+    if type(x.__self) == 'userdata' then
+      -- factorio object
+      if x.object_name then
+        -- [1] https://lua-api.factorio.com/latest/Common.html#Common.object_name
+        return '{<'..x.object_name..'>}'
+      else
+        return '{<userdata>}'
+        end
     else return Hydra.line(x,{nocode=true}) end
     end,
   })
 
   
-  
--- -------------------------------------------------------------------------- --
--- Proof of Concepts / Drafts / Other Garbage                                 --
--- -------------------------------------------------------------------------- --
+----------
+-- Find all occurances of a pattern in a string.
+-- @tparam string str
+-- @tparam Pattern pattern
+-- @tparam[opt=false] boolean multi_capture If the pattern can return more than
+-- one capture at a time. If true the result will return a sub-table for every
+-- group of captures. If false the result will be a plain array of strings.
+--
+-- @usage 
+--   local test = 'ABCDEFG'
+--   print(String.to_string(String.find_all(test,'(..)')))
+--   > {"AB", "CD", "EF"}
+--
+--   print(String.to_string(String.find_all(test,'(.)(.)')))
+--   > {"A", "C", "E"}
+--
+--   print(String.to_string(String.find_all(test,'(.)(.)',true)))
+--   > {{"A", "B"}, {"C", "D"}, {"E", "F"}}
+--
+function String.find_all(str,pattern,multi_capture)
+  local matches = {}
+  local f = string_gmatch(str,pattern)
+  -- local r
+  if multi_capture then
+    repeat
+      local r = {f()}
+      matches[#matches+1] = r
+      until #r == 0
+    matches[#matches] = nil --remove empty capture at the end
+  else
+    repeat
+      local r =  f() 
+      matches[#matches+1] = r
+      until r == nil
+    end
+  return matches
+  end
 
   
+----------
+-- Splits a string into an array of sub-strings.
+--
+-- @tparam string str
+-- @tparam Pattern pattern
+-- @tparam boolean raw If the pattern should be treated as a raw string.
+-- See @{string.find} "plain".
+--
+-- @treturn table 
+--
+-- @usage
+--   local test = 'AB12CD34EF56'
+--   print(String.to_string(String.split(test,'%d%d')))
+--   > {"AB", "CD", "EF"}
+--
+--   print(String.to_string(String.split(test,'%a%d')))
+--   > {"A", "2C", "4E", "6"}
+--
+function String.split(str,pattern,raw)
+  if pattern == '' then stop('Can not split by empty string.') end
+  local r = {}
+  local s = 1
+  while true do
+    local i,j = string_find(str,pattern,s,not not raw)
+    if not i then break end
+    r[#r+1] = str:sub(s,i-1)
+    s = j+1
+    end
+  if s <= #str then
+    r[#r+1] = str:sub(s) -- rest after the last find
+    end
+  return r
+  end
+
+----------
+-- Replaces a raw substring with another raw substring.
+-- Similar to @{string.gsub}, but ignores all Lua @{Patterns}.
+--
+-- @tparam string str
+-- @tparam string pattern
+-- @tparam string replacement
+-- @tparam[opt=inf] NaturalNumber n How often the pattern should be replaced.
+-- Specify @{nil} for infinite.
+-- @tparam[opt=true] boolean raw If the pattern and replacement are raw
+-- strings. Non-raw calls will be redirected to native @{string.gsub}.
+--
+-- @treturn string The new replacified string.
+-- @treturn NaturalNumber How many replacements happend.
+--
+-- @usage
+--   local test = '%a%d%l%a'
+--
+--   print(String.replace(test,'%a','%d'))
+--   > %d%d%l%d 2
+--
+--   print(String.replace(test,'%a','%d',1))
+--   > %d%d%l%a 1
+--
+function String.replace(str,pattern,replacement,n,raw)
+  -- Non-raw mode is faster with native gsub.
+  if raw == false then
+    return string_gsub(str,pattern,replacement,n)
+    end
+  -- Raw mode requested by Reika.
+  local s,c = 1,0
+  n = n or math.huge
+  while n > 0 do
+    local i,j = string_find(str,pattern,s,true) -- always raw
+    if not i then break end
+    str = str:sub(1,i-1)..replacement..str:sub(j+1,-1)
+    s = j+1
+    n = n-1
+    c = c+1
+    end
+  return str,c
+  end
+  
+----------
+-- Puts a seperator between each pattern of the input string.
+-- @tparam string str
+-- @tparam[opt='.']  Pattern pattern
+-- @tparam           string seperator (*default* ',')
+-- @tparam[opt=1]    double i Start point in str.
+-- @tparam[opt=#str] double j End point in str.
+--
+-- @usage
+--   print(String.splice('ABCDEFG','..',':',3,7))
+--   > CD:EF
+--
+function String.splice(str,pattern,seperator,i,j)
+  seperator = seperator or ','
+  pattern = pattern or '.'
+  -- return str
+    -- :sub (i or 1,j or #str)        --partial string
+    -- :gsub(pattern,'%1'..seperator) --comma seperate
+    -- :sub (1,-2)                    --no comma after last
+  local r = {}
+  for s in str:sub(i or 1,j or #str):gmatch(pattern) do
+    r[#r+1] = s
+    end
+  return table_concat(r,seperator)
+  end
+
+
+
+----------
+-- Either pads or chops a string to an exact length.
+-- Too long strings will be chopped up in the middle, too short strings
+-- will be either right- or left-padded.
+--
+-- @tparam string str
+-- @tparam NaturalNumber length
+-- @tparam[opt=false] boolean left_pad If the padding of short strings should
+-- be applied on the left instead of the right side.
+--
+-- @treturn string 
+--
+-- @usage
+--   local long_test  = 'The quick brown fox jumps over the lazy dog.'
+--   local short_test = 'Nice boat.'
+--
+--   print(String.enforce_length(long_test,21))
+--   > "The quick...lazy dog."
+--
+--   print(String.enforce_length(short_test,21))
+--   > "Nice boat.           "
+--
+--   print(String.enforce_length(short_test,21,true))
+--   > "           Nice boat."
+--
+function String.enforce_length(str,length,left_pad)
+  if (length <  5) and (#str > length) then
+    -- Inserting triple-dots into a string below length 5 makes no sense.
+    stop('Can not shorten strings below length of 5.')
+    end
+  if #str == length then
+    return str
+  elseif #str < length then
+    --i.e. string.format('%-20.20s')
+    if not left_pad then
+      return string_format('%-'..length..'.'..length..'s',str)
+    else
+      return string_format('%+'..length..'.'..length..'s',str)
+      end
+  else  
+    local n,m = math_ceil(length/2)-2,math_floor(length/2)-1
+    return str:sub(1,n)..'...'..str:sub(-m)
+    end
+  end
+  
+  
+
+--------------------------------------------------------------------------------
+-- Factorio specific
+-- @section
+--------------------------------------------------------------------------------
+
+----------
+-- Removes the rich text tags from a string. Useful for use with LuaRendering
+-- which doesn't support them.
+--
+-- @tparam string str
+-- @treturn string
+--
+-- @usage
+--   local test = '[test][color=red]![/color]1[img=bla]2[item=bla]3'
+--   print(String.remove_rich_text_tags(test))
+--   > [test]!123
+function String.remove_rich_text_tags(str)
+  --'[test][color=red]![/color]1[img=bla]2[item=bla]3'
+  --
+  --one or two groups of not-a-closing-square-bracket
+  --with an equal or a slash before the second group
+  --between one opening and one closing square bracket
+  return (str:gsub('%[[^%]]*[=/][^%]]+%]',''))
+  end
+
+
+--------------------------------------------------------------------------------
+-- Proof of Concepts / Drafts / Other Garbage
+-- @section
+--------------------------------------------------------------------------------
 ----------
 -- __PROOF OF CONCEPT__. __SLOW__. Do not use in production.   
 -- Python-esque string formatting from locals and upvalues.
 -- @tparam string str the formatting pattern
--- @within Experimental
 -- @usage
 --   local f = String._poc_format
 --   function test(name,surname)

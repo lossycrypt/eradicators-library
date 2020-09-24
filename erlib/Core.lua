@@ -59,6 +59,7 @@ local Modules = {
   Version    = 'erlib/lua/Version',
   Logic      = 'erlib/lua/Logic',
   Tool       = 'erlib/lua/Tool',
+  Set        = 'erlib/lua/Set',
   
   -- groups
   Coding     = 'erlib/lua/Coding/!init',

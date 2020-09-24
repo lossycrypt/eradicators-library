@@ -32,8 +32,9 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Section">Section </a></li>
-<li><a href="#Experimental">Experimental</a></li>
+<li><a href="#Constants">Constants </a></li>
+<li><a href="#Create_strings">Create strings </a></li>
+<li><a href="#Factorio_specific">Factorio specific </a></li>
 </ul>
 
 
@@ -88,26 +89,61 @@
     </ul>
 
 
-<h2><a href="#Section">Section </a></h2>
+<h2><a href="#Constants">Constants </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Foo">Foo</a></td>
-	<td class="summary">Foo</td>
+	<td class="name" nowrap><a href="#UPPER_ARGS">UPPER_ARGS</a></td>
+	<td class="summary">'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z'</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#splice">splice(str, pattern, length, seperator)</a></td>
-	<td class="summary">Puts a seperator between every $pattern of the input string.</td>
+	<td class="name" nowrap><a href="#LOWER_LETTERS">LOWER_LETTERS</a></td>
+	<td class="summary">'abcdefghijklmnopqrstuvwxyz'</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#tostring">tostring(object)</a></td>
+	<td class="name" nowrap><a href="#LOWER_ARGS">LOWER_ARGS</a></td>
+	<td class="summary">'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'</td>
+	</tr>
+</table>
+<h2><a href="#Create_strings">Create strings </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#ltrim">ltrim(str)</a></td>
+	<td class="summary">Trims whitespace from left side of a string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rtrim">rtrim(str)</a></td>
+	<td class="summary">Trims whitespace from right side of a string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_string">to_string(object)</a></td>
 	<td class="summary">Creates a pretty string representation of an object.</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#find_all">find_all(str, pattern[, multi_capture=false])</a></td>
+	<td class="summary">Find all occurances of a pattern in a string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#split">split(str, pattern, raw)</a></td>
+	<td class="summary">Splits a string into an array of sub-strings.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#replace">replace(str, pattern, replacement[, n=inf[, raw=true]])</a></td>
+	<td class="summary">Replaces a raw substring with another raw substring.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#splice">splice(str[, pattern='.'], seperator[, i=1[, j=#str]])</a></td>
+	<td class="summary">Puts a seperator between each pattern of the input string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#enforce_length">enforce_length(str, length[, left_pad=false])</a></td>
+	<td class="summary">Either pads or chops a string to an exact length.</td>
+	</tr>
 </table>
-<h2><a href="#Experimental">Experimental</a></h2>
+<h2><a href="#Factorio_specific">Factorio specific </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#_poc_format">_poc_format(str)</a></td>
-	<td class="summary"><strong>PROOF OF CONCEPT</strong>.</td>
+	<td class="name" nowrap><a href="#remove_rich_text_tags">remove_rich_text_tags(str)</a></td>
+	<td class="summary">Removes the rich text tags from a string.</td>
 	</tr>
 </table>
 
@@ -115,72 +151,127 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Section"></a>Section </h2>
+    <h2 class="section-header "><a name="Constants"></a>Constants </h2>
 
     <dl class="function">
     <dt>
-    <a name = "Foo"></a>
-    <strong>Foo</strong>
+    <a name = "UPPER_ARGS"></a>
+    <strong>UPPER_ARGS</strong>
     </dt>
     <dd>
-    Foo
+    'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z'
 
 
 
 
 
 
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"></pre>
-    </ul>
 
 </dd>
     <dt>
-    <a name = "splice"></a>
-    <strong>splice(str, pattern, length, seperator)</strong>
+    <a name = "LOWER_LETTERS"></a>
+    <strong>LOWER_LETTERS</strong>
     </dt>
     <dd>
-    Puts a seperator between every $pattern of the input string.
+    'abcdefghijklmnopqrstuvwxyz'
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "LOWER_ARGS"></a>
+    <strong>LOWER_ARGS</strong>
+    </dt>
+    <dd>
+    'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Create_strings"></a>Create strings </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "ltrim"></a>
+    <strong>ltrim(str)</strong>
+    </dt>
+    <dd>
+    Trims whitespace from left side of a string.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">str</span>
-
-
-
-        </li>
-        <li><span class="parameter">pattern</span>
-
-
-
-        </li>
-        <li><span class="parameter">length</span>
-
-
-
-        </li>
-        <li><span class="parameter">seperator</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
 
 
 
         </li>
     </ul>
 
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+    </ol>
 
 
 
 
 </dd>
     <dt>
-    <a name = "tostring"></a>
-    <strong>tostring(object)</strong>
+    <a name = "rtrim"></a>
+    <strong>rtrim(str)</strong>
+    </dt>
+    <dd>
+    Trims whitespace from right side of a string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_string"></a>
+    <strong>to_string(object)</strong>
     </dt>
     <dd>
     Creates a pretty string representation of an object.  Differs from native
  <a href="../lua-5.2/doc/manual.html#pdf-tostring">tostring</a> in that it knows about factorio userdata and can show
  the content of tables.</p>
+
+<p> See also <a href="../api/Common.html#Common.object_name">Common.object_name</a>.</p>
 
 <p> <strong>Note:</strong> For pretty printing only. Result is not guaranteed to be loadable.
 
@@ -216,31 +307,41 @@
 &gt; <span class="keyword">true</span>
 &gt; <span class="number">42</span>
 &gt; test
-&gt; {&lt;userdata&gt;}
+&gt; {&lt;LuaPlayer&gt;}
 &gt; {x = -<span class="number">17.2109375</span>, y = <span class="number">14.265625</span>}
 &gt; &lt;<span class="keyword">function</span>&gt;
 </pre>
     </ul>
 
 </dd>
-</dl>
-    <h2 class="section-header "><a name="Experimental"></a>Experimental</h2>
-
-    <dl class="function">
     <dt>
-    <a name = "_poc_format"></a>
-    <strong>_poc_format(str)</strong>
+    <a name = "find_all"></a>
+    <strong>find_all(str, pattern[, multi_capture=false])</strong>
     </dt>
     <dd>
-    <strong>PROOF OF CONCEPT</strong>.  <strong>SLOW</strong>. Do not use in production. <br/>
- Python-esque string formatting from locals and upvalues.
+    Find all occurances of a pattern in a string.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">str</span>
             <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-         the formatting pattern
+
+
+
+        </li>
+        <li><span class="parameter">pattern</span>
+            <span class="types"><a class="type" href="../modules/Types.html#Pattern">Pattern</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">multi_capture</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         If the pattern can return more than
+ one capture at a time. If true the result will return a sub-table for every
+ group of captures. If false the result will be a plain array of strings.
+         (<em>default</em> false)
         </li>
     </ul>
 
@@ -249,12 +350,288 @@
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example"><span class="keyword">local</span> f = String._poc_format
-<span class="keyword">function</span> test(name,surname)
-  <span class="global">print</span>(f<span class="string">'Hi. My name is {name} {surname}!'</span>)
-  <span class="keyword">end</span>
-test(<span class="string">'E.R.'</span>,<span class="string">'Adicator'</span>)
-&gt; Hi. My name is E.R. Adicator!
+        <pre class="example"><span class="keyword">local</span> test = <span class="string">'ABCDEFG'</span>
+<span class="global">print</span>(String.to_string(String.find_all(test,<span class="string">'(..)'</span>)))
+&gt; {<span class="string">"AB"</span>, <span class="string">"CD"</span>, <span class="string">"EF"</span>}
+
+<span class="global">print</span>(String.to_string(String.find_all(test,<span class="string">'(.)(.)'</span>)))
+&gt; {<span class="string">"A"</span>, <span class="string">"C"</span>, <span class="string">"E"</span>}
+
+<span class="global">print</span>(String.to_string(String.find_all(test,<span class="string">'(.)(.)'</span>,<span class="keyword">true</span>)))
+&gt; {{<span class="string">"A"</span>, <span class="string">"B"</span>}, {<span class="string">"C"</span>, <span class="string">"D"</span>}, {<span class="string">"E"</span>, <span class="string">"F"</span>}}
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "split"></a>
+    <strong>split(str, pattern, raw)</strong>
+    </dt>
+    <dd>
+    Splits a string into an array of sub-strings.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">pattern</span>
+            <span class="types"><a class="type" href="../modules/Types.html#Pattern">Pattern</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">raw</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         If the pattern should be treated as a raw string.
+ See <a href="../lua-5.2/doc/manual.html#pdf-string.find">string.find</a> "plain".
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> test = <span class="string">'AB12CD34EF56'</span>
+<span class="global">print</span>(String.to_string(String.split(test,<span class="string">'%d%d'</span>)))
+&gt; {<span class="string">"AB"</span>, <span class="string">"CD"</span>, <span class="string">"EF"</span>}
+
+<span class="global">print</span>(String.to_string(String.split(test,<span class="string">'%a%d'</span>)))
+&gt; {<span class="string">"A"</span>, <span class="string">"2C"</span>, <span class="string">"4E"</span>, <span class="string">"6"</span>}
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "replace"></a>
+    <strong>replace(str, pattern, replacement[, n=inf[, raw=true]])</strong>
+    </dt>
+    <dd>
+    Replaces a raw substring with another raw substring.
+ Similar to <a href="../lua-5.2/doc/manual.html#pdf-string.gsub">string.gsub</a>, but ignores all Lua <a href="../lua-5.2/doc/manual.html#6.4.1 ">Patterns</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">pattern</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">replacement</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">n</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         How often the pattern should be replaced.
+ Specify <a href="https://www.lua.org/pil/2.1.html">nil</a> for infinite.
+         (<em>default</em> inf)
+        </li>
+        <li><span class="parameter">raw</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         If the pattern and replacement are raw
+ strings. Non-raw calls will be redirected to native <a href="../lua-5.2/doc/manual.html#pdf-string.gsub">string.gsub</a>.
+         (<em>default</em> true)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+        The new replacified string.</li>
+        <li>
+           <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+        How many replacements happend.</li>
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> test = <span class="string">'%a%d%l%a'</span>
+
+<span class="global">print</span>(String.replace(test,<span class="string">'%a'</span>,<span class="string">'%d'</span>))
+&gt; %d%d%l%d <span class="number">2</span>
+
+<span class="global">print</span>(String.replace(test,<span class="string">'%a'</span>,<span class="string">'%d'</span>,<span class="number">1</span>))
+&gt; %d%d%l%a <span class="number">1</span>
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "splice"></a>
+    <strong>splice(str[, pattern='.'], seperator[, i=1[, j=#str]])</strong>
+    </dt>
+    <dd>
+    Puts a seperator between each pattern of the input string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">pattern</span>
+            <span class="types"><a class="type" href="../modules/Types.html#Pattern">Pattern</a></span>
+
+
+
+         (<em>default</em> '.')
+        </li>
+        <li><span class="parameter">seperator</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         (<em>default</em> ',')
+        </li>
+        <li><span class="parameter">i</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#double">double</a></span>
+         Start point in str.
+         (<em>default</em> 1)
+        </li>
+        <li><span class="parameter">j</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#double">double</a></span>
+         End point in str.
+         (<em>default</em> #str)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="global">print</span>(String.splice(<span class="string">'ABCDEFG'</span>,<span class="string">'..'</span>,<span class="string">':'</span>,<span class="number">3</span>,<span class="number">7</span>))
+&gt; CD:EF
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "enforce_length"></a>
+    <strong>enforce_length(str, length[, left_pad=false])</strong>
+    </dt>
+    <dd>
+    Either pads or chops a string to an exact length.
+ Too long strings will be chopped up in the middle, too short strings
+ will be either right- or left-padded.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">length</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">left_pad</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         If the padding of short strings should
+ be applied on the left instead of the right side.
+         (<em>default</em> false)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> long_test  = <span class="string">'The quick brown fox jumps over the lazy dog.'</span>
+<span class="keyword">local</span> short_test = <span class="string">'Nice boat.'</span>
+
+<span class="global">print</span>(String.enforce_length(long_test,<span class="number">21</span>))
+&gt; <span class="string">"The quick...lazy dog."</span>
+
+<span class="global">print</span>(String.enforce_length(short_test,<span class="number">21</span>))
+&gt; <span class="string">"Nice boat.           "</span>
+
+<span class="global">print</span>(String.enforce_length(short_test,<span class="number">21</span>,<span class="keyword">true</span>))
+&gt; <span class="string">"           Nice boat."</span>
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Factorio_specific"></a>Factorio specific </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "remove_rich_text_tags"></a>
+    <strong>remove_rich_text_tags(str)</strong>
+    </dt>
+    <dd>
+    Removes the rich text tags from a string.  Useful for use with LuaRendering
+ which doesn't support them.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> test = <span class="string">'[test][color=red]![/color]1[img=bla]2[item=bla]3'</span>
+<span class="global">print</span>(String.remove_rich_text_tags(test))
+&gt; [test]!<span class="number">123</span>
 </pre>
     </ul>
 
@@ -266,7 +643,7 @@ test(<span class="string">'E.R.'</span>,<span class="string">'Adicator'</span>)
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-23 23:04:02 </i>
+<i style="float:right;">Last updated 2020-09-24 20:02:26 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
