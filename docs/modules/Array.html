@@ -33,6 +33,8 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Todo">Todo</a></li>
+<li><a href="#SparseArray">SparseArray </a></li>
+<li><a href="#DenseArray">DenseArray </a></li>
 </ul>
 
 
@@ -75,8 +77,16 @@
 <div id="content">
 
 <h1>Module <code>Array</code></h1>
-<p>Description</p>
+<p>Numerically indexed table manipulation.</p>
 <p>
+
+<p> Supports 0-indexed arrays?
+ Everything works for sparse arrays?
+ -> The point of this whole module is to be <em>fast</em>. </p>
+
+<pre>
+So any slow operations like MixedTable2Array should be <span class="keyword">in</span> Table!
+</pre>
 
 </p>
     <h3>Usage:</h3>
@@ -91,6 +101,24 @@
 	<tr>
 	<td class="name" nowrap><a href="#todo1">todo1</a></td>
 	<td class="summary">Nothing.</td>
+	</tr>
+</table>
+<h2><a href="#SparseArray">SparseArray </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#size">size(arr)</a></td>
+	<td class="summary">The size of this array.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#compress">compress(arr[, i=1[, j=Array.size(arr)]])</a></td>
+	<td class="summary"><strong>In-place.</strong> Compresses a <a href="../modules/Types.html#SparseArray">SparseArray</a> into a <a href="../modules/Types.html#DenseArray">DenseArray</a>.</td>
+	</tr>
+</table>
+<h2><a href="#DenseArray">DenseArray </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#map">map(arr, f, i, j)</a></td>
+	<td class="summary"><strong>In-place.</strong> Applies a function to all elements of an array.</td>
 	</tr>
 </table>
 
@@ -123,13 +151,140 @@
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="SparseArray"></a>SparseArray </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "size"></a>
+    <strong>size(arr)</strong>
+    </dt>
+    <dd>
+    The size of this array.  For non-spares <a href="../modules/Types.html#array">array</a>s it's faster to use #.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">arr</span>
+            <span class="types"><a class="type" href="../modules/Types.html#SparseArray">SparseArray</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "compress"></a>
+    <strong>compress(arr[, i=1[, j=Array.size(arr)]])</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Compresses a <a href="../modules/Types.html#SparseArray">SparseArray</a> into a <a href="../modules/Types.html#DenseArray">DenseArray</a>.  The order of the elements
+ is preserved. Can also compress only parts of the input, for example to
+ split the compression into multiple steps.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">arr</span>
+            <span class="types"><a class="type" href="../modules/Types.html#SparseArray">SparseArray</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">i</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         Partial array start index.
+         (<em>default</em> 1)
+        </li>
+        <li><span class="parameter">j</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         Partial array end index.
+         (<em>default</em> Array.size(arr))
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="DenseArray"></a>DenseArray </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "map"></a>
+    <strong>map(arr, f, i, j)</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Applies a function to all elements of an array.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">arr</span>
+            <span class="types"><span class="type">Array</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">f</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         The function f(value,index,arr) that is applied to every
+ key→value mapping in the array. If <strong>f() returns nil</strong> for any value then
+ the <strong>return</strong> array will be <strong>sparse</strong>.
+        </li>
+        <li><span class="parameter">i</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         The index at which to start the operation.
+        </li>
+        <li><span class="parameter">j</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         The index at which to end the operation.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a> or <a class="type" href="../modules/Types.html#SparseArray">SparseArray</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-25 00:46:47 </i>
+<i style="float:right;">Last updated 2020-09-26 23:08:10 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

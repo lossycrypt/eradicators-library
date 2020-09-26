@@ -59,7 +59,23 @@ function Table:map(f) -- see Cache.TickedCache
   end
 
   
-
+----------
+-- The size of the array part of a MixedTable.
+-- @treturn NaturalNumbe|nil The size of the array of nil if there was no array part.
+function Table.array_size(arr,i)
+  local last = 0
+  for i in pairs(arr) do
+    if type(i) == 'number' then
+      if i > last then last = i end
+      end
+    end
+  return (last > 0) and last or nil
+  end
+  
+  
+  
+  
+  
 --------------------------------------------------------------------------------
 -- Section
 -- @section

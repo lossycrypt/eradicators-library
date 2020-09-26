@@ -103,7 +103,7 @@ function Class.SimpleClass(initializer,finalizer)
   -- returns the object.
   -- @tparam AnyValue ... Any data needed to initialize a ClassObject.
   -- @treturn ClassObjectWithMetatable
-  -- @function SimpleClass()
+  -- @function MySimpleClass
   class_mt .__call = function(self,...)
       local object, extra = initializer(...)
       if extra ~= nil then
@@ -129,7 +129,7 @@ function Class.SimpleClass(initializer,finalizer)
   -- @tparam table object A ClassObject that has lost it's metatable.
   -- @treturn ClassObjectWithMetatable
   --
-  -- @function SimpleClass.reclassify
+  -- @function MySimpleClass.reclassify
   class .reclassify = function(object)
       return setmetatable(object,object_mt)
       end
@@ -146,6 +146,11 @@ function Class.SimpleClass(initializer,finalizer)
 ----------
 -- A class initializer based on a @{Meta.SwitchCase}.
 --
+-- __Note:__ If the case function returns a ClassObject__With__Metatable then
+-- the metatable for this class will __not__ be attached. A possible usecase
+-- for this is for example an "invalid" case that returns an object that
+-- doesn't instantly crash class methods but is still not a full member.
+--
 -- @tparam function analyzer 
 -- @tparam table cases
 --
@@ -155,12 +160,21 @@ function Class.SimpleClass(initializer,finalizer)
 -- @usage
 --    local MyClass = Class.SwitchCaseClass(
 --      function(input)
+--        if type(input) == 'table' then
+--          return 'invalid'
+--          end
 --        return type(input)
 --        end,
 --      {
 --        string  = function(x) return {value = tostring(x),source = 'string '} end,
 --        number  = function(x) return {value =          x ,source = 'number '} end,
 --        default = function(x) return {value =          0 ,source = 'default'} end,
+--        invalid = function(x) return setmetatable(
+--          {valid=false},
+--          {__index = function()
+--            error('Error! Reading data from an invalid object is not allowed!')
+--            end }
+--          ) end
 --      })
 --
 --    function MyClass:show()
@@ -183,6 +197,10 @@ function Class.SimpleClass(initializer,finalizer)
 --    MyObjectD:show()
 --    > This was a secret operation and now has value 17.
 --
+--    local MyObjectE = MyClass({dummy=0})
+--    MyObjectE:show()
+--    > Error! Reading data from an invalid object is not allowed!
+--
 function Class.SwitchCaseClass(analyzer,cases)
   local class, class_mt = {}, {}
   local object_mt = {__index=class}
@@ -200,7 +218,7 @@ function Class.SwitchCaseClass(analyzer,cases)
   --
   -- @tparam AnyValue ... Any data needed to initialize a ClassObject.
   -- @treturn ClassObjectWithMetatable
-  -- @function SwitchCaseClass()
+  -- @function MySwitchCaseClass
   --
   function class_mt .__call (self,...)
       local object, extra = switch(...)
@@ -217,6 +235,8 @@ function Class.SwitchCaseClass(analyzer,cases)
           -- that can't be used with cases.default if the meta
           -- is overwritten.
           setmetatable(object,object_mt)
+        else
+          print('had metatable')
           end
         return object
         end
@@ -235,7 +255,7 @@ function Class.SwitchCaseClass(analyzer,cases)
   -- @tparam table object A ClassObject that has lost it's metatable.
   -- @treturn ClassObjectWithMetatable
   --
-  -- @function SwitchCaseClass.reclassify
+  -- @function MySwitchCaseClass.reclassify
   function class .reclassify (object)
       return setmetatable(object,object_mt)
       end

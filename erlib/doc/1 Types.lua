@@ -73,6 +73,10 @@
 --   print(#A)
 --   > 5
 
+----------
+-- See @{array} above.
+-- @table DenseArray
+
 
 ----------
 -- A SparseArray is also a @{Table} in which all keys are @{NaturalNumber}s.
@@ -87,6 +91,17 @@
 --
 -- @usage
 --  local entities = {[entity.unit_number] = entity}
+
+
+----------
+-- A table that contains both numeric and string keys.
+-- 
+-- @field 1 @{NotNil}
+-- @field one @{NotNil}
+-- @table MixedTable
+--
+-- @usage
+--  local my_table = {'val1','val2','val3',description='MyMixedTable'}
 
   
 --------------------------------------------------------------------------------

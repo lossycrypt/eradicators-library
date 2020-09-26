@@ -105,24 +105,24 @@
 <h2><a href="#SimpleClass_built_in_methods">SimpleClass built-in methods </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#SimpleClass">SimpleClass(...)</a></td>
+	<td class="name" nowrap><a href="#MySimpleClass">MySimpleClass(...)</a></td>
 	<td class="summary">Instantiates a new object of the class by passing it
  through the initializer and the finalizer.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#SimpleClass.reclassify">SimpleClass.reclassify(object)</a></td>
+	<td class="name" nowrap><a href="#MySimpleClass.reclassify">MySimpleClass.reclassify(object)</a></td>
 	<td class="summary">Unconditionally attaches this classes metatable to an object.</td>
 	</tr>
 </table>
 <h2><a href="#SwitchCaseClass_built_in_methods">SwitchCaseClass built-in methods </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#SwitchCaseClass">SwitchCaseClass(...)</a></td>
+	<td class="name" nowrap><a href="#MySwitchCaseClass">MySwitchCaseClass(...)</a></td>
 	<td class="summary">Instantiates a new object of the class by calling the
  appropriate case function.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#SwitchCaseClass.reclassify">SwitchCaseClass.reclassify(object)</a></td>
+	<td class="name" nowrap><a href="#MySwitchCaseClass.reclassify">MySwitchCaseClass.reclassify(object)</a></td>
 	<td class="summary">Unconditionally attaches this classes metatable to an object.</td>
 	</tr>
 </table>
@@ -214,7 +214,12 @@ vegetables:show()
     <strong>SwitchCaseClass(analyzer, cases)</strong>
     </dt>
     <dd>
-    A class initializer based on a <a href="../modules/Meta.html#SwitchCase">Meta.SwitchCase</a>.
+    A class initializer based on a <a href="../modules/Meta.html#SwitchCase">Meta.SwitchCase</a>. </p>
+
+<p> <strong>Note:</strong> If the case function returns a ClassObject<strong>With</strong>Metatable then
+ the metatable for this class will <strong>not</strong> be attached. A possible usecase
+ for this is for example an "invalid" case that returns an object that
+ doesn't instantly crash class methods but is still not a full member.
 
 
     <h3>Parameters:</h3>
@@ -240,12 +245,21 @@ vegetables:show()
     <ul>
         <pre class="example"><span class="keyword">local</span> MyClass = Class.SwitchCaseClass(
   <span class="keyword">function</span>(input)
+    <span class="keyword">if</span> <span class="global">type</span>(input) == <span class="string">'table'</span> <span class="keyword">then</span>
+      <span class="keyword">return</span> <span class="string">'invalid'</span>
+      <span class="keyword">end</span>
     <span class="keyword">return</span> <span class="global">type</span>(input)
     <span class="keyword">end</span>,
   {
     <span class="global">string</span>  = <span class="keyword">function</span>(x) <span class="keyword">return</span> {value = <span class="global">tostring</span>(x),source = <span class="string">'string '</span>} <span class="keyword">end</span>,
     number  = <span class="keyword">function</span>(x) <span class="keyword">return</span> {value =          x ,source = <span class="string">'number '</span>} <span class="keyword">end</span>,
     default = <span class="keyword">function</span>(x) <span class="keyword">return</span> {value =          <span class="number">0</span> ,source = <span class="string">'default'</span>} <span class="keyword">end</span>,
+    invalid = <span class="keyword">function</span>(x) <span class="keyword">return</span> <span class="global">setmetatable</span>(
+      {valid=<span class="keyword">false</span>},
+      {__index = <span class="keyword">function</span>()
+        <span class="global">error</span>(<span class="string">'Error! Reading data from an invalid object is not allowed!'</span>)
+        <span class="keyword">end</span> }
+      ) <span class="keyword">end</span>
   })
 
 <span class="keyword">function</span> MyClass:show()
@@ -267,6 +281,10 @@ MyObjectC:show()
 <span class="keyword">local</span> MyObjectD = MyClass.reclassify {value = <span class="number">17</span>, source = <span class="string">'secret operation'</span>}
 MyObjectD:show()
 &gt; This was a secret operation <span class="keyword">and</span> now has value <span class="number">17.</span>
+
+<span class="keyword">local</span> MyObjectE = MyClass({dummy=<span class="number">0</span>})
+MyObjectE:show()
+&gt; Error! Reading data from an invalid object is <span class="keyword">not</span> allowed!
 </pre>
     </ul>
 
@@ -276,8 +294,8 @@ MyObjectD:show()
 
     <dl class="function">
     <dt>
-    <a name = "SimpleClass"></a>
-    <strong>SimpleClass(...)</strong>
+    <a name = "MySimpleClass"></a>
+    <strong>MySimpleClass(...)</strong>
     </dt>
     <dd>
     Instantiates a new object of the class by passing it
@@ -307,8 +325,8 @@ MyObjectD:show()
 
 </dd>
     <dt>
-    <a name = "SimpleClass.reclassify"></a>
-    <strong>SimpleClass.reclassify(object)</strong>
+    <a name = "MySimpleClass.reclassify"></a>
+    <strong>MySimpleClass.reclassify(object)</strong>
     </dt>
     <dd>
     Unconditionally attaches this classes metatable to an object.
@@ -342,8 +360,8 @@ MyObjectD:show()
 
     <dl class="function">
     <dt>
-    <a name = "SwitchCaseClass"></a>
-    <strong>SwitchCaseClass(...)</strong>
+    <a name = "MySwitchCaseClass"></a>
+    <strong>MySwitchCaseClass(...)</strong>
     </dt>
     <dd>
     Instantiates a new object of the class by calling the
@@ -372,8 +390,8 @@ MyObjectD:show()
 
 </dd>
     <dt>
-    <a name = "SwitchCaseClass.reclassify"></a>
-    <strong>SwitchCaseClass.reclassify(object)</strong>
+    <a name = "MySwitchCaseClass.reclassify"></a>
+    <strong>MySwitchCaseClass.reclassify(object)</strong>
     </dt>
     <dd>
     Unconditionally attaches this classes metatable to an object.
@@ -434,7 +452,7 @@ MyObjectD:show()
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-25 00:46:47 </i>
+<i style="float:right;">Last updated 2020-09-26 23:08:10 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

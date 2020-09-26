@@ -40,9 +40,35 @@ local package_reset = function()
   for k in pairs(package.loaded) do package.loaded[k] = nil end
   end
 
+local Stacktrace = elreq ('erlib/factorio/Stacktrace')()
+local Error      = elreq ('erlib/lua/Error')()
+
+-- -------------------------------------------------------------------------- --
+-- Constants                                                                  --
+-- -------------------------------------------------------------------------- --
+
+local Const = {}
+  --mod that contains this file
+  Const.lib_name   = Stacktrace.get_mod_name( 1)
+  Const.lib_root   = Stacktrace.get_mod_root( 1)
+  --mod that required this file
+  Const.mod_name   = Stacktrace.get_mod_name(-1)
+  Const.mod_root   = Stacktrace.get_mod_root(-1)
+  --load stage/phase
+  Const.load_stage = Stacktrace.get_load_stage()
+  Const.load_phase = Stacktrace.get_load_phase()
+
+local stop = Error .Stopper 'Core' -- local to each plugin in the future
+
+
 -- -------------------------------------------------------------------------- --
 -- Module Init                                                                --
 -- -------------------------------------------------------------------------- --
+
+-- stage limitation (default is "always")
+local startup_only = function(path) if not Const.load_stage.control then return path end end
+local control_only = function(path) if     Const.load_stage.control then return path end end
+
 
 local Modules = {
   --determines load order
@@ -55,6 +81,7 @@ local Modules = {
   Time       = 'erlib/lua/Time',
   String     = 'erlib/lua/String',
   Table      = 'erlib/lua/Table',
+  Array      = 'erlib/lua/Array',
   Lock       = 'erlib/lua/Lock',
   Version    = 'erlib/lua/Version',
   Logic      = 'erlib/lua/Logic',
@@ -70,9 +97,10 @@ local Modules = {
     -- Compose    = 'erlib/lua/Compose',
     -- Closurize  = 'erlib/lua/Closurize',
 
-  -- factorio --> @todo: only if control stage  
-  Cache       = 'erlib/factorio/Cache',
-  Entity      = 'erlib/factorio/Entity',
+  -- factorio
+  -- (tests do their own checks)
+  Cache       = control_only 'erlib/factorio/Cache',
+  Entity      = control_only 'erlib/factorio/Entity',
   }
   
 -- require() does not support multiple return values. So every module
@@ -106,6 +134,9 @@ local erlib_strict = {}; do
     end
   end
 
+erlib       .Const = Const
+erlib_strict.Const = Const
+
   
 -- Pulls functions from sub-paths directly
 -- into the main table.
@@ -123,24 +154,7 @@ local function uplift(target,names)
   end
 
 
-  
--- -------------------------------------------------------------------------- --
--- Constants                                                                  --
--- -------------------------------------------------------------------------- --
-local Const = {}
-  erlib.Const = Const
-  --mod that contains this file
-  Const.lib_name = erlib.Stacktrace.get_mod_name( 1)
-  Const.lib_root = erlib.Stacktrace.get_mod_root( 1)
-  --mod that required this file
-  Const.mod_name = erlib.Stacktrace.get_mod_name(-1)
-  Const.mod_root = erlib.Stacktrace.get_mod_root(-1)
-  --load stage/phase
-  Const.load_stage = erlib.Stacktrace.get_load_stage()
-  Const.load_phase = erlib.Stacktrace.get_load_phase()
 
-local Stop = erlib .Error .Stopper 'Core' -- local to each plugin in the future
-  
 -- -------------------------------------------------------------------------- --
 -- Main                                                                       --
 -- -------------------------------------------------------------------------- --
@@ -170,7 +184,7 @@ local function EradicatorsLibraryMain(options)
   Core.InjectIntoPublicModules = function(ENV)
     -- in data/settings disturbing other mods is rude
     if not Const.load_stage.control then
-      Stop('Public injection is not supported during startup.')
+      stop('Public injection is not supported during startup.')
       end
     -- so only allow this in control
     ENV.string.f = ENV.string.format
@@ -184,7 +198,7 @@ local function EradicatorsLibraryMain(options)
     and (ENV == PublicENV)
     and flag.IS_FACTORIO
     then
-      Stop('Please use a private environment to install erlib.')
+      stop('Please use a private environment to install erlib.')
       end
     opt = opt or {}
     --make a new env for the caller?

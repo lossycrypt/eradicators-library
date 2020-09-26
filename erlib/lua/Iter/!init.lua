@@ -31,8 +31,12 @@ local Iter,_Iter,_uLocale = {},{},{}
 
 
 
+
 Iter.deep_pairs  = elreq('erlib/lua/Iter/deep_pairs' )()
 Iter.sync_tuples = elreq('erlib/lua/Iter/sync_tuples')()
+
+Iter.array_pairs = elreq('erlib/lua/Iter/array_pairs')()
+
 Iter.filter_pairs  = elreq('erlib/lua/Iter/filter_pairs' )()
 -- Iter.map_tuples  = elreq('erlib/lua/Iter/map_tuples' )()
 
