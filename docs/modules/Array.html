@@ -33,7 +33,8 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Module">Module </a></li>
-<li><a href="#Methods">Methods </a></li>
+<li><a href="#Basic_Methods">Basic Methods </a></li>
+<li><a href="#Search_Methods">Search Methods </a></li>
 <li><a href="#In_Place_Methods">In-Place Methods </a></li>
 <li><a href="#Copy_Methods">Copy Methods </a></li>
 </ul>
@@ -113,12 +114,23 @@ So any slow operations like MixedTable2Array should be <span class="keyword">in<
 	<td class="summary">Attaches the Array modules metatable to any table.</td>
 	</tr>
 </table>
-<h2><a href="#Methods">Methods </a></h2>
+<h2><a href="#Basic_Methods">Basic Methods </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#size">size(arr)</a></td>
 	<td class="summary">The size of this array.</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#keys">keys(arr[, i=1[, j=#arr]])</a></td>
+	<td class="summary">Produces an array of only the keys of another array.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#values">values(arr[, i=1[, j=#arr]])</a></td>
+	<td class="summary">Produces an array of only the values of another array.</td>
+	</tr>
+</table>
+<h2><a href="#Search_Methods">Search Methods </a></h2>
+<table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#first_gap">first_gap(arr[, i=1[, j=infinity]])</a></td>
 	<td class="summary">Finds the first nil value in an array.</td>
@@ -151,7 +163,7 @@ So any slow operations like MixedTable2Array should be <span class="keyword">in<
 	<td class="summary"><strong>In-place.</strong> Reverses the order of an array.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#try_unique_insert">try_unique_insert(arr, value[, i=1])</a></td>
+	<td class="name" nowrap><a href="#insert_once">insert_once(arr, value[, i=1])</a></td>
 	<td class="summary"><strong>In-place.</strong> Appends a value at the end of an array <strong>only if</strong> no other
  key in the array has an == equal value.</td>
 	</tr>
@@ -209,7 +221,7 @@ So any slow operations like MixedTable2Array should be <span class="keyword">in<
 
 </dd>
 </dl>
-    <h2 class="section-header "><a name="Methods"></a>Methods </h2>
+    <h2 class="section-header "><a name="Basic_Methods"></a>Basic Methods </h2>
 
     <dl class="function">
     <dt>
@@ -246,6 +258,92 @@ So any slow operations like MixedTable2Array should be <span class="keyword">in<
 
 
 </dd>
+    <dt>
+    <a name = "keys"></a>
+    <strong>keys(arr[, i=1[, j=#arr]])</strong>
+    </dt>
+    <dd>
+    Produces an array of only the keys of another array.  Values are not preserved.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">arr</span>
+            <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a> or <a class="type" href="../modules/Types.html#SparseArray">SparseArray</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">i</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         First index to process. Mandatory for sparse input.
+         (<em>default</em> 1)
+        </li>
+        <li><span class="parameter">j</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         Last index to process. Mandatory for sparse input.
+         (<em>default</em> #arr)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "values"></a>
+    <strong>values(arr[, i=1[, j=#arr]])</strong>
+    </dt>
+    <dd>
+    Produces an array of only the values of another array.  Keys are not preserved.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">arr</span>
+            <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a> or <a class="type" href="../modules/Types.html#SparseArray">SparseArray</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">i</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         First index to process. Mandatory for sparse input.
+         (<em>default</em> 1)
+        </li>
+        <li><span class="parameter">j</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         Last index to process. Mandatory for sparse input.
+         (<em>default</em> #arr)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Search_Methods"></a>Search Methods </h2>
+
+    <dl class="function">
     <dt>
     <a name = "first_gap"></a>
     <strong>first_gap(arr[, i=1[, j=infinity]])</strong>
@@ -583,8 +681,8 @@ So any slow operations like MixedTable2Array should be <span class="keyword">in<
 
 </dd>
     <dt>
-    <a name = "try_unique_insert"></a>
-    <strong>try_unique_insert(arr, value[, i=1])</strong>
+    <a name = "insert_once"></a>
+    <strong>insert_once(arr, value[, i=1])</strong>
     </dt>
     <dd>
     <strong>In-place.</strong> Appends a value at the end of an array <strong>only if</strong> no other
@@ -765,7 +863,7 @@ So any slow operations like MixedTable2Array should be <span class="keyword">in<
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-29 19:32:55 </i>
+<i style="float:right;">Last updated 2020-09-29 21:15:27 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

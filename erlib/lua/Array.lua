@@ -86,10 +86,9 @@ do end
 
 
 --------------------------------------------------------------------------------
--- Methods.
+-- Basic Methods.
 -- @section
 --------------------------------------------------------------------------------
-
 
 ----------
 -- The size of this array.  
@@ -108,6 +107,51 @@ function Array.size(arr)
     end
   return last
   end
+  
+  
+----------
+-- Produces an array of only the keys of another array. Values are not preserved.
+--  
+-- @tparam DenseArray|SparseArray arr
+--  
+-- @tparam[opt=1]    NaturalNumber i First index to process. Mandatory for sparse input.
+-- @tparam[opt=#arr] NaturalNumber j Last index to process. Mandatory for sparse input.
+--
+-- @treturn DenseArray
+--
+function Array.keys(arr,i,j)
+  local r = {}
+  for k=(i or 1),(j or #arr) do
+    if arr[k] ~= nil then r[#r+1] = k end
+    end
+  return r
+  end
+  
+  
+----------
+-- Produces an array of only the values of another array. Keys are not preserved.
+--  
+-- @tparam DenseArray|SparseArray arr
+--  
+-- @tparam[opt=1]    NaturalNumber i First index to process. Mandatory for sparse input.
+-- @tparam[opt=#arr] NaturalNumber j Last index to process. Mandatory for sparse input.
+--
+-- @treturn DenseArray
+--
+function Array.values(arr,i,j)
+  local r = {}
+  for k=(i or 1),(j or #arr) do
+    if arr[k] ~= nil then r[#r+1] = arr[k] end
+    end
+  return r
+  end
+
+
+  
+--------------------------------------------------------------------------------
+-- Search Methods.
+-- @section
+--------------------------------------------------------------------------------
 
 
 ----------
@@ -176,7 +220,11 @@ function Array.find_all(arr,value,i,j)
     if arr[k] == value then r[#r+1]= k end
     end
   return _toArray(r)
-  end  
+  end
+  
+  
+  
+
 
   
   
@@ -304,7 +352,7 @@ function Array.reverse(arr,target,i,j)
 -- @treturn boolean false: element was already in array, true: element was
 -- inserted at the end.
 -- 
-function Array.try_unique_insert(arr,value,i)
+function Array.insert_once(arr,value,i)
   -- This function does not support i,j ranges because there
   -- is no obvious correct place to insert the value inside a range.
   -- Therefore the user should use Array.find() and handle that themselfs.

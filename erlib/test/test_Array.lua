@@ -210,18 +210,18 @@ local function Test()
     assert(equ(sparse,{nil,nil,nil,"k",nil,"i","h","g","f",nil,nil,'l','m'}))
     end
 
-  -- Array.try_unique_insert
+  -- Array.insert_once
   do
     local test1 = Array.compress(make_dense(),{},1,6)
     local test2 = Array.compress(make_dense(),{},1,7)
     
-    local arr,changed = Array.try_unique_insert(test1,'g')
+    local arr,changed = Array.insert_once(test1,'g')
     assert(test1 == arr)
     assert(equ(test1,test2))
     assert(changed == true)
     assert(7 == Array.size(test1))
     
-    local arr,changed = Array.try_unique_insert(test1,'g')
+    local arr,changed = Array.insert_once(test1,'g')
     assert(test1 == arr)
     assert(equ(test1,test2))
     assert(changed == false)
@@ -270,7 +270,21 @@ local function Test()
     assert(13 == copy:size())
     end
   
+  -- Array.keys, Array.values
+  do
+    local sparse = make_sparse()
     
+    local keys = Array(sparse):keys(nil,13)
+    assert(equ(keys,{6,7,8,9,11,12,13}))
+    
+    local values = Array(sparse):values(3,11)
+    assert(equ(values,{'f','g','h','i','k'}))
+    
+    -- dense array is inheritely a value array
+    assert(equ(make_dense(),Array.values(make_dense())))
+    end
+
+
   say('  TESTR  @  erlib.Array → Ok')
   end
 

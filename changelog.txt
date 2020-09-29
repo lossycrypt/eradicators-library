@@ -25,14 +25,15 @@ Date: 2020-09-x
 Version: 4.0.16
 Date: 2020-09-29
   Internal:
-    - New module Array + Tests
-    - New function Iter.array_pairs
+    - ?
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.15
-Date: 2020-09-24
+Date: 2020-09-29
   Internal:
     - New module Set
     - New module Class
+    - New module Array + Tests
+    - New function Iter.array_pairs
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.14
 Date: 2020-09-23
