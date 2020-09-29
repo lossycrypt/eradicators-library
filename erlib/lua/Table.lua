@@ -1,7 +1,12 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- Description
+-- Table manipulation.
+--
+-- __Note:__ This module inherits all native-Lua @{table} module methods unless
+-- overwritten by same-named local methods.
+--
+--
 --
 -- @module Table
 -- @usage
@@ -28,6 +33,27 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 
 
 local Table,_Table,_uLocale = {},{},{}
+
+-- -------------------------------------------------------------------------- --
+-- Metatable                                                                  --
+-- -------------------------------------------------------------------------- --
+
+-- Inherit all Table methods.
+for k,v in pairs( table) do  Table[k] = v end
+-- for k,v in pairs(_Table) do _Table[k] = v end
+
+local _obj_mt = {__index=Table}
+local _toTable = function(tbl)
+  if not getmetatable(tbl) then setmetatable(tbl,_obj_mt) end
+  return tbl end
+do setmetatable( Table,{__call = function(_,tbl) return _toTable(tbl) end}) end
+do setmetatable(_Table,{__call = function(_,tbl) return _toTable(tbl) end}) end
+
+
+--------------------------------------------------------------------------------
+-- Module.
+-- @section
+--------------------------------------------------------------------------------
 
 
 Table.size = (
@@ -73,7 +99,13 @@ function Table.array_size(arr,i)
   end
   
   
-  
+----------
+-- test
+function Table.scopy(tbl)
+  local r = {}
+  for k in pairs(tbl) do r[k] = tbl[k] end
+  return r
+  end
   
   
 --------------------------------------------------------------------------------

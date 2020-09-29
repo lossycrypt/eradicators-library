@@ -49,6 +49,12 @@
 -- @field key @{NotNil}
 -- @table PseudoSet
 
+
+----------
+-- See @{array} below.
+-- @table DenseArray
+
+
 ----------
 -- An array - sometimes also called a DenseArray - is a table
 -- in which all keys are non-zero @{NaturalNumber}s. Additionally
@@ -72,10 +78,6 @@
 --   local A = {'a','b','c','d','e'}
 --   print(#A)
 --   > 5
-
-----------
--- See @{array} above.
--- @table DenseArray
 
 
 ----------

@@ -2,6 +2,7 @@
   
 -- This list was automatically generated. 
 return { 
+  'test_Array', 
   'test_Assumptions', 
   'test_Cache', 
   'test_Coding', 

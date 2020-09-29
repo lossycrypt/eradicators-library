@@ -6,8 +6,10 @@
 -- and @{wiki List_of_logic_symbols}. In unions and intersections of PseudoSets
 -- the values of Set B take precedence.
 --
--- __Note:__ All methods of this module that return a set also set the metatable of 
--- the result to this module.
+-- __Note:__ All methods of this module that return a set also set the metatable
+-- of the result to this module.
+--
+-- __Note:__ This module inherits all @{Table} module methods.
 --
 -- @module Set
 -- @usage
@@ -24,6 +26,8 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 local Table,_Table = elreq('erlib/lua/Table')()
+
+local setmetatable, getmetatable = setmetatable, getmetatable
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -59,10 +63,13 @@ local Set,_Set,_uLocale = {},{},{}
 for k,v in pairs( Table) do  Set[k] = v end
 for k,v in pairs(_Table) do _Set[k] = v end
 
-local _toSet = function(  tbl) return setmetatable(tbl,Set) end
-Set.__call   = function(_,tbl) return setmetatable(tbl,Set) end
-Set.__index = Set
-do setmetatable(Set,Set) end
+local _obj_mt = {__index=Set}
+local _toSet = function(tbl)
+  if not getmetatable(tbl) then setmetatable(tbl,_obj_mt) end
+  return tbl end
+do setmetatable( Set,{__call = function(_,tbl) return _toSet(tbl) end}) end
+do setmetatable(_Set,{__call = function(_,tbl) return _toSet(tbl) end}) end
+
 
 --------------------------------------------------------------------------------
 -- Conversion
