@@ -22,13 +22,20 @@ local Array = elreq('erlib/lua/Array')()
 
 local function Test()
 
+  -- fake array to latest test which methods were never called
+  -- local RealArray = Array
+  -- local Array = setmetatable({},{
+  --   __index=function(self,key); local f = RealArray[key]; self[key] = f; return f; end,
+  --   __call =function(_   ,key); return RealArray(key) end,
+  --   })
+
   --                                     1   2   3   4   5   6   7   8   9   10  11  12  13
   local function make_dense  () return {'a','b','c','d','e','f','g','h','i','j','k','l','m'} end
   local function make_sparse () return {nil,nil,nil,nil,nil,'f','g','h','i',nil,'k','l','m'} end
   
   -- Are two arrays equal?
   local function equ(a,b)
-    for i=1,13 do -- hardcoded range for this test
+    for i=1,15 do -- hardcoded range for this test
       if a[i] ~= b[i] then return false end
       end
     return true
@@ -279,12 +286,54 @@ local function Test()
     
     local values = Array(sparse):values(3,11)
     assert(equ(values,{'f','g','h','i','k'}))
-    
-    -- dense array is inheritely a value array
+
+    -- any dense array is tautologically the value array of itself
     assert(equ(make_dense(),Array.values(make_dense())))
     end
 
+  -- Array.clear
+  do
+    local dense = make_dense()
+    local clear = Array.clear(dense)
+    --full
+    assert(clear == dense)
+    assert(equ({},clear))
+    assert(0 == clear:size())
+    --partial
+    assert(equ({'a','b','c','d',nil,nil,nil,nil,nil,'j','k','l','m'},
+      Array.clear(make_dense(),5,9)))
+    end
+    
+  -- Array.extend
+  do
+    local test = Array{}
+    local test2 = test
+      :extend {'a','b','c'}
+      :extend({'a','b','c','d','e','f','g','h','i','j','k','l','m'}, 4, 7)
+      :extend({'a','b','c','d','e','f','g','h','i','j','k','l','m'}, 8,12)
+      :extend({'a','b','c','d','e','f','g','h','i','j','k','l','m'},13,13)
+    assert(equ(make_dense(),test2))
+    assert(test,test2)
+    end
+    
+  -- Array.splice, Array.fray
+  do
+    local spliced_array = Array.splice({1,2,3},42,{'a','b','c'},nil,'end')
+    assert( spliced_array:to_string()
+      == '{1, 42, "a", nil, "end", 2, 42, "b", nil, "end", 3, 42, "c", [15] = "end"}' )
+      
+    assert( spliced_array:fray(5,1,15):to_string()
+      == '{{1, 2, 3}, {42, 42, 42}, {"a", "b", "c"}, {}, {"end", "end", "end"}}' )
+      
+    assert(equ(spliced_array, Array.splice(table.unpack(spliced_array:fray(5,1,15)))))
+    end
 
+  -- check which methods were not called
+  -- setmetatable(Array,nil)
+  -- local missing = {}
+  -- for k in pairs(RealArray) do if not Array[k] then missing[#missing+1] = k end end
+  -- say(('Untested methods: %s'):format(table.concat(missing,',')))
+    
   say('  TESTR  @  erlib.Array → Ok')
   end
 

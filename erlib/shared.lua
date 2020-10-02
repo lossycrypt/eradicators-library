@@ -28,7 +28,7 @@ local does_file_exist = function(path) return (pcall(require,path)) end
 -- A sufficiently unlikely to collide but save/load stable unique value.
 -- Used to represent nil in table values and keys where Lua can not.
 -- local sha = '' for i=1,5 do sha = erlib.Coding.Sha256(sha) print(sha) end
-local Nil = '2a132dbfe4784627b86aa3807cd19cfeff487aab3dd7a60d0ab119a72e736936'
+local NIL = '2a132dbfe4784627b86aa3807cd19cfeff487aab3dd7a60d0ab119a72e736936'
 
 
 -- -------------------------------------------------------------------------- --
@@ -49,7 +49,7 @@ local shared = {
   [5] = {},
   --ercfg
   [6] = {
-    Nil = Nil,
+    NIL = NIL,
     }
   }
   

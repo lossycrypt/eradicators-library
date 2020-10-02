@@ -94,6 +94,14 @@
 -- @usage
 --  local entities = {[entity.unit_number] = entity}
 
+----------
+-- An array that contains no key→value mappings. Remember that Lua tables have
+-- identity and thus empty tables are not primitively equal.
+-- @usage local empty = {}
+-- @usage
+--   if {} ~= {} then print("Similar but not the same!") end
+--   > Similar but not the same!
+-- @table EmptyArray
 
 ----------
 -- A table that contains both numeric and string keys.

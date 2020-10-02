@@ -48,7 +48,7 @@
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
-  <li><a href="../modules/Compare.html">Compare</a></li>
+  <li><strong>Compare</strong></li>
   <li><a href="../modules/Debug.html">Debug</a></li>
   <li><a href="../modules/Error.html">Error</a></li>
   <li><a href="../modules/Filter.html">Filter</a></li>
@@ -62,7 +62,7 @@
   <li><a href="../modules/String.html">String</a></li>
   <li><a href="../modules/Table.html">Table</a></li>
   <li><a href="../modules/Time.html">Time</a></li>
-  <li><strong>Tool</strong></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
 </ul>
@@ -75,15 +75,14 @@
 
 <div id="content">
 
-<h1>Module <code>Tool</code></h1>
-<p>A bunch of small utilities.</p>
-<p> Factorio already has "util" so this is Tool.
- Basically a collection of functions that don't fit into any other module.
- When a new module is added that is a good fit for one of these they
- will be moved there on short notice so watch the changelog carefully.</p>
+<h1>Module <code>Compare</code></h1>
+<p>Description</p>
+<p>
+
+</p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Tool = require(&apos;__eradicators-library__/erlib/factorio/Tool&apos;)()
+        <pre class="example">local Compare = require(&apos;__eradicators-library__/erlib/lua/Compare&apos;)()
 </pre>
     </ul>
 
@@ -91,12 +90,12 @@
 <h2><a href="#Section">Section </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#apply">apply(f, o)</a></td>
-	<td class="summary">In-Line definition and simultaenous usage of new tables.</td>
+	<td class="name" nowrap><a href="#STRING_SHORTER">STRING_SHORTER(a, b)</a></td>
+	<td class="summary">True if a is shorter than b.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#first">first(...)</a></td>
-	<td class="summary">Get the first non-nil value.</td>
+	<td class="name" nowrap><a href="#STRING_ALPHABETIC">STRING_ALPHABETIC(a, b)</a></td>
+	<td class="summary">True if a is before b in natural language order.</td>
 	</tr>
 </table>
 
@@ -108,65 +107,90 @@
 
     <dl class="function">
     <dt>
-    <a name = "apply"></a>
-    <strong>apply(f, o)</strong>
+    <a name = "STRING_SHORTER"></a>
+    <strong>STRING_SHORTER(a, b)</strong>
     </dt>
     <dd>
-    In-Line definition and simultaenous usage of new tables.
+    True if a is shorter than b.
+ Equal length strings are sorted alphabetically.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">f</span>
-            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
 
 
 
         </li>
-        <li><span class="parameter">o</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
 
 
 
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> prototype = Tool.apply(SimpleHotkey,{<span class="string">'some'</span>,<span class="string">'values'</span>})</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "first"></a>
-    <strong>first(...)</strong>
-    </dt>
-    <dd>
-    Get the first non-nil value.
- For when you can't use <code>return a or b</code> because false is a valid return value.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">...</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
-         It is an error if not at least one value given is <a href="../modules/Types.html#NotNil">NotNil</a>.
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../modules/Types.html#NotNil">NotNil</a></span>
-        The first value that was not nil. Can return boolean false
- if that was the first applicable value.
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+
+
+
     </ol>
 
 
 
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="global">print</span>(Array.sort({<span class="string">'ababa'</span>,<span class="string">'aaaa'</span>,<span class="string">'aab'</span>},Compare.STRING_SHORTER):to_string())
+&gt; {<span class="string">"aab"</span>, <span class="string">"aaaa"</span>, <span class="string">"ababa"</span>}
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "STRING_ALPHABETIC"></a>
+    <strong>STRING_ALPHABETIC(a, b)</strong>
+    </dt>
+    <dd>
+    True if a is before b in natural language order.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="global">print</span>(Array.sort({<span class="string">'aaaa'</span>,<span class="string">'aab'</span>,<span class="string">'ababa'</span>},Compare.STRING_ALPHABETIC):to_string())
+&gt; {<span class="string">"aaaa"</span>, <span class="string">"aab"</span>, <span class="string">"ababa"</span>}
+</pre>
+    </ul>
 
 </dd>
 </dl>

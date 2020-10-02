@@ -1,21 +1,17 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- Numerically indexed table manipulation.
--- Supports 0-indexed arrays?
--- Everything works for sparse arrays?
--- -> The point of this whole module is to be *fast*. 
---    So any slow operations like MixedTable2Array should be in Table!
+-- Numerically indexed table manipulation. Optimized for speed.
 -- 
 -- __Note:__ All methods of this module that return an array also set the
 -- metatable of the result to this module, except for in-place methods that
 -- recieve an input that already had a metatable.
 --
--- __Note:__ Most methods of this module directly apply their result to the 
--- input table. If you want the input table to be unaffected you can supply
--- feed an (empty) table as the _target_ to which the result should be copied.
--- This allows both in-place and copy operations to be performed without
--- additional overhead.
+-- __Note:__ Some methods of this module apply their result directly to the 
+-- input table to be faster. If you want the input table to be unaffected you
+-- can supply an (empty) table as the _target_ to which the result should
+-- be written instead. This allows both in-place and copy-on-write operations
+-- to be handled by the same method at the same cpu-cost.
 --
 -- __Note:__ This module inherits all @{Table} module methods. Same-named
 -- Array methods override inherited Table methods.
@@ -39,9 +35,11 @@ local Table,_Table = elreq('erlib/lua/Table')()
 local setmetatable, getmetatable, pairs
     = setmetatable, getmetatable, pairs
 
-local math_floor, math_ceil
-    = math.floor, math.ceil
+local math_floor, math_ceil, table_sort
+    = math.floor, math.ceil, table.sort
 
+local stop = elreq('erlib/lua/Error')().Stopper('Array')
+    
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
@@ -110,7 +108,8 @@ function Array.size(arr)
   
   
 ----------
--- Produces an array of only the keys of another array. Values are not preserved.
+-- Produces an array of only the keys with @{NotNil} values of this array.
+-- Values are not preserved.
 --  
 -- @tparam DenseArray|SparseArray arr
 --  
@@ -124,12 +123,12 @@ function Array.keys(arr,i,j)
   for k=(i or 1),(j or #arr) do
     if arr[k] ~= nil then r[#r+1] = k end
     end
-  return r
+  return _toArray(r)
   end
   
   
 ----------
--- Produces an array of only the values of another array. Keys are not preserved.
+-- Produces an array of only the @{NotNil} values of this array. Keys are not preserved.
 --  
 -- @tparam DenseArray|SparseArray arr
 --  
@@ -143,7 +142,7 @@ function Array.values(arr,i,j)
   for k=(i or 1),(j or #arr) do
     if arr[k] ~= nil then r[#r+1] = arr[k] end
     end
-  return r
+  return _toArray(r)
   end
 
 
@@ -152,7 +151,6 @@ function Array.values(arr,i,j)
 -- Search Methods.
 -- @section
 --------------------------------------------------------------------------------
-
 
 ----------
 -- Finds the first nil value in an array.
@@ -222,11 +220,7 @@ function Array.find_all(arr,value,i,j)
   return _toArray(r)
   end
   
-  
-  
 
-
-  
   
 --------------------------------------------------------------------------------
 -- In-Place Methods.
@@ -267,6 +261,9 @@ function Array.compress(arr,target,i,j)
 -- on if f() ever returns nil, or if the input array or partial range include
 -- nil values.
 -- 
+-- __Note:__ Due to the inherit extra overhead of one function call per element
+-- this will always be slower than a simple for-pairs loop.
+-- 
 -- @tparam DenseArray|SparseArray arr
 -- @tparam function f The function f(value,index,arr) that is applied to every
 -- key→value mapping in the array.
@@ -287,6 +284,9 @@ function Array.map(arr,f,target,i,j)
  
 ----------
 -- __In-place.__ Removes elements from an array based on a filter function.
+--
+-- __Note:__ Due to the inherit extra overhead of one function call per element
+-- this will always be slower than a simple for-pairs loop.
 --
 -- @tparam DenseArray|SparseArray arr
 -- @tparam function f Any elements for which the filter function f(value,index,arr)
@@ -413,12 +413,69 @@ function Array.unsorted_remove_key(arr,key)
   end
 
   
+----------
+-- __In-place.__ Sets all values to nil. Useful if you need to keep the table
+-- reference intact.
+--
+-- @tparam DenseArray|SparseArray arr
+--  
+-- @tparam[opt=1]    NaturalNumber i First index to process. Mandatory for sparse input.
+-- @tparam[opt=#arr] NaturalNumber j Last index to process. Mandatory for sparse input.
+--
+-- @treturn EmptyArray|DenseArray|SparseArray The input array.
+--
+function Array.clear(arr,i,j)
+  for k=(i or 1),(j or #arr) do
+    arr[k] = nil
+    end
+  return _toArray(arr)
+  end
+  
+  
+----------
+-- __In-place.__ Inserts the content of arr2 at the end of arr.
+--
+-- @tparam DenseArray|SparseArray arr The array that will be extended.
+-- @tparam DenseArray|SparseArray arr2 The array from which to shallow-copy the new content.
+--  
+-- @tparam[opt=1]    NaturalNumber i First index of arr2 to process. Mandatory for sparse input.
+-- @tparam[opt=#arr2] NaturalNumber j Last index of arr2 to process. Mandatory for sparse input.
+--
+-- @treturn DenseArray|SparseArray The input array.
+--
+function Array.extend(arr,arr2,i,j)
+  local n = #arr-(i or 1)+1
+  for k=(i or 1),(j or #arr2) do
+    arr[n+k] = arr2[k]
+    end
+  return _toArray(arr)
+  end
+  
+  
+----------
+-- __In-place.__ Applies a sorting function to an array.
+-- See the @{Compare} module for built-in comparing functions.
+--
+-- @tparam DenseArray arr
+-- @tparam function comparator A function f(a,b)→boolean which determines
+-- the final order.
+-- 
+-- @treturn DenseArray
+-- 
+function Array.sort(arr,comparator)
+  if not comparator then err('Missing sorting function') end
+  table_sort(arr,comparator)
+  return _toArray(arr)
+  end
+  
+
   
 --------------------------------------------------------------------------------
 -- Copy Methods.
 -- @section
 --------------------------------------------------------------------------------
-  
+
+
 ----------
 -- __Shallow Copy.__ Copies (parts of) an array to a new table. Sub-tables
 -- will reference the original tables.
@@ -440,11 +497,113 @@ function Array.scopy(arr,i,j)
     end
   return _toArray(r)
   end
+  
+  
+--------------------------------------------------------------------------------
+-- Other Methods.
+-- @section
+--------------------------------------------------------------------------------
+
+  
+----------
+-- Takes elements from multiple input tables and puts them
+-- into a flat array.
+-- 
+-- @tparam DenseArray arr
+-- @tparam[opt] AnyValue ... Not giving any extra inputs is equivalent to
+-- @{Array.scopy}(arr). If a table is given its values will be taken from
+-- the same key as the preceeding value of arr. If a non-table is given
+-- it will simply be repeated.
+-- 
+-- @treturn DenseArray|SparseArray
+-- 
+-- @usage
+--   local spliced_array = Array.splice({1,2,3},42,{'a','b','c'},nil,'end')
+--   print(spliced_array:to_string())
+--   > {1, 42, "a", nil, "end", 2, 42, "b", nil, "end", 3, 42, "c", nil, "end"}
+--
+function Array.splice(arr,...)
+  local all = {arr,...}
+  local n = 1 + select('#',...)
+  local r = {}
+  for i=0,#arr-1 do    -- i = key in master table (shifted to 0-indexed)
+    for j=1,n do       -- j = current input subtable index
+      local s = all[j] -- s = current subtable
+      local k = n*i+j  -- k = key in output table (start at 0+1)
+      if type(s) == 'table' then
+        r[k] = s[i+1]  -- compensate 0-shift
+      else
+        r[k] = s
+        end
+      end
+    end
+  return _toArray(r)
+  end
 
 
+----------
+-- Reverse of Array.splice(). Splits a large array into
+-- sub-arrays.
+-- 
+-- @tparam DenseArray|SparseArray arr
+-- @tparam NaturalNumber count How many sub-tables should be constructed from
+-- the input array. When giving a i,j range it must be divisable by count without
+-- rest.
+--
+-- @tparam[opt=1]    NaturalNumber i First index to process. Mandatory for sparse input.
+-- @tparam[opt=#arr] NaturalNumber j Last index to process. Mandatory for sparse input.
+--
+-- @treturn DenseArray Array of arrays. If the input was made using Array.splice()
+-- with non-table inputs then those inputs will __not__ be reconstructed.
+-- They will instead return a table with repetitions of the value.
+--
+-- @usage
+--   -- Using the same array as above...
+--   local spliced_array = Array.splice({1,2,3},42,{'a','b','c'},nil,'end')
+--   -- Which was made of 5 inputs, but one of them was nil, so the
+--   -- output is a SparseArray and thus range specification is mandatory.
+--   print(spliced_array:fray(5,1,15):to_string())
+--   > {{1,2,3}, {42,42,42}, {"a","b","c"}, {nil,nil,nil}, {"end","end","end"}}
+--   -- partial ranges will return partial results.
+--   print(spliced_array:fray(5,6,10):to_string())
+--   > {{2}, {42}, {"b"}, {nil}, {"end"}}
+--
+function Array.fray(arr,count,i,j)
+  -- sanity
+  i,j = (i or 1),(j or #arr)
+  if (j-i+1)%count ~= 0 then
+    stop('Array.fray range must be divisable by count.')
+    end  
+  -- prepare subtables
+  local r = {}
+  for i=1,count do r[i] = {} end
+  -- fray
+  local k = -count -- partial range output index should start at 1
+  for m=(i or 1)-1,(j or #arr)-1,count do
+    k = k + count
+    local n = k/count+1
+    for l=1,count do
+      r[l][n] = arr[m+l]
+      end
+    end
+  return _toArray(r)
+  end
+
+
+
+--------------------------------------------------------------------------------
+-- Metamethods.
+-- @section
+--------------------------------------------------------------------------------
+
+--- Concatenation with `\.\.` is Array.extend().
+-- @function Array.__concat
+_obj_mt.__concat = Array.extend
+  
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
 do (STDOUT or log or print)('  Loaded → erlib.Array') end
 return function() return Array,_Array,_uLocale end
+

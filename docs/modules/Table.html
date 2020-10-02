@@ -32,8 +32,14 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Todo">Todo</a></li>
-<li><a href="#Module">Module </a></li>
+<li><a href="#Basic_Methods">Basic Methods </a></li>
+<li><a href="#Search_Methods">Search Methods </a></li>
+<li><a href="#In_Place_Methods">In-Place Methods </a></li>
+<li><a href="#Copy_Methods">Copy Methods </a></li>
+<li><a href="#Other_Methods">Other Methods </a></li>
+<li><a href="#Metamethods">Metamethods </a></li>
+<li><a href="#Path_Methods">Path Methods </a></li>
+<li><a href="#Factories">Factories </a></li>
 </ul>
 
 
@@ -49,6 +55,7 @@
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Compare.html">Compare</a></li>
   <li><a href="../modules/Debug.html">Debug</a></li>
   <li><a href="../modules/Error.html">Error</a></li>
   <li><a href="../modules/Filter.html">Filter</a></li>
@@ -86,26 +93,195 @@
     </ul>
 
 
-<h2><a href="#Todo">Todo</a></h2>
+<h2><a href="#Basic_Methods">Basic Methods </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#todo1">todo1</a></td>
-	<td class="summary">Nothing.</td>
+	<td class="name" nowrap><a href="#size">size(tbl)</a></td>
+	<td class="summary">Counts keys→value pairs.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#array_size">array_size(tbl)</a></td>
+	<td class="summary">The largest numeric key in the array part of this table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#range">range([a=1], b[, step])</a></td>
+	<td class="summary">Generates a <a href="../modules/Types.html#DenseArray">DenseArray</a> of <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>s.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#values">values(tbl)</a></td>
+	<td class="summary">Generates an unsorted DenseArray from the values of tbl.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#keys">keys(tbl)</a></td>
+	<td class="summary">Generates an unsorted DenseArray from the keys of tbl.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#plural">plural(obj)</a></td>
+	<td class="summary">Wraps the object in a table if it is not already a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_empty">is_empty(tbl)</a></td>
+	<td class="summary">Returns true if the table contains no values.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#nil_if_empty">nil_if_empty(tbl)</a></td>
+	<td class="summary">Converts empty tables into a <a href="https://www.lua.org/pil/2.1.html">nil</a> value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_equal">is_equal(tbl, tbl2)</a></td>
+	<td class="summary"><strong>Deep compare.</strong> If two tables have exactly the same content.</td>
 	</tr>
 </table>
-<h2><a href="#Module">Module </a></h2>
+<h2><a href="#Search_Methods">Search Methods </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#map">map(f)</a></td>
-	<td class="summary">map</td>
+	<td class="name" nowrap><a href="#find_largest">find_largest(tbl[, gtr])</a></td>
+	<td class="summary">Finds the largest element in a table.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#array_size">array_size(arr, i)</a></td>
-	<td class="summary">The size of the array part of a MixedTable.</td>
+	<td class="name" nowrap><a href="#has_value">has_value(tbl, value)</a></td>
+	<td class="summary">Checks if a value is in a table.</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#next_value">next_value(tbl[, key=nil])</a></td>
+	<td class="summary">Fetches the next value in a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#first_value">first_value(tbl)</a></td>
+	<td class="summary">Shortcut to Table.next_value(tbl,nil) that doesn't return the key at all.</td>
+	</tr>
+</table>
+<h2><a href="#In_Place_Methods">In-Place Methods </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#map">map(tbl, f[, target=nil])</a></td>
+	<td class="summary"><strong>In-place.</strong> Applies a function to all elements of a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#filter">filter(tbl, f[, target=nil])</a></td>
+	<td class="summary"><strong>In-place.</strong> Removes elements from a table based on a filter function.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#smerge">smerge(tbl, tbl2)</a></td>
+	<td class="summary"><strong>In-place.</strong> <strong>Shallow Merge.</strong> Copies data from one table into another.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#insert_once">insert_once(tbl, key, value)</a></td>
+	<td class="summary"><strong>In-place.</strong> Inserts value into tbl <strong>only if</strong> no other key in the table
+ has an == equal value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#clear">clear(tbl)</a></td>
+	<td class="summary"><strong>In-place.</strong> Removes all key→value mappings from a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#overwrite">overwrite(table_reference, value_table)</a></td>
+	<td class="summary"><strong>In-place.</strong> Puts the content of one table into the reference of another.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#migrate">migrate(tbl, index, migrations[, ...])</a></td>
+	<td class="summary"><strong>In-place.</strong> Applies a series of migration functions to sub-table.</td>
+	</tr>
+</table>
+<h2><a href="#Copy_Methods">Copy Methods </a></h2>
+<table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#scopy">scopy(tbl)</a></td>
-	<td class="summary">test</td>
+	<td class="summary"><strong>Shallow Copy.</strong> Copies the first level of the table such that all
+ <strong>sub-table references stay identical</strong> to the original table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#dcopy">dcopy(tbl[, remove_metatables=false])</a></td>
+	<td class="summary"><strong>Deep Copy.</strong> A copy of a table that shares none of the original table
+ references but has the <strong>same self-referencing</strong> structure.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#fcopy">fcopy(tbl[, remove_metatables=false])</a></td>
+	<td class="summary"><strong>Full Copy.</strong> A copy of a table that shares none of the original table
+ references and in which all formerly self-referenced <strong>sub-tables are made
+ unique</strong>.</td>
+	</tr>
+</table>
+<h2><a href="#Other_Methods">Other Methods </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#rep">rep(tbl[, variation_count[, patterns]])</a></td>
+	<td class="summary">Creates patterned and unpatterened table repetitions.</td>
+	</tr>
+</table>
+<h2><a href="#Metamethods">Metamethods </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#__concat">__concat()</a></td>
+	<td class="summary">Addition with + is Table.smerge().</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_metamethod">set_metamethod(tbl, method_name, f)</a></td>
+	<td class="summary">Set a function as metamethod of tbl.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_metamethod">get_metamethod(tbl, method_name)</a></td>
+	<td class="summary">Gets the metamethod handler function of tbl.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#deep_clear_metatables">deep_clear_metatables(tbl)</a></td>
+	<td class="summary">Recursively removes metatables from all subtables but not from other object types.</td>
+	</tr>
+</table>
+<h2><a href="#Path_Methods">Path Methods </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#TablePath">TablePath</a></td>
+	<td class="summary"><strong>Concept.</strong>
+ A <a href="../modules/Types.html#DenseArray">DenseArray</a> of values that represent keys of a nested path in another table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get">get(tbl, path[, default=nil])</a></td>
+	<td class="summary">Get the value at location path in tbl.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set">set(tbl, path, value)</a></td>
+	<td class="summary">Set a new value to location path in tbl.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sget">sget(tbl, path, default)</a></td>
+	<td class="summary">Get the value at location path in tbl if it exists, otherwise creates it.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TablePatch">TablePatch</a></td>
+	<td class="summary"><strong>Concept.</strong>
+ A <a href="../modules/Types.html#DenseArray">DenseArray</a> consisting of a <a href="../modules/Table.html#TablePath">TablePath</a> followed by a
+ <a href="../modules/Table.html#TablePatchValue">TablePatchValue</a>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TablePatchValue">TablePatchValue</a></td>
+	<td class="summary"><strong>Concept.</strong> <br/>
+ The value part of a <a href="../modules/Table.html#TablePatch">TablePatch</a> is not further interpreted
+  <strong>unless</strong> it is a <a href="../modules/Types.html#MixedTable">MixedTable</a> made of a <a href="../modules/Table.html#TablePath">TablePath</a>
+ that contains the mapping <code>{self=true}</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#patch">patch(tbl, patches)</a></td>
+	<td class="summary">Takes an array of patches and applies them to a table.</td>
+	</tr>
+</table>
+<h2><a href="#Factories">Factories </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#normalizer">normalizer(defaults)</a></td>
+	<td class="summary"><strong>Factory.</strong> Applies default values to tables.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TableNormalizerFunction">TableNormalizerFunction(tbl)</a></td>
+	<td class="summary"><strong>In-place.</strong> Applies enclosurized defaults.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#remapper">remapper(mappings[, allow_tables_as_keys=false])</a></td>
+	<td class="summary"><strong>Factory.</strong> Moves values from one key to another.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TableRemapperFunction">TableRemapperFunction(tbl)</a></td>
+	<td class="summary"><strong>In-place.</strong> Applies enclosurized re-mappings.</td>
 	</tr>
 </table>
 
@@ -113,71 +289,22 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Todo"></a>Todo</h2>
+    <h2 class="section-header "><a name="Basic_Methods"></a>Basic Methods </h2>
 
     <dl class="function">
     <dt>
-    <a name = "todo1"></a>
-    <strong>todo1</strong>
+    <a name = "size"></a>
+    <strong>size(tbl)</strong>
     </dt>
     <dd>
-    Nothing.
-
-
-    <ul>
-        <li><span class="parameter">todo1</span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="Module"></a>Module </h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "map"></a>
-    <strong>map(f)</strong>
-    </dt>
-    <dd>
-    map
+    Counts keys→value pairs.  Uses factorio <a href="../api/Libraries.html#table_size">table_size</a> when
+ available.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">f</span>
-            <span class="types"><span class="type">see Cache.TickedCache table {key -> value} -> new_table {new_key -> (f(value,key,table) -> new_value,new_key)} Replacing a table with it's own map in one call is too expensive. And can be emulated by Table(tbl)</span></span>
-        clear():merge(Table(tbl):map(f)) Also the most common usecase is to use the map seperately.
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "array_size"></a>
-    <strong>array_size(arr, i)</strong>
-    </dt>
-    <dd>
-    The size of the array part of a MixedTable.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">arr</span>
-
-
-
-        </li>
-        <li><span class="parameter">i</span>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
 
 
 
@@ -187,8 +314,9 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">NaturalNumbe</span> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
-        The size of the array of nil if there was no array part.
+           <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         The total number of keys in this table. Counts all
+ types of keys including numeric.
     </ol>
 
 
@@ -196,25 +324,1556 @@
 
 </dd>
     <dt>
-    <a name = "scopy"></a>
-    <strong>scopy(tbl)</strong>
+    <a name = "array_size"></a>
+    <strong>array_size(tbl)</strong>
     </dt>
     <dd>
-    test
+    The largest numeric key in the array part of this table.
+ For <a href="../modules/Types.html#DenseArray">DenseArray</a>s
+ <a href="../lua-5.2/doc/manual.html#3.4.6 ">the length operator #</a> is <strong>much faster</strong>.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../modules/Types.html#MixedTable">MixedTable</a></span>
+         A table with a sparse array part.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "range"></a>
+    <strong>range([a=1], b[, step])</strong>
+    </dt>
+    <dd>
+    Generates a <a href="../modules/Types.html#DenseArray">DenseArray</a> of <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>s.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+
+
+
+         (<em>default</em> 1)
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         The end of the range (inclusive).
+        </li>
+        <li><span class="parameter">step</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+
+
+
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="global">print</span>(Table.range(<span class="number">10</span>))
+&gt; {<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>}
+<span class="global">print</span>(Table.range(<span class="number">5</span>,<span class="number">10</span>))
+&gt; {<span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>}
+<span class="global">print</span>(Table.range(<span class="number">2</span>,<span class="number">44</span>,<span class="number">4</span>))
+&gt; {<span class="number">2</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="number">14</span>, <span class="number">18</span>, <span class="number">22</span>, <span class="number">26</span>, <span class="number">30</span>, <span class="number">34</span>, <span class="number">38</span>, <span class="number">42</span>}
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "values"></a>
+    <strong>values(tbl)</strong>
+    </dt>
+    <dd>
+    Generates an unsorted DenseArray from the values of tbl.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
 
 
 
         </li>
     </ul>
 
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
 
 
 
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "keys"></a>
+    <strong>keys(tbl)</strong>
+    </dt>
+    <dd>
+    Generates an unsorted DenseArray from the keys of tbl.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "plural"></a>
+    <strong>plural(obj)</strong>
+    </dt>
+    <dd>
+    Wraps the object in a table if it is not already a table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">obj</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Table</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_empty"></a>
+    <strong>is_empty(tbl)</strong>
+    </dt>
+    <dd>
+    Returns true if the table contains no values.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "nil_if_empty"></a>
+    <strong>nil_if_empty(tbl)</strong>
+    </dt>
+    <dd>
+    Converts empty tables into a <a href="https://www.lua.org/pil/2.1.html">nil</a> value.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_equal"></a>
+    <strong>is_equal(tbl, tbl2)</strong>
+    </dt>
+    <dd>
+    <strong>Deep compare.</strong> If two tables have exactly the same content. </p>
+
+<p> <strong>Note:</strong> Does not compare the content of tables-as-keys.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">tbl2</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> a = {<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>}
+<span class="keyword">local</span> b = {<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>}
+<span class="keyword">local</span> c = {<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="string">'c'</span>,<span class="string">'d'</span>}; c[<span class="number">5</span>] = c
+<span class="keyword">local</span> test1 = {a=a,b={b=b,c={c=c}}}
+<span class="keyword">local</span> test2 = {a=a,b={b=b,c={c=c}}}
+<span class="global">print</span>(test1 == test2)
+&gt; <span class="keyword">false</span>
+<span class="global">print</span>(Table.is_equal(test1,test2))
+&gt; <span class="keyword">true</span>
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Search_Methods"></a>Search Methods </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "find_largest"></a>
+    <strong>find_largest(tbl[, gtr])</strong>
+    </dt>
+    <dd>
+    Finds the largest element in a table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">gtr</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         A comparitor function f(a,b)→boolean that
+ returns true when a is larger than b. Defaults to a>b.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        The <strong>value</strong>.</li>
+        <li>
+           <span class="types"><a class="type" href="../modules/Types.html#NotNil">NotNil</a></span>
+        The <strong>key</strong> of the <strong>first</strong> occurance of value in tbl.</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "has_value"></a>
+    <strong>has_value(tbl, value)</strong>
+    </dt>
+    <dd>
+    Checks if a value is in a table.  If you need to do this alot consider using
+ a <a href="../modules/Set.html#">Set</a> instead.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NotNil">NotNil</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "next_value"></a>
+    <strong>next_value(tbl[, key=nil])</strong>
+    </dt>
+    <dd>
+    Fetches the next value in a table.  Respects __pairs metamethod. Return
+ value order is reversed compared to lua <a href="../lua-5.2/doc/manual.html#pdf-next">next</a>. By default will return
+ the <strong>first</strong> value of a table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         The key <strong>preceeding</strong> the output key.
+         (<em>default</em> nil)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        The <strong>value</strong>.</li>
+        <li>
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        The <strong>key</strong> of above value in tbl.</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "first_value"></a>
+    <strong>first_value(tbl)</strong>
+    </dt>
+    <dd>
+    Shortcut to Table.next_value(tbl,nil) that doesn't return the key at all.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        The <strong>value</strong>.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="In_Place_Methods"></a>In-Place Methods </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "map"></a>
+    <strong>map(tbl, f[, target=nil])</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Applies a function to all elements of a table. </p>
+
+<p> <strong>Experts only:</strong> Table.map in <strong>Copy Mode</strong> supports changing the key
+ that a value is associated with. If f(value,key,tbl) returns <strong>two</strong> values
+ then the first is the new value and the second is the new key. If it returns
+ <strong>one</strong> value then the original key will be used. This check is done for
+ each key→value pair seperately.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">f</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         The function f(value,key,tbl) that produces the new value
+ for each key→value mapping in the table.
+        </li>
+        <li><span class="parameter">target</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         <strong>Copy Mode.</strong> The result of the operation will
+ be written to this table and tbl remains unchanged.
+         (<em>default</em> nil)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        The input table.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "filter"></a>
+    <strong>filter(tbl, f[, target=nil])</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Removes elements from a table based on a filter function.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">f</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         If calling f(value,key,tbl) does not return <a href="../modules/Concepts.html#truthy">truthy</a>
+ then the value will be removed from the table.
+        </li>
+        <li><span class="parameter">target</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         <strong>Copy Mode.</strong> The result of the operation will
+ be written to this table and tbl remains unchanged.
+         (<em>default</em> nil)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        The input table.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "smerge"></a>
+    <strong>smerge(tbl, tbl2)</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> <strong>Shallow Merge.</strong> Copies data from one table into another.
+ Copies only the first layer of the table. All sub-table references stay
+ identical.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">tbl2</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         The table from which to take the data.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        The input table.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "insert_once"></a>
+    <strong>insert_once(tbl, key, value)</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Inserts value into tbl <strong>only if</strong> no other key in the table
+ has an == equal value.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NotNil">NotNil</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        The input table.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "clear"></a>
+    <strong>clear(tbl)</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Removes all key→value mappings from a table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        The now empty input table.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "overwrite"></a>
+    <strong>overwrite(table_reference, value_table)</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Puts the content of one table into the reference of another.
+ Used when you need to replace all content of a table, but need to keep
+ external references to the table intact.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">table_reference</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         All key→value mappings in this table will be deleted.
+        </li>
+        <li><span class="parameter">value_table</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         All key→value mappings will be <strong>shallowly copied</strong>
+ into table_reference.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Table</span></span>
+        The input table reference with the
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> my_table  = {<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>}
+<span class="keyword">local</span> also_my_table = my_table
+<span class="keyword">local</span> my_values = {<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="string">'c'</span>}
+Table.overwrite(my_table,my_values)
+<span class="global">print</span>(my_table:to_string())
+&gt; {<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>}
+<span class="global">print</span>(my_table == my_values)
+&gt; <span class="keyword">false</span>
+<span class="global">print</span>(my_table == also_my_table) <span class="comment">-- all local references stay intact
+</span>&gt; <span class="keyword">true</span>
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "migrate"></a>
+    <strong>migrate(tbl, index, migrations[, ...])</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Applies a series of migration functions to sub-table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">index</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NotNil">NotNil</a></span>
+         The index of the to-be-migrated subtable in tbl. If
+ the index does not yet exist it will be initialized as an empty table.
+        </li>
+        <li><span class="parameter">migrations</span>
+            <span class="types"><a class="type" href="../modules/Types.html#SparseArray">SparseArray</a></span>
+         A group of to-be-sequentially-applied
+ migration functions. Each function will be called f(tbl[index],index,tbl,...).
+        </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         Arbitrary extra data that will be passed to each
+ migration function.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">The</span></span>
+        fully migrated subtable.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> my_data = {
+  [<span class="string">'Peter'</span>] = {
+    <span class="comment">-- No version means _version=0
+</span>    name = <span class="string">'Peter'</span>,
+    },
+  [<span class="string">'Paula'</span>] = {
+    <span class="comment">-- _version is internally managed and should not be manually changed.
+</span>    _version = <span class="number">1</span>,
+    value = <span class="number">12</span>,
+    givenname = <span class="string">'Paula'</span>,
+    }
+  }
+
+<span class="keyword">local</span> my_migrations = {
+  <span class="comment">-- The number indicates that version this function *outputs*
+</span>  <span class="comment">-- Usually you will only need (data).
+</span>  [<span class="number">1</span>] = <span class="keyword">function</span>(data)
+    <span class="comment">-- Rename old values.
+</span>    data.givenname = data.name
+    data.name      = <span class="keyword">nil</span>
+    <span class="comment">-- Initialize newly implemented values.
+</span>    data.value     = <span class="number">0</span>
+    <span class="comment">-- _version can *NOT* be manually changed during a migration.
+</span>    data._version  = <span class="number">42</span> <span class="comment">-- this has no effect
+</span>    <span class="keyword">end</span>,
+  <span class="comment">-- But sometimes extra parameters are useful.
+</span>  [<span class="number">2</span>] = <span class="keyword">function</span>(data,index,tbl,bonus,superbonus)
+    <span class="comment">-- Migrations can completely reconstruct the table.
+</span>    tbl[index] = {
+      gnam = data.givenname <span class="keyword">or</span> index,
+      val  = data.value + bonus + (superbonus <span class="keyword">or</span> <span class="number">0</span>)
+      }
+    <span class="keyword">end</span>,
+  }
+
+<span class="comment">-- You can migrate old data.
+</span><span class="keyword">for</span> k,_ <span class="keyword">in</span> <span class="global">pairs</span>(my_data) <span class="keyword">do</span>
+  Table.migrate(my_data,k,my_migrations,<span class="number">30</span>)
+  <span class="global">print</span>(k,<span class="string">':'</span>,Table(my_data[k]):to_string())
+  <span class="keyword">end</span>
+&gt; Paula : {_version = <span class="number">2</span>, gnam = <span class="string">"Paula"</span>, val = <span class="number">42</span>}
+&gt; Peter : {_version = <span class="number">2</span>, gnam = <span class="string">"Peter"</span>, val = <span class="number">30</span>}
+
+<span class="comment">-- Or you can create new data.
+</span>Table.migrate(my_data,<span class="string">'Alex'</span>,my_migrations,<span class="number">1</span>,<span class="number">9000</span>) <span class="comment">-- with superbonus
+</span><span class="global">print</span>(<span class="string">'Alex :'</span>,Table(my_data[<span class="string">'Alex'</span>]):to_string())
+&gt; Alex  : {_version = <span class="number">2</span>, gnam = <span class="string">"Alex"</span>, val = <span class="number">9001</span>}
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Copy_Methods"></a>Copy Methods </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "scopy"></a>
+    <strong>scopy(tbl)</strong>
+    </dt>
+    <dd>
+    <strong>Shallow Copy.</strong> Copies the first level of the table such that all
+ <strong>sub-table references stay identical</strong> to the original table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        The new table.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "dcopy"></a>
+    <strong>dcopy(tbl[, remove_metatables=false])</strong>
+    </dt>
+    <dd>
+    <strong>Deep Copy.</strong> A copy of a table that shares none of the original table
+ references but has the <strong>same self-referencing</strong> structure.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">remove_metatables</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         Removes metatables from
+ tbl and all sub-tables.
+         (<em>default</em> false)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        The new table.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "fcopy"></a>
+    <strong>fcopy(tbl[, remove_metatables=false])</strong>
+    </dt>
+    <dd>
+    <strong>Full Copy.</strong> A copy of a table that shares none of the original table
+ references and in which all formerly self-referenced <strong>sub-tables are made
+ unique</strong>.
+ Mostly useful for visual inspection of complex tables.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">remove_metatables</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         Removes metatables from
+ tbl and all sub-tables.
+         (<em>default</em> false)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        The new table.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Other_Methods"></a>Other Methods </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "rep"></a>
+    <strong>rep(tbl[, variation_count[, patterns]])</strong>
+    </dt>
+    <dd>
+    Creates patterned and unpatterened table repetitions.
+ <strong>Either count or patterns or both must be given.</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">variation_count</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         How many repetitions to create.
+ Will use the length of the first patterned key if not given.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">patterns</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         A table that maps each key to a DenseArray
+ of at least length variation_count.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example"><span class="comment">-- Simple example. Patternless repetition.
+</span><span class="keyword">local</span> test = Table.rep({<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>},<span class="number">3</span>)
+<span class="global">print</span>(Hydra.lines(test))
+&gt; {
+&gt;   {<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>},
+&gt;   {<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>},
+&gt;   {<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>}
+&gt; }
+</pre></li>
+        <li><pre class="example"><span class="comment">-- Intermediate example. Patterned repetition.
+</span><span class="keyword">local</span> test = Table.rep({},<span class="number">3</span>,{name = {<span class="string">'Peter'</span>,<span class="string">'Paula'</span>,<span class="string">'Alex'</span>}})
+<span class="global">print</span>(Hydra.lines(test))
+&gt; {
+&gt;   {name = <span class="string">"Peter"</span>},
+&gt;   {name = <span class="string">"Paula"</span>},
+&gt;   {name = <span class="string">"Alex"</span>}
+&gt; }
+</pre></li>
+        <li><pre class="example"><span class="comment">-- Advanced example.
+</span><span class="comment">-- Creating a Gui.construct compatible layout for a simple calculator.
+</span>
+<span class="keyword">local</span> buttons = {
+  <span class="number">1</span> , <span class="number">2</span> , <span class="number">3</span> ,<span class="string">'+'</span>,<span class="string">'-'</span>,
+  <span class="number">4</span> , <span class="number">5</span> , <span class="number">6</span> ,<span class="string">'*'</span>,<span class="string">'/'</span>,
+  <span class="number">7</span> , <span class="number">8</span> , <span class="number">9</span> ,<span class="string">'('</span>,<span class="string">')'</span>,
+  <span class="number">0</span> ,<span class="string">'.'</span>,<span class="string">'←'</span>,<span class="string">'C'</span>,
+  }
+
+<span class="keyword">local</span> layout = Table.rep(
+  {<span class="string">'button'</span>},
+  <span class="keyword">nil</span>, <span class="comment">-- You can automatically use #buttons length derived from #caption.
+</span>  {
+    caption=buttons,
+    path = Table.rep( <span class="comment">-- Nested call first creates a variation table.
+</span>      {<span class="string">'buttons'</span>},
+      #buttons, <span class="comment">-- Or you can specify the length manually.
+</span>      {[<span class="number">2</span>]=buttons}
+      )
+    }
+  )
+
+<span class="global">print</span>(Hydra.lines(layout))
+&gt; {
+    {<span class="string">"button"</span>, caption =  <span class="number">1</span> , path = {<span class="string">"buttons"</span>,  <span class="number">1</span> }},
+    {<span class="string">"button"</span>, caption =  <span class="number">2</span> , path = {<span class="string">"buttons"</span>,  <span class="number">2</span> }},
+    {<span class="string">"button"</span>, caption =  <span class="number">3</span> , path = {<span class="string">"buttons"</span>,  <span class="number">3</span> }},
+    {<span class="string">"button"</span>, caption = <span class="string">"+"</span>, path = {<span class="string">"buttons"</span>, <span class="string">"+"</span>}},
+    {<span class="string">"button"</span>, caption = <span class="string">"-"</span>, path = {<span class="string">"buttons"</span>, <span class="string">"-"</span>}},
+    {<span class="string">"button"</span>, caption =  <span class="number">4</span> , path = {<span class="string">"buttons"</span>,  <span class="number">4</span> }},
+    {<span class="string">"button"</span>, caption =  <span class="number">5</span> , path = {<span class="string">"buttons"</span>,  <span class="number">5</span> }},
+    {<span class="string">"button"</span>, caption =  <span class="number">6</span> , path = {<span class="string">"buttons"</span>,  <span class="number">6</span> }},
+    {<span class="string">"button"</span>, caption = <span class="string">"*"</span>, path = {<span class="string">"buttons"</span>, <span class="string">"*"</span>}},
+    {<span class="string">"button"</span>, caption = <span class="string">"/"</span>, path = {<span class="string">"buttons"</span>, <span class="string">"/"</span>}},
+    {<span class="string">"button"</span>, caption =  <span class="number">7</span> , path = {<span class="string">"buttons"</span>,  <span class="number">7</span> }},
+    {<span class="string">"button"</span>, caption =  <span class="number">8</span> , path = {<span class="string">"buttons"</span>,  <span class="number">8</span> }},
+    {<span class="string">"button"</span>, caption =  <span class="number">9</span> , path = {<span class="string">"buttons"</span>,  <span class="number">9</span> }},
+    {<span class="string">"button"</span>, caption = <span class="string">"("</span>, path = {<span class="string">"buttons"</span>, <span class="string">"("</span>}},
+    {<span class="string">"button"</span>, caption = <span class="string">")"</span>, path = {<span class="string">"buttons"</span>, <span class="string">")"</span>}},
+    {<span class="string">"button"</span>, caption =  <span class="number">0</span> , path = {<span class="string">"buttons"</span>,  <span class="number">0</span> }},
+    {<span class="string">"button"</span>, caption = <span class="string">"."</span>, path = {<span class="string">"buttons"</span>, <span class="string">"."</span>}},
+    {<span class="string">"button"</span>, caption = <span class="string">"←"</span>, path = {<span class="string">"buttons"</span>, <span class="string">"←"</span>}},
+    {<span class="string">"button"</span>, caption = <span class="string">"C"</span>, path = {<span class="string">"buttons"</span>, <span class="string">"C"</span>}}
+  }
+</pre></li>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Metamethods"></a>Metamethods </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "__concat"></a>
+    <strong>__concat()</strong>
+    </dt>
+    <dd>
+    Addition with + is Table.smerge().
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_metamethod"></a>
+    <strong>set_metamethod(tbl, method_name, f)</strong>
+    </dt>
+    <dd>
+    Set a function as metamethod of tbl.
+ Inherits current metatable or creates a new one.
+ Will <strong>overwrite</strong> existing metamethods of the same name.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">method_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         "__index", "__newindex", etc.
+        </li>
+        <li><span class="parameter">f</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+         A meta handler f(self,...).
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         This does <strong>not</strong> automatically inherit any methods of this
+ Table module.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_metamethod"></a>
+    <strong>get_metamethod(tbl, method_name)</strong>
+    </dt>
+    <dd>
+    Gets the metamethod handler function of tbl.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">method_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         "<strong>index", "</strong>newindex", etc.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "deep_clear_metatables"></a>
+    <strong>deep_clear_metatables(tbl)</strong>
+    </dt>
+    <dd>
+    Recursively removes metatables from all subtables but not from other object types.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        The input table. <em>Doesn't</em> have a Table module metatable.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> test = <span class="global">setmetatable</span>({},{
+  __index = <span class="keyword">function</span>() <span class="global">print</span><span class="string">'first meta'</span> <span class="keyword">return</span> <span class="number">1</span> <span class="keyword">end</span>,
+  })
+<span class="comment">-- recursive
+</span>test.test = test
+<span class="comment">-- different
+</span>test.foo  = <span class="global">setmetatable</span>({},{
+  __index = <span class="keyword">function</span>() <span class="global">print</span><span class="string">'second meta'</span> <span class="keyword">return</span> <span class="number">2</span> <span class="keyword">end</span>,
+  })
+
+<span class="comment">-- metamethods will trigger additional printing
+</span><span class="keyword">local</span> x = test[<span class="number">1</span>]
+&gt; first meta
+<span class="keyword">local</span> x = test.test[<span class="number">1</span>]
+&gt; first meta
+<span class="keyword">local</span> x = test.foo[<span class="number">1</span>]
+&gt; second meta
+
+Table.deep_clear_metatables(test)
+
+<span class="comment">-- without metatables there is no printing (and also no values in this case).
+</span><span class="keyword">local</span> x = test[<span class="number">1</span>]
+<span class="keyword">local</span> x = test.test[<span class="number">1</span>]
+<span class="keyword">local</span> x = test.foo[<span class="number">1</span>]
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Path_Methods"></a>Path Methods </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "TablePath"></a>
+    <strong>TablePath</strong>
+    </dt>
+    <dd>
+    <strong>Concept.</strong>
+ A <a href="../modules/Types.html#DenseArray">DenseArray</a> of values that represent keys of a nested path in another table.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get"></a>
+    <strong>get(tbl, path[, default=nil])</strong>
+    </dt>
+    <dd>
+    Get the value at location path in tbl.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">path</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">default</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         The value that will be returned if the full path points
+ at a nil value or if the path only partially exists in tbl.
+         (<em>default</em> nil)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#NotNil">NotNil</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example"><span class="keyword">local</span> tbl = {a = {b = {c = <span class="number">42</span>}}}
+<span class="keyword">local</span> path = {<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="string">'c'</span>}
+<span class="global">print</span> (Table(tbl):get(path))
+&gt; <span class="number">42</span>
+</pre></li>
+        <li><pre class="example"><span class="keyword">local</span> tbl = {a = {b = {c = <span class="number">42</span>}}}
+<span class="keyword">local</span> path = {<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="string">'c'</span>,<span class="string">'d'</span>,<span class="string">'e'</span>}
+<span class="global">print</span> (Table.get(tbl,path,<span class="string">"Don't panic!"</span>))
+&gt; Don't panic!
+</pre></li>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "set"></a>
+    <strong>set(tbl, path, value)</strong>
+    </dt>
+    <dd>
+    Set a new value to location path in tbl.  Automatically creates subtables
+ nessecary to fullfill the path.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">path</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">value</span></span>
+        A reference to the input value given.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sget"></a>
+    <strong>sget(tbl, path, default)</strong>
+    </dt>
+    <dd>
+    Get the value at location path in tbl if it exists, otherwise creates it.
+ Automatically creates subtables nessecary to fullfill the path.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">path</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">default</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        A reference to found value or the default value.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TablePatch"></a>
+    <strong>TablePatch</strong>
+    </dt>
+    <dd>
+    <strong>Concept.</strong>
+ A <a href="../modules/Types.html#DenseArray">DenseArray</a> consisting of a <a href="../modules/Table.html#TablePath">TablePath</a> followed by a
+ <a href="../modules/Table.html#TablePatchValue">TablePatchValue</a>.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TablePatchValue"></a>
+    <strong>TablePatchValue</strong>
+    </dt>
+    <dd>
+    <strong>Concept.</strong> <br/>
+ The value part of a <a href="../modules/Table.html#TablePatch">TablePatch</a> is not further interpreted
+  <strong>unless</strong> it is a <a href="../modules/Types.html#MixedTable">MixedTable</a> made of a <a href="../modules/Table.html#TablePath">TablePath</a>
+ that contains the mapping <code>{self=true}</code>.  In this case the actual value
+ will be fetched from the table being patched. Mainly used for in-line self
+ refernces during data-stage prototype creation.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">self</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         Unless this is <a href="../modules/Types.html#true">true</a> the whole table is the value.
+         (<em>default</em> nil)
+        </li>
+        <li><span class="parameter">copy</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         By default self-referencing values will be
+ copied. Set this to false if you want to use a direct reference instead.
+         (<em>default</em> true)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "patch"></a>
+    <strong>patch(tbl, patches)</strong>
+    </dt>
+    <dd>
+    Takes an array of patches and applies them to a table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">patches</span>
+            <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         An array of <a href="../modules/Table.html#TablePatch">TablePatch</a>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        The input table.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> test = {one = <span class="number">1</span>}
+Table(test)
+  :patch({{<span class="string">'two'</span>,value=<span class="number">2</span>}})
+test:patch({
+  {<span class="string">'deeper'</span>,<span class="string">'one'</span>,value={self=<span class="keyword">true</span>,copy=<span class="keyword">true</span>,<span class="string">'one'</span>}},
+  {<span class="string">'deeper'</span>,<span class="string">'two'</span>,value={self=<span class="keyword">true</span>,copy=<span class="keyword">true</span>,<span class="string">'two'</span>}},
+  })
+<span class="global">print</span>(Hydra.line(test))
+&gt; {deeper = {one = <span class="number">1</span>, two = <span class="number">2</span>}, one = <span class="number">1</span>, two = <span class="number">2</span>}
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Factories"></a>Factories </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "normalizer"></a>
+    <strong>normalizer(defaults)</strong>
+    </dt>
+    <dd>
+    <strong>Factory.</strong> Applies default values to tables.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">defaults</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         Mappings key→default_value.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+        TableNormalizerFunction
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TableNormalizerFunction"></a>
+    <strong>TableNormalizerFunction(tbl)</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Applies enclosurized defaults.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Table</span></span>
+        The input table.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> my_norm = Table.normalizer{name=<span class="string">'no name'</span>,value=<span class="number">0</span>}
+<span class="global">print</span>(my_norm{name=<span class="string">'testrr'</span>}:to_string())
+&gt; {name = <span class="string">"testrr"</span>, value = <span class="number">0</span>}
+
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "remapper"></a>
+    <strong>remapper(mappings[, allow_tables_as_keys=false])</strong>
+    </dt>
+    <dd>
+    <strong>Factory.</strong> Moves values from one key to another.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">mappings</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         Mappings old_key→new_key
+ or old_key→{new_key_1,...,new_key_n}
+        </li>
+        <li><span class="parameter">allow_tables_as_keys</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         When this is true then
+ new_key of type table will not be interpreted as a <a href="../modules/Types.html#DenseArray">DenseArray</a>
+ of new keys but instead used directly as the key.
+         (<em>default</em> false)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+        TableRemapperFunction
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TableRemapperFunction"></a>
+    <strong>TableRemapperFunction(tbl)</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Applies enclosurized re-mappings.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Table</span></span>
+        The input table.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- with multiple remappings per key
+</span><span class="keyword">local</span> my_remapper1 = Table.remapper {name=<span class="string">'surname'</span>,value={<span class="string">'cur'</span>,<span class="string">'act'</span>}}
+<span class="keyword">local</span> test_person1 = {name=<span class="string">'Adicator'</span>,value=<span class="number">42</span>}
+<span class="global">print</span>(my_remapper1(test_person1):to_string())
+&gt; {act = <span class="number">42</span>, cur = <span class="number">42</span>, surname = <span class="string">"Adicator"</span>}
+
+<span class="comment">-- with tables as keys
+</span><span class="keyword">local</span> my_remapper2 = Table.remapper({name=<span class="string">'surname'</span>,value={<span class="string">'cur'</span>,<span class="string">'act'</span>}},<span class="keyword">true</span>)
+<span class="keyword">local</span> test_person2 = {name=<span class="string">'Bdicator'</span>,value=<span class="number">42</span>}
+<span class="global">print</span>(my_remapper2(test_person2):to_string())
+&gt; {[{<span class="string">"cur"</span>,<span class="string">"act"</span>}] = <span class="number">42</span>, surname = <span class="string">"Bdicator"</span>}
+</pre>
+    </ul>
 
 </dd>
 </dl>
@@ -224,7 +1883,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-29 21:15:27 </i>
+<i style="float:right;">Last updated 2020-10-03 01:03:15 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

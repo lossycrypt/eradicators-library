@@ -88,6 +88,7 @@ local Modules = {
   Tool       = 'erlib/lua/Tool',
   Set        = 'erlib/lua/Set',
   Class      = 'erlib/lua/Class',
+  Compare    = 'erlib/lua/Compare',
   
   -- groups
   Coding     = 'erlib/lua/Coding/!init',

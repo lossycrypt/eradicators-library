@@ -32,10 +32,10 @@
 
 <h2>Contents</h2>
 <ul>
+<li><a href="#Metamethods">Metamethods </a></li>
 <li><a href="#Conversion">Conversion </a></li>
 <li><a href="#Creation">Creation </a></li>
 <li><a href="#Comparison">Comparison </a></li>
-<li><a href="#Metamethods">Metamethods </a></li>
 </ul>
 
 
@@ -51,6 +51,7 @@
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Compare.html">Compare</a></li>
   <li><a href="../modules/Debug.html">Debug</a></li>
   <li><a href="../modules/Error.html">Error</a></li>
   <li><a href="../modules/Filter.html">Filter</a></li>
@@ -95,6 +96,21 @@
     </ul>
 
 
+<h2><a href="#Metamethods">Metamethods </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#__concat">__concat()</a></td>
+	<td class="summary">Concatenation with <code>..</code> is Set.union().</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#__add">__add()</a></td>
+	<td class="summary">Addition with + is Set.union().</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#__sub">__sub()</a></td>
+	<td class="summary">Substraction with - is Set.complement().</td>
+	</tr>
+</table>
 <h2><a href="#Conversion">Conversion </a></h2>
 <table class="function_list">
 	<tr>
@@ -137,30 +153,19 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#is_superset">is_superset(A, B)</a></td>
-	<td class="summary">A⊃B, ∀xBx (Ax), ∃xAx (¬Bx)</td>
+	<td class="summary">A⊃B, ∀xBx (Ax) ∧ ∃xAx (¬Bx)</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#is_subset">is_subset(A, B)</a></td>
-	<td class="summary">A⊂B, ∀xAx (Bx), ∃xBx (¬Ax)</td>
+	<td class="summary">A⊂B, ∀xAx (Bx) ∧ ∃xBx (¬Ax)</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#is_equal">is_equal(A, B)</a></td>
-	<td class="summary">A⇔B, ∀xAx (Bx), ∀xBx (Ax)</td>
-	</tr>
-</table>
-<h2><a href="#Metamethods">Metamethods </a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#__concat">__concat</a></td>
-	<td class="summary">Concatenation with <code>..</code> is Set.union().</td>
+	<td class="summary">A⇔B, ∀xAx (Bx) ∧ ∀xBx (Ax)</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#__add">__add</a></td>
-	<td class="summary">Addition with + is Set.union().</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#__sub">__sub</a></td>
-	<td class="summary">Substraction with - is Set.complement().</td>
+	<td class="name" nowrap><a href="#is_disjoint">is_disjoint(A, B)</a></td>
+	<td class="summary">A∩B==∅, ¬∃xAx (Bx) ∧ ¬∃xBx (Ax), ∀xAx (¬Bx) ∧ ∀xBx (¬Ax).</td>
 	</tr>
 </table>
 
@@ -168,6 +173,52 @@
 <br/>
 
 
+    <h2 class="section-header "><a name="Metamethods"></a>Metamethods </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "__concat"></a>
+    <strong>__concat()</strong>
+    </dt>
+    <dd>
+    Concatenation with <code>..</code> is Set.union().
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__add"></a>
+    <strong>__add()</strong>
+    </dt>
+    <dd>
+    Addition with + is Set.union().
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__sub"></a>
+    <strong>__sub()</strong>
+    </dt>
+    <dd>
+    Substraction with - is Set.complement().
+
+
+
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Conversion"></a>Conversion </h2>
 
     <dl class="function">
@@ -452,7 +503,7 @@
     <strong>is_superset(A, B)</strong>
     </dt>
     <dd>
-    A⊃B, ∀xBx (Ax), ∃xAx (¬Bx)
+    A⊃B, ∀xBx (Ax) ∧ ∃xAx (¬Bx)
 
 
     <h3>Parameters:</h3>
@@ -487,7 +538,7 @@
     <strong>is_subset(A, B)</strong>
     </dt>
     <dd>
-    A⊂B, ∀xAx (Bx), ∃xBx (¬Ax)
+    A⊂B, ∀xAx (Bx) ∧ ∃xBx (¬Ax)
 
 
     <h3>Parameters:</h3>
@@ -522,7 +573,43 @@
     <strong>is_equal(A, B)</strong>
     </dt>
     <dd>
-    A⇔B, ∀xAx (Bx), ∀xBx (Ax)
+    A⇔B, ∀xAx (Bx) ∧ ∀xBx (Ax)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">A</span>
+
+
+
+        </li>
+        <li><span class="parameter">B</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_disjoint"></a>
+    <strong>is_disjoint(A, B)</strong>
+    </dt>
+    <dd>
+    A∩B==∅, ¬∃xAx (Bx) ∧ ¬∃xBx (Ax), ∀xAx (¬Bx) ∧ ∀xBx (¬Ax). <br/>
+ The empty set is disjoint from every other set.
 
 
     <h3>Parameters:</h3>
@@ -553,59 +640,13 @@
 
 </dd>
 </dl>
-    <h2 class="section-header "><a name="Metamethods"></a>Metamethods </h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "__concat"></a>
-    <strong>__concat</strong>
-    </dt>
-    <dd>
-    Concatenation with <code>..</code> is Set.union().
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "__add"></a>
-    <strong>__add</strong>
-    </dt>
-    <dd>
-    Addition with + is Set.union().
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "__sub"></a>
-    <strong>__sub</strong>
-    </dt>
-    <dd>
-    Substraction with - is Set.complement().
-
-
-
-
-
-
-
-</dd>
-</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-09-29 21:15:27 </i>
+<i style="float:right;">Last updated 2020-10-03 01:03:15 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

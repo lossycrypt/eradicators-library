@@ -13,7 +13,7 @@
 local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
 local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
 
-local Nil = ercfg.Nil
+local NIL = ercfg.NIL
 
 -- -------------------------------------------------------------------------- --
 -- Locals / Init                                                              --
@@ -130,7 +130,7 @@ function _Memo1(constructor)
 -- N-Argument Memoizer (Prototype 2)
 do
   -- @future: 
-  --   By removing Nil argument support and load()'ing a custom made
+  --   By removing NIL argument support and load()'ing a custom made
   --   function that simply uses pcall(load("function() return cache[a][b][c][d] end"))
   --   for the indexing operation to catch nil results it should be
   --   possible to make this significantly faster so that it becomes
@@ -152,7 +152,7 @@ do
     local value = cache
     for i=1,n do
       local key = path[i]
-      if key == nil then key = Nil end
+      if key == nil then key = NIL end
       value = value[key]
       if value == nil then break end
       end
@@ -165,7 +165,7 @@ do
         end
       cache.__size = cache.__size + 1
       return _set(cache,n,path,constructor,...) -- constructor must get real nil
-    elseif value == Nil then --cached nil result
+    elseif value == NIL then --cached nil result
       return nil
     else
       return value --@todo: copy value? performance?
@@ -174,10 +174,10 @@ do
   --setter
   function _set(cache,n,path,constructor,...)
     local value = constructor(...)
-    if value == nil then value = Nil end
+    if value == nil then value = NIL end
     for i=1,n-1 do
       local key = path[i]
-      if key == nil then key = Nil end
+      if key == nil then key = NIL end
       if cache[key] == nil then cache[key] = {} end -- "false" is not a problem here
       cache = cache[key]
       end

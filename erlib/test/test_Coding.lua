@@ -70,7 +70,7 @@ local function Test()
   recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) -- print(recompress) 
   recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) -- print(recompress) 
   
-  assert( recompress == 
+  assert( recompress == -- weird shit sometimes bugs out in NP++. No idea why.
   Coding.Bluestring.encode(Coding.Bluestring.decode(
   Coding.Bluestring.encode(Coding.Bluestring.decode(
   recompress)))) )

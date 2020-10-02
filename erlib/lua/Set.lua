@@ -27,7 +27,11 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- -------------------------------------------------------------------------- --
 local Table,_Table = elreq('erlib/lua/Table')()
 
-local setmetatable, getmetatable = setmetatable, getmetatable
+local setmetatable, getmetatable
+    = setmetatable, getmetatable
+    
+local Table_size
+    = Table.size
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -158,7 +162,7 @@ function Set.contains(A,e)
   return A[e] ~= nil
   end
   
---- A⊃B, ∀xBx (Ax), ∃xAx (¬Bx)
+--- A⊃B, ∀xBx (Ax) ∧ ∃xAx (¬Bx)
 -- @treturn boolean
 function Set.is_superset(A,B)
   for k in pairs(B) do if A[k] == nil then return false end end
@@ -166,17 +170,27 @@ function Set.is_superset(A,B)
   return false -- A==B
   end
 
---- A⊂B, ∀xAx (Bx), ∃xBx (¬Ax)
+--- A⊂B, ∀xAx (Bx) ∧ ∃xBx (¬Ax)
 -- @treturn boolean
 function Set.is_subset(A,B)
   return Set.is_superset(B,A)
   end
   
---- A⇔B, ∀xAx (Bx), ∀xBx (Ax)
+--- A⇔B, ∀xAx (Bx) ∧ ∀xBx (Ax)
 -- @treturn boolean
 function Set.is_equal(A,B)
   for k in pairs(B) do if A[k] == nil then return false end end
   for k in pairs(A) do if B[k] == nil then return false end end
+  return true
+  end
+
+--- A∩B==∅, ¬∃xAx (Bx) ∧ ¬∃xBx (Ax), ∀xAx (¬Bx) ∧ ∀xBx (¬Ax).    
+-- The empty set is disjoint from every other set.
+-- @treturn boolean
+function Set.is_disjoint(A,B)
+  if Table_size(A) == 0 or Table_size(B) == 0 then return true end
+  for k in pairs(A) do if B[k] ~= nil then return false end end
+  for k in pairs(B) do if A[k] ~= nil then return false end end
   return true
   end
   
@@ -187,13 +201,16 @@ function Set.is_equal(A,B)
 --------------------------------------------------------------------------------
 
 --- Concatenation with `\.\.` is Set.union().
-Set.__concat = Set.union
+-- @function Set.__concat
+_obj_mt.__concat = Set.union
 
 --- Addition with + is Set.union().
-Set.__add    = Set.union
+-- @function Set.__add
+_obj_mt.__add    = Set.union
 
 --- Substraction with - is Set.complement().
-Set.__sub    = Set.complement
+-- @function Set.__sub
+_obj_mt.__sub    = Set.complement
 
   
 -- -------------------------------------------------------------------------- --
