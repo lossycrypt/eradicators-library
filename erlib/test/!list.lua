@@ -11,8 +11,10 @@ return {
   'test_Iter', 
   'test_Json', 
   'test_Logic', 
+  'test_Math', 
   'test_Sha2', 
   'test_Stacktrace', 
   'test_Table', 
+  'test_Verificate', 
   'test_Version', 
   } 

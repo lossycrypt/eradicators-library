@@ -76,6 +76,18 @@ local function Test()
     assert(equ(Set.from_values(tbl1()),Set.from_values{'a','b','c','d','e',1,2,3,4,5}))
     end
 
+  -- Table.flip
+  do
+    local t1 = Table{'a','b','c','d','e'}
+    local t2 = t1:flip()
+    assert(5 == t1:size      ())
+    assert(5 == t2:size      ())
+    assert(5 == t1:array_size())
+    assert(0 == t2:array_size())
+    assert(false == t1:is_equal{a = 1, b = 2, c = 3, d = 4, e = 5})
+    assert(true  == t2:is_equal{a = 1, b = 2, c = 3, d = 4, e = 5})
+    end
+    
   -- Table.plural
   do
     assert(equ(Table.plural{{1,2,3}},{{1,2,3}}))

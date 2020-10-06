@@ -61,11 +61,13 @@ for k,v in pairs( table) do  Table[k] = v end
 -- for k,v in pairs(_Table) do _Table[k] = v end
 
 local _obj_mt = {__index=Table}
+-- attach meta if safe
 local _toTable = function(tbl)
   if not getmetatable(tbl) then setmetatable(tbl,_obj_mt) end
   return tbl end
-do setmetatable( Table,{__call = function(_,tbl) return _toTable(tbl) end}) end
-do setmetatable(_Table,{__call = function(_,tbl) return _toTable(tbl) end}) end
+-- user request to attach meta unconditionally
+do setmetatable( Table,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) end}) end
+do setmetatable(_Table,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) end}) end
 
 
 --------------------------------------------------------------------------------
@@ -78,6 +80,13 @@ do setmetatable(_Table,{__call = function(_,tbl) return _toTable(tbl) end}) end
 -- @within Todo
 -- @field todo1
 
+
+----------
+-- Attaches the Table modules metatable to any table.
+-- @tparam table tbl
+-- @treturn Table The unchanged input table.
+-- @function Table
+do end
 --------------------------------------------------------------------------------
 -- Basic Methods.
 -- @section
@@ -113,7 +122,9 @@ Table.size = (
 function Table.array_size(tbl)
   local last = 0
   for i in pairs(tbl) do
-    if type(i) == 'number' and i > last then
+    if type(i) == 'number'
+    and i % 1 == 0 -- isNaturalNumber without decimal points
+    and i > last then
       last = i
       end
     end
@@ -145,6 +156,12 @@ function Table.range(a,b,step)
     end
   return _toTable(r)
   end
+function _Table.range(a,b,step)
+  Verify(a   ,    'NaturalNumber')
+  Verify(b   ,'nil|NaturalNumber')
+  Verify(step,'nil|NaturalNumber') -- step requires a AND b
+  return true end
+
 
 ----------
 -- Generates an unsorted DenseArray from the values of tbl.
@@ -177,6 +194,39 @@ function Table.keys(tbl)
   return _toTable(r)
   end
 
+
+----------
+-- Creates a new table in which keys↔values mappings are swapped.
+-- Duplicate values will be mapped to the __last__ key that references them
+-- but due to the behavior of @{next} it's undefind behavior which key that
+-- will be. In factorio pairs is deterministic and it should thus be the
+-- key that was added to the table last.
+-- 
+-- @tparam table tbl
+-- 
+-- @treturn table A new flipped table.
+-- 
+-- @usage
+--   local my_table = {'a','b','c','c'}
+--   print(Table(my_table):flip():to_string())
+--   > {a = 1, b = 2, c = 4}
+-- 
+--   print(Hydra.lines(Table(defines.events):flip()))
+--   > {
+--       [0] = "on_tick"
+--       [1] = "on_gui_click",
+--       [2] = "on_gui_text_changed",
+--       [3] = "on_gui_checked_state_changed",
+--       [4] = "on_entity_died",
+--       [5] = "on_picked_up_item",
+--       ...
+--       }
+--
+function Table.flip(tbl)
+  local r = {}
+  for k,v in pairs(tbl) do r[v] = k end
+  return _toTable(r)
+  end
   
 ----------
 -- Wraps the object in a table if it is not already a table.
@@ -187,26 +237,6 @@ function Table.plural(obj)
     return _toTable(obj)
   else
     return _toTable{obj}
-    end
-  end
-
-----------
--- Returns true if the table contains no values.
--- @tparam table tbl
--- @treturn boolean
-function Table.is_empty(tbl)
-  for _ in pairs(tbl) do return false end
-  return true
-  end
-
-  
-----------
--- Converts empty tables into a @{nil} value.
--- @tparam table|nil tbl
--- @treturn table|nil  
-function Table.nil_if_empty(tbl)
-  if tbl and Table.size(tbl) ~= 0 then
-    return _toTable(tbl)
     end
   end
 
@@ -249,6 +279,28 @@ function Table.is_equal(tbl,tbl2)
     end
   return _isequ(tbl,tbl2)
   end
+
+  
+----------
+-- Returns true if the table contains no values.
+-- @tparam table tbl
+-- @treturn boolean
+function Table.is_empty(tbl)
+  for _ in pairs(tbl) do return false end
+  return true
+  end
+
+  
+----------
+-- Converts empty tables into a @{nil} value.
+-- @tparam table|nil tbl
+-- @treturn table|nil  
+function Table.nil_if_empty(tbl)
+  if tbl and Table.size(tbl) ~= 0 then
+    return _toTable(tbl)
+    end
+  end
+
 
 --------------------------------------------------------------------------------
 -- Other Methods.
@@ -354,6 +406,43 @@ function Table.rep (tbl,variation_count,patterns)
     end
   return _toTable(r)
   end
+  
+--------------------------------------------------------------------------------
+-- Conversion.
+-- @section
+--------------------------------------------------------------------------------
+
+----------
+-- __In-place.__ Converts MixedTable to SparseArray. All keys that are not
+-- @{NaturalNumber}s will be removed.
+--
+-- @tparam table tbl 
+-- @tparam[opt=nil] table target __Copy Mode.__ This table will be changed and
+-- tbl remains unchanged.
+--
+-- @treturn SparseArray|DenseArray A table containing only the numeric keys
+-- of the input array.
+--
+function Table.to_array(tbl,target)
+  -- Comment: i,j range based methods are in Array.
+  local copy_mode = not not target
+  
+  -- local isArrKey = isType.NaturalNumber --not yet implemented
+  local isArrKey = function(x) return type(x) == 'number' end
+  
+  if target then
+    for k,v in pairs(tbl) do
+      if isArrKey(k) then target[k] = v end
+      end
+    return _toTable(target)
+  else
+    for k in pairs(tbl) do
+      if not isArrKey(k) then tbl[k] = nil end
+      end
+    return _toTable(tbl)
+    end
+  end
+
   
 --------------------------------------------------------------------------------
 -- Search Methods.
@@ -1171,7 +1260,15 @@ function Table.remapper (mappings,allow_tables_as_keys)
 -- @section
 --------------------------------------------------------------------------------
 
-  
+
+-- old stuff of uncertain usability
+--[[
+  Table.locked_write = function() Error('Table','this table is write-locked.') end
+  Table.locked_read  = function() Error('Table','this table is read-locked.' ) end
+  Table.singular     = function(x) return (table_size(x)==1) and x[next(x)] or nil end
+  --insert but with table return (
+  Table.insert       = function(self,key,value) self[key] = value return self end
+  ]]
   
   
 

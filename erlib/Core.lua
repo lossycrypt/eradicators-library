@@ -72,6 +72,7 @@ local control_only = function(path) if     Const.load_stage.control then return 
 
 local Modules = {
   --determines load order
+  Verificate = 'erlib/lua/Verificate',
   Stacktrace = 'erlib/factorio/Stacktrace',
   Error      = 'erlib/lua/Error',
   Replicate  = 'erlib/lua/Replicate',
@@ -89,6 +90,7 @@ local Modules = {
   Set        = 'erlib/lua/Set',
   Class      = 'erlib/lua/Class',
   Compare    = 'erlib/lua/Compare',
+  Math       = 'erlib/lua/Math',
   
   -- groups
   Coding     = 'erlib/lua/Coding/!init',

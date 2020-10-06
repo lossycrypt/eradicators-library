@@ -18,13 +18,18 @@ Date: 2020-10-x
     - ?
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.17
-Date: 2020-10-x
+Date: 2020-10-04
   Internal:
-    - ?
+    - New module Math
+    - New module Verificate
+    - New function Iter.combinations + Tests
+    - New function Iter.permutations + Tests
+    - New function Iter.subsets + Tests
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.16
 Date: 2020-10-03
   Internal:
+    - New module Compare
     - New module Table
     - New test Table.*
 ---------------------------------------------------------------------------------------------------

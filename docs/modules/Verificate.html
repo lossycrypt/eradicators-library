@@ -1,0 +1,798 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#isType">isType </a></li>
+<li><a href="#isType_____Factorio">isType → Factorio </a></li>
+<li><a href="#isType_____Number">isType → Number </a></li>
+<li><a href="#isType_____Table">isType → Table </a></li>
+<li><a href="#isType_____Array">isType → Array </a></li>
+<li><a href="#isType_____Boolean">isType → Boolean </a></li>
+<li><a href="#isType_____String">isType → String </a></li>
+<li><a href="#isType_____Collections">isType → Collections </a></li>
+<li><a href="#isType_____Custom">isType → Custom </a></li>
+<li><a href="#Verify">Verify </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Core.html">Core</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/Entity.html">Entity</a></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Array.html">Array</a></li>
+  <li><a href="../modules/Class.html">Class</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Compare.html">Compare</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Iter.html">Iter</a></li>
+  <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Logic.html">Logic</a></li>
+  <li><a href="../modules/Math.html">Math</a></li>
+  <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
+  <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
+  <li><a href="../modules/Time.html">Time</a></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><strong>Verificate</strong></li>
+  <li><a href="../modules/Version.html">Version</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/Introduction.html">Introduction</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Verificate</code></h1>
+<p>Performance optimized multi- and complex-type detection and comparison.</p>
+<p>
+
+
+
+</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local Verificate = require(&apos;__eradicators-library__/erlib/lua/Verificate&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#isType">isType </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#isType">isType</a></td>
+	<td class="summary">This table contains all type checking functions offered by this module.</td>
+	</tr>
+</table>
+<h2><a href="#isType_____Factorio">isType → Factorio </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#isType.LuaObject">isType.LuaObject(obj)</a></td>
+	<td class="summary">Is this any kind of factorio lua object?</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.LuaAnyObjectName">isType.LuaAnyObjectName</a></td>
+	<td class="summary">Procedurally generated checkers for all factorio classes.</td>
+	</tr>
+</table>
+<h2><a href="#isType_____Number">isType → Number </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#isType.NaturalNumber">isType.NaturalNumber()</a></td>
+	<td class="summary">n > 0 and n % 1 == 0.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.Integer">isType.Integer()</a></td>
+	<td class="summary">n % 1 == 0.</td>
+	</tr>
+</table>
+<h2><a href="#isType_____Table">isType → Table </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#isType.NonEmptyTable">isType.NonEmptyTable()</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.EmptyTable">isType.EmptyTable()</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#isType_____Array">isType → Array </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#isType.Array">isType.Array()</a></td>
+	<td class="summary">DenseArray or SparseArray, not MixedTable.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.DenseArray">isType.DenseArray()</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.NonEmptyArray">isType.NonEmptyArray()</a></td>
+	<td class="summary">DenseArray or SparseArray, not MixedTable.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.EmptyArray">isType.EmptyArray()</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#isType_____Boolean">isType → Boolean </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#isType.true">isType.true()</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.false">isType.false()</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#isType_____String">isType → String </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#isType.NonEmptyString">isType.NonEmptyString()</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.EmptyString">isType.EmptyString()</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#isType_____Collections">isType → Collections </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#isType.NonEmptyArrayOfStrings">isType.NonEmptyArrayOfStrings()</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.NonEmptyTableOfFunction">isType.NonEmptyTableOfFunction()</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#isType_____Custom">isType → Custom </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#isType.NotNil">isType.NotNil()</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.Vector">isType.Vector()</a></td>
+	<td class="summary">A size-4 array of numbers.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.Position">isType.Position()</a></td>
+	<td class="summary">A factorio {[1]=,[2]=} or {x=,y=} table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.Probability">isType.Probability()</a></td>
+	<td class="summary">Float 0 &lt;= n &lt;= 1.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.TablePath">isType.TablePath()</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#Verify">Verify </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Verify">Verify(obj, typ[, ...])</a></td>
+	<td class="summary">assert() like checker with custom complex-type support.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Wrap">Wrap(functions, checkers)</a></td>
+	<td class="summary">Provides function input-checking wrappers.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="isType"></a>isType </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "isType"></a>
+    <strong>isType</strong>
+    </dt>
+    <dd>
+    This table contains all type checking functions offered by this module. </p>
+
+<p> <strong>Every isType function takes exactly one argument.</strong></p>
+
+<p> For the <a href="../lua-5.2/doc/manual.html#pdf-type">8 primary lua types</a> it offers functions to check any
+ <strong>combination of up to three types</strong> at once by concatenateing the names
+ with a | pipe. For these combinations you can also use the short names:
+ nil, num, str, bool, tbl, func, udat instead of the full type name.</p>
+
+<p> <strong>Note:</strong> To keep the documentation concise paramters for type functions are
+ not documented per function.</p>
+
+<p> <strong>Performance Note:</strong> Combinations starting with nil, i.e.
+ "nil", "nil|string", "nil|number|string" are optimized for situations where
+ the object to be checked is expected to be nil most
+ of the time. If you expect the object to be <a href="../modules/Types.html#NotNil">NotNil</a> most of the time then
+ you should put nil at the end of the combination, i.e. "str|nil", "num|str|nil".
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> isNumStr = Verificate.isType[<span class="string">'number|string'</span>]
+
+<span class="keyword">if</span> isNumStr(<span class="number">42</span>) <span class="keyword">then</span> <span class="global">print</span>(<span class="string">'Yes!'</span>) <span class="keyword">end</span>
+&gt; Yes!
+
+<span class="keyword">if</span> isNumStr(<span class="string">'word'</span>) <span class="keyword">then</span> <span class="global">print</span>(<span class="string">'Yes!'</span>) <span class="keyword">end</span>
+&gt; Yes!
+
+<span class="keyword">if</span> <span class="keyword">not</span> isNumStr(<span class="keyword">nil</span>) <span class="keyword">then</span> <span class="global">print</span>(<span class="string">'Not!'</span>) <span class="keyword">end</span>
+&gt; Not!
+
+<span class="keyword">if</span> Verificate.isType[<span class="string">'nil|str|tbl'</span>]( {<span class="string">'empty table'</span>} ) <span class="keyword">then</span> <span class="global">print</span>(<span class="string">'Yes!'</span>) <span class="keyword">end</span>
+&gt; Yes!
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="isType_____Factorio"></a>isType → Factorio </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "isType.LuaObject"></a>
+    <strong>isType.LuaObject(obj)</strong>
+    </dt>
+    <dd>
+    Is this any kind of factorio lua object?  A LuaPlayer, LuaEntity, etc...?
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">obj</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.LuaAnyObjectName"></a>
+    <strong>isType.LuaAnyObjectName</strong>
+    </dt>
+    <dd>
+    Procedurally generated checkers for all factorio classes. </p>
+
+<p> This module generates a checker function for
+ <strong>every</strong> <a href="../api/index.html#Classes">factorio class</a>.
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">if</span> Verificate.isType.LuaGameScript(game) <span class="keyword">then</span> <span class="global">print</span>(<span class="string">'Can do this!'</span>) <span class="keyword">end</span>
+&gt; Can <span class="keyword">do</span> this!
+
+<span class="keyword">if</span> Verificate.isType.LuaPlayer(game.player) <span class="keyword">then</span> <span class="global">print</span>(<span class="string">'Can also do this!'</span>) <span class="keyword">end</span>
+&gt; Can also <span class="keyword">do</span> this!
+
+<span class="global">print</span>(Verificate.isType.LuaPlayer(game))
+&gt; <span class="keyword">false</span>
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="isType_____Number"></a>isType → Number </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "isType.NaturalNumber"></a>
+    <strong>isType.NaturalNumber()</strong>
+    </dt>
+    <dd>
+    n > 0 and n % 1 == 0.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.Integer"></a>
+    <strong>isType.Integer()</strong>
+    </dt>
+    <dd>
+    n % 1 == 0.
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="isType_____Table"></a>isType → Table </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "isType.NonEmptyTable"></a>
+    <strong>isType.NonEmptyTable()</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.EmptyTable"></a>
+    <strong>isType.EmptyTable()</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="isType_____Array"></a>isType → Array </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "isType.Array"></a>
+    <strong>isType.Array()</strong>
+    </dt>
+    <dd>
+    DenseArray or SparseArray, not MixedTable.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.DenseArray"></a>
+    <strong>isType.DenseArray()</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.NonEmptyArray"></a>
+    <strong>isType.NonEmptyArray()</strong>
+    </dt>
+    <dd>
+    DenseArray or SparseArray, not MixedTable.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.EmptyArray"></a>
+    <strong>isType.EmptyArray()</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="isType_____Boolean"></a>isType → Boolean </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "isType.true"></a>
+    <strong>isType.true()</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.false"></a>
+    <strong>isType.false()</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="isType_____String"></a>isType → String </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "isType.NonEmptyString"></a>
+    <strong>isType.NonEmptyString()</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.EmptyString"></a>
+    <strong>isType.EmptyString()</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="isType_____Collections"></a>isType → Collections </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "isType.NonEmptyArrayOfStrings"></a>
+    <strong>isType.NonEmptyArrayOfStrings()</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.NonEmptyTableOfFunction"></a>
+    <strong>isType.NonEmptyTableOfFunction()</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="isType_____Custom"></a>isType → Custom </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "isType.NotNil"></a>
+    <strong>isType.NotNil()</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.Vector"></a>
+    <strong>isType.Vector()</strong>
+    </dt>
+    <dd>
+    A size-4 array of numbers.  Ignores extra content.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.Position"></a>
+    <strong>isType.Position()</strong>
+    </dt>
+    <dd>
+    A factorio {[1]=,[2]=} or {x=,y=} table.  Ignores extra content.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.Probability"></a>
+    <strong>isType.Probability()</strong>
+    </dt>
+    <dd>
+    Float 0 &lt;= n &lt;= 1.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.TablePath"></a>
+    <strong>isType.TablePath()</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Verify"></a>Verify </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Verify"></a>
+    <strong>Verify(obj, typ[, ...])</strong>
+    </dt>
+    <dd>
+    assert() like checker with custom complex-type support.
+ Raises an error if the input object is not of the expected type.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">obj</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">typ</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         An isType compatible string.
+        </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         Anything you want to show up in the error message.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#true">true</a> or <a class="type" href="../lua-5.2/doc/manual.html#pdf-error">error</a></span>
+         If the check succeeds this returns true, if not
+ a hard error is raised. Therefore it never returns false.
+    </ol>
+
+    <h3>Raises:</h3>
+     VerificationError with a standard error message plus anything you
+ specified in addition.
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> <span class="keyword">function</span> my_adder(x)
+  Verificate.Verify(x,<span class="string">'number|nil'</span>,<span class="string">"Your"</span>,<span class="string">"Error"</span>,<span class="string">"Message."</span>)
+  x = x <span class="keyword">or</span> <span class="number">0</span>
+  <span class="keyword">return</span> x + <span class="number">1</span>
+  <span class="keyword">end</span>
+
+<span class="global">print</span>(my_adder(<span class="number">5</span>))
+&gt; <span class="number">6</span>
+
+<span class="global">print</span>(my_adder(<span class="string">'five'</span>))
+&gt; Verification failed!
+&gt; expected: number|<span class="keyword">nil</span>
+&gt; received: five.
+&gt; Your Error Message.
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Wrap"></a>
+    <strong>Wrap(functions, checkers)</strong>
+    </dt>
+    <dd>
+    Provides function input-checking wrappers.
+ When a wrapped function is called then first the checker function is called
+ with all arguments. Only if the checker function returns
+ <a href="../modules/Concepts.html#truthy">truthy</a> is the real function called.</p>
+
+<p> <strong>Note:</strong> The checker is expected to raise an error if the check failed.
+ If it does not then Verificate.Wrap will raise a generic error. It is not
+ possible to continue execution after a failed check.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">functions</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a> or <a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         All functions that you want wrapped. If this
+ is a single function then checkers must also be a single function.
+        </li>
+        <li><span class="parameter">checkers</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a> or <a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         All checking functions, indexed by the same keys
+ as the to-be-wrapped functions.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         A table of wrapped functions. Functions for which checkers
+ did not contain a corresponding function will be returned unwrapped.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-10-06 02:05:40 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

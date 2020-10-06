@@ -68,17 +68,24 @@ for k,v in pairs( Table) do  Set[k] = v end
 for k,v in pairs(_Table) do _Set[k] = v end
 
 local _obj_mt = {__index=Set}
+-- attach meta if safe
 local _toSet = function(tbl)
   if not getmetatable(tbl) then setmetatable(tbl,_obj_mt) end
   return tbl end
-do setmetatable( Set,{__call = function(_,tbl) return _toSet(tbl) end}) end
-do setmetatable(_Set,{__call = function(_,tbl) return _toSet(tbl) end}) end
-
+-- user request to attach meta unconditionally
+do setmetatable( Set,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) end}) end
+do setmetatable(_Set,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) end}) end
 
 --------------------------------------------------------------------------------
--- Conversion
+-- Module.
 -- @section
 --------------------------------------------------------------------------------
+
+-- -------
+-- Nothing.
+-- @within Todo
+-- @field todo1
+
 
 ----------
 -- Attaches the Set modules metatable to the tbl.
@@ -86,6 +93,11 @@ do setmetatable(_Set,{__call = function(_,tbl) return _toSet(tbl) end}) end
 -- @treturn PseudoSet
 -- @function Set
 do end
+
+--------------------------------------------------------------------------------
+-- Conversion
+-- @section
+--------------------------------------------------------------------------------
 
 
 ----------

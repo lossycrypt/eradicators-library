@@ -32,7 +32,7 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Section">Section </a></li>
+<li><a href="#Calculation">Calculation </a></li>
 </ul>
 
 
@@ -48,7 +48,7 @@
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
-  <li><strong>Compare</strong></li>
+  <li><a href="../modules/Compare.html">Compare</a></li>
   <li><a href="../modules/Debug.html">Debug</a></li>
   <li><a href="../modules/Error.html">Error</a></li>
   <li><a href="../modules/Filter.html">Filter</a></li>
@@ -56,7 +56,7 @@
   <li><a href="../modules/Lambda.html">Lambda</a></li>
   <li><a href="../modules/Lock.html">Lock</a></li>
   <li><a href="../modules/Logic.html">Logic</a></li>
-  <li><a href="../modules/Math.html">Math</a></li>
+  <li><strong>Math</strong></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
@@ -77,27 +77,23 @@
 
 <div id="content">
 
-<h1>Module <code>Compare</code></h1>
+<h1>Module <code>Math</code></h1>
 <p>Description</p>
 <p>
 
 </p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Compare = require(&apos;__eradicators-library__/erlib/lua/Compare&apos;)()
+        <pre class="example">local Math = require(&apos;__eradicators-library__/erlib/lua/Math&apos;)()
 </pre>
     </ul>
 
 
-<h2><a href="#Section">Section </a></h2>
+<h2><a href="#Calculation">Calculation </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#STRING_SHORTER">STRING_SHORTER(a, b)</a></td>
-	<td class="summary">True if a is shorter than b.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#STRING_ALPHABETIC">STRING_ALPHABETIC(a, b)</a></td>
-	<td class="summary">True if a is before b in natural language order.</td>
+	<td class="name" nowrap><a href="#factorial">factorial(n)</a></td>
+	<td class="summary">The factorial n! is 1*2*3*...*n.</td>
 	</tr>
 </table>
 
@@ -105,38 +101,29 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Section"></a>Section </h2>
+    <h2 class="section-header "><a name="Calculation"></a>Calculation </h2>
 
     <dl class="function">
     <dt>
-    <a name = "STRING_SHORTER"></a>
-    <strong>STRING_SHORTER(a, b)</strong>
+    <a name = "factorial"></a>
+    <strong>factorial(n)</strong>
     </dt>
     <dd>
-    True if a is shorter than b.
- Equal length strings are sorted alphabetically.
+    The factorial n! is 1*2*3*...*n.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">a</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-
-
-        </li>
-        <li><span class="parameter">b</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-
-
+        <li><span class="parameter">n</span>
+            <span class="types"><a class="type" href="../modules/Types.html#Integer">Integer</a></span>
+         Negative input means -1*n!.
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+           <span class="types"><a class="type" href="../modules/Types.html#Integer">Integer</a></span>
 
 
 
@@ -144,55 +131,6 @@
 
 
 
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="global">print</span>(Array.sort({<span class="string">'ababa'</span>,<span class="string">'aaaa'</span>,<span class="string">'aab'</span>},Compare.STRING_SHORTER):to_string())
-&gt; {<span class="string">"aab"</span>, <span class="string">"aaaa"</span>, <span class="string">"ababa"</span>}
-</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "STRING_ALPHABETIC"></a>
-    <strong>STRING_ALPHABETIC(a, b)</strong>
-    </dt>
-    <dd>
-    True if a is before b in natural language order.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">a</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-
-
-        </li>
-        <li><span class="parameter">b</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-
-
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
-
-
-
-    </ol>
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="global">print</span>(Array.sort({<span class="string">'aaaa'</span>,<span class="string">'aab'</span>,<span class="string">'ababa'</span>},Compare.STRING_ALPHABETIC):to_string())
-&gt; {<span class="string">"aaaa"</span>, <span class="string">"aab"</span>, <span class="string">"ababa"</span>}
-</pre>
-    </ul>
 
 </dd>
 </dl>

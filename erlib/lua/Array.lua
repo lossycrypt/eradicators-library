@@ -35,8 +35,8 @@ local Table,_Table = elreq('erlib/lua/Table')()
 local setmetatable, getmetatable, pairs
     = setmetatable, getmetatable, pairs
 
-local math_floor, math_ceil, table_sort
-    = math.floor, math.ceil, table.sort
+local math_floor, math_ceil, table_sort, table_unpack
+    = math.floor, math.ceil, table.sort, table.unpack
 
 local stop = elreq('erlib/lua/Error')().Stopper('Array')
     
@@ -56,11 +56,13 @@ for k,v in pairs(_Table) do _Array[k] = v end
 
 
 local _obj_mt = {__index=Array}
+-- attach meta if safe
 local _toArray = function(tbl)
   if not getmetatable(tbl) then setmetatable(tbl,_obj_mt) end
   return tbl end
-do setmetatable( Array,{__call = function(_,tbl) return _toArray(tbl) end}) end
-do setmetatable(_Array,{__call = function(_,tbl) return _toArray(tbl) end}) end
+-- user request to attach meta unconditionally
+do setmetatable( Array,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) end}) end
+do setmetatable(_Array,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) end}) end
 
 
 --------------------------------------------------------------------------------
@@ -491,12 +493,19 @@ function Array.sort(arr,comparator)
 -- Even for partial copies.
 --
 function Array.scopy(arr,i,j)
-  local r = {}
-  for k=(i or 1),(j or #arr) do
-    r[k] = arr[k]
-    end
-  return _toArray(r)
+  i,j = (i or 1), (j or #arr)
+  return _toArray { table_unpack(arr,i,j) } -- 120% faster than for-i-loop
   end
+
+-- V1
+-- function Array.scopy(arr,i,j)
+--   local r = {}
+--   for k=(i or 1),(j or #arr) do
+--     r[k] = arr[k]
+--     end
+--   return _toArray(r)
+--   end
+  
   
   
 --------------------------------------------------------------------------------
