@@ -6,7 +6,7 @@
     + say should accept varargs and enforce them into a nice-string
       and remove newlines msg:gsub('\n','')
       > does that mean it needs to be a fully fledged serializer?
-        or is it ok to load Hydra?
+        or is it ok to load Hydra/Log?
         
     + Why is shared log-spamming when used instead of empty for the path test?
       is pcall interfering with registering the package after load?
@@ -28,8 +28,8 @@ local does_file_exist = function(path) return (pcall(require,path)) end
 -- A sufficiently unlikely to collide but save/load stable unique value.
 -- Used to represent nil in table values and keys where Lua can not.
 -- local sha = '' for i=1,5 do sha = erlib.Coding.Sha256(sha) print(sha) end
-local NIL = '2a132dbfe4784627b86aa3807cd19cfeff487aab3dd7a60d0ab119a72e736936'
-
+local NIL  = '2a132dbfe4784627b86aa3807cd19cfeff487aab3dd7a60d0ab119a72e736936'
+local SKIP = function()end
 
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -49,7 +49,8 @@ local shared = {
   [5] = {},
   --ercfg
   [6] = {
-    NIL = NIL,
+    NIL  = NIL ,
+    SKIP = SKIP,
     }
   }
   
@@ -96,7 +97,7 @@ local flag = shared[5]
 -- -------------------------------------------------------------------------- --
 
   -- Mute low-level logging
-  STDOUT = flag.IS_DEV_MODE and print or function()end
+  STDOUT = flag.IS_DEV_MODE and print or SKIP
  
  
   

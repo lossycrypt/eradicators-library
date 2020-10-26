@@ -35,10 +35,13 @@ local Table,_Table = elreq('erlib/lua/Table')()
 local setmetatable, getmetatable, pairs
     = setmetatable, getmetatable, pairs
 
-local math_floor, math_ceil, table_sort, table_unpack
-    = math.floor, math.ceil, table.sort, table.unpack
+local math_floor, math_ceil, table_sort, table_unpack, table_remove
+    = math.floor, math.ceil, table.sort, table.unpack, table.remove
 
 local stop = elreq('erlib/lua/Error')().Stopper('Array')
+
+local Table_size
+    = Table.size
     
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -230,9 +233,14 @@ function Array.find_all(arr,value,i,j)
 --------------------------------------------------------------------------------
   
 ----------
--- __In-place.__ Compresses a @{SparseArray} into a @{DenseArray}. The order of the elements
--- is preserved. Can also compress partial ranges of the input, for example to
--- split the compression into multiple steps.
+-- __In-place.__ Compresses a @{SparseArray} into a @{DenseArray}. The order of
+-- the elements is preserved. Can also compress partial ranges of the input,
+-- for example to split the compression into multiple steps.
+--
+-- __Note:__ If you know the size of the array then giving it as j significantly
+-- improves performance.
+--
+-- __Note:__ To compress @{MixedTable}s you can give Table.array_size(arr) as j.
 --
 -- @tparam SparseArray arr
 -- @tparam[opt=nil] table target __Copy Mode.__ This table will be changed and arr remains unchanged.
@@ -368,6 +376,28 @@ function Array.insert_once(arr,value,i)
   return _toArray(arr),true
   end
 
+
+----------
+-- __In-place.__ Puts one array into the middle of another.
+-- 
+-- @tparam DenseArray arr The array to insert into.
+-- @tparam DenseArray arr2 The array to be inserted.
+-- @tparam NaturalNumber i The index at which to start inserting arr2.
+-- All values after i (inclusive) will be shifted backwards by the length of arr2.
+--
+-- @tparam[opt=nil] table target __Copy Mode.__ This table will be changed and arr remains unchanged.
+--
+-- @treturn DenseArray The array containing the merged result.
+--
+function Array.insert_array(arr,arr2,i,target)
+  local n1, n2, i = #arr, #arr2, i-1
+  if target then for k = 1, i do target[k] = arr[k] end end -- copy beginning to target
+  target = target or arr
+  for k = n1, i+1, -1 do target[k + n2] = arr [k] end -- shift old data back
+  for k = 1 , n2      do target[i + k ] = arr2[k] end -- insert new data
+  return _toArray(target)
+  end
+  
 
 ----------
 -- __In-place.__ Replaces all instances of value with the then-last value of the array.
@@ -598,7 +628,73 @@ function Array.fray(arr,count,i,j)
   return _toArray(r)
   end
 
+  
+----------
+-- __In-place.__ Removes subtables, keeps value order.
+-- 
+-- __Note:__ Recursive tables and factorio objects
+-- are not supported and will produce garbage results.
+-- 
+-- @usage
+--   -- a chaotically nested array
+--   local arr = {{{{}}},1,2,{3,4,{5,6},{7}},8,{{{{9,{{10}}}}}}}
+--   print(Array.flatten(arr):to_string())
+--   > {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+-- 
+-- @tparam DenseArray arr A nested array.
+--
+-- @treturn DenseArray
+--
+function Array.flatten(arr)
+  local seen, j = {}, 1
+  repeat
+    local v = arr[j]
+    if type(v) ~= 'table' then
+      arr[j] = v
+      j = j+1
+    else
+      -- seen[v] = (not seen[v]) or stop('Recursive arrays can not be flattend.',arr)
+      local n2 = #v-1
+      if n2 == -1 then
+        -- v is an empty table, all elements must be shifted *forward*!
+        table_remove(arr,j)
+      else
+        -- This is a copy of Array.insert_array
+        -- tweaked to overwrite the value being inserted.
+        local n1, i = #arr, j-1
+        for k = n1,  j+1, -1 do arr[k + n2] = arr[k] end -- shift old data back
+        for k = 1 , n2+1     do arr[i + k ] = v  [k] end -- insert new data
+        end
+      end
+    until v == nil
+  return _toArray(arr)
+  end
+  
+--------------------------------------------------------------------------------
+-- Conversion.
+-- @section
+--------------------------------------------------------------------------------
 
+
+----------
+-- __Experimental.__ Collects the output of a parameterless iterator function into an array.
+-- All return values of each call of f_iter() are packed
+-- into a sub-array of the output array.
+--
+-- @tparam function f_iter The iterator function.
+--
+-- @treturn DenseArray An array of return value arrays.
+-- @treturn NaturalNumber The length of the returned array.
+--
+function Array.from_iterator(f_iter)
+  local r,n = {},0
+  repeat
+    n = n + 1
+    r[n] = {f_iter()}
+    until Table_size(r[n]) == 0
+  r[n],n = nil,n-1 -- loop counts one too far
+  return _toArray(r),n
+  end
 
 --------------------------------------------------------------------------------
 -- Metamethods.
@@ -607,8 +703,10 @@ function Array.fray(arr,count,i,j)
 
 --- Concatenation with `\.\.` is Array.extend().
 -- @function Array.__concat
-_obj_mt.__concat = Array.extend
-  
+_obj_mt.__concat = function(arr,arr2)
+  -- syntactic calling must not implicitly change the input!
+  return Array.extend(Array.scopy(arr), arr2)
+  end
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

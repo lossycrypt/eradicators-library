@@ -44,7 +44,9 @@
   <li><a href="../modules/Cache.html">Cache</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
@@ -55,9 +57,11 @@
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
   <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
   <li><a href="../modules/Logic.html">Logic</a></li>
   <li><a href="../modules/Math.html">Math</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
@@ -67,6 +71,7 @@
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Remote.EventNames.html">Remote.EventNames</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -93,12 +98,24 @@
 <h2><a href="#Section">Section </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#apply">apply(f, o)</a></td>
-	<td class="summary">In-Line definition and simultaenous usage of new tables.</td>
+	<td class="name" nowrap><a href="#KeepArgsCall">KeepArgsCall(f, ...)</a></td>
+	<td class="summary">In-line call a function but return the arguments first.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#first">first(...)</a></td>
+	<td class="name" nowrap><a href="#First">First(...)</a></td>
 	<td class="summary">Get the first non-nil value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Last">Last(...)</a></td>
+	<td class="summary">Get the last non-nil value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#IfThenElse">IfThenElse(condition[, then_value[, else_value]])</a></td>
+	<td class="summary">In-line trinary decision that allows nil and false.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Import">Import(relative_path)</a></td>
+	<td class="summary">Require()'s lua files relative to the calling file.</td>
 	</tr>
 </table>
 
@@ -110,11 +127,11 @@
 
     <dl class="function">
     <dt>
-    <a name = "apply"></a>
-    <strong>apply(f, o)</strong>
+    <a name = "KeepArgsCall"></a>
+    <strong>KeepArgsCall(f, ...)</strong>
     </dt>
     <dd>
-    In-Line definition and simultaenous usage of new tables.
+    In-line call a function but return the arguments first.
 
 
     <h3>Parameters:</h3>
@@ -125,7 +142,7 @@
 
 
         </li>
-        <li><span class="parameter">o</span>
+        <li><span class="parameter">...</span>
             <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
 
 
@@ -133,18 +150,30 @@
         </li>
     </ul>
 
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        ...</li>
+        <li>
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        f(...)</li>
+    </ol>
 
 
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example"><span class="keyword">local</span> prototype = Tool.apply(SimpleHotkey,{<span class="string">'some'</span>,<span class="string">'values'</span>})</pre>
+        <li><pre class="example"><span class="global">print</span>(Tool.KeepArgsCall(<span class="keyword">function</span>(a,b,c) <span class="keyword">return</span> a+b+c <span class="keyword">end</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>))
+&gt; <span class="number">1</span> <span class="number">2</span> <span class="number">3</span> <span class="number">6</span>
+</pre></li>
+        <li><pre class="example"><span class="keyword">local</span> arg1, prototype = Tool.KeepArgsCall(SimpleHotkey,{<span class="string">'some'</span>,<span class="string">'values'</span>})</pre></li>
     </ul>
 
 </dd>
     <dt>
-    <a name = "first"></a>
-    <strong>first(...)</strong>
+    <a name = "First"></a>
+    <strong>First(...)</strong>
     </dt>
     <dd>
     Get the first non-nil value.
@@ -171,6 +200,107 @@
 
 
 </dd>
+    <dt>
+    <a name = "Last"></a>
+    <strong>Last(...)</strong>
+    </dt>
+    <dd>
+    Get the last non-nil value.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         It is an error if not at least one value given is <a href="../modules/Types.html#NotNil">NotNil</a>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#NotNil">NotNil</a></span>
+        The last value that was not nil. Can return boolean false
+ if that was the last applicable value.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IfThenElse"></a>
+    <strong>IfThenElse(condition[, then_value[, else_value]])</strong>
+    </dt>
+    <dd>
+    In-line trinary decision that allows nil and false.
+ The lua idiom <code>(c and a or b)</code> doesn't work if false or nil
+ are possible values for a or b.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">condition</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         If this is a <a href="../modules/Concepts.html#truthy">truty</a> value then
+ the then_value will be returned, else the else_value will be returned.
+        </li>
+        <li><span class="parameter">then_value</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">else_value</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        The then_value or else_value.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Import"></a>
+    <strong>Import(relative_path)</strong>
+    </dt>
+    <dd>
+    Require()'s lua files relative to the calling file.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">relative_path</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        the return values of <a href="../lua-5.2/doc/manual.html#pdf-require">require</a>(current_dir..relative_path).
+    </ol>
+
+
+
+
+</dd>
 </dl>
 
 
@@ -178,7 +308,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-10-06 02:05:40 </i>
+<i style="float:right;">Last updated 2020-10-26 00:08:26 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

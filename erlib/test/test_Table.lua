@@ -31,7 +31,7 @@ local function Test()
     return {'a','b','c','d','e',a=1,b=2,c=3,d=4,e=5}
     end
   
-  -- Table.isequal (nessecary for most other tests)
+  -- Table.is_equal (nessecary for most other tests)
   do
     local a = {1,2,nil,3,4}
     local b = {5,6,7,8}
@@ -143,6 +143,22 @@ local function Test()
     assert(equ(layout,result))
     end
     
+  -- Table.to_array
+  do
+    local t0 = {'a','b','c'}
+    local t1 = {'a','b','c',[5.1] = 'd',[-1] = 'e'}
+  
+    -- copy mode
+    local a1 = Table.to_array(t1,{})
+    assert(t1 ~= a1)
+    assert(equ(t0,a1))
+    
+    -- in-place mode
+    Table.to_array(t1)
+    assert(equ(t0,t1))
+    end
+    
+    
   -- Table.find_largest
   do
     local t1 = {4,3,5,2,7,3}
@@ -178,14 +194,19 @@ local function Test()
   -- Table.set, Table.get, Table.sget
   do
     local t1 = {}
+    local t2 = {}
     local p1 = {'a','b','c'}
     local p2 = {'e','f','g'}
     local val = {}
     
-    --set/get
+    --set
     Table.set(t1,p1,42)
     assert(equ(t1,{a={b={c=42}}})) -- set constructs subtables
-    assert(42 == Table.get(t1,p1)) -- just get
+    --sget
+    Table.sget(t2,p2,42)
+    assert(equ(t2,{e={f={g=42}}}))
+    --get
+    assert(42 == Table.get(t1,p1))
     --return/delete
     assert(val == Table.set(t1,p1,val)) --set returns value
     assert(nil == Table.set(t1,p1,nil)) --set can delete

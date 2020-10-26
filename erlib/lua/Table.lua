@@ -38,6 +38,10 @@ local String = elreq('erlib/lua/String')()
 local Replicate = elreq('erlib/lua/Replicate')()
 local Twice = Replicate.Twice
     
+local Verificate = elreq('erlib/lua/Verificate')()
+local isNaturalNumber = Verificate.isType.NaturalNumber
+local isPlainTable    = Verificate.isType.PlainTable
+    
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
@@ -49,7 +53,7 @@ local Twice = Replicate.Twice
 local Table,_Table,_uLocale = {},{},{}
 
 Table.NIL      , _Table.NIL      = Twice(NIL)
-Table.to_string,_Table.to_string = Twice(String.to_string)
+
 
 
 -- -------------------------------------------------------------------------- --
@@ -65,6 +69,10 @@ local _obj_mt = {__index=Table}
 local _toTable = function(tbl)
   if not getmetatable(tbl) then setmetatable(tbl,_obj_mt) end
   return tbl end
+-- attach meta if really safe
+local _toTableIfTable = function(obj)
+  if isPlainTable(obj) then return _toTable(obj) else return obj end
+  end
 -- user request to attach meta unconditionally
 do setmetatable( Table,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) end}) end
 do setmetatable(_Table,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) end}) end
@@ -87,6 +95,18 @@ do setmetatable(_Table,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt
 -- @treturn Table The unchanged input table.
 -- @function Table
 do end
+
+----------
+-- Workaround to put <nil> values into tables. Lua can not usually put
+-- @{nil} as keys or values in tables because it treats those as not to be
+-- in the table in the first place. For situations where you need to put
+-- nil values into tables Erlib offers to use this unique @{string} that
+-- certain functions like @{Table.remove_nil}, @{Table.set} or @{Table.patch}
+-- will recognize as nil value.
+-- 
+-- @field Table.NIL
+do end
+
 --------------------------------------------------------------------------------
 -- Basic Methods.
 -- @section
@@ -233,7 +253,9 @@ function Table.flip(tbl)
 -- @tparam AnyValue obj
 -- @treturn Table
 function Table.plural(obj)
-  if type(obj) == 'table' then
+  -- if  type(obj) == 'table'
+  -- and type(obj.__self) ~= 'userdata' then
+  if isPlainTable(obj) then
     return _toTable(obj)
   else
     return _toTable{obj}
@@ -407,6 +429,23 @@ function Table.rep (tbl,variation_count,patterns)
   return _toTable(r)
   end
   
+----------
+-- __In-place.__ Shallowly replaces @{Table.NIL} keys and values with @{nil},
+-- deleting the affected mappings.
+--
+-- @tparam table tbl
+-- 
+-- @treturn tbl
+-- 
+function Table.remove_nil(tbl)
+  for k,v in pairs(tbl) do
+    if (k == NIL) or (v == NIL) then
+      tbl[k] = nil
+      end
+    end
+  return _toTable(tbl)
+  end
+  
 --------------------------------------------------------------------------------
 -- Conversion.
 -- @section
@@ -424,25 +463,31 @@ function Table.rep (tbl,variation_count,patterns)
 -- of the input array.
 --
 function Table.to_array(tbl,target)
-  -- Comment: i,j range based methods are in Array.
-  local copy_mode = not not target
-  
-  -- local isArrKey = isType.NaturalNumber --not yet implemented
-  local isArrKey = function(x) return type(x) == 'number' end
+
+  -- Comment: i,j range based methods are in Array
+  --          so this doesn't need to support i,j.
   
   if target then
     for k,v in pairs(tbl) do
-      if isArrKey(k) then target[k] = v end
+      if isNaturalNumber(k) then target[k] = v end
       end
     return _toTable(target)
   else
     for k in pairs(tbl) do
-      if not isArrKey(k) then tbl[k] = nil end
+      if not isNaturalNumber(k) then tbl[k] = nil end
       end
     return _toTable(tbl)
     end
   end
 
+----------
+-- __Alias__ of @{String.to_string}.
+--
+-- @tparam table tbl
+-- @treturn string
+--
+-- @function Table.to_string
+Table.to_string = String.to_string
   
 --------------------------------------------------------------------------------
 -- Search Methods.
@@ -589,7 +634,7 @@ function Table.set(tbl,path,value)
     end
   if value == NIL then value = nil end
   r[path[n]] = value
-  return value
+  return _toTableIfTable(value)
   end
 
   
@@ -611,8 +656,10 @@ function Table.sget(tbl,path,default)
     if r[k] == nil then r[k] = {} end -- checking type(r[k])=='table') makes it slower.
     r = r[k]
     end
-  if r[n] == nil then r[n] = default end -- NIL makes no sense here
-  return r[n]
+  local k = path[n]
+  if r[k] == nil then r[k] = default end -- NIL makes no sense here
+  -- return r[k]
+  return _toTableIfTable(r[k])
   end
 
   
@@ -675,7 +722,10 @@ function Table.patch(tbl,patches)
         v = Table.dcopy(Table.get(tbl,v))
         end
       if v == nil then
-        stop('Self-referencing patch value was nil!',tbl,patch)
+        stop('Self-referencing patch value was nil!',
+          '\npatch: ',patch,
+          '\ntable: ',tbl
+          )
         end
       end
     Table.set(tbl,patch,v) -- can be NIL
@@ -761,17 +811,19 @@ function Table.filter(tbl,f,target)
 -- identical.
 --
 -- @tparam table tbl
--- @tparam table tbl2 The table from which to take the data.
+-- @tparam[opt] table tbl2 The table from which to take the data.
 --
 -- @treturn table The input table.
 --
 function Table.smerge(tbl,tbl2)
-  for k,v in pairs(tbl2) do
-    tbl[k] = v
+  if tbl2 then
+    for k,v in pairs(tbl2) do
+      tbl[k] = v
+      end
     end
   return _toTable(tbl)
   end
-  
+
   
 ----------
 -- __In-place.__ Inserts value into tbl __only if__ no other key in the table
@@ -797,12 +849,19 @@ function Table.insert_once(tbl,key,value)
 -- __In-place.__ Removes all key→value mappings from a table.
 -- 
 -- @tparam table tbl
+-- @tparam DenseArray except_keys These keys will not be deleted.
 --
 -- @treturn table The now empty input table.
 --
-function Table.clear(tbl)
-  for k in pairs(tbl) do tbl[k] = nil end
-  return _toTable(tbl)
+function Table.clear(tbl,except_keys)
+  if not except_keys then
+    for k in pairs(tbl) do tbl[k] = nil end
+    return _toTable(tbl)
+  else
+    local keep = {}; for _,k in pairs(except_keys) do keep[k] = true end
+    for k in pairs(tbl) do if not keep[k] then tbl[k] = nil end end
+    return _toTable(tbl)
+    end
   end
 
 
@@ -930,17 +989,6 @@ function Table.migrate (tbl, index, migrations, ...)
 --------------------------------------------------------------------------------
 
 
--- These are used by d/f/copy because they support "copying" non-tables.
-local function _doNotCopy (obj)
-  --rawget: detection of factorio objects ignores meta
-  if type(obj) ~= 'table' or type(rawget(obj,'__self')) == 'userdata' then
-    return true else return false end
-  end
-local function _toTableIfTable(obj)
-  if _doNotCopy(obj) then return obj else return _toTable(obj) end
-  end
-
-
 ----------
 -- __Shallow Copy.__ Copies the first level of the table such that all
 -- __sub-table references stay identical__ to the original table.
@@ -954,7 +1002,7 @@ function Table.scopy(tbl)
   --  * First tparam is documented as AnyValue because that's actually
   --    what's supported, but the intended purpose is copying tables,
   --    so the parameter should be called tbl not obj.
-  if _doNotCopy(tbl) then
+  if not isPlainTable(tbl) then
     return tbl
   else
     local r = {}
@@ -979,7 +1027,7 @@ function Table.dcopy(tbl,remove_metatables)
   --@future: is iterative / non-recursive faster?
   local seen = {}
   local function _copy(this)
-    if _doNotCopy(this) then
+    if not isPlainTable(this) then
       return this
     elseif seen[this] then
       return seen[this]
@@ -1046,9 +1094,11 @@ function Table.fcopy(tbl,remove_metatables)
 
 --- Addition with + is Table.smerge().
 -- @function Table.__concat
-_obj_mt.__add = Table.smerge
-  
-  
+_obj_mt.__add = function(tbl,tbl2)
+  -- syntactic calling must not implicitly change the input!
+  return Table.smerge(Table.scopy(tbl),tbl2)
+  end
+
 ----------
 -- Set a function as metamethod of tbl.
 -- Inherits current metatable or creates a new one.
@@ -1120,7 +1170,8 @@ function Table.get_metamethod(tbl,method_name)
 function Table.deep_clear_metatables(tbl)
   local seen = {}
   local function _clear(obj)
-    if  type(obj) == 'table'
+    -- if  type(obj) == 'table'
+    if  isPlainTable(obj)
     and seen[obj] ~= true then
       seen[obj] = true
       debug_setmetatable(obj,nil)
@@ -1132,6 +1183,19 @@ function Table.deep_clear_metatables(tbl)
     return obj
     end
   return _clear(tbl)
+  end
+  
+
+----------
+-- Removes the metatable from a table.
+-- Does not recurse into the table. Useful for finalizing tables in data stage,
+-- when the automatically attached metatables of a @{Table}, @{Array}, @{Set}
+-- etc. shouldn't be inherited into data.raw.
+-- 
+-- @tparam table tbl
+-- @treturn table The input table. *Doesn't* have a Table module metatable.
+function Table.clear_meta(tbl)
+  return debug_setmetatable(tbl,nil)
   end
 
   

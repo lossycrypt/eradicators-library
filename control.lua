@@ -4,13 +4,49 @@
 -- -------------------------------------------------------------------------- --
 -- Main                                                                       --
 -- -------------------------------------------------------------------------- --
-local _ENV = require '__eradicators-library__/erlib/Core'().Core.InstallToEnv()
-Core.RunTests()
+local _ENV = require '__eradicators-library__/erlib/Core'().Core.install_to_env()
+Core.run_tests()
+
+-- Log testing
+local log = Log.Logger('testlogger')
+log:warn('warn') log:info('info') log:debug('deb') log:say('say')
+
+-- Create shared event uids
+require('__eradicators-library__/erlib/remote/shared_event_uids')
+
+
+-- -------------------------------------------------------------------------- --
+-- Draft (Custom Event UIDs)                                                  --
+-- -------------------------------------------------------------------------- --
+
+--[[
+-- Event UIDs that should be shared by all library instances.
+local SKIP = function()end
+local uids = {}
+remote.add_interface('eradicators-library:custom-event-uids', uids)
+
+local function new_uid(name)
+  -- local r = {
+    -- name = name,
+    -- uid  = script.generate_event_name()
+    -- }
+  -- uids[ serpent.line(r, {compact=true}) ] = SKIP
+  uids[ name .. ';' .. script.generate_event_name() ] = SKIP
+  end
+
+new_uid 'on_research_reset'
+new_uid 'on_player_changed_chunk'
+--]]
+
+-- -------------------------------------------------------------------------- --
+-- Draft                                                                      --
+-- -------------------------------------------------------------------------- --
+
 
 
 if true then return end
 -- -------------------------------------------------------------------------- --
--- Draft                                                                      --
+-- Garbage                                                                    --
 -- -------------------------------------------------------------------------- --
 
 
@@ -24,6 +60,7 @@ local flag = pcall(require,'__zz-toggle-to-enable-dev-mode__/empty')
 
 -- collective loading of all modules without changing _ENV
 local EradicatorsLibrary = require '__eradicators-library__/erlib/Core'()
+
 
 
 

@@ -2,6 +2,7 @@
 
 --------------------------------------------------
 -- Performance optimized multi- and complex-type detection and comparison.
+-- See @{Verificate.isType|isType} for details.
 --
 -- @module Verificate
 -- @usage
@@ -87,22 +88,25 @@ local Verificate,_Verificate,_uLocale = {},{},{}
 --------------------------------------------------------------------------------
 
 ----------
--- This table contains all type checking functions offered by this module.
---
--- __Every isType function takes exactly one argument.__
+-- This table contains all type checking functions offered by this module.  
 --
 -- For the @{type|8 primary lua types} it offers functions to check any
 -- __combination of up to three types__ at once by concatenateing the names 
 -- with a | pipe. For these combinations you can also use the short names:
 -- nil, num, str, bool, tbl, func, udat instead of the full type name.
 -- 
--- __Note:__ To keep the documentation concise paramters for type functions are
--- not documented per function.
+-- __Note:__ This module also automatically generates a "nil|" variant
+-- for non-primary type methods. I.e. isType['nil|LuaPlayer'], etc..
 -- 
--- __Performance Note:__ Combinations starting with nil, i.e.
+-- __Note:__ To keep the documentation concise paramters for type functions are
+-- not documented per function. __Every function takes exactly one argument - the
+-- object to type-check - and returns a boolean__.
+-- 
+-- __Performance Tip:__ Combinations starting with nil, i.e.
 -- "nil", "nil|string", "nil|number|string" are optimized for situations where
--- the object to be checked is expected to be nil most
--- of the time. If you expect the object to be @{NotNil} most of the time then
+-- the object to be checked is expected to be nil most of the time (~90% faster
+-- if obj is nil, but 10% slower if obj is not nil).
+-- If you expect the object to be @{NotNil} most of the time then
 -- you should put nil at the end of the combination, i.e. "str|nil", "num|str|nil".
 -- 
 -- @usage
@@ -306,6 +310,7 @@ for k,v in pairs(isTypePrimaryCheckers) do
 
 do
   
+  -- @2020-10-06: Factorio Version 1.0.0
   local FactorioTypes = {
     -- from index.html#Classes
     'LuaAISettings','LuaAccumulatorControlBehavior','LuaAchievementPrototype',
@@ -346,6 +351,7 @@ do
 
   ----------
   -- Is this any kind of factorio lua object? A LuaPlayer, LuaEntity, etc...?
+  -- @function isType.LuaObject
   function isType.LuaObject(obj)
     return type(obj) == 'table'
        and type(obj.__self) == 'userdata'
@@ -353,9 +359,7 @@ do
 
 
   ----------
-  -- Procedurally generated checkers for all factorio classes.
-  -- 
-  -- This module generates a checker function for
+  -- This module procedurally generates a checker function for
   -- __every__ @{FAPI index Classes|factorio class}.
   -- 
   -- @usage
@@ -368,7 +372,7 @@ do
   --   print(Verificate.isType.LuaPlayer(game))
   --   > false
   -- 
-  -- @table isType.LuaAnyObjectName
+  -- @function isType.LuaFactorioClassName
   local isLuaObject = isType['LuaObject']
   for _,t in pairs(FactorioTypes) do
     isType[t] = function(obj)
@@ -418,6 +422,22 @@ function isType.EmptyTable (obj)
   for _ in pairs(obj) do return false end
   return true
   end
+
+--- A lua table, not a factorio LuaObject.
+--- @function isType.PlainTable
+function isType.PlainTable (obj)
+  return type(obj) == 'table'
+     and type(rawget(obj,'__self')) ~= 'userdata'
+  -- rawget circumvents AutoLock
+  end
+  
+-- Detection of array-part in a table
+-- is better done with Table.array_size(obj)
+function isType.MixedTable (obj)
+  err('Is there any usecase for this?')
+  end
+  
+  
   
 --------------------------------------------------------------------------------
 -- isType → Array.
@@ -456,14 +476,17 @@ function isType.DenseArray (obj)
   return true
   end
 
+  
 --- DenseArray or SparseArray, not MixedTable.
 --- @function isType.NonEmptyArray
 function isType.NonEmptyArray (obj)
+  if type(obj) ~= 'table' then return false end
   for _ in pairs(obj) do
     return isType.Array(obj)
     end
   return false
   end
+
 
 --- @function isType.EmptyArray
 isType.EmptyArray = isType.EmptyTable
@@ -508,7 +531,7 @@ function isType.EmptyString (obj)
 --------------------------------------------------------------------------------
 
 
---- @function isType.NonEmptyArrayOfStrings
+--- @function isType.NonEmptyArrayOfNonEmptyString
 function isType.NonEmptyArrayOfNonEmptyString (obj)
   if type(obj) ~= 'table' then return false end
   local empty = true
@@ -529,6 +552,21 @@ function isType.NonEmptyTableOfFunction (obj)
     if type(v) ~= 'function' then return false end
     end
   return not empty
+  end
+  
+--- @function isType.NonEmptyDenseArrayOfNaturalNumber
+function isType.NonEmptyDenseArrayOfNaturalNumber (obj)
+  if type(obj) ~= 'table' then return false end
+  local largest = 0
+  for k,v in pairs(obj) do
+    if not isType.NaturalNumber(k) then return false end
+    if not isType.NaturalNumber(v) then return false end
+    if k > largest then largest = k end
+    end
+  for i=1,largest do
+    if obj[i] == nil then return false end
+    end
+  return true
   end
   
 --------------------------------------------------------------------------------
@@ -554,6 +592,7 @@ function isType.Vector (obj)
   end
   
 --- A factorio {[1]=,[2]=} or {x=,y=} table. Ignores extra content.
+--- Also accepts mixed definitions like {[1]=,y=}.
 --- @function isType.Position
 function isType.Position (obj)
   if type(obj) ~= 'table' then return false end
@@ -562,13 +601,20 @@ function isType.Position (obj)
     (type(obj[2]) == 'number' or type(obj.y) == 'number')
   end
   
---- Float 0 <= n <= 1.
+--- Float 0 ≤ n ≤ 1.
 --- @function isType.Probability
 function isType.Probability (obj)
   if type(obj) ~= 'number' then return false end
   end
 
-
+--- Float 0 ≤ n ≤ 1. @{wiki Unit interval}
+--- @function isType.UnitInterval
+function isType.UnitInterval (obj)
+  if type(obj) ~= 'number' then return false end
+  return (obj >= 0) and (obj <= 1)
+  end
+  
+--- @{Table.TablePath}
 --- @function isType.TablePath
 function isType.TablePath (obj)
   if type(obj) ~= 'table' then return false end
@@ -583,6 +629,10 @@ function isType.TablePath (obj)
 -- isType → or nil.
 -- @section
 --------------------------------------------------------------------------------
+
+-- Generates a "nil|" variant for all custom type functions.
+-- I.e. not for any of the primary type combinations because
+-- those alrelady have nil variants.
 
 local function isTypeOrNil(name)
   local f = isType[name]
@@ -616,26 +666,34 @@ for name in pairs(
 -- @section
 --------------------------------------------------------------------------------
 
--- Desired internal syntax
-
+-- Error message template.
+local function _verification_failed(obj,typ,...)
+  stop(
+    'Verification failed!','\n',
+    'expected : ',typ     ,'\n',
+    'received : ',obj     ,'\n',
+    '\n',
+    ...
+    )
+  end
 
 ----------
--- assert() like checker with custom complex-type support.
+-- @{assert}() like checker with support for all isType checks.
 -- Raises an error if the input object is not of the expected type.
 -- 
 -- @tparam AnyValue obj
 -- @tparam string typ An isType compatible string.
 -- @tparam[opt] AnyValue ... Anything you want to show up in the error message.
 --
--- @treturn true|error If the check succeeds this returns true, if not 
--- a hard error is raised. Therefore it never returns false.
+-- @treturn AnyValue|error If the check succeeds this returns obj, if not 
+-- a hard error is raised.
 --
 -- @raise VerificationError with a standard error message plus anything you
 -- specified in addition.
 --
 -- @usage
 --    local function my_adder(x)
---      Verificate.Verify(x,'number|nil',"Your","Error","Message.")
+--      Verificate.verify(x,'number|nil',"Your","Error","Message.")
 --      x = x or 0
 --      return x + 1
 --      end
@@ -649,17 +707,55 @@ for name in pairs(
 --    > received: five.
 --    > Your Error Message.
 --
-function Verificate.Verify (obj,typ,...)
-  -- @todo: readd meta typoprotection after all funcs generated
-  return isType[typ](obj) or stop(
-    'Verification failed!',
-    'expected : '.. typ,
-    'received : '.. obj,
-    '',
-    ...
-    )
+function Verificate.verify (obj,typ,...)
+  if isType[typ](obj) then
+    return obj
+  else
+    _verification_failed(obj,typ,...)
+    end
   end
 
+----------
+-- Performes multiple type checks in order.
+--
+-- @tparam AnyValue obj
+-- @tparam DenseArray types The types in the order they should be verified.
+-- @tparam[opt] AnyValue ... Anything you want to show up in the error message.
+--
+-- @treturn AnyValue|error If __at least one check__ succeeds this returns obj,
+-- if not a hard error is raised.
+--
+function Verificate.verify_or(obj,types,...)
+  for _,typ in ipairs(types) do
+    if isType[typ](obj) then return obj end
+    end
+  _verification_failed(obj,types,...)
+  end
+  
+----------
+-- Performes multiple type checks in order.
+--
+-- @tparam AnyValue obj
+-- @tparam DenseArray types The types in the order they should be verified.
+-- @tparam[opt] AnyValue ... Anything you want to show up in the error message.
+--
+-- @treturn AnyValue|error If __all checks__ succeed this returns obj,
+-- if not a hard error is raised.
+--
+function Verificate.verify_and(obj,types,...)
+  local ok = true
+  for _,typ in ipairs(types) do
+    -- Because false is an error there is no need to optimize
+    -- this loop for early break "if ok == false".
+    ok = ok and isType[typ](obj)
+    end
+  if ok == true then
+    return obj
+  else
+    _verification_failed(obj,types,...)
+    end
+  end
+  
 
 ----------
 -- Provides function input-checking wrappers.
@@ -679,13 +775,13 @@ function Verificate.Verify (obj,typ,...)
 -- @treturn table A table of wrapped functions. Functions for which checkers
 -- did not contain a corresponding function will be returned unwrapped.
 -- 
-function Verificate.Wrap (functions,checkers)
+function Verificate.wrap (functions,checkers)
   
   -- function + checker function + error name
   local function wrap(f,f_check,name)
     return function(...)
       if f_check(...) then return f(...) end
-      stop('Wrapped function failed without error message.',name)
+      stop('Wrapped function failed without error message.','\n',name)
       end
     end
     

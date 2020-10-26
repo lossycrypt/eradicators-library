@@ -32,10 +32,10 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Module">Module </a></li>
-<li><a href="#Metamethods">Metamethods </a></li>
-<li><a href="#Conversion">Conversion </a></li>
 <li><a href="#Creation">Creation </a></li>
+<li><a href="#Module">Module </a></li>
+<li><a href="#Conversion">Conversion </a></li>
+<li><a href="#Metamethods">Metamethods </a></li>
 <li><a href="#Comparison">Comparison </a></li>
 </ul>
 
@@ -48,7 +48,9 @@
   <li><a href="../modules/Cache.html">Cache</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
@@ -59,9 +61,11 @@
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
   <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
   <li><a href="../modules/Logic.html">Logic</a></li>
   <li><a href="../modules/Math.html">Math</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><strong>Set</strong></li>
   <li><a href="../modules/String.html">String</a></li>
@@ -71,6 +75,7 @@
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Remote.EventNames.html">Remote.EventNames</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -99,39 +104,6 @@
     </ul>
 
 
-<h2><a href="#Module">Module </a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#Set">Set(tbl)</a></td>
-	<td class="summary">Attaches the Set modules metatable to the tbl.</td>
-	</tr>
-</table>
-<h2><a href="#Metamethods">Metamethods </a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#__concat">__concat()</a></td>
-	<td class="summary">Concatenation with <code>..</code> is Set.union().</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#__add">__add()</a></td>
-	<td class="summary">Addition with + is Set.union().</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#__sub">__sub()</a></td>
-	<td class="summary">Substraction with - is Set.complement().</td>
-	</tr>
-</table>
-<h2><a href="#Conversion">Conversion </a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#from_values">from_values(tbl)</a></td>
-	<td class="summary">Creates a <a href="../modules/Set.html#">Set</a> that maps all values from the input table to <a href="../modules/Types.html#true">true</a>.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#from_keys">from_keys(tbl)</a></td>
-	<td class="summary">Creates a <a href="../modules/Set.html#">Set</a> that maps all keys from the input table to <a href="../modules/Types.html#true">true</a></td>
-	</tr>
-</table>
 <h2><a href="#Creation">Creation </a></h2>
 <table class="function_list">
 	<tr>
@@ -149,6 +121,35 @@
 	<tr>
 	<td class="name" nowrap><a href="#difference">difference(A, B)</a></td>
 	<td class="summary">→∀x (¬(Ax ∧ Bx))</td>
+	</tr>
+</table>
+<h2><a href="#Module">Module </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Set">Set(tbl)</a></td>
+	<td class="summary">Attaches the Set modules metatable to the tbl.</td>
+	</tr>
+</table>
+<h2><a href="#Conversion">Conversion </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#from_values">from_values(tbl)</a></td>
+	<td class="summary">Creates a <a href="../modules/Set.html#">Set</a> that maps all values from the input table to <a href="../modules/Types.html#true">true</a>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_keys">from_keys(tbl)</a></td>
+	<td class="summary">Creates a <a href="../modules/Set.html#">Set</a> that maps all keys from the input table to <a href="../modules/Types.html#true">true</a></td>
+	</tr>
+</table>
+<h2><a href="#Metamethods">Metamethods </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#__add">__add()</a></td>
+	<td class="summary">Addition with + is Set.union().</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#__sub">__sub()</a></td>
+	<td class="summary">Substraction with - is Set.complement().</td>
 	</tr>
 </table>
 <h2><a href="#Comparison">Comparison </a></h2>
@@ -179,153 +180,6 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Module"></a>Module </h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "Set"></a>
-    <strong>Set(tbl)</strong>
-    </dt>
-    <dd>
-    Attaches the Set modules metatable to the tbl.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">tbl</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
-
-
-
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../modules/Types.html#PseudoSet">PseudoSet</a></span>
-
-
-
-    </ol>
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="Metamethods"></a>Metamethods </h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "__concat"></a>
-    <strong>__concat()</strong>
-    </dt>
-    <dd>
-    Concatenation with <code>..</code> is Set.union().
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "__add"></a>
-    <strong>__add()</strong>
-    </dt>
-    <dd>
-    Addition with + is Set.union().
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "__sub"></a>
-    <strong>__sub()</strong>
-    </dt>
-    <dd>
-    Substraction with - is Set.complement().
-
-
-
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="Conversion"></a>Conversion </h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "from_values"></a>
-    <strong>from_values(tbl)</strong>
-    </dt>
-    <dd>
-    Creates a <a href="../modules/Set.html#">Set</a> that maps all values from the input table to <a href="../modules/Types.html#true">true</a>.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">tbl</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
-
-
-
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../modules/Types.html#set">set</a></span>
-
-
-
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "from_keys"></a>
-    <strong>from_keys(tbl)</strong>
-    </dt>
-    <dd>
-    Creates a <a href="../modules/Set.html#">Set</a> that maps all keys from the input table to <a href="../modules/Types.html#true">true</a>
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">tbl</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
-
-
-
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../modules/Types.html#set">set</a></span>
-
-
-
-    </ol>
-
-
-
-
-</dd>
-</dl>
     <h2 class="section-header "><a name="Creation"></a>Creation </h2>
 
     <dl class="function">
@@ -464,6 +318,139 @@
 
 
     </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Module"></a>Module </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Set"></a>
+    <strong>Set(tbl)</strong>
+    </dt>
+    <dd>
+    Attaches the Set modules metatable to the tbl.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#PseudoSet">PseudoSet</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Conversion"></a>Conversion </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "from_values"></a>
+    <strong>from_values(tbl)</strong>
+    </dt>
+    <dd>
+    Creates a <a href="../modules/Set.html#">Set</a> that maps all values from the input table to <a href="../modules/Types.html#true">true</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#set">set</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_keys"></a>
+    <strong>from_keys(tbl)</strong>
+    </dt>
+    <dd>
+    Creates a <a href="../modules/Set.html#">Set</a> that maps all keys from the input table to <a href="../modules/Types.html#true">true</a>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#set">set</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Metamethods"></a>Metamethods </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "__add"></a>
+    <strong>__add()</strong>
+    </dt>
+    <dd>
+    Addition with + is Set.union().
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__sub"></a>
+    <strong>__sub()</strong>
+    </dt>
+    <dd>
+    Substraction with - is Set.complement().
+
+
+
 
 
 
@@ -656,7 +643,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-10-06 02:05:40 </i>
+<i style="float:right;">Last updated 2020-10-26 00:08:26 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

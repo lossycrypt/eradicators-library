@@ -102,7 +102,7 @@ local table_insert, table_remove = table.insert, table.remove
 ----------
 
   do 
-    --todo-> place by Table:map(mt.cache)
+    --todo-> replace by Table:map(mt.cache)
 
     
   -- Lua next():
@@ -257,6 +257,17 @@ Cache.AutoCache = function(constructor)
       fill(self,constructor)
       return pairs(self)
       end,
+      
+      --@future: allow clearing the cache to be refilled
+      -- on next write. Usecase: rebuilding the cache after data
+      -- changes such as on_research_finished for caching a
+      -- forces allowed recipes.
+      --> requires not deleting the metatable on fill
+      --> requires somehow circumventing __pairs.
+    -- clear = function(self)
+      -- for k in pairs(self) do self[k] = nil end
+      -- end,
+      
     })
   end
   end

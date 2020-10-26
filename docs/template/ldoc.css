@@ -76,7 +76,13 @@ body {
     background-color: #ffffff; margin: 0px;
 }
 
-code, tt { font-family: monospace; font-size: 1.1em; }
+
+/* lossycrypt: code and example should have same size */
+
+/* code, tt { font-family: monospace; font-size: 1.1em; } */
+tt   { font-family: monospace; font-size: 1.1em; }
+code { font-family: monospace; font-size: .85em; }
+
 span.parameter { font-family:monospace; }
 span.parameter:after { content:":"; }
 span.types:before { content:"("; }

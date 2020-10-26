@@ -32,7 +32,7 @@ local Logic,_Logic,_uLocale = {},{},{}
 
 
 ----------
--- And-compares an arbitrary number of objects for __truthyness__..
+-- And-compares an arbitrary number of objects for __truthyness__.
 -- @treturn boolean True if __all__ objects were truthy.
 function Logic.And(...) return not not Logic.Andy(...) end
 

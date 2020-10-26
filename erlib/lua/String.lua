@@ -24,8 +24,6 @@ local string_gsub,string_gmatch,string_find,string_format,
     = string.gsub,string.gmatch,string.find,string.format,
       table.concat,math.floor,math.ceil
 
-local real_tostring = _ENV.tostring
-
 local Hydra    = elreq ('erlib/lua/Coding/Hydra')()
 local Meta     = elreq ('erlib/lua/Meta/!init')()
 
@@ -100,31 +98,42 @@ function String.count(str,pattern)
 --   > <function>
 --
 -- @function String.to_string
+do
 
-String.to_string = Meta.SwitchCase(type,{
-  ['default' ] = function( ) return '<unknown>'                 end,
-  ['nil'     ] = function( ) return 'nil'                       end,
-  ['boolean' ] = real_tostring                                     ,
-  ['number'  ] = real_tostring                                     ,
-  ['string'  ] = function(x) return  x                          end,
-  ['thread'  ] = function( ) return '<thread>'                  end,
-  ['function'] = function( ) return '<function>'                end,
-  ['userdata'] = function( ) return '{<userdata>}'              end,
-  ['table'   ] = function(x)
-    if type(x.__self) == 'userdata' then
-      -- factorio object
-      if x.object_name then
-        -- [1] https://lua-api.factorio.com/latest/Common.html#Common.object_name
-        return '{<'..x.object_name..'>}'
-      else
-        return '{<userdata>}'
-        end
-    else return Hydra.line(x,{nocode=true}) end
-    end,
-  })
+  local hydra_options = {
+    sortkeys = true , -- line: true
+    comment  = false, -- line: false
+    sparse   = false, -- line: false?
+    nocode   = true , -- line: true?
+    indent   = nil  , -- line: nil
+    compact  = false, -- line: false
+    }
 
-  
-  
+  local Hydra_serialize = Hydra.serialize -- skip Hydra internal option merging.
+
+  -- Copied code: String.to_string, Log._to_table_of_strings, Error.simplify
+  local f_tostring = {
+    ['nil'     ] = function( ) return '<nil>'      end,
+    ['number'  ] = _ENV .tostring                     ,
+    ['boolean' ] = _ENV .tostring                     ,
+    ['string'  ] = function(x)
+      if x ~= '' then return x
+      else return '<empty string>' end end,
+    ['thread'  ] = function( ) return "<thread>"   end,
+    ['function'] = function( ) return "<function>" end,
+    ['userdata'] = function( ) return "<userdata>" end,
+    ['table'   ] = function(x) return Hydra_serialize(x,hydra_options) end,
+    }
+
+  function String.to_string (obj)
+    -- Performance:
+    -- For strings it would be 20% faster to not call any function
+    -- at all, but checking if obj *is* a string makes *all other*
+    -- data types 20% slower.
+    return f_tostring[type(obj)](obj)
+    end
+  end
+ 
 --------------------------------------------------------------------------------
 -- Create tables.
 -- @section
@@ -343,7 +352,38 @@ function String.enforce_length(str,length,left_pad)
     end
   end
   
-
+----------
+-- Removes spaces, dashes and underscores then capitalizes words.
+-- Preserves leading and trailing underscores.
+--
+-- @usage
+--   print(String.to_camel_case '_private_function_name')
+--   > _PrivateFunctionName
+--   print(String.to_camel_case 'prototype-name')
+--   > PrototypeName
+--   print(String.to_camel_case '__mod-root__')
+--   > __ModRoot__
+--   print(String.to_camel_case 'A random sentence!')
+--   > ARandomSentence
+--
+-- @tparam string str
+--
+-- @treturn string
+--
+-- @function String.to_camel_case
+--
+  do local function _up_last (str) return str:sub(-1):upper() end
+function String.to_camel_case(str)
+  local prefix  = str:match'^[_]*'
+  local postfix = str:match '[_]*$'
+  local infix   = str
+    :gsub('[^%a]+%a',_up_last) -- capitalize letters after non-letters
+    :gsub( '^%a'    ,_up_last) -- capitalize first letter
+    :gsub('[^%a]*$' ,''      ) -- remove trailing non-letters
+  return prefix .. infix .. postfix
+  end
+  end
+  
   
 --------------------------------------------------------------------------------
 -- Factorio specific

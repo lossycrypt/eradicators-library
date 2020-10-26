@@ -164,9 +164,9 @@ custom_see_handler('^wiki (.+)', Wiki)
 
 -- Simple Factorio Api urls "Page.html#section"
 local function FactApi(page,section)
-  return section, url.local_api:format(page,section)
+  return (section ~= '') and section or page, url.local_api:format(page,section)
   end
-custom_see_handler('^FAPI ([^ ]+) ([^ ]*)',FactApi)
+custom_see_handler('^FAPI ([^ ]+) ?([^ ]*)',FactApi) -- @{FAPI PageFileName section_name}
 
 -- -- Factorio Api "LuaObject.html#LuaObject.section"
 -- local function FactObj(obj,section)

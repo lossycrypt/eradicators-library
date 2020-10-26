@@ -28,7 +28,7 @@ local function Test()
   
 
 
-  say('  TESTR  @  erlib.Verificate → Ok')
+  say('  TESTR  @  erlib.Verificate → No test implemented.')
   end
 
 

@@ -64,7 +64,7 @@ local function Test()
   -- Assume pairs() gives a meaningful index for game.x groups.
   for i,this in pairs(game.players ) do assert(i==this.index) end
   for i,this in pairs(game.forces  ) do assert(i==this.name ) end
-  for i,this in pairs(game.surfaces) do assert(i==this.name ) end  
+  for i,this in pairs(game.surfaces) do assert(i==this.name ) end
   say('  TESTR  @  erlib.Assumptions.PairsIndexIsName → Ok')
   
   

@@ -38,8 +38,8 @@
 <li><a href="#In_Place_Methods">In-Place Methods </a></li>
 <li><a href="#Copy_Methods">Copy Methods </a></li>
 <li><a href="#Other_Methods">Other Methods </a></li>
-<li><a href="#Metamethods">Metamethods </a></li>
 <li><a href="#Conversion">Conversion </a></li>
+<li><a href="#Metamethods">Metamethods </a></li>
 <li><a href="#Path_Methods">Path Methods </a></li>
 <li><a href="#Factories">Factories </a></li>
 </ul>
@@ -53,7 +53,9 @@
   <li><a href="../modules/Cache.html">Cache</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
@@ -64,9 +66,11 @@
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
   <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
   <li><a href="../modules/Logic.html">Logic</a></li>
   <li><a href="../modules/Math.html">Math</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
@@ -76,6 +80,7 @@
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Remote.EventNames.html">Remote.EventNames</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -102,6 +107,10 @@
 	<tr>
 	<td class="name" nowrap><a href="#Table">Table(tbl)</a></td>
 	<td class="summary">Attaches the Table modules metatable to any table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#NIL">NIL</a></td>
+	<td class="summary">Workaround to put <nil> values into tables.</td>
 	</tr>
 </table>
 <h2><a href="#Basic_Methods">Basic Methods </a></h2>
@@ -177,7 +186,7 @@
 	<td class="summary"><strong>In-place.</strong> Removes elements from a table based on a filter function.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#smerge">smerge(tbl, tbl2)</a></td>
+	<td class="name" nowrap><a href="#smerge">smerge(tbl[, tbl2])</a></td>
 	<td class="summary"><strong>In-place.</strong> <strong>Shallow Merge.</strong> Copies data from one table into another.</td>
 	</tr>
 	<tr>
@@ -186,7 +195,7 @@
  has an == equal value.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#clear">clear(tbl)</a></td>
+	<td class="name" nowrap><a href="#clear">clear(tbl, except_keys)</a></td>
 	<td class="summary"><strong>In-place.</strong> Removes all key→value mappings from a table.</td>
 	</tr>
 	<tr>
@@ -223,6 +232,22 @@
 	<td class="name" nowrap><a href="#rep">rep(tbl[, variation_count[, patterns]])</a></td>
 	<td class="summary">Creates patterned and unpatterened table repetitions.</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#remove_nil">remove_nil(tbl)</a></td>
+	<td class="summary"><strong>In-place.</strong> Shallowly replaces <a href="../modules/Table.html#NIL">Table.NIL</a> keys and values with <a href="https://www.lua.org/pil/2.1.html">nil</a>,
+ deleting the affected mappings.</td>
+	</tr>
+</table>
+<h2><a href="#Conversion">Conversion </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#to_array">to_array(tbl[, target=nil])</a></td>
+	<td class="summary"><strong>In-place.</strong> Converts MixedTable to SparseArray.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_string">to_string(tbl)</a></td>
+	<td class="summary"><strong>Alias</strong> of <a href="../modules/String.html#to_string">String.to_string</a>.</td>
+	</tr>
 </table>
 <h2><a href="#Metamethods">Metamethods </a></h2>
 <table class="function_list">
@@ -242,12 +267,9 @@
 	<td class="name" nowrap><a href="#deep_clear_metatables">deep_clear_metatables(tbl)</a></td>
 	<td class="summary">Recursively removes metatables from all subtables but not from other object types.</td>
 	</tr>
-</table>
-<h2><a href="#Conversion">Conversion </a></h2>
-<table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#to_array">to_array(tbl[, target=nil])</a></td>
-	<td class="summary"><strong>In-place.</strong> Converts MixedTable to SparseArray.</td>
+	<td class="name" nowrap><a href="#clear_meta">clear_meta(tbl)</a></td>
+	<td class="summary">Removes the metatable from a table.</td>
 	</tr>
 </table>
 <h2><a href="#Path_Methods">Path Methods </a></h2>
@@ -338,6 +360,25 @@
            <span class="types"><span class="type">Table</span></span>
         The unchanged input table.
     </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "NIL"></a>
+    <strong>NIL</strong>
+    </dt>
+    <dd>
+    Workaround to put <nil> values into tables.  Lua can not usually put
+ <a href="https://www.lua.org/pil/2.1.html">nil</a> as keys or values in tables because it treats those as not to be
+ in the table in the first place. For situations where you need to put
+ nil values into tables Erlib offers to use this unique <a href="../lua-5.2/doc/manual.html#pdf-string">string</a> that
+ certain functions like <a href="../modules/Table.html#remove_nil">Table.remove_nil</a>, <a href="../modules/Table.html#set">Table.set</a> or <a href="../modules/Table.html#patch">Table.patch</a>
+ will recognize as nil value.
+
+
+
 
 
 
@@ -960,7 +1001,7 @@
 </dd>
     <dt>
     <a name = "smerge"></a>
-    <strong>smerge(tbl, tbl2)</strong>
+    <strong>smerge(tbl[, tbl2])</strong>
     </dt>
     <dd>
     <strong>In-place.</strong> <strong>Shallow Merge.</strong> Copies data from one table into another.
@@ -979,6 +1020,7 @@
         <li><span class="parameter">tbl2</span>
             <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
          The table from which to take the data.
+         (<em>optional</em>)
         </li>
     </ul>
 
@@ -1037,7 +1079,7 @@
 </dd>
     <dt>
     <a name = "clear"></a>
-    <strong>clear(tbl)</strong>
+    <strong>clear(tbl, except_keys)</strong>
     </dt>
     <dd>
     <strong>In-place.</strong> Removes all key→value mappings from a table.
@@ -1050,6 +1092,10 @@
 
 
 
+        </li>
+        <li><span class="parameter">except_keys</span>
+            <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         These keys will not be deleted.
         </li>
     </ul>
 
@@ -1431,6 +1477,110 @@ Table.overwrite(my_table,my_values)
     </ul>
 
 </dd>
+    <dt>
+    <a name = "remove_nil"></a>
+    <strong>remove_nil(tbl)</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Shallowly replaces <a href="../modules/Table.html#NIL">Table.NIL</a> keys and values with <a href="https://www.lua.org/pil/2.1.html">nil</a>,
+ deleting the affected mappings.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">tbl</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Conversion"></a>Conversion </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "to_array"></a>
+    <strong>to_array(tbl[, target=nil])</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Converts MixedTable to SparseArray.  All keys that are not
+ <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>s will be removed.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">target</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         <strong>Copy Mode.</strong> This table will be changed and
+ tbl remains unchanged.
+         (<em>default</em> nil)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#SparseArray">SparseArray</a> or <a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         A table containing only the numeric keys
+ of the input array.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_string"></a>
+    <strong>to_string(tbl)</strong>
+    </dt>
+    <dd>
+    <strong>Alias</strong> of <a href="../modules/String.html#to_string">String.to_string</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
 </dl>
     <h2 class="section-header "><a name="Metamethods"></a>Metamethods </h2>
 
@@ -1581,17 +1731,15 @@ Table.deep_clear_metatables(test)
     </ul>
 
 </dd>
-</dl>
-    <h2 class="section-header "><a name="Conversion"></a>Conversion </h2>
-
-    <dl class="function">
     <dt>
-    <a name = "to_array"></a>
-    <strong>to_array(tbl[, target=nil])</strong>
+    <a name = "clear_meta"></a>
+    <strong>clear_meta(tbl)</strong>
     </dt>
     <dd>
-    <strong>In-place.</strong> Converts MixedTable to SparseArray.  All keys that are not
- <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>s will be removed.
+    Removes the metatable from a table.
+ Does not recurse into the table. Useful for finalizing tables in data stage,
+ when the automatically attached metatables of a <a href="../modules/Table.html#">Table</a>, <a href="../modules/Array.html#">Array</a>, <a href="../modules/Set.html#">Set</a>
+ etc. shouldn't be inherited into data.raw.
 
 
     <h3>Parameters:</h3>
@@ -1602,20 +1750,13 @@ Table.deep_clear_metatables(test)
 
 
         </li>
-        <li><span class="parameter">target</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
-         <strong>Copy Mode.</strong> This table will be changed and
- tbl remains unchanged.
-         (<em>default</em> nil)
-        </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../modules/Types.html#SparseArray">SparseArray</a> or <a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
-         A table containing only the numeric keys
- of the input array.
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        The input table. <em>Doesn't</em> have a Table module metatable.
     </ol>
 
 
@@ -2030,7 +2171,7 @@ test:patch({
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-10-06 02:05:40 </i>
+<i style="float:right;">Last updated 2020-10-26 00:08:26 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

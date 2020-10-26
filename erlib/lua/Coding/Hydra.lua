@@ -19,6 +19,7 @@
       + renamed to "Hydra" to avoid confusion with factorio built-in "serpent"
       + added Hydra.encode and Hydra.decode single-return function
       + changed module return value to be erlib compatible
+      + added factorio userdata class awareness using object.object_name
       
       local test_input = {
         x = { x = { x = { x = { x = { x = { 'a' }}}}}},
@@ -130,6 +131,14 @@ do
         local sparse = sparse and #o > maxn -- disable sparsness if only numeric keys (shorter output)
         for n, key in ipairs(o) do
           local value, ktype, plainindex = t[key], type(key), n <= maxn and not sparse
+
+          -- [[lossycrypt: factorio userdata class awareness]]
+          -- [[LuaPlayer, LuaGameScript, LuaEntity, etcpp...]]
+          -- [1] https://lua-api.factorio.com/latest/Common.html#Common.object_name
+          if key == '__self' and type(value) == 'userdata' then
+            value = t.object_name or value
+            end
+
           if opts.valignore and opts.valignore[value] -- skip ignored values; do nothing
           or opts.keyallow and not opts.keyallow[key]
           or opts.keyignore and opts.keyignore[key]
@@ -161,11 +170,11 @@ do
         return tag..globerr(t, level)
       elseif ttype == 'function' then
         seen[t] = insref or spath
-        
+
         --[[lossycrypt: less garbage text]]
         -- if opts.nocode then return tag.."function() --[[..skipped..]] end"..comment(t, level) end
         if opts.nocode then return tag.."function()end"..comment(t, level) end
-        
+
         local ok, res = pcall(string.dump, t)
         local func = ok and "((loadstring or load)("..safestr(res)..",'@serialized'))"..comment(t, level)
         return tag..(func or globerr(t, level))

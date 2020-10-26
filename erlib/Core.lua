@@ -75,6 +75,7 @@ local Modules = {
   Verificate = 'erlib/lua/Verificate',
   Stacktrace = 'erlib/factorio/Stacktrace',
   Error      = 'erlib/lua/Error',
+  Log        = 'erlib/lua/Log',
   Replicate  = 'erlib/lua/Replicate',
   Filter     = 'erlib/lua/Filter',
   Debug      = 'erlib/lua/Debug',
@@ -145,13 +146,16 @@ erlib_strict.Const = Const
 -- into the main table.
 -- @usage uplift(erlib,{'Coding','Replicate','Filter'})
 --
-local function uplift(target,names)
+local function uplift(target,names,setter)
   for _,name in pairs(names       ) do
   for k,v    in pairs(target[name]) do
   -- if type(v) == 'function'          then --@think: are limits needed? Coding needs tables.
-    say('  Uplifting',name,k)
-    target[k] = v
-    -- end
+    -- say('  Uplifting',name,k)
+    if setter then
+      setter(target,k,v)
+    else
+      target[k] = v
+      end
     end
     end
   end
@@ -184,7 +188,7 @@ local function EradicatorsLibraryMain(options)
   ----------
   -- Injects some methods directly into public modules like string, table, etc.
   -- @tparam table ENV the environment in which to carry out the operation
-  Core.InjectIntoPublicModules = function(ENV)
+  Core.inject_into_native_lua_modules = function(ENV)
     -- in data/settings disturbing other mods is rude
     if not Const.load_stage.control then
       stop('Public injection is not supported during startup.')
@@ -196,7 +200,7 @@ local function EradicatorsLibraryMain(options)
   ----------
   -- Makes all erlib modules available directly in ENV.
   -- 
-  Core.InstallToEnv = function(ENV,opt)
+  Core.install_to_env = function(ENV,opt)
     if (not Const.load_stage.control)
     and (ENV == PublicENV)
     and flag.IS_FACTORIO
@@ -207,24 +211,37 @@ local function EradicatorsLibraryMain(options)
     --make a new env for the caller?
     if ENV == nil then
       ENV = {} ---@todo: write lock? read lookup?
-      ENV.PublicENV = PublicENV
       for k,v in pairs(PublicENV) do ENV[k] = v end
+      end
+    ENV.PrivateEnv = ENV
+    ENV.PublicENV  = PublicENV -- PrivateEnv needs access to PublicEnv
+    --lock (NP++ has custom metatable)
+    local setter = function(t,k,v) t[k] = v end
+    if flag.IS_FACTORIO and (opt.auto_lock ~= false) then
+      erlib.Lock.AutoLock(ENV,'Erlib Core-Installed Environment','GLOBAL')
+      setter = function(t,k,v) t.GLOBAL(k,v) end
       end
     --install to env
     for k,v in pairs(erlib) do
       ---@todo implement strict wrapping
-      ENV[k] = opt.strict and erlib_strict[k] or erlib[k]
+      setter(ENV, k, opt.strict and erlib_strict[k] or erlib[k])
       end
     --uplift
-    -- uplift(ENV,{'Coding','Meta'})
-    uplift(ENV,{'Coding','Meta','Logic'})
+    uplift(ENV, {'Coding', 'Meta', 'Logic', 'Tool'}, setter)
+    setter(ENV, {'L'} ,erlib .Lambda)
+    -- @future: Tool -> CamelCase
+    -- @future: Import (automatic relative-directory require)(with "!init"?)
+    --extra constants
+    setter(ENV, 'LOAD_STAGE', Const.load_stage)
+    setter(ENV, 'LOAD_PHASE', Const.load_phase)
     return ENV
     end
   
   ----------
   -- Runs all unit tests included in erlib.
-  Core.RunTests = function()
-    if flag.DO_TESTS then
+  -- Does not run in non-erlib mods.
+  Core.run_tests = function()
+    if flag.DO_TESTS and (flag.IS_LIBRARY_MOD or not flag.IS_FACTORIO) then
       -- print('here',erlib.Stacktrace.get_pos())
       local Tester = elreq('erlib/test/!init')()
       if not Const.load_stage.control then

@@ -23,10 +23,17 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 
 local Filter = {}
 
+--------------------------------------------------------------------------------
+-- Simple.
+-- @section
+--------------------------------------------------------------------------------
+
 
 ----------
 -- No-Op, does nothing at all.
-Filter.SKIP  = function( ) end
+Filter.SKIP  = ercfg.SKIP
+
+-- Filter.SKIP  = function( ) end
 
 ----------
 -- Always returns boolean true.
@@ -61,6 +68,45 @@ Filter.INVALID = function(obj) return not obj.valid end
 -- @tparam AnyValue obj
 -- @treturn AnyValue obj
 Filter.PASS = function(obj) return obj end
+
+
+
+--------------------------------------------------------------------------------
+-- Factory.
+-- @section
+--------------------------------------------------------------------------------
+
+
+----------
+-- Creates a table filter function.
+function Filter.new_complex(filter_spec) return function(obj)
+
+  local example = {
+    'and',
+    {'my','path',is ={'value1','value2'}}, -- value exquals exactly
+    {'my','path',has={'or','value1','value2'}}, -- value in table
+    }
+    
+  local ex2 = { --recursive spec
+    'or', 
+  
+    { 'and',
+      {'my','path',is ={'value1','value2'}}, -- value exquals exactly
+      {'my','path',has={'or','value1','value2'}}, -- value in table
+      },
+    
+    { 'and',
+      {'my','path',is ={'value1','value2'}}, -- value exquals exactly
+      {'my','path',has={'or','value1','value2'}}, -- value in table
+      },
+  
+  
+    }
+
+
+  return nil
+  end end
+   
 
 
 -- -------------------------------------------------------------------------- --

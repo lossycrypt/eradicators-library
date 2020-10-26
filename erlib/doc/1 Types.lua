@@ -158,6 +158,16 @@
 -- @name NegativeInteger
 -- @class field
 
+
+----------
+-- A @{float} 0 ≤ x ≤ 1. Often used for probability values.
+-- See also @{wiki Unit interval}.
+--
+-- @name UnitInterval
+-- @class field 
+
+
+
 --------------------------------------------------------------------------------
 -- String.
 -- @section

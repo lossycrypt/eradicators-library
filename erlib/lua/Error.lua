@@ -36,7 +36,8 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 local Stacktrace = require(elroot.. 'erlib/factorio/Stacktrace')()
 local Hydra      = require(elroot.. 'erlib/lua/Coding/Hydra'   )()
 
-local table,type,pairs = table,type,pairs
+local table,type,pairs,tostring
+    = table,type,pairs,tostring
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -53,23 +54,38 @@ local Error,_Error,_uLocale = {},{},{}
 
 
 -- the error message
-local template  = {
-  "  [color=default]                                                 ",
-  "  ##### [%s : %s] #####                                           ",
-  "  I suspected this might happen. Please tell me how you got here. ",
-  "                                                                  ",
-  "  [color=red]%s[/color]                                           ",
-  "                                                                  ",
-  "  [color=green](%s nil values removed.)[/color]                   ",
-  "  [color=green]%s > %s[/color]                                    ",
-  "  ############################                                    ",
-  "  [/color]                                                        ",
-  }
+local template
+
+if flag.IS_FACTORIO then
+  template = {
+    "  [color=default]                                                 ",
+    "  ##### [%s : %s] #####                                           ",
+    "  I suspected this might happen. Please tell me how you got here. ",
+    "                                                                  ",
+    "  [color=red]%s[/color]                                           ",
+    "                                                                  ",
+    "  [color=green](%s nil values removed.)[/color]                   ",
+    "  [color=green]%s > %s[/color]                                    ",
+    "  ############################                                    ",
+    "  [/color]                                                        ",
+    }
+else
+  template = {
+    "  ##### [%s : %s] #####                                           ",
+    "  Error.                                                          ",
+    "                                                                  ",
+    "  %s                                                              ",
+    "                                                                  ",
+    "  (%s nil values removed.)                                        ",
+    "  %s > %s                                                         ",
+    "  ############################                                    ",
+    }
+  end
+  
 -- remove extra whitespace (from indented code representation)
 for i,l in pairs(template) do template[i]=l:match' *(.-) *$' end
 -- finalize into one string
 template = table.concat(template,'\n')
-
 
 -- Removes all nil values from an Array.
 -- @varargs AnyValue ...
@@ -86,15 +102,19 @@ local function to_dense_array(...)
 -- @tparam Table tbl, containing AnyValue
 -- @treturn an Array of strings
 local simplify; do
+
+  -- Copied code: String.to_string, Log._to_table_of_strings, Error.simplify
   local _simplify = {
-    ['nil'     ] = function( ) return 'nil'          end,
-    ['boolean' ] = function(x) return tostring(x)    end,
-    ['number'  ] = function(x) return tostring(x)    end,
-    ['string'  ] = function(x) return x              end,
-    ['function'] = function( ) return '<function>'   end,
-    ['userdata'] = function( ) return '{<userdata>}' end,
-    ['thread'  ] = function( ) return '{<thread>}'   end,
-    ['table'   ] = function(x) return Hydra.line(x,{nocode=true}) end,
+    ['nil'     ] = function( ) return '<nil>'      end,
+    ['boolean' ] = tostring                           ,
+    ['number'  ] = tostring                           ,
+    ['string'  ] = function(x)
+      if x ~= '' then return x
+      else return '<empty string>' end end,
+    ['thread'  ] = function( ) return '<thread>'   end,
+    ['function'] = function( ) return '<function>' end,
+    ['userdata'] = function( ) return '<userdata>' end,
+    ['table'   ] = function(x) return Hydra.line(x,{nocode=true,showref=true}) end,
     }
   function simplify(tbl)
     for k,v in pairs(tbl) do
@@ -145,10 +165,11 @@ local _error = function(prefix,postfix,...)
   local err = template:format(
     args[1],
     args[2],
-    table.concat({table.unpack(args,3)},'\n'),
+    -- table.concat({table.unpack(args,3)},'\n'), -- don't impose any formatting
+    table.concat({table.unpack(args,3)},''),
     select('#',...) - #args + 2,
-    Stacktrace.get_pos(4),
-    Stacktrace.get_pos(3) --this must be *exactly* 2 above the outside caller
+    Stacktrace.get_pos(4) or '?',--? == probably already at bottom of stack
+    Stacktrace.get_pos(3) or '?' --this must be *exactly* 2 above the outside caller
     )
 
   error(err,0) -- without built-in level info

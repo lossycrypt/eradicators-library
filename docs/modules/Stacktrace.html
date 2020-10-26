@@ -46,7 +46,9 @@
   <li><a href="../modules/Cache.html">Cache</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><strong>Stacktrace</strong></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
@@ -57,9 +59,11 @@
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
   <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
   <li><a href="../modules/Logic.html">Logic</a></li>
   <li><a href="../modules/Math.html">Math</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
@@ -69,6 +73,7 @@
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Remote.EventNames.html">Remote.EventNames</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -90,7 +95,7 @@
 </pre></li>
         <li><pre class="example">An example stack. l=level
  l  l
- 0 -4 erlib/factorio/Stacktrace.lua                -- top    (called last )
+ 0 -4 erlib/factorio/Stacktrace.lua           -- top    (called last )
  1 -3 core/lualib/util.lua (table.deepcopy)   --
  2 -2 prototypes/entity/my-modded-entity.lua  --
  3 -1 data.lua                                -- bottom (called first)
@@ -125,22 +130,22 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#get_mod_root">get_mod_root([l=1])</a></td>
-	<td class="summary">→　"<strong>my-mod-name</strong>"</td>
+	<td class="summary">→　"__my-mod-name__"</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#get_cur_dir">get_cur_dir([l=1])</a></td>
-	<td class="summary">→　"<strong>my-mod-name</strong>/sub/directory"</td>
+	<td class="summary">→　"__my-mod-name__/sub/directory"</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#path2name">path2name(path)</a></td>
-	<td class="summary">"<strong>my-mod-name</strong>/sub/directory" →　"my-mod"</td>
+	<td class="summary">"__my-mod-name__/sub/directory" →　"my-mod"</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#name2root">name2root(name)</a></td>
-	<td class="summary">"my-mod-name" → "<strong>my-mod-name</strong>"</td>
+	<td class="summary">"my-mod-name" → "__my-mod-name__"</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#unsafe_get_stage_and_phase">unsafe_get_stage_and_phase()</a></td>
+	<td class="name" nowrap><a href="#_unsafe_get_stage_and_phase">_unsafe_get_stage_and_phase()</a></td>
 	<td class="summary">Retrieves the current load stage and phase from the filenames on the stack.</td>
 	</tr>
 </table>
@@ -296,11 +301,8 @@
     <ol>
         <li>
            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-<p>name of the mod at level l: "my-mod-name"</p>
-<pre><code>            or "unknown/scenario" if the check failed.
-</code></pre>
-</li>
+        name of the mod at level l: "my-mod-name"
+ or "unknown/scenario" if the check failed.</li>
         <li>
            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
         if the name was found.</li>
@@ -315,7 +317,7 @@
     <strong>get_mod_root([l=1])</strong>
     </dt>
     <dd>
-    →　"<strong>my-mod-name</strong>"
+    →　"__my-mod-name__"
 
 
     <h3>Parameters:</h3>
@@ -333,11 +335,8 @@
     <ol>
         <li>
            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-<p>"<strong>my-mod-name</strong>" root of the mod at level l</p>
-<pre><code>            or "__unknown/scenario__" if the check failed.
-</code></pre>
-</li>
+        "__my-mod-name__" root of the mod at level l
+ or "__unknown/scenario__" if the check failed.</li>
         <li>
            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
         if the root was found.</li>
@@ -352,7 +351,7 @@
     <strong>get_cur_dir([l=1])</strong>
     </dt>
     <dd>
-    →　"<strong>my-mod-name</strong>/sub/directory"
+    →　"__my-mod-name__/sub/directory"
 
 
     <h3>Parameters:</h3>
@@ -370,11 +369,8 @@
     <ol>
         <li>
            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-<p>"<strong>my-mod-name</strong>/sub/directory" directory of the mod at level l</p>
-<pre><code>            or "__unknown/scenario__" if the check failed.
-</code></pre>
-</li>
+        "__my-mod-name__/sub/directory" directory of the mod at level l
+ or "__unknown/scenario__" if the check failed.</li>
         <li>
            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
         if the root was found.</li>
@@ -389,14 +385,14 @@
     <strong>path2name(path)</strong>
     </dt>
     <dd>
-    "<strong>my-mod-name</strong>/sub/directory" →　"my-mod"
+    "__my-mod-name__/sub/directory" →　"my-mod"
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">path</span>
             <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-         "<strong>my-mod-name</strong>/sub/directory" any path
+         "__my-mod-name__/sub/directory" any path
         </li>
     </ul>
 
@@ -416,7 +412,7 @@
     <strong>name2root(name)</strong>
     </dt>
     <dd>
-    "my-mod-name" → "<strong>my-mod-name</strong>"
+    "my-mod-name" → "__my-mod-name__"
 
 
     <h3>Parameters:</h3>
@@ -431,7 +427,7 @@
     <ol>
 
            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-        "<strong>my-mod-name</strong>" the absolute root of the mod
+        "__my-mod-name__" the absolute root of the mod
     </ol>
 
 
@@ -439,8 +435,8 @@
 
 </dd>
     <dt>
-    <a name = "unsafe_get_stage_and_phase"></a>
-    <strong>unsafe_get_stage_and_phase()</strong>
+    <a name = "_unsafe_get_stage_and_phase"></a>
+    <strong>_unsafe_get_stage_and_phase()</strong>
     </dt>
     <dd>
     Retrieves the current load stage and phase from the filenames on the stack.
@@ -472,7 +468,7 @@
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example"><span class="keyword">local</span> stage,phase = Stacktrace.unsafe_get_stage_and_phase()</pre>
+        <pre class="example"><span class="keyword">local</span> stage,phase = Stacktrace._unsafe_get_stage_and_phase()</pre>
     </ul>
 
 </dd>
@@ -492,13 +488,8 @@
 
 
     <h3>Raises:</h3>
-
-<p> It is an error if the stage could not be detected. I.e. when calling</p>
-<pre><code>    from inside a scenario or a data stage metatable.
-</code></pre>
-
-
-
+     It is an error if the stage could not be detected. I.e. when calling
+ from inside a scenario or a data stage metatable.
 
 
 
@@ -515,13 +506,8 @@
 
 
     <h3>Raises:</h3>
-
-<p> It is an error if the phase could not be detected. I.e. when calling</p>
-<pre><code>    from inside a scenario or a data stage metatable.
-</code></pre>
-
-
-
+     It is an error if the phase could not be detected. I.e. when calling
+ from inside a scenario or a data stage metatable.
 
 
 
@@ -533,7 +519,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-10-06 02:05:40 </i>
+<i style="float:right;">Last updated 2020-10-26 00:08:26 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

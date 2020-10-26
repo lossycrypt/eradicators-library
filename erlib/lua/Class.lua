@@ -107,12 +107,12 @@ function Class.SimpleClass(initializer,finalizer)
   class_mt .__call = function(self,...)
       local object, extra = initializer(...)
       if extra ~= nil then
-        stop('SimpleClass','Normalizer returned unexpected extra data:\n',extra)
+        stop('SimpleClass.\n','Normalizer returned unexpected extra data:\n',extra)
         end
       if object ~= nil then
         --@todo measure performance impact of this check
         if type(object) ~= 'table' then
-          stop('SimpleClass','Normalizer did not return a table:\n',object)
+          stop('SimpleClass.\n','Normalizer did not return a table:\n',object)
           end
         setmetatable(object,object_mt)
         if finalizer then finalizer(object) end
@@ -223,11 +223,11 @@ function Class.SwitchCaseClass(analyzer,cases)
   function class_mt .__call (self,...)
       local object, extra = switch(...)
       if extra ~= nil then
-        stop('SwitchCaseClass','SwitchCase returned unexpected extra data:\n',extra)
+        stop('SwitchCaseClass.\n','SwitchCase returned unexpected extra data:\n',extra)
         end
       if object ~= nil then
         if type(object) ~= 'table' then
-          stop('SwitchCaseClass','SwitchCase did not return a table:\n',object)
+          stop('SwitchCaseClass.\n','SwitchCase did not return a table:\n',object)
           end
         if not getmetatable(object) then -- do not overwrite if initializer added custom meta?
           --- @fixme Maybe there are better solutions.

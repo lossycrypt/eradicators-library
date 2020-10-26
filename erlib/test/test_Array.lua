@@ -15,6 +15,8 @@ local Stacktrace = elreq('erlib/factorio/Stacktrace')()
 local stage,phase= Stacktrace.get_load_stage(), Stacktrace.get_load_phase()
 
 local Array = elreq('erlib/lua/Array')()
+local Table = elreq('erlib/lua/Table')()
+local Iter  = elreq('erlib/lua/Iter/!init' )()
 
 -- -------------------------------------------------------------------------- --
 -- Tests                                                                      --
@@ -236,6 +238,27 @@ local function Test()
     assert(7 == #test1)
     end
     
+  -- Array.insert_array
+  do
+    local equ = Table.is_equal
+  
+    local r1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, [20] = "b"}
+    local r2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+    
+    local t1,t2 = {1,5,6,7,8,9,10},{2,3,4}
+    
+    -- with target
+    assert(equ(r1, Array.insert_array({1,5,6,7,8,9,10},{2,3,4},2,{[20]='b'}) )) -- #arr > #arr2
+    assert(equ(r1, Array.insert_array({1,10},{2,3,4,5,6,7,8,9},2,{[20]='b'}) )) -- #arr < #arr2
+    assert(equ(t1,{1,5,6,7,8,9,10}))
+    assert(equ(t2,{2,3,4}))
+    
+    -- in-place
+    Array.insert_array(t1,t2,2)
+    assert(equ(t1,r2))
+    assert(equ(t2,{2,3,4}))
+    end
+    
   -- Array.unsorted_remove_value
   do
     local test = {'a','b','a','b','a','b','a','b','a'}
@@ -328,6 +351,56 @@ local function Test()
     assert(equ(spliced_array, Array.splice(table.unpack(spliced_array:fray(5,1,15)))))
     end
 
+  -- Array.flatten
+  do
+    local t = {{{{}}},1,2,{3,4,{5,6},{7}},8,{{{{9,{{10}}}}}}}
+    Array.flatten(t)
+    assert(equ(t,{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}))
+    end
+    
+  -- Array.from_iterator
+  do
+    local equ = Table.is_equal
+    
+    local arr,n = Array.from_iterator(function()end)
+    assert(n == 0)
+    assert(equ(arr,{}))
+    
+    local arr,n = Array.from_iterator(Iter.subsets(3,{1,2,3,4,5,6}))
+    assert(n == 20)
+    assert(equ(arr,{
+      {{1, 2, 3}},
+      {{1, 2, 4}},
+      {{1, 2, 5}},
+      {{1, 2, 6}},
+      {{1, 3, 4}},
+      {{1, 3, 5}},
+      {{1, 3, 6}},
+      {{1, 4, 5}},
+      {{1, 4, 6}},
+      {{1, 5, 6}},
+      {{2, 3, 4}},
+      {{2, 3, 5}},
+      {{2, 3, 6}},
+      {{2, 4, 5}},
+      {{2, 4, 6}},
+      {{2, 5, 6}},
+      {{3, 4, 5}},
+      {{3, 4, 6}},
+      {{3, 5, 6}},
+      {{4, 5, 6}}
+      }))
+    end
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
   -- check which methods were not called
   -- setmetatable(Array,nil)
   -- local missing = {}

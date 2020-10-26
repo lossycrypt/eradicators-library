@@ -12,7 +12,7 @@
 -- @usage
 --  An example stack. l=level
 --   l  l
---   0 -4 erlib/factorio/Stacktrace.lua                -- top    (called last )
+--   0 -4 erlib/factorio/Stacktrace.lua           -- top    (called last )
 --   1 -3 core/lualib/util.lua (table.deepcopy)   --
 --   2 -2 prototypes/entity/my-modded-entity.lua  --
 --   3 -1 data.lua                                -- bottom (called first)
@@ -158,7 +158,7 @@ local function _src_getter(pattern,fallback,substitutes)
 --
 -- @tparam[opt=1] integer l
 -- @treturn string name of the mod at level l: "my-mod-name"
---                or "unknown/scenario" if the check failed.
+-- or "unknown/scenario" if the check failed.
 -- @treturn boolean if the name was found.
 --
 -- @function Stacktrace.get_mod_name
@@ -167,11 +167,11 @@ Stacktrace.get_mod_name = _src_getter('^__(.+)__/?','unknown/scenario')
 
 
 ----------
--- →　"__my-mod-name__"
+-- →　"\_\_my-mod-name\_\_"
 --
 -- @tparam[opt=1] integer l
--- @treturn string "__my-mod-name__" root of the mod at level l
---                or "__unknown/scenario__" if the check failed.
+-- @treturn string "\_\_my-mod-name\_\_" root of the mod at level l
+-- or "\_\_unknown/scenario\_\_" if the check failed.
 -- @treturn boolean if the root was found.
 --
 -- @function Stacktrace.get_mod_root
@@ -180,11 +180,11 @@ Stacktrace.get_mod_root = _src_getter('^(__.+__)/?','__unknown/scenario__')
 
 
 ----------
--- →　"__my-mod-name__/sub/directory"
+-- →　"\_\_my-mod-name\_\_/sub/directory"
 --
 -- @tparam[opt=1] integer l
--- @treturn string "__my-mod-name__/sub/directory" directory of the mod at level l
---                or "__unknown/scenario__" if the check failed.
+-- @treturn string "\_\_my-mod-name\_\_/sub/directory" directory of the mod at level l
+-- or "\_\_unknown/scenario\_\_" if the check failed.
 -- @treturn boolean if the root was found.
 --
 -- @function Stacktrace.get_cur_dir
@@ -193,9 +193,9 @@ Stacktrace.get_cur_dir  = _src_getter('^(.*)/','__unknown/scenario__')
 
 
 ----------
--- "__my-mod-name__/sub/directory" →　"my-mod"
+-- "\_\_my-mod-name\_\_/sub/directory" →　"my-mod"
 --
--- @string path "__my-mod-name__/sub/directory" any path
+-- @string path "\_\_my-mod-name\_\_/sub/directory" any path
 -- @treturn string "my-mod" the undecorated name of the mod
 --
 function Stacktrace.path2name(path)
@@ -203,10 +203,10 @@ function Stacktrace.path2name(path)
   end
 
 ----------
--- "my-mod-name" → "__my-mod-name__"
+-- "my-mod-name" → "\_\_my-mod-name\_\_"
 --
 -- @string name "my-mod-name" the undecorated name of a mod
--- @treturn string "__my-mod-name__" the absolute root of the mod
+-- @treturn string "\_\_my-mod-name\_\_" the absolute root of the mod
 --
 function Stacktrace.name2root(name)
   return '__'..name..'__'
@@ -247,12 +247,12 @@ local phases = {
 -- Should only be used when the error throwing behavior of
 -- @{Stacktrace.get_load_stage} or @{Stacktrace.get_load_phase} is undesired.
 --
--- @usage local stage,phase = Stacktrace.unsafe_get_stage_and_phase()
+-- @usage local stage,phase = Stacktrace._unsafe_get_stage_and_phase()
 --
 -- @treturn LoadStageName|nil
 -- @treturn LoadPhaseName|nil
 --
-function Stacktrace.unsafe_get_stage_and_phase()
+function Stacktrace._unsafe_get_stage_and_phase()
 
     local _stage = Stacktrace._get_raw_load_stage(-1)
     local _phase = Stacktrace._get_raw_load_phase(-1)
@@ -266,7 +266,7 @@ function Stacktrace.unsafe_get_stage_and_phase()
 
 -- Load Stage/Phase can not change during runtime so it's cheaper to cache the
 -- result. but it's safer if returned tables are unique per call anyway
-local _load_stage, _load_phase = Stacktrace. unsafe_get_stage_and_phase()
+local _load_stage, _load_phase = Stacktrace. _unsafe_get_stage_and_phase()
 
 --------------------------------------------------------------------------------
 -- !Main.
@@ -278,7 +278,7 @@ local _load_stage, _load_phase = Stacktrace. unsafe_get_stage_and_phase()
 -- are quite fast.
 --
 -- @raise It is an error if the stage could not be detected. I.e. when calling
---        from inside a scenario or a data stage metatable.
+-- from inside a scenario or a data stage metatable.
 --
 function Stacktrace.get_load_stage()
   if flag.IS_FACTORIO then
@@ -294,7 +294,7 @@ function Stacktrace.get_load_stage()
 -- are quite fast.
 --
 -- @raise It is an error if the phase could not be detected. I.e. when calling
---        from inside a scenario or a data stage metatable.
+-- from inside a scenario or a data stage metatable.
 --
 function Stacktrace.get_load_phase()
   if flag.IS_FACTORIO then

@@ -53,7 +53,9 @@
   <li><a href="../modules/Cache.html">Cache</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
@@ -64,9 +66,11 @@
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
   <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
   <li><a href="../modules/Logic.html">Logic</a></li>
   <li><a href="../modules/Math.html">Math</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
@@ -76,6 +80,7 @@
   <li><strong>Verificate</strong></li>
   <li><a href="../modules/Version.html">Version</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Remote.EventNames.html">Remote.EventNames</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -88,11 +93,7 @@
 
 <h1>Module <code>Verificate</code></h1>
 <p>Performance optimized multi- and complex-type detection and comparison.</p>
-<p>
-
-
-
-</p>
+<p> See <a href="../modules/Verificate.html#isType">isType</a> for details.</p>
     <h3>Usage:</h3>
     <ul>
         <pre class="example">local Verificate = require(&apos;__eradicators-library__/erlib/lua/Verificate&apos;)()
@@ -110,12 +111,13 @@
 <h2><a href="#isType_____Factorio">isType → Factorio </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#isType.LuaObject">isType.LuaObject(obj)</a></td>
+	<td class="name" nowrap><a href="#isType.LuaObject">isType.LuaObject()</a></td>
 	<td class="summary">Is this any kind of factorio lua object?</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#isType.LuaAnyObjectName">isType.LuaAnyObjectName</a></td>
-	<td class="summary">Procedurally generated checkers for all factorio classes.</td>
+	<td class="name" nowrap><a href="#isType.LuaFactorioClassName">isType.LuaFactorioClassName()</a></td>
+	<td class="summary">This module procedurally generates a checker function for
+ <strong>every</strong> <a href="../api/index.html#Classes">factorio class</a>.</td>
 	</tr>
 </table>
 <h2><a href="#isType_____Number">isType → Number </a></h2>
@@ -142,6 +144,10 @@
 	<td class="summary">
 
 </td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.PlainTable">isType.PlainTable()</a></td>
+	<td class="summary">A lua table, not a factorio LuaObject.</td>
 	</tr>
 </table>
 <h2><a href="#isType_____Array">isType → Array </a></h2>
@@ -200,13 +206,19 @@
 <h2><a href="#isType_____Collections">isType → Collections </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#isType.NonEmptyArrayOfStrings">isType.NonEmptyArrayOfStrings()</a></td>
+	<td class="name" nowrap><a href="#isType.NonEmptyArrayOfNonEmptyString">isType.NonEmptyArrayOfNonEmptyString()</a></td>
 	<td class="summary">
 
 </td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#isType.NonEmptyTableOfFunction">isType.NonEmptyTableOfFunction()</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.NonEmptyDenseArrayOfNaturalNumber">isType.NonEmptyDenseArrayOfNaturalNumber()</a></td>
 	<td class="summary">
 
 </td>
@@ -230,23 +242,33 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#isType.Probability">isType.Probability()</a></td>
-	<td class="summary">Float 0 &lt;= n &lt;= 1.</td>
+	<td class="summary">Float 0 ≤ n ≤ 1.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isType.UnitInterval">isType.UnitInterval()</a></td>
+	<td class="summary">Float 0 ≤ n ≤ 1.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#isType.TablePath">isType.TablePath()</a></td>
-	<td class="summary">
-
-</td>
+	<td class="summary"><a href="../modules/Table.html#TablePath">Table.TablePath</a></td>
 	</tr>
 </table>
 <h2><a href="#Verify">Verify </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Verify">Verify(obj, typ[, ...])</a></td>
-	<td class="summary">assert() like checker with custom complex-type support.</td>
+	<td class="name" nowrap><a href="#verify">verify(obj, typ[, ...])</a></td>
+	<td class="summary"><a href="../lua-5.2/doc/manual.html#pdf-assert">assert</a>() like checker with support for all isType checks.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Wrap">Wrap(functions, checkers)</a></td>
+	<td class="name" nowrap><a href="#verify_or">verify_or(obj, types[, ...])</a></td>
+	<td class="summary">Performes multiple type checks in order.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#verify_and">verify_and(obj, types[, ...])</a></td>
+	<td class="summary">Performes multiple type checks in order.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#wrap">wrap(functions, checkers)</a></td>
 	<td class="summary">Provides function input-checking wrappers.</td>
 	</tr>
 </table>
@@ -263,22 +285,25 @@
     <strong>isType</strong>
     </dt>
     <dd>
-    This table contains all type checking functions offered by this module. </p>
-
-<p> <strong>Every isType function takes exactly one argument.</strong></p>
+    This table contains all type checking functions offered by this module.   </p>
 
 <p> For the <a href="../lua-5.2/doc/manual.html#pdf-type">8 primary lua types</a> it offers functions to check any
  <strong>combination of up to three types</strong> at once by concatenateing the names
  with a | pipe. For these combinations you can also use the short names:
  nil, num, str, bool, tbl, func, udat instead of the full type name.</p>
 
-<p> <strong>Note:</strong> To keep the documentation concise paramters for type functions are
- not documented per function.</p>
+<p> <strong>Note:</strong> This module also automatically generates a "nil|" variant
+ for non-primary type methods. I.e. isType['nil|LuaPlayer'], etc..</p>
 
-<p> <strong>Performance Note:</strong> Combinations starting with nil, i.e.
+<p> <strong>Note:</strong> To keep the documentation concise paramters for type functions are
+ not documented per function. <strong>Every function takes exactly one argument - the
+ object to type-check - and returns a boolean</strong>.</p>
+
+<p> <strong>Performance Tip:</strong> Combinations starting with nil, i.e.
  "nil", "nil|string", "nil|number|string" are optimized for situations where
- the object to be checked is expected to be nil most
- of the time. If you expect the object to be <a href="../modules/Types.html#NotNil">NotNil</a> most of the time then
+ the object to be checked is expected to be nil most of the time (~90% faster
+ if obj is nil, but 10% slower if obj is not nil).
+ If you expect the object to be <a href="../modules/Types.html#NotNil">NotNil</a> most of the time then
  you should put nil at the end of the combination, i.e. "str|nil", "num|str|nil".
 
 
@@ -311,20 +336,12 @@
     <dl class="function">
     <dt>
     <a name = "isType.LuaObject"></a>
-    <strong>isType.LuaObject(obj)</strong>
+    <strong>isType.LuaObject()</strong>
     </dt>
     <dd>
     Is this any kind of factorio lua object?  A LuaPlayer, LuaEntity, etc...?
 
 
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">obj</span>
-
-
-
-        </li>
-    </ul>
 
 
 
@@ -332,13 +349,11 @@
 
 </dd>
     <dt>
-    <a name = "isType.LuaAnyObjectName"></a>
-    <strong>isType.LuaAnyObjectName</strong>
+    <a name = "isType.LuaFactorioClassName"></a>
+    <strong>isType.LuaFactorioClassName()</strong>
     </dt>
     <dd>
-    Procedurally generated checkers for all factorio classes. </p>
-
-<p> This module generates a checker function for
+    This module procedurally generates a checker function for
  <strong>every</strong> <a href="../api/index.html#Classes">factorio class</a>.
 
 
@@ -420,6 +435,20 @@
 
 
 
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.PlainTable"></a>
+    <strong>isType.PlainTable()</strong>
+    </dt>
+    <dd>
+    A lua table, not a factorio LuaObject.
 
 
 
@@ -569,8 +598,8 @@
 
     <dl class="function">
     <dt>
-    <a name = "isType.NonEmptyArrayOfStrings"></a>
-    <strong>isType.NonEmptyArrayOfStrings()</strong>
+    <a name = "isType.NonEmptyArrayOfNonEmptyString"></a>
+    <strong>isType.NonEmptyArrayOfNonEmptyString()</strong>
     </dt>
     <dd>
 
@@ -587,6 +616,22 @@
     <dt>
     <a name = "isType.NonEmptyTableOfFunction"></a>
     <strong>isType.NonEmptyTableOfFunction()</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.NonEmptyDenseArrayOfNaturalNumber"></a>
+    <strong>isType.NonEmptyDenseArrayOfNaturalNumber()</strong>
     </dt>
     <dd>
 
@@ -640,6 +685,7 @@
     </dt>
     <dd>
     A factorio {[1]=,[2]=} or {x=,y=} table.  Ignores extra content.
+ Also accepts mixed definitions like {[1]=,y=}.
 
 
 
@@ -653,7 +699,21 @@
     <strong>isType.Probability()</strong>
     </dt>
     <dd>
-    Float 0 &lt;= n &lt;= 1.
+    Float 0 ≤ n ≤ 1.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isType.UnitInterval"></a>
+    <strong>isType.UnitInterval()</strong>
+    </dt>
+    <dd>
+    Float 0 ≤ n ≤ 1.  <a href="https://en.wikipedia.org/wiki/Unit_interval">Unit interval</a>
 
 
 
@@ -667,9 +727,7 @@
     <strong>isType.TablePath()</strong>
     </dt>
     <dd>
-
-
-
+    <a href="../modules/Table.html#TablePath">Table.TablePath</a>
 
 
 
@@ -683,11 +741,11 @@
 
     <dl class="function">
     <dt>
-    <a name = "Verify"></a>
-    <strong>Verify(obj, typ[, ...])</strong>
+    <a name = "verify"></a>
+    <strong>verify(obj, typ[, ...])</strong>
     </dt>
     <dd>
-    assert() like checker with custom complex-type support.
+    <a href="../lua-5.2/doc/manual.html#pdf-assert">assert</a>() like checker with support for all isType checks.
  Raises an error if the input object is not of the expected type.
 
 
@@ -713,9 +771,9 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../modules/Types.html#true">true</a> or <a class="type" href="../lua-5.2/doc/manual.html#pdf-error">error</a></span>
-         If the check succeeds this returns true, if not
- a hard error is raised. Therefore it never returns false.
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a> or <a class="type" href="../lua-5.2/doc/manual.html#pdf-error">error</a></span>
+         If the check succeeds this returns obj, if not
+ a hard error is raised.
     </ol>
 
     <h3>Raises:</h3>
@@ -726,7 +784,7 @@
     <h3>Usage:</h3>
     <ul>
         <pre class="example"><span class="keyword">local</span> <span class="keyword">function</span> my_adder(x)
-  Verificate.Verify(x,<span class="string">'number|nil'</span>,<span class="string">"Your"</span>,<span class="string">"Error"</span>,<span class="string">"Message."</span>)
+  Verificate.verify(x,<span class="string">'number|nil'</span>,<span class="string">"Your"</span>,<span class="string">"Error"</span>,<span class="string">"Message."</span>)
   x = x <span class="keyword">or</span> <span class="number">0</span>
   <span class="keyword">return</span> x + <span class="number">1</span>
   <span class="keyword">end</span>
@@ -744,8 +802,86 @@
 
 </dd>
     <dt>
-    <a name = "Wrap"></a>
-    <strong>Wrap(functions, checkers)</strong>
+    <a name = "verify_or"></a>
+    <strong>verify_or(obj, types[, ...])</strong>
+    </dt>
+    <dd>
+    Performes multiple type checks in order.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">obj</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">types</span>
+            <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         The types in the order they should be verified.
+        </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         Anything you want to show up in the error message.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a> or <a class="type" href="../lua-5.2/doc/manual.html#pdf-error">error</a></span>
+         If <strong>at least one check</strong> succeeds this returns obj,
+ if not a hard error is raised.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "verify_and"></a>
+    <strong>verify_and(obj, types[, ...])</strong>
+    </dt>
+    <dd>
+    Performes multiple type checks in order.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">obj</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">types</span>
+            <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         The types in the order they should be verified.
+        </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+         Anything you want to show up in the error message.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a> or <a class="type" href="../lua-5.2/doc/manual.html#pdf-error">error</a></span>
+         If <strong>all checks</strong> succeed this returns obj,
+ if not a hard error is raised.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "wrap"></a>
+    <strong>wrap(functions, checkers)</strong>
     </dt>
     <dd>
     Provides function input-checking wrappers.
@@ -791,7 +927,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-10-06 02:05:40 </i>
+<i style="float:right;">Last updated 2020-10-26 00:08:26 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

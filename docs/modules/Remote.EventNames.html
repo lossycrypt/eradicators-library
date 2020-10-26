@@ -32,7 +32,7 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Functions">Functions</a></li>
+<li><a href="#Events">Events </a></li>
 </ul>
 
 
@@ -62,7 +62,7 @@
   <li><a href="../modules/Math.html">Math</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
-  <li><strong>Replicate</strong></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
   <li><a href="../modules/Table.html">Table</a></li>
@@ -71,7 +71,7 @@
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
-  <li><a href="../modules/Remote.EventNames.html">Remote.EventNames</a></li>
+  <li><strong>Remote.EventNames</strong></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -82,37 +82,29 @@
 
 <div id="content">
 
-<h1>Module <code>Replicate</code></h1>
-<p>Inline replication of object references.</p>
-<p>
-
-
-
-</p>
+<h1>Module <code>Remote.EventNames</code></h1>
+<p>Numeric event names for Erlib custom events.</p>
+<p> Requiring this file returns a table
+ mapping {event_name -> event_number}, just like defines.events.
+ The numbers are dynamically generated so they may change
+ every time you start the game, change mods, etc..</p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Replicate = require(&apos;__eradicators-library__/erlib/lua/Replicate&apos;)()
+        <pre class="example">defines.custom_events = require(&apos;__eradicators-library__/erlib/remote/shared_event_uids&apos;)
 </pre>
     </ul>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#Events">Events </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Twice">Twice(v)</a></td>
-	<td class="summary">Returns two references to the given object.</td>
+	<td class="name" nowrap><a href="#on_player_changed_chunk">on_player_changed_chunk</a></td>
+	<td class="summary">Raised when the player moves or is teleported across a chunk border.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Thrice">Thrice(v)</a></td>
-	<td class="summary">Returns three references to the given object.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#FourtyTwo">FourtyTwo(v)</a></td>
-	<td class="summary">Returns 42 references to the given object.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#Replicate">Replicate(n, v)</a></td>
-	<td class="summary">Returns n references to the given object.</td>
+	<td class="name" nowrap><a href="#on_research_reset">on_research_reset</a></td>
+	<td class="summary">Raised when the researched state of a technology has changed from true to
+ false.</td>
 	</tr>
 </table>
 
@@ -120,21 +112,34 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="Events"></a>Events </h2>
 
     <dl class="function">
     <dt>
-    <a name = "Twice"></a>
-    <strong>Twice(v)</strong>
+    <a name = "on_player_changed_chunk"></a>
+    <strong>on_player_changed_chunk</strong>
     </dt>
     <dd>
-    Returns two references to the given object.
+    Raised when the player moves or is teleported across a chunk border.
+ This is a higher-resolution abstraction of <a href="../api/events.html#on_player_changed_position">on_player_changed_position</a>.
 
 
-    <h3>Parameters:</h3>
+    <h3>Fields:</h3>
     <ul>
-        <li><span class="parameter">v</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        <li><span class="parameter">player_index</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#uint">uint</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">old_chunk</span>
+            <span class="types"><span class="type">ChunkPosition</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">new_chunk</span>
+            <span class="types"><span class="type">ChunkPosition</span></span>
 
 
 
@@ -144,24 +149,21 @@
 
 
 
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> A,B = Twice(f)</pre>
-    </ul>
 
 </dd>
     <dt>
-    <a name = "Thrice"></a>
-    <strong>Thrice(v)</strong>
+    <a name = "on_research_reset"></a>
+    <strong>on_research_reset</strong>
     </dt>
     <dd>
-    Returns three references to the given object.
+    Raised when the researched state of a technology has changed from true to
+ false.  For example because another mod called <a href="../api/LuaForce.html#LuaForce.reset">LuaForce.reset</a>.
 
 
-    <h3>Parameters:</h3>
+    <h3>Fields:</h3>
     <ul>
-        <li><span class="parameter">v</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        <li><span class="parameter">research</span>
+            <span class="types"><span class="type">LuaTechnology</span></span>
 
 
 
@@ -171,72 +173,6 @@
 
 
 
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> A,B,C = Thrice({})</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "FourtyTwo"></a>
-    <strong>FourtyTwo(v)</strong>
-    </dt>
-    <dd>
-    Returns 42 references to the given object.
- That should be enough for everyone.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">v</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> A,B,C,D,E,F,G = FourtyTwo(LuaEntity) <span class="comment">--You don't have to catch 'em all.</span></pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "Replicate"></a>
-    <strong>Replicate(n, v)</strong>
-    </dt>
-    <dd>
-    Returns n references to the given object.
- For when you need precision.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">n</span>
-            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
-
-
-
-        </li>
-        <li><span class="parameter">v</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> A,B,C,E,F,G = Replicate(<span class="number">6</span>,LuaEntity)</pre>
-    </ul>
 
 </dd>
 </dl>

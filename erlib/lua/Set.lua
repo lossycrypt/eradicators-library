@@ -212,9 +212,9 @@ function Set.is_disjoint(A,B)
 -- @section
 --------------------------------------------------------------------------------
 
---- Concatenation with `\.\.` is Set.union().
+-- Concatenation with `\.\.` is Set.union().
 -- @function Set.__concat
-_obj_mt.__concat = Set.union
+-- _obj_mt.__concat = Set.union
 
 --- Addition with + is Set.union().
 -- @function Set.__add
@@ -223,6 +223,7 @@ _obj_mt.__add    = Set.union
 --- Substraction with - is Set.complement().
 -- @function Set.__sub
 _obj_mt.__sub    = Set.complement
+
 
   
 -- -------------------------------------------------------------------------- --

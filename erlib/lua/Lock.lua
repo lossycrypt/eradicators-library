@@ -20,14 +20,17 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 local String = elreq('erlib/lua/String')()
 local Hydra  = elreq('erlib/lua/Coding/Hydra')()
 local stop   = elreq('erlib/lua/Error')().Stopper('Auto-Lock Table')
+local Tool   = elreq('erlib/lua/Tool' )()
 
 local function Locked(name,mode)
   return function (self,key,value) return stop( --tail call to reduce stack level for correct error level?
     ('"%s" is [color=red]*%s*[/color] locked.'):format(name,mode),
-    '',
-    ('key    = %s'):format(String.tostring(key)),
-    (mode == 'read') and '' or 
-    ('value  = %s'):format(String.tostring(value))
+    '\n',
+    ('key    = %s'):format(String.to_string(key)),
+    '\n',
+    Tool.IfThenElse(
+      (mode == 'read'),nil,('value  = %s'):format(String.to_string(value))
+      )
   ) end end
   
 -- Debug Test Call: Locked('bla','write')(nil,'foo',table)

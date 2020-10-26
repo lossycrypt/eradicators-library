@@ -45,7 +45,9 @@
   <li><a href="../modules/Cache.html">Cache</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
@@ -56,9 +58,11 @@
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
   <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
   <li><a href="../modules/Logic.html">Logic</a></li>
   <li><a href="../modules/Math.html">Math</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
@@ -68,6 +72,7 @@
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Remote.EventNames.html">Remote.EventNames</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -94,15 +99,15 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#InjectIntoPublicModules">InjectIntoPublicModules(ENV)</a></td>
+	<td class="name" nowrap><a href="#inject_into_native_lua_modules">inject_into_native_lua_modules(ENV)</a></td>
 	<td class="summary">Injects some methods directly into public modules like string, table, etc.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#InstallToEnv">InstallToEnv(ENV, opt)</a></td>
+	<td class="name" nowrap><a href="#install_to_env">install_to_env(ENV, opt)</a></td>
 	<td class="summary">Makes all erlib modules available directly in ENV.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#RunTests">RunTests()</a></td>
+	<td class="name" nowrap><a href="#run_tests">run_tests()</a></td>
 	<td class="summary">Runs all unit tests included in erlib.</td>
 	</tr>
 </table>
@@ -114,15 +119,15 @@
  erlib_strict[k] = UnknownMagic(v[2],v[1])</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#InstallToEnv-todo2">InstallToEnv-todo2</a></td>
+	<td class="name" nowrap><a href="#install_to_env-todo2">install_to_env-todo2</a></td>
 	<td class="summary">: write lock? read lookup?</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#InstallToEnv-todo2-todo3">InstallToEnv-todo2-todo3</a></td>
+	<td class="name" nowrap><a href="#install_to_env-todo2-todo3">install_to_env-todo2-todo3</a></td>
 	<td class="summary">implement strict wrapping</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#RunTests-fixme4">RunTests-fixme4</a></td>
+	<td class="name" nowrap><a href="#run_tests-fixme4">run_tests-fixme4</a></td>
 	<td class="summary">on<em>nth</em>tick calls this <em>twice</em> in the same tick....why?</td>
 	</tr>
 </table>
@@ -135,8 +140,8 @@
 
     <dl class="function">
     <dt>
-    <a name = "InjectIntoPublicModules"></a>
-    <strong>InjectIntoPublicModules(ENV)</strong>
+    <a name = "inject_into_native_lua_modules"></a>
+    <strong>inject_into_native_lua_modules(ENV)</strong>
     </dt>
     <dd>
     Injects some methods directly into public modules like string, table, etc.
@@ -156,8 +161,8 @@
 
 </dd>
     <dt>
-    <a name = "InstallToEnv"></a>
-    <strong>InstallToEnv(ENV, opt)</strong>
+    <a name = "install_to_env"></a>
+    <strong>install_to_env(ENV, opt)</strong>
     </dt>
     <dd>
     Makes all erlib modules available directly in ENV.
@@ -183,11 +188,12 @@
 
 </dd>
     <dt>
-    <a name = "RunTests"></a>
-    <strong>RunTests()</strong>
+    <a name = "run_tests"></a>
+    <strong>run_tests()</strong>
     </dt>
     <dd>
     Runs all unit tests included in erlib.
+ Does not run in non-erlib mods.
 
 
 
@@ -216,8 +222,8 @@
 
 </dd>
     <dt>
-    <a name = "InstallToEnv-todo2"></a>
-    <strong>InstallToEnv-todo2</strong>
+    <a name = "install_to_env-todo2"></a>
+    <strong>install_to_env-todo2</strong>
     </dt>
     <dd>
     : write lock? read lookup?
@@ -230,8 +236,8 @@
 
 </dd>
     <dt>
-    <a name = "InstallToEnv-todo2-todo3"></a>
-    <strong>InstallToEnv-todo2-todo3</strong>
+    <a name = "install_to_env-todo2-todo3"></a>
+    <strong>install_to_env-todo2-todo3</strong>
     </dt>
     <dd>
     implement strict wrapping
@@ -244,8 +250,8 @@
 
 </dd>
     <dt>
-    <a name = "RunTests-fixme4"></a>
-    <strong>RunTests-fixme4</strong>
+    <a name = "run_tests-fixme4"></a>
+    <strong>run_tests-fixme4</strong>
     </dt>
     <dd>
     on<em>nth</em>tick calls this <em>twice</em> in the same tick....why?
@@ -264,7 +270,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-10-06 02:05:40 </i>
+<i style="float:right;">Last updated 2020-10-26 00:08:26 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

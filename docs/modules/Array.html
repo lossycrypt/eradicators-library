@@ -38,6 +38,7 @@
 <li><a href="#In_Place_Methods">In-Place Methods </a></li>
 <li><a href="#Copy_Methods">Copy Methods </a></li>
 <li><a href="#Other_Methods">Other Methods </a></li>
+<li><a href="#Conversion">Conversion </a></li>
 <li><a href="#Metamethods">Metamethods </a></li>
 </ul>
 
@@ -50,7 +51,9 @@
   <li><a href="../modules/Cache.html">Cache</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><strong>Array</strong></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
@@ -61,9 +64,11 @@
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
   <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
   <li><a href="../modules/Logic.html">Logic</a></li>
   <li><a href="../modules/Math.html">Math</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
@@ -73,6 +78,7 @@
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Remote.EventNames.html">Remote.EventNames</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -167,6 +173,10 @@
  key in the array has an == equal value.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#insert_array">insert_array(arr, arr2, i[, target=nil])</a></td>
+	<td class="summary"><strong>In-place.</strong> Puts one array into the middle of another.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#unsorted_remove_value">unsorted_remove_value(arr, value[, i=1])</a></td>
 	<td class="summary"><strong>In-place.</strong> Replaces all instances of value with the then-last value of the array.</td>
 	</tr>
@@ -204,6 +214,17 @@
 	<tr>
 	<td class="name" nowrap><a href="#fray">fray(arr, count[, i=1[, j=#arr]])</a></td>
 	<td class="summary">Reverse of Array.splice().</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#flatten">flatten(arr)</a></td>
+	<td class="summary"><strong>In-place.</strong> Removes subtables, keeps value order.</td>
+	</tr>
+</table>
+<h2><a href="#Conversion">Conversion </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#from_iterator">from_iterator(f_iter)</a></td>
+	<td class="summary"><strong>Experimental.</strong> Collects the output of a parameterless iterator function into an array.</td>
 	</tr>
 </table>
 <h2><a href="#Metamethods">Metamethods </a></h2>
@@ -518,9 +539,14 @@
     <strong>compress(arr[, target=nil[, i=1[, j=Array.size(arr)]]])</strong>
     </dt>
     <dd>
-    <strong>In-place.</strong> Compresses a <a href="../modules/Types.html#SparseArray">SparseArray</a> into a <a href="../modules/Types.html#DenseArray">DenseArray</a>.  The order of the elements
- is preserved. Can also compress partial ranges of the input, for example to
- split the compression into multiple steps.
+    <strong>In-place.</strong> Compresses a <a href="../modules/Types.html#SparseArray">SparseArray</a> into a <a href="../modules/Types.html#DenseArray">DenseArray</a>.  The order of
+ the elements is preserved. Can also compress partial ranges of the input,
+ for example to split the compression into multiple steps.</p>
+
+<p> <strong>Note:</strong> If you know the size of the array then giving it as j significantly
+ improves performance.</p>
+
+<p> <strong>Note:</strong> To compress <a href="../modules/Types.html#MixedTable">MixedTable</a>s you can give Table.array_size(arr) as j.
 
 
     <h3>Parameters:</h3>
@@ -757,6 +783,47 @@
            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
          false: element was already in array, true: element was
  inserted at the end.</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "insert_array"></a>
+    <strong>insert_array(arr, arr2, i[, target=nil])</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Puts one array into the middle of another.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">arr</span>
+            <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         The array to insert into.
+        </li>
+        <li><span class="parameter">arr2</span>
+            <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         The array to be inserted.
+        </li>
+        <li><span class="parameter">i</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         The index at which to start inserting arr2.
+ All values after i (inclusive) will be shifted backwards by the length of arr2.
+        </li>
+        <li><span class="parameter">target</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         <strong>Copy Mode.</strong> This table will be changed and arr remains unchanged.
+         (<em>default</em> nil)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+        The array containing the merged result.
     </ol>
 
 
@@ -1123,6 +1190,82 @@
     </ul>
 
 </dd>
+    <dt>
+    <a name = "flatten"></a>
+    <strong>flatten(arr)</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Removes subtables, keeps value order. </p>
+
+<p> <strong>Note:</strong> Recursive tables and factorio objects
+ are not supported and will produce garbage results.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">arr</span>
+            <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         A nested array.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- a chaotically nested array
+</span><span class="keyword">local</span> arr = {{{{}}},<span class="number">1</span>,<span class="number">2</span>,{<span class="number">3</span>,<span class="number">4</span>,{<span class="number">5</span>,<span class="number">6</span>},{<span class="number">7</span>}},<span class="number">8</span>,{{{{<span class="number">9</span>,{{<span class="number">10</span>}}}}}}}
+<span class="global">print</span>(Array.flatten(arr):to_string())
+&gt; {<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>}
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Conversion"></a>Conversion </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "from_iterator"></a>
+    <strong>from_iterator(f_iter)</strong>
+    </dt>
+    <dd>
+    <strong>Experimental.</strong> Collects the output of a parameterless iterator function into an array.
+ All return values of each call of f_iter() are packed
+ into a sub-array of the output array.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f_iter</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         The iterator function.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+        An array of return value arrays.</li>
+        <li>
+           <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+        The length of the returned array.</li>
+    </ol>
+
+
+
+
+</dd>
 </dl>
     <h2 class="section-header "><a name="Metamethods"></a>Metamethods </h2>
 
@@ -1148,7 +1291,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-10-06 02:05:40 </i>
+<i style="float:right;">Last updated 2020-10-26 00:08:26 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

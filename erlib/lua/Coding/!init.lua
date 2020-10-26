@@ -35,8 +35,11 @@ local Coding,_Coding,_uLocale = {},{},{}
 -- This is a customized version of "serpent" - renamed to avoid confusion
 -- with Factorios built-in serpent installation.
 -- This page only documents __changes__ compared to serpent.
--- Equal to Factorios built-in serpent, Hydra represents redundant sub-tables
+--
+--  * Equal to Factorios built-in serpent, Hydra represents redundant sub-tables
 -- references by the number 0 zero (instead of @{nil} like normal serpent does).
+--
+--  * Hydra knows about factorio userdata like LuaEntity, LuaPlayer, etc..
 --
 -- @section
 --
@@ -73,6 +76,14 @@ Coding.Hydra = import 'erlib/lua/Coding/Hydra'
 --   >   {0 --[[ self[1] ]], 0 --[[ self[1] ]], 0 --[[ self[1] ]]}, --one level indented
 --   >   [42] = {{{{{function()end}}}}}                            --short code skip
 --   > }
+--
+-- @usage
+--  print(Hydra.lines{game, game.player, game.player.force})
+--  > {
+--  >   {__self = "LuaGameScript"},
+--  >   {__self = "LuaPlayer"},
+--  >   {__self = "LuaForce"}
+--  > }
 
 ----------
 -- Single-line serialization preset.
