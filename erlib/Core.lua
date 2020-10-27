@@ -190,11 +190,18 @@ local function EradicatorsLibraryMain(options)
   -- @tparam table ENV the environment in which to carry out the operation
   Core.inject_into_native_lua_modules = function(ENV)
     -- in data/settings disturbing other mods is rude
-    if not Const.load_stage.control then
+    -- so only allow this in control
+    if flag.IS_FACTORIO and not Const.load_stage.control then
       stop('Public injection is not supported during startup.')
       end
-    -- so only allow this in control
-    ENV.string.f = ENV.string.format
+    -- string
+    local mt_string = getmetatable('').__index
+    mt_string.f = ENV.string.format
+    for name, method in pairs(erlib.String) do
+      if mt_string[name] == nil then
+        mt_string[name] = method
+        end
+      end
     end 
   
   ----------
@@ -228,7 +235,8 @@ local function EradicatorsLibraryMain(options)
       end
     --uplift
     uplift(ENV, {'Coding', 'Meta', 'Logic', 'Tool'}, setter)
-    setter(ENV, {'L'} ,erlib .Lambda)
+    setter(ENV, 'L' ,erlib .Lambda)
+    setter(ENV, 'F' ,erlib .String.smart_format)
     -- @future: Tool -> CamelCase
     -- @future: Import (automatic relative-directory require)(with "!init"?)
     --extra constants
@@ -290,6 +298,7 @@ if true then return EradicatorsLibraryMain end
 
 -- -----------------------------------------------------------------------------
 -- ###########################################################################--
+-- ### Deprecated / Legacy ###################################################--
 -- -----------------------------------------------------------------------------
 
 local function __init__(PublicENV,options)
@@ -318,11 +327,11 @@ local function __init__(PublicENV,options)
 
 ----NAME,PATH-------------------------------------------------------------------------------------
   --mod that contains this file
-  _Lib_name = Stacktrace .get_mod_name(1)
-  _Lib_root = Stacktrace .get_cur_dir (1) 
+  _Lib_name = Stacktrace.get_mod_name(1)
+  _Lib_root = Stacktrace.get_directory (1) 
   --mod that required this file
-  _Mod_name = Stacktrace .get_mod_name( ) or 'unknown/scenario'
-  _Mod_root = Stacktrace .get_mod_root( ) or 'unknown/scenario'
+  _Mod_name = Stacktrace.get_mod_name( ) or 'unknown/scenario'
+  _Mod_root = Stacktrace.get_mod_root( ) or 'unknown/scenario'
   --debug.getinfo can actually see the full path to the scenario (engine bug).
   --if this ever breaks i should just scan for "/temp/currently-playing/control.lua"
 

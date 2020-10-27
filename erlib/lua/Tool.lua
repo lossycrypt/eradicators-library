@@ -1,10 +1,13 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- A bunch of small utilities. Factorio already has "util" so this is Tool.
+-- A bunch of small experimental utilities that don't clearly belong into
+-- any of the other modules or do not have a good name yet.
+--
+-- Factorio already has "util" so this is Tool.
 -- Basically a collection of functions that don't fit into any other module.
 -- When a new module is added that is a good fit for one of these they
--- will be moved there on short notice so watch the changelog carefully.
+-- will be moved there on short notice so __watch the changelog carefully__.
 --
 -- @module Tool
 -- @usage
@@ -22,6 +25,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- -------------------------------------------------------------------------- --
 
 local stop = elreq('erlib/lua/Error')().Stopper('Tool')
+local log  = elreq('erlib/lua/Log'  )().Logger ('Tool')
 
 local Stacktrace = elreq ('erlib/factorio/Stacktrace')()
 
@@ -96,43 +100,87 @@ function Tool.Last(...)
  
  
 ----------
--- In-line trinary decision that allows nil and false.
+-- In-line ternary decision that allows nil and false.
 -- The lua idiom `(c and a or b)` doesn't work if false or nil
 -- are possible values for a or b.
 --
+-- Not to be confused with @{select}.
+--
 -- @tparam AnyValue condition If this is a @{Concepts.truthy|truty} value then
--- the then\_value will be returned, else the else\_value will be returned.
+-- the true\_value will be returned, else the false\_value will be returned.
 --
--- @tparam[opt] AnyValue then_value
--- @tparam[opt] AnyValue else_value
+-- @tparam AnyValue true_value
+-- @tparam AnyValue false_value
 --
--- @treturn AnyValue The then\_value or else\_value.
---
-function Tool.IfThenElse(condition,then_value,else_value)
-  if condition then
-    return then_value
-  else
-    return else_value
-    end
+-- @treturn AnyValue The true\_value or false\_value.
+-- 
+function Tool.Select(condition,true_value,false_value)
+  if condition then return true_value else return false_value end
   end
-  
+
+
+----------
+-- Returns the second argument given.
+-- About ~5% faster than @{select}(2,...)
+-- @tparam AnyValue ...
+-- @treturn AnyValue
+-- @function Tool.Select_second
+function Tool.Select_second(_,_) return _ end
+
+
+----------
+-- Returns the third argument given.
+-- About ~5% faster than @{select}(3,...)
+-- @tparam AnyValue ...
+-- @treturn AnyValue
+-- @function Tool.Select_third
+function Tool.Select_third(_,_,_) return _ end
+
+
 ----------
 -- Require()'s lua files relative to the calling file.
 --
--- @tparam string relative_path
+-- @tparam string relative_path Directories are seperated by "/" forward slash,
+-- ".." two full stops go up one directory.
 --
--- @treturn AnyValue the return values of @{require}(current\_dir..relative\_path).
+-- @treturn AnyValue the return value of @{require}("current\_dir/relative\_path").
 --
 function Tool.Import(relative_path)
-  local root, ok = Stacktrace.get_cur_dir(2)
-  if ok ~= true then
-    stop(
-      'Could not find relative path for Import.',
-      'Import does not work outside of factorio.',
-      relative_path)
+  local root, ok = Stacktrace.get_directory(2)
+  if ok ~= true then stop(
+    'Could not find relative path for Import.\n',
+    'Import does not work outside of factorio.\n',
+    relative_path)
     end
-  local seperator = (relative_path:find('/') ~= nil) and '/' or '.'
-  return require(root .. seperator .. relative_path)
+  local full_path = root .. relative_path
+  
+  -- Factorio does not support explicit relative paths.
+  -- So some basic interpretation is hardcoded.
+  if flag.IS_FACTORIO then
+    full_path = full_path
+      :gsub('/%./'         ,'/') -- relative path same directory
+      :gsub('/?[^/]+/%.%./','/') -- relative path one directory above
+      :gsub('/+'           ,'/') -- erroneous multi-slash
+      :gsub('^/'           ,'' ) -- erroneous starting slash (from /../ substitution)
+    end
+  
+  log:debug('Imported "', full_path, '".')
+  
+  -- Make nicer error messages when something fails.
+  local ok, chunk = pcall(require,full_path)
+  if ok ~= true then
+    -- ".lua" is automatically appended to the second part
+    -- of the message but not to the first.
+    local template = 'module %s not found;  no such file %s'
+    if chunk:gsub('%.lua$','') == template:format(full_path,full_path):gsub('%.lua$','') then
+      stop('Import failed. ', 'No such file:\n', full_path)
+    else
+      -- The error message is already formated. Possibly by a custom Stopper.
+      error('\n[color=blue]Import failed:\n'..full_path..'\n[/color]'..chunk)
+      end
+    end
+
+  return chunk
   end
  
 --------------------------------------------------------------------------------

@@ -28,7 +28,7 @@ local function Locked(name,mode)
     '\n',
     ('key    = %s'):format(String.to_string(key)),
     '\n',
-    Tool.IfThenElse(
+    Tool.Select(
       (mode == 'read'),nil,('value  = %s'):format(String.to_string(value))
       )
   ) end end

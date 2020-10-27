@@ -45,6 +45,7 @@ file = {
     root..'/erlib/test/_DocTest.lua' ,
     root..'/erlib/test/_TemplateModule.lua',
     root..'/erlib/test/_TemplateTest.lua',
+    root..'/erlib/factorio/EventManager/_TemplateEvent.lua',
     },
   
   }

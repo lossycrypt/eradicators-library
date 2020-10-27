@@ -27,8 +27,7 @@
 --
 -- @module EventManager
 -- @usage
---  local EventManager = require('__eradicators-library__/erlib/factorio/EventManager')()
-  
+--  local EventManager = require('__eradicators-library__/erlib/factorio/EventManager/EventManager-10')()
 
 --------------------------------------------------------------------------------
 -- Todo.
@@ -64,6 +63,9 @@
 --
 -- Would be nicer if EventManager stays agnostic and works automatically.
 -- This might require auto-detecting valid event names.
+--
+-- -> get_new_event_uid()
+-- Simultaenously creates a new id and makes it available via remote interface.
 --
 -- @table todo2
   
@@ -116,6 +118,20 @@
 ----------
 -- Change font-size of bootstrap_event_order blocks
 -- @table todo7  
+
+
+----------
+-- enqueue should deepcopy/shallow (?) to prevent putting 
+-- desync-unsafe table references into args. and prevent
+-- putting bullshit like functions into args.
+-- @table todo8
+
+
+----------
+-- "Unsafe" mode -> allowing to use new_handler at runtime
+-- should be disabled by default and only enabled if explicitly requested.
+-- EventManager.allow_runtime_handler_additions()
+-- @table todo9
   
 --------------------------------------------------------------------------------
 -- Concepts.
@@ -138,7 +154,7 @@
 do end
 
 ----------
--- A handler subscriped to 'action' instead of to an event.
+-- A handler subscribed to 'action' instead of to an event.
 -- 
 -- Actions are event handlers that are registered for the event_uid `"action"`.
 -- Actions __do not happen naturally__. Instead they are used with
@@ -149,7 +165,7 @@ do end
 do end
 
 ----------
--- A handler subscriped to defines.events.on_tick.
+-- A handler subscribed to defines.events.on_tick.
 --
 -- OnTick handlers handle __only__ @{FAPI events on_tick}. They can not
 -- be subscribed to any other type of event, and __can not be used as actions__.
@@ -259,6 +275,8 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 local log  = elreq('erlib/lua/Log'  )().Logger  'EventManager'
 local stop = elreq('erlib/lua/Error')().Stopper 'EventManager'
 
+local Stacktrace = elreq('erlib/factorio/Stacktrace')()
+
 local Verificate = elreq('erlib/lua/Verificate')()
 local Verify           , Verify_Or
     = Verificate.verify, Verificate.verify_or
@@ -274,6 +292,7 @@ local Crc32      = elreq('erlib/lua/Coding/Crc32')()
 local Cache      = elreq('erlib/factorio/Cache')()
 
 local L          = elreq('erlib/lua/Lambda'    )()
+
 
 local LuaBootstrap = script
 
@@ -293,9 +312,66 @@ local UID_INTERFACE_NAME = 'eradicators-library:custom-event-uids'
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
+-- do
+--  Draft: auto fetch correct copy of manager?
+-- 
+--   -- local this_file_name = Stacktrace.get_file_name(1)
+--   -- local this_directory = Stacktrace.get_directory(1)
+--   
+--   local relative_path = 
+--     ( Stacktrace.get_directory(1)
+--         :gsub(Stacktrace.get_mod_root(1),'')
+--     ..
+--       Stacktrace.get_file_name(1)
+--       )
+--     :gsub('/','.')
+--   
+--   
+--   for path, chunk in pairs(package.loaded) do
+--     if path:find(relative_path) then
+--       error('found: '..path)
+--       end
+--     end
+-- 
+--   end
+
+
+
 local EventManager,_EventManager,_uLocale = {},{},{}
 local Private = {} -- Not exported to outside scripts.
 
+
+-- -------------------------------------------------------------------------- --
+-- Runtime check                                                              --
+-- -------------------------------------------------------------------------- --
+
+if not Stacktrace.get_load_stage().control then
+  stop('EventManager only works in control stage.')
+  end
+
+if rawget(_ENV,'EVENT_MANAGER_ACTIVE') == nil then
+  rawset(_ENV,'EVENT_MANAGER_ACTIVE',true)
+else
+  stop('EventManager can only be loaded once per mod.')
+  end
+
+
+-- Methods that require write access to global Savedata
+-- must be protected from being run before on_load finishes,
+-- as they might see the empty invalid global Savedata table,
+-- that exists before the game loads the real Savedata
+-- into this mods lua state.
+
+-- The "global" table that exists before on_load is garbage.
+
+-- This flag must toggled "true" at the end of 
+-- on_init, on_config and on_load.
+local isOnLoadFinished = false
+local function VerifyIsOnLoadFinished(...)
+  if not isOnLoadFinished then
+    stop('This method can only be used inside event handlers.\n',...)
+    end
+  end
 
 -- -------------------------------------------------------------------------- --
 -- Savedata                                                                   --
@@ -548,6 +624,9 @@ local Queue -- not accessible before on_load
 local Queue_mt = {__index={
   -- Methods have to be meta so they are never stored in Savedata.
   
+  -- All of these must be called after VerifyIsOnLoadFinished().
+  -- For better performance they do not check it themselfs.
+  
   -- @tparam array queued_handler {uid,{arg1,arg2,...,argN}}
   raw_enqueue = function(self,tick,queued_handler)
     -- most of the time queue for a particular tick will *not* exist yet
@@ -715,11 +794,12 @@ for _, method in pairs {
   'set_event_filter'        ,
   'get_event_filter'        ,
   } do
-    EventManagerScript[method] = function()
+    EventManagerScript[method] = function(...)
       stop(
         'Function call blocked by EventManager.\n',
         'Wrapping is not implemented for:\n\n',
-        'script.', method, '()'
+        'script.', method, '()\n',
+        ...
         )
       end
   end
@@ -930,120 +1010,7 @@ do
   end
 
 
-
-
--- EM.on_event{
-  -- 'on_entity_built',
-  -- name = 'bla',
-  -- plugin = 'fake-plug',
-  -- enabled = false,
-  -- filter = function() end,
-  -- probability = 0,
-  -- period = 61,
-  -- function(e,p)
-    -- end}
-
--- EM.on_event{
-  -- 'on_entity_built::my_cool_handler',
-  -- name = 'bla',
-  -- plugin = 'fake-plug',
-  -- enabled = false,
-  -- filter = function() end,
-  -- probability = 0,
-  -- period = 61,
-  -- function(e,p)
-    -- end}
-
--- EM.on_event{
-  -- 'action',
-  -- name = 'some-one-time-thing',
-  -- plugin = 'fake-plug',
-  -- enabled = false,
-  -- filter = function() end,
-  -- probability = 0,
-  -- period = 61,
-  -- function(e,p)
-    -- end}
-
-    
--- -------------------------------------------------------------------------- --
--- Enqueue / Dequeue                                                          --
--- -------------------------------------------------------------------------- --
-
-
-----------
--- Schedule an action to be called in the future.
---
--- __Note:__ Can only be called from inside events.
--- 
--- @tparam NaturalNumber|DenseArray tick_delay How many ticks in the future this
--- should be executed.
--- 
--- @tparam string action_name The name used to register the handler you want
--- to call.
--- 
--- @tparam AnyValue ... Additional arguments that will be passed to the handler.
--- The exact values will be passed. In particular __table references will not
--- be protected__ against manipulation from multiple handlers.
---
--- @treturn DenseArray All ticks that the handler has been queued for. Useful
--- if you later want to dequeue it from specific ticks.
---
-function EventManager.enqueue(tick_delay,action_name,...)
-  -- The UnifiedQueue does not handle name collisions between 
-  -- OnTick and action handlers. It is thus nessecary that only
-  -- actions can be enqueued. EventManager.new_handler enforces
-  -- that actions and OnTick can never have the same name.
-
-  local handler_data = Private.get_handler_data_from_name(action_name)
-  Verify(handler_data.event_uids['action'], 'true', 'Can only enqueue actions.')
-
-  local ticks = Table.plural(tick_delay)
-  Verify(ticks,'NonEmptyDenseArrayOfNaturalNumber','Invalid tick_delay.')
-  return Queue:enqueue_action(ticks,handler_data,...)
-  end
-
-
-
-----------
--- Remove previously made future schedules for an action.
---
--- __Note:__ Can only be called from inside events.
---
--- @tparam string action_name
---
--- @tparam[opt=1] NaturalNumber from_tick
--- Do not remove the actions from ticks earlier than this.
---
--- @tparam[opt=infinity] NaturalNumber to_tick
--- Do not remove the actions from ticks later than this.
---
-function EventManager.dequeue(action_name,from_tick,to_tick)
-  local handler_data = Private.get_handler_data_from_name(action_name)
-  Verify(handler_data.event_uids['action'], 'true', 'Can only dequeue actions.')
-  Queue:dequeue_action(
-    handler_data,
-    from_tick or 0,
-    to_tick   or math.huge
-    )
-  end
-
-
-----------  
--- Calls a registered handler directly.
--- 
--- @tparam string handler_name 
--- @tparam[opt] AnyValue ... Additional arguments for the handler.
--- 
--- @return The data returned by the handler.
--- 
-function EventManager.call(handler_name,...)
-  log:debug('Handler called: ', handler_name)
-  local handler_data = Private.get_handler_data_from_name(handler_name)
-  return handler_data.f(...)
-  end
-
-    
+  
 -- -------------------------------------------------------------------------- --
 -- Enable / Disable                                                           --
 -- -------------------------------------------------------------------------- --
@@ -1052,6 +1019,7 @@ function EventManager.call(handler_name,...)
 -- @tparam string handler_name
 -- @tparam boolean _enabled On/Off
 function Private.set_handler_status(handler_data,_enabled)
+  VerifyIsOnLoadFinished()
   if handler_data.persistent then
     stop('Persistent handlers can not be toggled.\n',handler_data)
     end
@@ -1062,7 +1030,7 @@ function Private.set_handler_status(handler_data,_enabled)
      handler_data.enabled  = _enabled
     -- fixup savedata
     -- @future: should this always store, instead of only if not default?
-    Savedata.handler_status[handler_data.uid] = Tool.IfThenElse(
+    Savedata.handler_status[handler_data.uid] = Tool.Select(
       handler_data.default_enabled == _enabled, nil, _enabled
       )
     -- if OnTick handle Queue
@@ -1094,7 +1062,7 @@ function Private.set_handler_status(handler_data,_enabled)
 -- Enabling an on_tick handler will not run it immediately. It will be
 -- be run according to it's own period as if it had never been disabled.
 -- 
--- __Note:__ Can only be called from inside events.
+-- __Note:__ Can only be called from inside event handlers.
 --
 -- @tparam string handler_name
 --
@@ -1111,7 +1079,7 @@ function EventManager.enable(handler_name)
 --
 -- Disabled handlers do not recieve any events.
 -- 
--- __Note:__ Can only be called from inside events.
+-- __Note:__ Can only be called from inside event handlers.
 -- 
 -- @tparam string handler_name
 --
@@ -1123,10 +1091,91 @@ function EventManager.disable(handler_name)
   
   
 -- -------------------------------------------------------------------------- --
+-- Enqueue / Dequeue                                                          --
+-- -------------------------------------------------------------------------- --
+
+----------
+-- Schedule an action to be called in the future.
+--
+-- __Note:__ Can only be called from inside event handlers.
+-- 
+-- @tparam NaturalNumber|DenseArray tick_delay How many ticks in the future this
+-- should be executed.
+-- 
+-- @tparam string action_name The name used to register the handler you want
+-- to call.
+-- 
+-- @tparam AnyValue ... Additional arguments that will be passed to the handler.
+-- The exact values will be passed. In particular __table references will not
+-- be protected__ against manipulation from multiple handlers.
+--
+-- @treturn DenseArray All ticks that the handler has been queued for. Useful
+-- if you later want to dequeue it from specific ticks.
+--
+function EventManager.enqueue(tick_delay,action_name,...)
+  -- The UnifiedQueue does not handle name collisions between 
+  -- OnTick and action handlers. It is thus nessecary that only
+  -- actions can be enqueued. EventManager.new_handler enforces
+  -- that actions and OnTick can never have the same name.
+  VerifyIsOnLoadFinished()
+  
+  local handler_data = Private.get_handler_data_from_name(action_name)
+  Verify(handler_data.event_uids['action'], 'true', 'Can only enqueue actions.')
+
+  local ticks = Table.plural(tick_delay)
+  Verify(ticks,'NonEmptyDenseArrayOfNaturalNumber','Invalid tick_delay.')
+  return Queue:enqueue_action(ticks,handler_data,...)
+  end
+
+
+
+----------
+-- Remove previously made future schedules for an action.
+--
+-- __Note:__ Can only be called from inside event handlers.
+--
+-- @tparam string action_name
+--
+-- @tparam[opt=1] NaturalNumber from_tick
+-- Do not remove the actions from ticks earlier than this.
+--
+-- @tparam[opt=infinity] NaturalNumber to_tick
+-- Do not remove the actions from ticks later than this.
+--
+function EventManager.dequeue(action_name,from_tick,to_tick)
+  VerifyIsOnLoadFinished()
+  
+  local handler_data = Private.get_handler_data_from_name(action_name)
+  Verify(handler_data.event_uids['action'], 'true', 'Can only dequeue actions.')
+  
+  Queue:dequeue_action(
+    handler_data,
+    from_tick or 0,
+    to_tick   or math.huge
+    )
+  end
+
+
+----------  
+-- Calls a registered handler directly.
+-- 
+-- @tparam string handler_name 
+-- @tparam[opt] AnyValue ... Additional arguments for the handler.
+-- 
+-- @return The data returned by the handler.
+-- 
+function EventManager.call(handler_name,...)
+  log:debug('Handler called: ', handler_name)
+  local handler_data = Private.get_handler_data_from_name(handler_name)
+  return handler_data.f(...)
+  end
+
+
+  
+-- -------------------------------------------------------------------------- --
 -- on_every_event / on_every_tick                                             --
 -- -------------------------------------------------------------------------- --
 
-  
 do
   -- Straight table lookup for 100%, calculated on-the-fly for everything else.
   -- Must be different for each handler to prevent i.e. all 5% handlers from
@@ -1461,6 +1510,7 @@ function Private.on_load()
   Private.restore_handler_status()
   -- log:tell('Full Registry at end of on_load:',OrderedHandlers)
   EventManager.raise_private('on_load', nil)
+  isOnLoadFinished = true
   end
 
   
@@ -1500,7 +1550,7 @@ function Private.on_confinit()
 LuaBootstrap.on_load(function()
   if not Private.isSavedataUpToDate() then
     -- on_load before on_config
-    log:debug('Skipping on_load: Savedata.event_manager missing or outdated.')
+    log:info('Skipping on_load: Savedata.event_manager missing or outdated.')
     return
     end
   log:debug('Bootstrap      : on_load')
@@ -1545,7 +1595,7 @@ LuaBootstrap.on_event(defines.events,nil)
 -- forces and players. And the researching and __un__researching of technologies.
 --
 -- All simulated events are raised with the additional event data
--- `simulated = true` to make them distingusishable from natural events.
+-- `{simulated = true}` to make them distingusishable from natural events.
 --
 -- Simulation also happens when the mod is first added to a map. This means
 -- even __if your mod is added to an old map__ you will still recieve i.e.
@@ -1559,7 +1609,7 @@ LuaBootstrap.on_event(defines.events,nil)
 -- 
 -- 
 -- @table Simulation
--- @within Concepts
+-- @within Simulation
 
 
 --[[
@@ -1848,50 +1898,26 @@ do
     
   end
   
+--------------------------------------------------------------------------------
+-- CustomEvents.
+-- @section CustomEvents
+--------------------------------------------------------------------------------
   
--- -------------------------------------------------------------------------- --
--- Testing                                                                    --
--- -------------------------------------------------------------------------- --
+----------
+-- dummy
+-- @table dummy
+  
+if flag.IS_DEV_MODE then
+  Tool.Import('event_test_dynamic_endisable_endequeue')(EventManager)
+  end
 
-EventManager.new_handler {
-  name = 'test ticker',
-  defines.events.on_tick,
-  period = 67,
-  enabled = false,
-  function(tick)
-    log:say('ticked!',tick)
-    end
-  }
-  
-EventManager.new_handler {
-  name = 'build tester',
-  defines.events.on_built_entity,
-  function(e)
-    log:say('built! ',e.created_entity,e.created_entity.name)
-    
-    if e.created_entity.type == 'assembling-machine' then
-      EventManager.disable('test ticker')
-      EventManager.enqueue(1,'test action',1,2,3,{['4']=5})
-      EventManager.enqueue(2,'test action',1,2,3,{['4']=5})
-      EventManager.enqueue(3,'test action',1,2,3,{['4']=5})
-      EventManager.enqueue(4,'test action',1,2,3,{['4']=5})
-      EventManager.enqueue(Table.range(5,9),'test action')
-      
-      EventManager.dequeue('test action',game.tick+2,game.tick + 10)
-      EventManager.enqueue(120,'test action',1,2,3,{['4']=5})
-    else
-      EventManager.enable('test ticker')
-      end
-    end,
-  }
-  
-EventManager.new_handler {
-  'action',
-  name = 'test action',
-  function(tick,...)
-    log:say('delayed test action! ',...)
-    end,
-  }
+if true then -- EventManager.enable_extra_events()?
+
+  -- Each event must detect if there are subscriptions to it.
+
+  -- Tool.Import('event_on_entity_created')(EventManager)
+  end
+
   
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

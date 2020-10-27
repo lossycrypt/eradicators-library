@@ -64,9 +64,11 @@ String.LOWER_ARGS    = 'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
 function String.count(str,pattern)
   -- Empty gsub() replace is 7% faster than find() loop.
   -- Local gsub is 2% faster than str:gsub().
+  -- All types of "select(2,...)" are slower due to function overhead.
   local _,c = string_gsub(str,pattern,'')
-  return c end
-
+  return c
+  end
+  
   
 --------------------------------------------------------------------------------
 -- Create strings.
@@ -419,42 +421,79 @@ function String.remove_rich_text_tags(str)
 ----------
 -- __PROOF OF CONCEPT__. __SLOW__. Do not use in production.   
 -- Python-esque string formatting from locals and upvalues.
--- @tparam string str the formatting pattern
+--
+-- __Quirk:__ Lua functions only see upvalues that they actually
+-- use. If an upvalue is not used inside the format-calling function
+-- then a same named global variable will be used if it exists.
+--
+-- @tparam string str The template to be formatted.
+--
+-- @treturn string The formatted output.
+-- @treturn NaturalNumber The total number of formatted patterns.
+--
 -- @usage
---   local f = String._poc_format
+--   -- A variable name in curly brackets is the basic pattern.
+--   local t = '{varname}'
+--   -- You can also use string.format() syntax.
+--   local t = '{varname:2.2f'}
+--
+-- @usage
+--   local F = String.smart_format
 --   function test(name,surname)
---     print(f'Hi. My name is {name} {surname}!')
+--     print(F'Hi. My name is {name} {surname}!')
 --     end
 --   test('E.R.','Adicator')
 --   > Hi. My name is E.R. Adicator!
-function String._poc_format(str)
+--
+-- @function String.smart_format
+--
+do 
+  local debug_getinfo, debug_getupvalue, debug_getlocal
+      = debug.getinfo, debug.getupvalue, debug.getlocal
+      
+  local string_gsub, string_format, tostring, tonumber, setmetatable
+      = string.gsub, string.format, tostring, tonumber, setmetatable 
+      
+  -- Test commands
+  -- load_erlib(); bla = '5'; local bla3 = 5; local bla3 = 3 ; local blax = 'blax'; print( (function() return ( F'{bla}{bla2}{bla3}{blax}' ) end)()  )
+      
+function String.smart_format(str)
   -- [1] http://lua-users.org/lists/lua-l/2004-01/msg00075.html
   -- Identifiers in Lua can be any string of letters, digits, and
-  -- underscores, not beginning with a digit.  
-  local caller = debug.getinfo(2,'f').func
-  local values = {} 
+  -- underscores, not beginning with a digit.
+  local caller = debug_getinfo(2,'f').func
+  local values = {}
   --upvalues
+  --(only included if the function references them)
   local i=0; while true do i=i+1
-    local k,v = debug.getupvalue(caller,i)
+    local k,v = debug_getupvalue(caller,i)
     if k == nil then break end
-    values[k]=v
+    values[k] = v
     end
   --locals (overshadow upvalues)
   local i=0; while true do i=i+1
-    local k,v = debug.getlocal(2,i)
+    local k,v = debug_getlocal(2,i)
     if k == nil then break end
-    values[k]=v
+    values[k] = v
     end
-  --string replace one-by-one
-  --@todo: can this be streamlined into a single call for :format?
-  for match,key,tail in string.gmatch(str,'({([_%a][_%w]*):?(.-)})') do
-    local value = values[key]
-    if tail == '' then tail = 's' end -- singular % is not valid format string
-    str = str:gsub(match,'%%'..tail):format(value) -- nil becomes "nil"
-    end  
-  return str
+  --globals
+  setmetatable(values,{__index=values._ENV or _ENV});
+  --format
+  return string_gsub(
+    str,
+    '({([_%a][_%w]*):?(.-)})', -- "{_varname0:tail}", tail is format spec or nil
+    function(_,key,tail)
+      local value = values[key]
+      -- do not replace if no value was found
+      if value == nil then return nil end
+      -- full string format, default "%s"
+      return string_format('%'..((tail == '') and 's' or tail), value )
+      -- naive plain text
+      -- return tostring(values[key])
+      end
+    )
   end
-
+  end
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

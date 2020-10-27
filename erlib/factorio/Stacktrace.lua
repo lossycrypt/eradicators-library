@@ -83,7 +83,7 @@ local function _get_info(l)
 -- l=0 the last file on the stack (the file containing this function).
 --
 -- @tparam[opt=1] integer l The stack level at which to get the info.
--- @treturn {short_src=,...} The output of @{debug.getinfo} at the given level.
+-- @treturn {source=,...} The output of @{debug.getinfo} at the given level.
 --
 function Stacktrace.get_info(l)
   local info = _get_info(l) -- tail-call would alter the stack height!
@@ -109,7 +109,7 @@ function Stacktrace.get_all_info()
 function Stacktrace.get_pos(l)
   local info = _get_info(l)
   if info then
-    return info.short_src:match'[^/]+$':sub(1,50)
+    return info.source:match'[^/]+$'
       ..':' .. info.currentline
     end
   end
@@ -133,22 +133,27 @@ function Stacktrace.print_info(l)
 --But scenario detection isn't implemented.
 --"/temp/currently-playing/control.lua"
 
--- @tparam string pattern what to look for in short_src
+-- @tparam string pattern what to look for in debug.getinfo().source
 -- @tparam string fallback what to return if the pattern returned nil
 -- @tparam Array substitutes {pattern,replace} groups gsub'ed before return
-local function _src_getter(pattern,fallback,substitutes)
+-- @tparam string postfix the trailing slash for directories
+local function _src_getter(pattern,fallback,substitutes,postfix)
+  postfix = postfix or ''
   return function(l)
     local info,r = _get_info(l),nil
     if info then
-      r = info.short_src:match(pattern)
+      -- short_src truncates the path if it gets too long, rendering
+      -- it unusable. full source always starts the path with @ "at"
+      -- if it is a lua file.
+      r = info.source:match(pattern)
       end
     --no info *or* pattern mis-match
-    if not r then return fallback, false
+    if not r then return fallback..postfix, false
     else
       for _,s in ipairs(substitutes or {}) do
         r = r:gsub(s[1],s[2])
         end
-      return r, true
+      return r..postfix, true
       end
     end
   end
@@ -158,38 +163,55 @@ local function _src_getter(pattern,fallback,substitutes)
 --
 -- @tparam[opt=1] integer l
 -- @treturn string name of the mod at level l: "my-mod-name"
--- or "unknown/scenario" if the check failed.
+-- or "unknown-or-scenario" if the check failed.
 -- @treturn boolean if the name was found.
 --
 -- @function Stacktrace.get_mod_name
 --
-Stacktrace.get_mod_name = _src_getter('^__(.+)__/?','unknown/scenario')
+Stacktrace.get_mod_name = _src_getter('^@__(.+)__/?','unknown-or-scenario')
 
 
 ----------
--- →　"\_\_my-mod-name\_\_"
+-- →　"\_\_my-mod-name\_\_/"
 --
 -- @tparam[opt=1] integer l
--- @treturn string "\_\_my-mod-name\_\_" root of the mod at level l
--- or "\_\_unknown/scenario\_\_" if the check failed.
+-- @treturn string "\_\_my-mod-name\_\_/" root of the mod at level l
+-- or "\_\_unknown-or-scenario\_\_/" if the check failed.
 -- @treturn boolean if the root was found.
 --
 -- @function Stacktrace.get_mod_root
 --
-Stacktrace.get_mod_root = _src_getter('^(__.+__)/?','__unknown/scenario__')
+Stacktrace.get_mod_root = _src_getter('^@(__.+__)/?','__unknown-or-scenario__',nil,'/')
 
 
 ----------
--- →　"\_\_my-mod-name\_\_/sub/directory"
+-- →　"my-modded-file.lua"
 --
 -- @tparam[opt=1] integer l
--- @treturn string "\_\_my-mod-name\_\_/sub/directory" directory of the mod at level l
--- or "\_\_unknown/scenario\_\_" if the check failed.
+-- @treturn string|nil "my-modded-file.lua" file of the mod at level l
+-- or "file-not-found.lua" if the check failed.
 -- @treturn boolean if the root was found.
 --
--- @function Stacktrace.get_cur_dir
+-- @function Stacktrace.get_file_name
+Stacktrace.get_file_name = _src_getter('([^/]+)%.lua$','file-not-found.lua')
+
+
+----------
+-- →　"\_\_my-mod-name\_\_/sub/directory/"
 --
-Stacktrace.get_cur_dir  = _src_getter('^(.*)/','__unknown/scenario__')
+-- @tparam[opt=1] integer l
+-- @treturn string "\_\_my-mod-name\_\_/sub/directory/" directory of the mod at level l
+-- or "\_\_unknown-or-scenario\_\_/" if the check failed.
+-- @treturn boolean if the root was found.
+--
+-- @usage
+--   local full_path = Stacktrace.get_directory(1) .. Stacktrace.get_file_name(1)
+--   print(full_path)
+--   > __my-mod-name__/sub/directory/my-modded-file.lua
+--
+-- @function Stacktrace.get_directory
+--
+Stacktrace.get_directory  = _src_getter('^@(.*)/','__unknown-or-scenario__',nil,'/')
 
 
 ----------
@@ -203,13 +225,13 @@ function Stacktrace.path2name(path)
   end
 
 ----------
--- "my-mod-name" → "\_\_my-mod-name\_\_"
+-- "my-mod-name" → "\_\_my-mod-name\_\_/"
 --
 -- @string name "my-mod-name" the undecorated name of a mod
--- @treturn string "\_\_my-mod-name\_\_" the absolute root of the mod
+-- @treturn string "\_\_my-mod-name\_\_/" the absolute root of the mod
 --
 function Stacktrace.name2root(name)
-  return '__'..name..'__'
+  return '__'..name..'__/'
   end
 
 
@@ -217,6 +239,9 @@ function Stacktrace.name2root(name)
 -- -------------------------------------------------------------------------- --
 -- Factorio stage + phase (dynamic)                                           --
 -- -------------------------------------------------------------------------- --
+
+--These must be used with level "-1", other levels
+--would just retrieve the filename.
 
 --stage: "settings", "data" or "control"
 Stacktrace._get_raw_load_stage = 
@@ -226,6 +251,7 @@ Stacktrace._get_raw_load_stage =
 Stacktrace._get_raw_load_phase = 
   _src_getter('([^/]+)%.lua$','?',{{'-','_'}})
 
+  
 
 -- -------------------------------------------------------------------------- --
 -- Factorio stage + phase (pre-calculate + closurize)                         --
@@ -267,6 +293,8 @@ function Stacktrace._unsafe_get_stage_and_phase()
 -- Load Stage/Phase can not change during runtime so it's cheaper to cache the
 -- result. but it's safer if returned tables are unique per call anyway
 local _load_stage, _load_phase = Stacktrace. _unsafe_get_stage_and_phase()
+
+
 
 --------------------------------------------------------------------------------
 -- !Main.

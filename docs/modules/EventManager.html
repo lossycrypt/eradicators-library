@@ -38,7 +38,10 @@
 <li><a href="#Examples">Examples </a></li>
 <li><a href="#Event_groups">Event groups </a></li>
 <li><a href="#Registry">Registry </a></li>
-<li><a href="#Concepts">Concepts</a></li>
+<li><a href="#Simulation">Simulation</a></li>
+<li><a href="#CustomEvents">CustomEvents </a></li>
+<li><a href="#factorio_EventManager_event_on_entity_created_Functions">factorio.EventManager.event_on_entity_created Functions</a></li>
+<li><a href="#factorio_EventManager_event_test_dynamic_endisable_endequeue_Functions">factorio.EventManager.event_test_dynamic_endisable_endequeue Functions</a></li>
 </ul>
 
 
@@ -118,7 +121,7 @@
 </p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local EventManager = require(&apos;__eradicators-library__/erlib/factorio/EventManager&apos;)()
+        <pre class="example">local EventManager = require(&apos;__eradicators-library__/erlib/factorio/EventManager/EventManager-10&apos;)()
 </pre>
     </ul>
 
@@ -131,19 +134,15 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Action">Action</a></td>
-	<td class="summary">A handler subscriped to 'action' instead of to an event.</td>
+	<td class="summary">A handler subscribed to 'action' instead of to an event.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#OnTick">OnTick</a></td>
-	<td class="summary">A handler subscriped to defines.events.on_tick.</td>
+	<td class="summary">A handler subscribed to defines.events.on_tick.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#NonTick">NonTick</a></td>
 	<td class="summary">A handler subscribed to any event except on_tick.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#Simulation">Simulation</a></td>
-	<td class="summary">Enforces raising of easily missable events.</td>
 	</tr>
 </table>
 <h2><a href="#Todo">Todo </a></h2>
@@ -194,6 +193,16 @@
 	<td class="name" nowrap><a href="#todo7">todo7</a></td>
 	<td class="summary">Change font-size of bootstrap<em>event</em>order blocks</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#todo8">todo8</a></td>
+	<td class="summary">enqueue should deepcopy/shallow (?) to prevent putting
+ desync-unsafe table references into args.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#todo9">todo9</a></td>
+	<td class="summary">"Unsafe" mode -> allowing to use new_handler at runtime
+ should be disabled by default and only enabled if explicitly requested.</td>
+	</tr>
 </table>
 <h2><a href="#Behavior">Behavior </a></h2>
 <table class="function_list">
@@ -241,6 +250,14 @@
 	<td class="summary">Add another event handler.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#enable">enable(handler_name)</a></td>
+	<td class="summary">Enables a handler.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#disable">disable(handler_name)</a></td>
+	<td class="summary">Disables a handler.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#enqueue">enqueue(tick_delay, action_name, ...)</a></td>
 	<td class="summary">Schedule an action to be called in the future.</td>
 	</tr>
@@ -252,36 +269,33 @@
 	<td class="name" nowrap><a href="#call">call(handler_name[, ...])</a></td>
 	<td class="summary">Calls a registered handler directly.</td>
 	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#enable">enable(handler_name)</a></td>
-	<td class="summary">Enables a handler.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#disable">disable(handler_name)</a></td>
-	<td class="summary">Disables a handler.</td>
-	</tr>
 </table>
-<h2><a href="#Concepts">Concepts</a></h2>
+<h2><a href="#Simulation">Simulation</a></h2>
 <table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#event_uid">event_uid</a></td>
-	<td class="summary">The unique identifier of an event.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#Action">Action</a></td>
-	<td class="summary">A handler subscriped to 'action' instead of to an event.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#OnTick">OnTick</a></td>
-	<td class="summary">A handler subscriped to defines.events.on_tick.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#NonTick">NonTick</a></td>
-	<td class="summary">A handler subscribed to any event except on_tick.</td>
-	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Simulation">Simulation</a></td>
 	<td class="summary">Enforces raising of easily missable events.</td>
+	</tr>
+</table>
+<h2><a href="#CustomEvents">CustomEvents </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#dummy">dummy</a></td>
+	<td class="summary">dummy</td>
+	</tr>
+</table>
+<h2><a href="#factorio_EventManager_event_on_entity_created_Functions">factorio.EventManager.event_on_entity_created Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#on_entity_created">on_entity_created</a></td>
+	<td class="summary">Combines all entity building related events into one.</td>
+	</tr>
+</table>
+<h2><a href="#factorio_EventManager_event_test_dynamic_endisable_endequeue_Functions">factorio.EventManager.event_test_dynamic_endisable_endequeue Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#test_dynamic_endisable_endequeue">test_dynamic_endisable_endequeue</a></td>
+	<td class="summary">Custom Event Description</td>
 	</tr>
 </table>
 
@@ -320,7 +334,7 @@
     <strong>Action</strong>
     </dt>
     <dd>
-    A handler subscriped to 'action' instead of to an event. </p>
+    A handler subscribed to 'action' instead of to an event. </p>
 
 <p> Actions are event handlers that are registered for the event_uid <code>&quot;action&quot;</code>.
  Actions <strong>do not happen naturally</strong>. Instead they are used with
@@ -339,7 +353,7 @@
     <strong>OnTick</strong>
     </dt>
     <dd>
-    A handler subscriped to defines.events.on_tick. </p>
+    A handler subscribed to defines.events.on_tick. </p>
 
 <p> OnTick handlers handle <strong>only</strong> <a href="../api/events.html#on_tick">on_tick</a>. They can not
  be subscribed to any other type of event, and <strong>can not be used as actions</strong>.
@@ -361,47 +375,6 @@
 <p> Can be subscribed to any event type or custom input.
  Can simultaenously handle multiple event types and <strong>can be used as</strong>
  <a href="../modules/EventManager.html#Action">Actions</a>.
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Simulation"></a>
-    <strong>Simulation</strong>
-    </dt>
-    <dd>
-    Enforces raising of easily missable events. </p>
-
-<p> Because of certain quirks of the factorio engine a mod might not
- recieve an event even if it has a handler for that event.</p>
-
-<p> Specifically a mod will not recieve <strong>any</strong> events before it's own
- on_init handler has finished. Thus any events raised by <strong>other mods</strong>
- during their on_init will be missed. I call this <strong>overshadowing</strong>.</p>
-
-<p> Simulation aims to reduce edge cases and make event handlers more reliable.
- For this EventManager simulates <strong>some</strong> of these
- overshadowed events when it detects them in it's own on_init. </p>
-
-<p> Namely EventManager detects the creation and deletition of surfaces,
- forces and players. And the researching and <strong>un</strong>researching of technologies.</p>
-
-<p> All simulated events are raised with the additional event data
- <code>simulated = true</code> to make them distingusishable from natural events.</p>
-
-<p> Simulation also happens when the mod is first added to a map. This means
- even <strong>if your mod is added to an old map</strong> you will still recieve i.e.
- on_player_created for <strong>all</strong> players that already exist in the map.
- Removing the need to manually detect which players, forces or surfaces
- already existed before.</p>
-
-<p> <strong>Known Issue:</strong> Simulated on_forces_merged events only contains <code>source_index</code>,
- but not <code>source_name</code> or <code>destination</code> because that information is lost for
- overshadowed force mergers.
 
 
 
@@ -463,7 +436,10 @@
  Is that still useful?</p>
 
 <p> Would be nicer if EventManager stays agnostic and works automatically.
- This might require auto-detecting valid event names.
+ This might require auto-detecting valid event names.</p>
+
+<p> -> get<em>new</em>event_uid()
+ Simultaenously creates a new id and makes it available via remote interface.
 
 
 
@@ -559,6 +535,38 @@
     </dt>
     <dd>
     Change font-size of bootstrap<em>event</em>order blocks
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "todo8"></a>
+    <strong>todo8</strong>
+    </dt>
+    <dd>
+    enqueue should deepcopy/shallow (?) to prevent putting
+ desync-unsafe table references into args.  and prevent
+ putting bullshit like functions into args.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "todo9"></a>
+    <strong>todo9</strong>
+    </dt>
+    <dd>
+    "Unsafe" mode -> allowing to use new<em>handler at runtime
+ should be disabled by default and only enabled if explicitly requested.
+ EventManager.allow</em>runtime<em>handler</em>additions()
 
 
 
@@ -848,13 +856,71 @@ StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_init+ON_LOAD   -   
 
 </dd>
     <dt>
+    <a name = "enable"></a>
+    <strong>enable(handler_name)</strong>
+    </dt>
+    <dd>
+    Enables a handler.
+ Works for OnTick and all other events. Has no meaning for actions.</p>
+
+<p> Enabling an on_tick handler will not run it immediately. It will be
+ be run according to it's own period as if it had never been disabled.</p>
+
+<p> <strong>Note:</strong> Can only be called from inside event handlers.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">handler_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "disable"></a>
+    <strong>disable(handler_name)</strong>
+    </dt>
+    <dd>
+    Disables a handler.
+ Works for OnTick and all other events.
+ Has no meaning for actions.</p>
+
+<p> Disabled handlers do not recieve any events.</p>
+
+<p> <strong>Note:</strong> Can only be called from inside event handlers.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">handler_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "enqueue"></a>
     <strong>enqueue(tick_delay, action_name, ...)</strong>
     </dt>
     <dd>
     Schedule an action to be called in the future. </p>
 
-<p> <strong>Note:</strong> Can only be called from inside events.
+<p> <strong>Note:</strong> Can only be called from inside event handlers.
 
 
     <h3>Parameters:</h3>
@@ -896,7 +962,7 @@ StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_init+ON_LOAD   -   
     <dd>
     Remove previously made future schedules for an action. </p>
 
-<p> <strong>Note:</strong> Can only be called from inside events.
+<p> <strong>Note:</strong> Can only be called from inside event handlers.
 
 
     <h3>Parameters:</h3>
@@ -957,145 +1023,10 @@ StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_init+ON_LOAD   -   
 
 
 </dd>
-    <dt>
-    <a name = "enable"></a>
-    <strong>enable(handler_name)</strong>
-    </dt>
-    <dd>
-    Enables a handler.
- Works for OnTick and all other events. Has no meaning for actions.</p>
-
-<p> Enabling an on_tick handler will not run it immediately. It will be
- be run according to it's own period as if it had never been disabled.</p>
-
-<p> <strong>Note:</strong> Can only be called from inside events.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">handler_name</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "disable"></a>
-    <strong>disable(handler_name)</strong>
-    </dt>
-    <dd>
-    Disables a handler.
- Works for OnTick and all other events.
- Has no meaning for actions.</p>
-
-<p> Disabled handlers do not recieve any events.</p>
-
-<p> <strong>Note:</strong> Can only be called from inside events.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">handler_name</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
 </dl>
-    <h2 class="section-header "><a name="Concepts"></a>Concepts</h2>
+    <h2 class="section-header "><a name="Simulation"></a>Simulation</h2>
 
     <dl class="function">
-    <dt>
-    <a name = "event_uid"></a>
-    <strong>event_uid</strong>
-    </dt>
-    <dd>
-    The unique identifier of an event. </p>
-
-<p> An event_uid is any <a href="https://www.lua.org/pil/2.3.html">number</a> or <a href="../lua-5.2/doc/manual.html#pdf-string">string</a> that could be used to register
- an event handler with script.on_event(event_uid,handler_function).</p>
-
-<p> That means any number from <a href="../api/defines.html#defines.events">defines.events</a>,
- any number generated with script.generate_event_name(),
- any string that is the name of a <a href="../api/LuaCustomInputPrototype.html#">LuaCustomInputPrototype</a>,
- or one of the literal strings
- <code>&quot;action&quot;</code>, <code>&quot;on_init&quot;</code>, <code>&quot;on_load</code>" and <code>&quot;on_config</code>".
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Action"></a>
-    <strong>Action</strong>
-    </dt>
-    <dd>
-    A handler subscriped to 'action' instead of to an event. </p>
-
-<p> Actions are event handlers that are registered for the event_uid <code>&quot;action&quot;</code>.
- Actions <strong>do not happen naturally</strong>. Instead they are used with
- <a href="../modules/EventManager.html#enqueue">EventManager.enqueue</a> and <a href="../modules/EventManager.html#dequeue">EventManager.dequeue</a> to manually
- schedule <strong>future</strong> script actions that do not depend on events.
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "OnTick"></a>
-    <strong>OnTick</strong>
-    </dt>
-    <dd>
-    A handler subscriped to defines.events.on_tick. </p>
-
-<p> OnTick handlers handle <strong>only</strong> <a href="../api/events.html#on_tick">on_tick</a>. They can not
- be subscribed to any other type of event, and <strong>can not be used as actions</strong>.
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "NonTick"></a>
-    <strong>NonTick</strong>
-    </dt>
-    <dd>
-    A handler subscribed to any event except on_tick. </p>
-
-<p> Can be subscribed to any event type or custom input.
- Can simultaenously handle multiple event types and <strong>can be used as</strong>
- <a href="../modules/EventManager.html#Action">Actions</a>.
-
-
-
-
-
-
-
-</dd>
     <dt>
     <a name = "Simulation"></a>
     <strong>Simulation</strong>
@@ -1118,7 +1049,7 @@ StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_init+ON_LOAD   -   
  forces and players. And the researching and <strong>un</strong>researching of technologies.</p>
 
 <p> All simulated events are raised with the additional event data
- <code>simulated = true</code> to make them distingusishable from natural events.</p>
+ <code>{simulated = true}</code> to make them distingusishable from natural events.</p>
 
 <p> Simulation also happens when the mod is first added to a map. This means
  even <strong>if your mod is added to an old map</strong> you will still recieve i.e.
@@ -1138,13 +1069,123 @@ StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_init+ON_LOAD   -   
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="CustomEvents"></a>CustomEvents </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "dummy"></a>
+    <strong>dummy</strong>
+    </dt>
+    <dd>
+    dummy
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="factorio_EventManager_event_on_entity_created_Functions"></a>factorio.EventManager.event_on_entity_created Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "on_entity_created"></a>
+    <strong>on_entity_created</strong>
+    </dt>
+    <dd>
+    Combines all entity building related events into one. </p>
+
+<p> <a href="../api/Events.html#on_built_entity">on_built_entity</a> <br/>
+ <a href="../api/Events.html#on_robot_built_entity">on_robot_built_entity</a> <br/>
+ <a href="../api/Events.html#script_raised_built">script_raised_built</a> <br/>
+ <a href="../api/Events.html#script_raised_revive">script_raised_revive</a> <br/>
+ <a href="../api/Events.html#on_entity_cloned">on_entity_cloned</a> <br/>
+ <a href="../api/Events.html#on_trigger_created_entity">on_trigger_created_entity</a>
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">created_entity</span>
+            <span class="types"><span class="type">LuaEntity</span></span>
+         The entity built.
+        </li>
+        <li><span class="parameter">robot</span>
+            <span class="types"><span class="type">LuaEntity</span></span>
+         The robot that did the building.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">player</span>
+            <span class="types"><span class="type">LuaPlayer</span></span>
+         The player who did the building.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">player_index</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#uint">uint</a></span>
+
+
+
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">stack</span>
+            <span class="types"><span class="type">LuaItemStack</span></span>
+         The item used to do the building.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">item</span>
+            <span class="types"><span class="type">LuaItemPrototype</span></span>
+         The item prototype used to build the entity. Note this won't exist in some situations (built from blueprint, undo, etc).
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">tags</span>
+            <span class="types"><span class="type">Tags</span></span>
+         The tags associated with this entity.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">clone_source</span>
+            <span class="types"><span class="type">LuaEntity</span></span>
+         The entity that this entity was cloned from.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">trigger_source</span>
+            <span class="types"><span class="type">LuaEntity</span></span>
+         The entity with a trigger prototype (such as capsules) that created this entity.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="factorio_EventManager_event_test_dynamic_endisable_endequeue_Functions"></a>factorio.EventManager.event_test_dynamic_endisable_endequeue Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "test_dynamic_endisable_endequeue"></a>
+    <strong>test_dynamic_endisable_endequeue</strong>
+    </dt>
+    <dd>
+    Custom Event Description
+
+
+
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-10-26 00:08:26 </i>
+<i style="float:right;">Last updated 2020-10-27 07:04:57 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

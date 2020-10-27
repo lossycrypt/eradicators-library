@@ -44,11 +44,11 @@ local function Test()
   
   if flag.IS_FACTORIO then
     assert(Stacktrace.get_mod_name(-1) == 'eradicators-library'    )
-    assert(Stacktrace.get_mod_root(-1) == '__eradicators-library__')
-    assert(Stacktrace.get_cur_dir ( 1) == '__eradicators-library__/erlib/test')
+    assert(Stacktrace.get_mod_root(-1) == '__eradicators-library__/')
+    assert(Stacktrace.get_directory ( 1) == '__eradicators-library__/erlib/test/')
     
-    assert(Stacktrace.path2name(Stacktrace.get_cur_dir(-1)) == 'eradicators-library')
-    assert(Stacktrace.name2root(Stacktrace.get_mod_name(0)) == Stacktrace.get_mod_root(0))
+    assert(Stacktrace.path2name(Stacktrace.get_directory(-1)) == 'eradicators-library')
+    assert(Stacktrace.name2root(Stacktrace.get_mod_name ( 0)) == Stacktrace.get_mod_root(0))
   
     end
   say('  TESTR  @  erlib.Stacktrace → Ok')

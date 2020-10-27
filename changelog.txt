@@ -20,6 +20,9 @@ Date: 2020-10-21
     - New function Array.flatten
     - New module EventManager
     - New remote shared_event_uids
+  Fixes:
+    - Fixes Stacktrace not working with long file paths.
+    - Stacktrace directory paths now always include a trailing / slash.
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.17
 Date: 2020-10-06

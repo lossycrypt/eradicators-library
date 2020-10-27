@@ -83,11 +83,12 @@
 <div id="content">
 
 <h1>Module <code>Tool</code></h1>
-<p>A bunch of small utilities.</p>
+<p>A bunch of small experimental utilities that don't clearly belong into
+ any of the other modules or do not have a good name yet.</p>
 <p> Factorio already has "util" so this is Tool.
  Basically a collection of functions that don't fit into any other module.
  When a new module is added that is a good fit for one of these they
- will be moved there on short notice so watch the changelog carefully.</p>
+ will be moved there on short notice so <strong>watch the changelog carefully</strong>.</p>
     <h3>Usage:</h3>
     <ul>
         <pre class="example">local Tool = require(&apos;__eradicators-library__/erlib/factorio/Tool&apos;)()
@@ -110,8 +111,16 @@
 	<td class="summary">Get the last non-nil value.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#IfThenElse">IfThenElse(condition[, then_value[, else_value]])</a></td>
-	<td class="summary">In-line trinary decision that allows nil and false.</td>
+	<td class="name" nowrap><a href="#Select">Select(condition, true_value, false_value)</a></td>
+	<td class="summary">In-line ternary decision that allows nil and false.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Select_second">Select_second(...)</a></td>
+	<td class="summary">Returns the second argument given.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Select_third">Select_third(...)</a></td>
+	<td class="summary">Returns the third argument given.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Import">Import(relative_path)</a></td>
@@ -229,13 +238,15 @@
 
 </dd>
     <dt>
-    <a name = "IfThenElse"></a>
-    <strong>IfThenElse(condition[, then_value[, else_value]])</strong>
+    <a name = "Select"></a>
+    <strong>Select(condition, true_value, false_value)</strong>
     </dt>
     <dd>
-    In-line trinary decision that allows nil and false.
+    In-line ternary decision that allows nil and false.
  The lua idiom <code>(c and a or b)</code> doesn't work if false or nil
- are possible values for a or b.
+ are possible values for a or b.</p>
+
+<p> Not to be confused with <a href="../lua-5.2/doc/manual.html#pdf-select">select</a>.
 
 
     <h3>Parameters:</h3>
@@ -243,21 +254,19 @@
         <li><span class="parameter">condition</span>
             <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
          If this is a <a href="../modules/Concepts.html#truthy">truty</a> value then
- the then_value will be returned, else the else_value will be returned.
+ the true_value will be returned, else the false_value will be returned.
         </li>
-        <li><span class="parameter">then_value</span>
+        <li><span class="parameter">true_value</span>
             <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
 
 
 
-         (<em>optional</em>)
         </li>
-        <li><span class="parameter">else_value</span>
+        <li><span class="parameter">false_value</span>
             <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
 
 
 
-         (<em>optional</em>)
         </li>
     </ul>
 
@@ -265,7 +274,71 @@
     <ol>
 
            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
-        The then_value or else_value.
+        The true_value or false_value.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Select_second"></a>
+    <strong>Select_second(...)</strong>
+    </dt>
+    <dd>
+    Returns the second argument given.
+ About ~5% faster than <a href="../lua-5.2/doc/manual.html#pdf-select">select</a>(2,...)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Select_third"></a>
+    <strong>Select_third(...)</strong>
+    </dt>
+    <dd>
+    Returns the third argument given.
+ About ~5% faster than <a href="../lua-5.2/doc/manual.html#pdf-select">select</a>(3,...)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
     </ol>
 
 
@@ -284,9 +357,8 @@
     <ul>
         <li><span class="parameter">relative_path</span>
             <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-
-
+         Directories are seperated by "/" forward slash,
+ ".." two full stops go up one directory.
         </li>
     </ul>
 
@@ -294,7 +366,7 @@
     <ol>
 
            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
-        the return values of <a href="../lua-5.2/doc/manual.html#pdf-require">require</a>(current_dir..relative_path).
+        the return value of <a href="../lua-5.2/doc/manual.html#pdf-require">require</a>("current_dir/relative_path").
     </ol>
 
 
@@ -308,7 +380,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-10-26 00:08:26 </i>
+<i style="float:right;">Last updated 2020-10-27 07:04:57 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
