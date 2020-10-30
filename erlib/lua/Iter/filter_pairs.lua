@@ -26,7 +26,7 @@ local type,pairs,next = type,pairs,next
 -- -------------------------------------------------------------------------- --
 
 ----------
--- Returns only key->value pairs for which f(value,key,tbl) returns true.
+-- Returns only @{key->value} pairs for which f(value,key,tbl) returns true.
 -- Other values in the table are simply skipped during iteration.
 -- 
 -- @tparam table tbl The table to be iterated.

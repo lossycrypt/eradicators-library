@@ -91,7 +91,7 @@ _Class.SimpleClass = {
 function Class.SimpleClass(initializer,finalizer)
   local class, class_mt = {}, {}
   local object_mt = {__index=class}
-    
+
   ------------------------------------------------------------------------------
   -- SimpleClass built-in methods.
   -- @section
@@ -120,6 +120,8 @@ function Class.SimpleClass(initializer,finalizer)
         end
       end
       
+  -- Synonym: But erlib shouldn't have synonyms!
+  -- class .new = function(...) return class_mt .__call(nil,...) end
 
   ----------
   -- Unconditionally attaches this classes metatable to an object.
@@ -133,6 +135,8 @@ function Class.SimpleClass(initializer,finalizer)
   class .reclassify = function(object)
       return setmetatable(object,object_mt)
       end
+      
+
 
       
   return setmetatable(class,class_mt)

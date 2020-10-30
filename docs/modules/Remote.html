@@ -1,0 +1,286 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#PackedInterfaceGroup">PackedInterfaceGroup </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Core.html">Core</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/Entity.html">Entity</a></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
+  <li><strong>Remote</strong></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Array.html">Array</a></li>
+  <li><a href="../modules/Class.html">Class</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Compare.html">Compare</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Iter.html">Iter</a></li>
+  <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
+  <li><a href="../modules/Logic.html">Logic</a></li>
+  <li><a href="../modules/Math.html">Math</a></li>
+  <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Polygon.html">Polygon</a></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
+  <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
+  <li><a href="../modules/Time.html">Time</a></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Verificate.html">Verificate</a></li>
+  <li><a href="../modules/Version.html">Version</a></li>
+  <li><a href="../modules/get_erlib_event_uids.html">get_erlib_event_uids</a></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/Introduction.html">Introduction</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Remote</code></h1>
+<p>Description</p>
+<p>
+
+</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local Remote = require(&apos;__eradicators-library__/erlib/factorio/Remote&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#PackedInterfaceGroup">PackedInterfaceGroup </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#PackedInterfaceGroup">PackedInterfaceGroup</a></td>
+	<td class="summary">A table distributed in parts accross multiple remote interfaces.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#PackedInterfaceGroup">PackedInterfaceGroup(name)</a></td>
+	<td class="summary">Create a new PackedInterfaceGroup object instance.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#PackedInterfaceGroup:get">PackedInterfaceGroup:get(key)</a></td>
+	<td class="summary">Decodes and returns the value of a key.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#PackedInterfaceGroup:get_all">PackedInterfaceGroup:get_all()</a></td>
+	<td class="summary">Decodes and returns all <a href="../modules/Types.html#KeyValuePair">(key → value)</a> pairs.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#PackedInterfaceGroup:set">PackedInterfaceGroup:set(key, value)</a></td>
+	<td class="summary">Encodes the given <a href="../modules/Types.html#KeyValuePair">(key → value)</a> mapping and makes it publically accessible.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="PackedInterfaceGroup"></a>PackedInterfaceGroup </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "PackedInterfaceGroup"></a>
+    <strong>PackedInterfaceGroup</strong>
+    </dt>
+    <dd>
+    A table distributed in parts accross multiple remote interfaces. </p>
+
+<p> A PackedInterfaceGroup encodes static data into the method names of
+ multiple remote interfaces. One <a href="../modules/Types.html#KeyValuePair">(key → value)</a> pair is encoded per method.
+ Keys are unique within the group. They can only be written once and can never
+ be removed. The methods themselfs are No-Op dummies.</p>
+
+<p> A PackedInterfaceGroup object provides read access to the data
+ of an arbitary number of sequentially numbered remote interfaces.
+ Each instance has write access to a single such numbered interface.</p>
+
+<p> Used to transfer static data between mods before on_load. For example
+ event names generated by script.generate_event_name().</p>
+
+<p> This allows all mods using the same PackedInterfaceGroup name to
+ transparently access each others constants without having to know
+ which mods are installed.</p>
+
+<p> However you can only read data from mods that were loaded before yours.
+ So if you want to read data from a particular mod you must
+ <strong>declare an (optional) dependency</strong> on that mod.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "PackedInterfaceGroup"></a>
+    <strong>PackedInterfaceGroup(name)</strong>
+    </dt>
+    <dd>
+    Create a new PackedInterfaceGroup object instance.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The name of this group. The same name must be used
+ by all mods that intend to share data.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">PackedInterfaceGroup</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "PackedInterfaceGroup:get"></a>
+    <strong>PackedInterfaceGroup:get(key)</strong>
+    </dt>
+    <dd>
+    Decodes and returns the value of a key.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a> or <a class="type" href="https://www.lua.org/pil/2.3.html">number</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a>, <a class="type" href="https://www.lua.org/pil/2.3.html">number</a>, <a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        Returns nil if there is no such key.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "PackedInterfaceGroup:get_all"></a>
+    <strong>PackedInterfaceGroup:get_all()</strong>
+    </dt>
+    <dd>
+    Decodes and returns all <a href="../modules/Types.html#KeyValuePair">(key → value)</a> pairs.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "PackedInterfaceGroup:set"></a>
+    <strong>PackedInterfaceGroup:set(key, value)</strong>
+    </dt>
+    <dd>
+    Encodes the given <a href="../modules/Types.html#KeyValuePair">(key → value)</a> mapping and makes it publically accessible.
+ All keys are <strong>writeable only once</strong>. Keys that already have a value
+ can not be altered or deleted.</p>
+
+<p> Writing the exact same value that the key already maps will be silently ignored.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a> or <a class="type" href="https://www.lua.org/pil/2.3.html">number</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a>, <a class="type" href="https://www.lua.org/pil/2.3.html">number</a> or <a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-10-30 04:33:55 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

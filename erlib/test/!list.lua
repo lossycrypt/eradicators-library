@@ -7,6 +7,7 @@ return {
   'test_Cache', 
   'test_Coding', 
   'test_Crc32', 
+  'test_Filter', 
   'test_Hydra', 
   'test_Iter', 
   'test_Json', 

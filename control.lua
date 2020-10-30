@@ -12,7 +12,7 @@ local log = Log.Logger('testlogger')
 log:warn('warn') log:info('info') log:debug('deb') log:say('say')
 
 -- Create shared event uids
-require('__eradicators-library__/erlib/remote/shared_event_uids')
+-- require('__eradicators-library__/erlib/remote/shared_event_uids')
 
 
 -- -------------------------------------------------------------------------- --

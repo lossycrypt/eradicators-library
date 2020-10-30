@@ -93,6 +93,7 @@ local Modules = {
   Compare    = 'erlib/lua/Compare',
   Math       = 'erlib/lua/Math',
   
+  
   -- groups
   Coding     = 'erlib/lua/Coding/!init',
   Iter       = 'erlib/lua/Iter/!init',
@@ -103,8 +104,9 @@ local Modules = {
 
   -- factorio
   -- (tests do their own checks)
-  Cache       = control_only 'erlib/factorio/Cache',
-  Entity      = control_only 'erlib/factorio/Entity',
+  Cache      = control_only 'erlib/factorio/Cache',
+  Entity     = control_only 'erlib/factorio/Entity',
+  Remote     = control_only 'erlib/factorio/Remote',
   }
   
 -- require() does not support multiple return values. So every module

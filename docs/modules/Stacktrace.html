@@ -33,8 +33,8 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#raw">raw </a></li>
-<li><a href="#factorio">factorio </a></li>
-<li><a href="#_Main">!Main </a></li>
+<li><a href="#factorio_generic">factorio generic </a></li>
+<li><a href="#factorio_load_stage___phase">factorio load stage + phase </a></li>
 </ul>
 
 
@@ -47,8 +47,8 @@
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
   <li><a href="../modules/PluginManager.html">PluginManager</a></li>
+  <li><a href="../modules/Remote.html">Remote</a></li>
   <li><strong>Stacktrace</strong></li>
-  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
@@ -63,7 +63,7 @@
   <li><a href="../modules/Logic.html">Logic</a></li>
   <li><a href="../modules/Math.html">Math</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
-  <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Polygon.html">Polygon</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
@@ -72,8 +72,7 @@
   <li><a href="../modules/Tool.html">Tool</a></li>
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
-  <li><a href="../modules/Template.html">Template</a></li>
-  <li><a href="../modules/Remote.EventNames.html">Remote.EventNames</a></li>
+  <li><a href="../modules/get_erlib_event_uids.html">get_erlib_event_uids</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -122,7 +121,7 @@
 	<td class="summary">Prints a stacktrace directly to <a href="../modules/Concepts.html#stdout">stdout</a>, starting at level l.</td>
 	</tr>
 </table>
-<h2><a href="#factorio">factorio </a></h2>
+<h2><a href="#factorio_generic">factorio generic </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#get_mod_name">get_mod_name([l=1])</a></td>
@@ -153,15 +152,31 @@
 	<td class="summary">Retrieves the current load stage and phase from the filenames on the stack.</td>
 	</tr>
 </table>
-<h2><a href="#_Main">!Main </a></h2>
+<h2><a href="#factorio_load_stage___phase">factorio load stage + phase </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#get_load_stage">get_load_stage()</a></td>
-	<td class="summary">Gets the current <a href="../modules/Types.html#LoadStageName">LoadStageName</a>.</td>
+	<td class="summary">Creates a fresh <a href="../modules/Stacktrace.html#LoadStageTable">LoadStageTable</a>.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#get_load_phase">get_load_phase()</a></td>
-	<td class="summary">Gets the current <a href="../modules/Types.html#LoadPhaseTable">LoadPhaseTable</a>.</td>
+	<td class="summary">Creates a fresh <a href="../modules/Stacktrace.html#LoadPhaseTable">LoadPhaseTable</a>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#LoadStageName">LoadStageName</a></td>
+	<td class="summary">The name of a load stage.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#LoadPhaseName">LoadPhaseName</a></td>
+	<td class="summary">The name of a load phase.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#LoadStageTable">LoadStageTable</a></td>
+	<td class="summary">A <a href="../lua-5.2/doc/manual.html#pdf-table">table</a> that contains three <a href="../modules/Types.html#KeyValuePair">(key → value) pairs</a>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#LoadPhaseTable">LoadPhaseTable</a></td>
+	<td class="summary">A <a href="../lua-5.2/doc/manual.html#pdf-table">table</a> that contains three <a href="../modules/Types.html#KeyValuePair">(key → value) pairs</a>.</td>
 	</tr>
 </table>
 
@@ -279,7 +294,7 @@
 
 </dd>
 </dl>
-    <h2 class="section-header "><a name="factorio"></a>factorio </h2>
+    <h2 class="section-header "><a name="factorio_generic"></a>factorio generic </h2>
 
     <dl class="function">
     <dt>
@@ -498,12 +513,12 @@
     <h3>Returns:</h3>
     <ol>
         <li>
-           <span class="types"><a class="type" href="../modules/Types.html#LoadStageName">LoadStageName</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+           <span class="types"><span class="type">LoadStageName</span> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
 
 
 </li>
         <li>
-           <span class="types"><a class="type" href="../modules/Types.html#LoadPhaseName">LoadPhaseName</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+           <span class="types"><span class="type">LoadPhaseName</span> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
 
 
 </li>
@@ -518,7 +533,7 @@
 
 </dd>
 </dl>
-    <h2 class="section-header "><a name="_Main"></a>!Main </h2>
+    <h2 class="section-header "><a name="factorio_load_stage___phase"></a>factorio load stage + phase </h2>
 
     <dl class="function">
     <dt>
@@ -526,17 +541,32 @@
     <strong>get_load_stage()</strong>
     </dt>
     <dd>
-    Gets the current <a href="../modules/Types.html#LoadStageName">LoadStageName</a>.  The stage is internally cached so these
- are quite fast.
+    Creates a fresh <a href="../modules/Stacktrace.html#LoadStageTable">LoadStageTable</a>.
+ The stage name is internally cached so this is quite fast.
 
 
 
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">LoadStageTable</span></span>
+
+
+
+    </ol>
 
     <h3>Raises:</h3>
      It is an error if the stage could not be detected. I.e. when calling
  from inside a scenario or a data stage metatable.
 
 
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">if</span> Stacktrace.get_load_stage().control <span class="keyword">then</span>
+  script.on_event(defines.events.on_tick,<span class="keyword">function</span>()<span class="keyword">end</span>)
+  <span class="keyword">end</span>
+</pre>
+    </ul>
 
 </dd>
     <dt>
@@ -544,15 +574,126 @@
     <strong>get_load_phase()</strong>
     </dt>
     <dd>
-    Gets the current <a href="../modules/Types.html#LoadPhaseTable">LoadPhaseTable</a>.  The phase is internally cached so these
- are quite fast.
+    Creates a fresh <a href="../modules/Stacktrace.html#LoadPhaseTable">LoadPhaseTable</a>.
+ The phase name is internally cached so this is quite fast.
 
 
 
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">LoadPhaseTable</span></span>
+
+
+
+    </ol>
 
     <h3>Raises:</h3>
      It is an error if the phase could not be detected. I.e. when calling
  from inside a scenario or a data stage metatable.
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">if</span> Stacktrace.get_load_phase().data_updates <span class="keyword">then</span>
+  <span class="comment">-- do_something()
+</span>  <span class="keyword">end</span>
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LoadStageName"></a>
+    <strong>LoadStageName</strong>
+    </dt>
+    <dd>
+    The name of a load stage.
+ One of three strings: "settings", "data" or "control".
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "LoadPhaseName"></a>
+    <strong>LoadPhaseName</strong>
+    </dt>
+    <dd>
+    The name of a load phase.
+ This is one of 7 strings:
+   "settings", "settings_updates", "settings_final_fixes"
+   "data", "data_updates", "data_final_fixes"
+   or "control".</p>
+
+<p> Be aware that unlike the corresponding file names <strong>these strings
+ use _ underscores instead of - dashes</strong> for ease of use.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "LoadStageTable"></a>
+    <strong>LoadStageTable</strong>
+    </dt>
+    <dd>
+    A <a href="../lua-5.2/doc/manual.html#pdf-table">table</a> that contains three <a href="../modules/Types.html#KeyValuePair">(key → value) pairs</a>.  It is used
+ for stage based conditional code execution.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">LoadStageName</span>
+            <span class="types"><a class="type" href="../modules/Types.html#true">true</a></span>
+         Maps the <strong>current</strong> <a href="../modules/Stacktrace.html#LoadStageName">LoadStageName</a> to <a href="../modules/Types.html#true">true</a>.
+        </li>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The current <a href="../modules/Stacktrace.html#LoadStageName">LoadStageName</a>.
+        </li>
+        <li><span class="parameter">any</span>
+            <span class="types"><a class="type" href="../modules/Types.html#true">true</a></span>
+         Maps the string "any" to <a href="../modules/Types.html#true">true</a>.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "LoadPhaseTable"></a>
+    <strong>LoadPhaseTable</strong>
+    </dt>
+    <dd>
+    A <a href="../lua-5.2/doc/manual.html#pdf-table">table</a> that contains three <a href="../modules/Types.html#KeyValuePair">(key → value) pairs</a>.  It is used
+ for stage based conditional code execution.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">LoadPhaseName</span>
+            <span class="types"><a class="type" href="../modules/Types.html#true">true</a></span>
+         Maps the <strong>current</strong> <a href="../modules/Stacktrace.html#LoadPhaseName">LoadPhaseName</a> to <a href="../modules/Types.html#true">true</a>.
+        </li>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The current <a href="../modules/Stacktrace.html#LoadPhaseName">LoadPhaseName</a>.
+        </li>
+        <li><span class="parameter">any</span>
+            <span class="types"><a class="type" href="../modules/Types.html#true">true</a></span>
+         Maps the string "any" to <a href="../modules/Types.html#true">true</a>.
+        </li>
+    </ul>
+
+
 
 
 
@@ -564,7 +705,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-10-27 07:04:57 </i>
+<i style="float:right;">Last updated 2020-10-30 04:33:55 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

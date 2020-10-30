@@ -9,7 +9,7 @@
 
 
 --------------------------------------------------------------------------------
--- Tables.
+-- Table.
 -- @section
 --------------------------------------------------------------------------------
 
@@ -84,6 +84,9 @@
 -- A SparseArray is also a @{Table} in which all keys are @{NaturalNumber}s.
 -- Contrary to an @{Array} the sequence of keys may be discontinuous.
 --
+-- Tautologically any function that expects a SparseArray can also take a 
+-- DenseArray.
+--
 -- These are often used to store entities indexed by their unit_number.
 --
 -- @field 1  @{NotNil}
@@ -114,8 +117,24 @@
 --  local my_table = {'val1','val2','val3',description='MyMixedTable'}
 
   
+----------
+-- The concept of a key in a table referencing one specific value.
+-- 
+-- When any lua table contains a value that value can be accessed only by it's key.
+-- 
+-- Any lua table is thus said to be a mapping of multiple keys to one value each.
+-- Each key is said to map a value. Each key and it's value form a KeyValuePair.
+-- 
+-- In lua both keys and values must be @{NotNil} to be considered "in" the table
+-- for example for iteration with @{pairs}. All keys that are not "in" the
+-- table map to @{nil}. Only keys "in" the table contribute to the size of a table.
+-- 
+-- @usage local my_table = {[key] = value} -- a table with one KeyValuePair
+-- 
+-- @table KeyValuePair
+  
 --------------------------------------------------------------------------------
--- Numbers.
+-- Number.
 -- @section
 --------------------------------------------------------------------------------
 
@@ -174,7 +193,7 @@
 --------------------------------------------------------------------------------
 
 ----------
--- An @{string} containing a Lua @{Patterns|Pattern}. __Not__ to be confused
+-- A @{string} containing a Lua @{Patterns|Pattern}. __Not__ to be confused
 -- with Regular Expessions.
 --
 -- @name Pattern
@@ -187,12 +206,18 @@
 -- @section
 --------------------------------------------------------------------------------
 
-
 ----------
--- A @{boolean} that is always true, never false.
+-- The @{boolean} value true.
 --
 -- @name true
 -- @class field
+
+----------
+-- The @{boolean} value false.
+--
+-- @name false
+-- @class field
+
 
 
 --------------------------------------------------------------------------------
@@ -225,53 +250,3 @@
 -- @usage local yes = (TruthyValue and true)
 
 
---------------------------------------------------------------------------------
--- Load Stage / Phase.
--- @section
---------------------------------------------------------------------------------
-
-
-----------
--- The name of a load stage.
--- One of three strings: "settings", "data" or "control".
---
--- @name LoadStageName
--- @class field
-
-
-----------
--- The name of a load phase.
--- This is one of 7 strings:
---   "settings", "settings_updates", "settings_final_fixes"
---   "data", "data_updates", "data_final_fixes"
---   or "control".
---
--- Be aware that unlike the corresponding file names these strings
--- use _ underscores instead of - dashes for ease of use.
---
--- @name LoadPhaseName
--- @class field
-
-
-----------
--- A @{Table} that contains three keys->value mappings. It is used
--- for stage based conditional code execution.
---
--- @field LoadStageName @{true}, maps  @{LoadStageName} → @{true}
--- @field any           @{true}, maps of the string "any" → @{true}
--- @field name          string, the @{LoadStageName}
--- @table LoadStageTable
---
--- @usage
---    if LoadStageTable.control then
---      script.on_event(defines.events.on_tick,function()end)
---      end
-
-
-----------
--- A @{Table} that contains three (key → value) mappings.
---
--- @field LoadPhaseName @{true}
--- @field name          @{LoadPhaseName}
--- @field any           @{true}
--- @table LoadPhaseTable

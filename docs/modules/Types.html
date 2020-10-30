@@ -32,12 +32,11 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Tables">Tables </a></li>
-<li><a href="#Numbers">Numbers </a></li>
+<li><a href="#Table">Table </a></li>
+<li><a href="#Number">Number </a></li>
 <li><a href="#String">String </a></li>
 <li><a href="#Boolean">Boolean </a></li>
 <li><a href="#Misc">Misc </a></li>
-<li><a href="#Load_Stage___Phase">Load Stage / Phase </a></li>
 </ul>
 
 
@@ -50,8 +49,8 @@
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
   <li><a href="../modules/PluginManager.html">PluginManager</a></li>
+  <li><a href="../modules/Remote.html">Remote</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
-  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
@@ -66,7 +65,7 @@
   <li><a href="../modules/Logic.html">Logic</a></li>
   <li><a href="../modules/Math.html">Math</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
-  <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Polygon.html">Polygon</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
@@ -75,8 +74,7 @@
   <li><a href="../modules/Tool.html">Tool</a></li>
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
-  <li><a href="../modules/Template.html">Template</a></li>
-  <li><a href="../modules/Remote.EventNames.html">Remote.EventNames</a></li>
+  <li><a href="../modules/get_erlib_event_uids.html">get_erlib_event_uids</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -96,7 +94,7 @@
 </p>
 
 
-<h2><a href="#Tables">Tables </a></h2>
+<h2><a href="#Table">Table </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#table">table</a></td>
@@ -133,8 +131,12 @@
 	<td class="name" nowrap><a href="#MixedTable">MixedTable</a></td>
 	<td class="summary">A table that contains both numeric and string keys.</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#KeyValuePair">KeyValuePair</a></td>
+	<td class="summary">The concept of a key in a table referencing one specific value.</td>
+	</tr>
 </table>
-<h2><a href="#Numbers">Numbers </a></h2>
+<h2><a href="#Number">Number </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#Number">Number</a></td>
@@ -165,14 +167,18 @@
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#Pattern">Pattern</a></td>
-	<td class="summary">An <a href="../lua-5.2/doc/manual.html#pdf-string">string</a> containing a Lua <a href="../lua-5.2/doc/manual.html#6.4.1 ">Pattern</a>.</td>
+	<td class="summary">A <a href="../lua-5.2/doc/manual.html#pdf-string">string</a> containing a Lua <a href="../lua-5.2/doc/manual.html#6.4.1 ">Pattern</a>.</td>
 	</tr>
 </table>
 <h2><a href="#Boolean">Boolean </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#true">true</a></td>
-	<td class="summary">A <a href="../api/Builtin-Types.html#boolean">boolean</a> that is always true, never false.</td>
+	<td class="summary">The <a href="../api/Builtin-Types.html#boolean">boolean</a> value true.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#false">false</a></td>
+	<td class="summary">The <a href="../api/Builtin-Types.html#boolean">boolean</a> value false.</td>
 	</tr>
 </table>
 <h2><a href="#Misc">Misc </a></h2>
@@ -190,31 +196,12 @@
 	<td class="summary">Any value that when negated twice evaluates to <a href="../modules/Types.html#true">true</a>.</td>
 	</tr>
 </table>
-<h2><a href="#Load_Stage___Phase">Load Stage / Phase </a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#LoadStageName">LoadStageName</a></td>
-	<td class="summary">The name of a load stage.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#LoadPhaseName">LoadPhaseName</a></td>
-	<td class="summary">The name of a load phase.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#LoadStageTable">LoadStageTable</a></td>
-	<td class="summary">A <a href="../modules/Table.html#">Table</a> that contains three keys->value mappings.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#LoadPhaseTable">LoadPhaseTable</a></td>
-	<td class="summary">A <a href="../modules/Table.html#">Table</a> that contains three (key → value) mappings.</td>
-	</tr>
-</table>
 
 <br/>
 <br/>
 
 
-    <h2 class="section-header "><a name="Tables"></a>Tables </h2>
+    <h2 class="section-header "><a name="Table"></a>Table </h2>
 
     <dl class="function">
     <dt>
@@ -361,6 +348,9 @@
     A SparseArray is also a <a href="../modules/Table.html#">Table</a> in which all keys are <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>s.
  Contrary to an <a href="../modules/Array.html#">Array</a> the sequence of keys may be discontinuous.</p>
 
+<p> Tautologically any function that expects a SparseArray can also take a
+ DenseArray.</p>
+
 <p> These are often used to store entities indexed by their unit_number.
 
 
@@ -435,8 +425,35 @@
     </ul>
 
 </dd>
+    <dt>
+    <a name = "KeyValuePair"></a>
+    <strong>KeyValuePair</strong>
+    </dt>
+    <dd>
+    The concept of a key in a table referencing one specific value. </p>
+
+<p> When any lua table contains a value that value can be accessed only by it's key.</p>
+
+<p> Any lua table is thus said to be a mapping of multiple keys to one value each.
+ Each key is said to map a value. Each key and it's value form a KeyValuePair.</p>
+
+<p> In lua both keys and values must be <a href="../modules/Types.html#NotNil">NotNil</a> to be considered "in" the table
+ for example for iteration with <a href="../lua-5.2/doc/manual.html#pdf-pairs">pairs</a>. All keys that are not "in" the
+ table map to <a href="https://www.lua.org/pil/2.1.html">nil</a>. Only keys "in" the table contribute to the size of a table.
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> my_table = {[key] = value} <span class="comment">-- a table with one KeyValuePair</span></pre>
+    </ul>
+
+</dd>
 </dl>
-    <h2 class="section-header "><a name="Numbers"></a>Numbers </h2>
+    <h2 class="section-header "><a name="Number"></a>Number </h2>
 
     <dl class="function">
     <dt>
@@ -541,7 +558,7 @@
     <strong>Pattern</strong>
     </dt>
     <dd>
-    An <a href="../lua-5.2/doc/manual.html#pdf-string">string</a> containing a Lua <a href="../lua-5.2/doc/manual.html#6.4.1 ">Pattern</a>.  <strong>Not</strong> to be confused
+    A <a href="../lua-5.2/doc/manual.html#pdf-string">string</a> containing a Lua <a href="../lua-5.2/doc/manual.html#6.4.1 ">Pattern</a>.  <strong>Not</strong> to be confused
  with Regular Expessions.
 
 
@@ -560,7 +577,21 @@
     <strong>true</strong>
     </dt>
     <dd>
-    A <a href="../api/Builtin-Types.html#boolean">boolean</a> that is always true, never false.
+    The <a href="../api/Builtin-Types.html#boolean">boolean</a> value true.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "false"></a>
+    <strong>false</strong>
+    </dt>
+    <dd>
+    The <a href="../api/Builtin-Types.html#boolean">boolean</a> value false.
 
 
 
@@ -623,125 +654,13 @@
 
 </dd>
 </dl>
-    <h2 class="section-header "><a name="Load_Stage___Phase"></a>Load Stage / Phase </h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "LoadStageName"></a>
-    <strong>LoadStageName</strong>
-    </dt>
-    <dd>
-    The name of a load stage.
- One of three strings: "settings", "data" or "control".
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "LoadPhaseName"></a>
-    <strong>LoadPhaseName</strong>
-    </dt>
-    <dd>
-    The name of a load phase.
- This is one of 7 strings:
-   "settings", "settings<em>updates", "settings</em>final<em>fixes"
-   "data", "data</em>updates", "data<em>final</em>fixes"
-   or "control".</p>
-
-<p> Be aware that unlike the corresponding file names these strings
- use _ underscores instead of - dashes for ease of use.
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "LoadStageTable"></a>
-    <strong>LoadStageTable</strong>
-    </dt>
-    <dd>
-    A <a href="../modules/Table.html#">Table</a> that contains three keys->value mappings.  It is used
- for stage based conditional code execution.
-
-
-    <h3>Fields:</h3>
-    <ul>
-        <li><span class="parameter">LoadStageName</span>
-         <a href="../modules/Types.html#true">true</a>, maps  <a href="../modules/Types.html#LoadStageName">LoadStageName</a> → <a href="../modules/Types.html#true">true</a>
-        </li>
-        <li><span class="parameter">any</span>
-
-<pre><code>       &lt;a href="../modules/Types.html#true"&gt;true&lt;/a&gt;, maps of the string "any" → &lt;a href="../modules/Types.html#true"&gt;true&lt;/a&gt;
-</code></pre>
-
-        </li>
-        <li><span class="parameter">name</span>
-
-<pre><code>      string, the &lt;a href="../modules/Types.html#LoadStageName"&gt;LoadStageName&lt;/a&gt;
-</code></pre>
-
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">if</span> LoadStageTable.control <span class="keyword">then</span>
-  script.on_event(defines.events.on_tick,<span class="keyword">function</span>()<span class="keyword">end</span>)
-  <span class="keyword">end</span>
-</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "LoadPhaseTable"></a>
-    <strong>LoadPhaseTable</strong>
-    </dt>
-    <dd>
-    A <a href="../modules/Table.html#">Table</a> that contains three (key → value) mappings.
-
-
-    <h3>Fields:</h3>
-    <ul>
-        <li><span class="parameter">LoadPhaseName</span>
-         <a href="../modules/Types.html#true">true</a>
-        </li>
-        <li><span class="parameter">name</span>
-
-<pre><code>      &lt;a href="../modules/Types.html#LoadPhaseName"&gt;LoadPhaseName&lt;/a&gt;
-</code></pre>
-
-        </li>
-        <li><span class="parameter">any</span>
-
-<pre><code>       &lt;a href="../modules/Types.html#true"&gt;true&lt;/a&gt;
-</code></pre>
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-10-27 07:04:57 </i>
+<i style="float:right;">Last updated 2020-10-30 04:33:55 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

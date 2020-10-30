@@ -3,7 +3,7 @@
 --------------------------------------------------
 -- Description is ignored for submodules.
 --
--- @module EventManager
+-- @submodule EventManager
 
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -16,7 +16,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 
-local log  = elreq('erlib/lua/Log'  )().Logger  'EventManager'
+-- local log  = elreq('erlib/lua/Log'  )().Logger  'EventManager'
 -- local stop = elreq('erlib/lua/Error')().Stopper 'EventManager'
 
 -- local Verificate = elreq('erlib/lua/Verificate')()
@@ -25,7 +25,7 @@ local log  = elreq('erlib/lua/Log'  )().Logger  'EventManager'
 
 -- local Tool       = elreq('erlib/lua/Tool'      )()
 
-local Table      = elreq('erlib/lua/Table'     )()
+-- local Table      = elreq('erlib/lua/Table'     )()
 -- local Array      = elreq('erlib/lua/Array'     )()
 -- local Set        = elreq('erlib/lua/Set'       )()
 
@@ -49,60 +49,37 @@ return function (EventManager)
 
 
   -- ------------------------------------------------------------------------ --
-  -- test_dynamic_endisable_endequeue                                                                  --
+  -- Template                                                                  --
   -- ------------------------------------------------------------------------ --
 
   ----------
   -- Custom Event Description
   --
-  -- @within Built-in Custom Events
-  -- @table test_dynamic_endisable_endequeue
-
+  -- @table Template
+  
+  
   EventManager.new_handler {
-    name = 'test ticker',
-    defines.events.on_tick,
-    period = 67,
-    enabled = false,
-    function(tick)
-      log:say('ticked!',tick)
+    '',
+    function (e)
       end
     }
-    
-  EventManager.new_handler {
-    name = 'build tester',
-    defines.events.on_built_entity,
-    function(e)
-      log:say('built! ',e.created_entity,e.created_entity.name)
-      
-      if e.created_entity.type == 'assembling-machine' then
-        EventManager.disable('test ticker')
-        EventManager.enqueue(1,'test action',1,2,3,{['4']=5})
-        EventManager.enqueue(2,'test action',1,2,3,{['4']=5})
-        EventManager.enqueue(3,'test action',1,2,3,{['4']=5})
-        EventManager.enqueue(4,'test action',1,2,3,{['4']=5})
-        EventManager.enqueue(Table.range(5,9),'test action')
-        
-        EventManager.dequeue('test action',game.tick+2,game.tick + 10)
-        EventManager.enqueue(120,'test action',1,2,3,{['4']=5})
-      else
-        EventManager.enable('test ticker')
-        end
-      end,
-    }
-    
-  EventManager.new_handler {
-    'action',
-    name = 'test action',
-    function(tick,...)
-      log:say('delayed test action! ',...)
-      end,
-    }
-
   
+
+  ----------
+  -- Raised when the player moves or is teleported across a chunk border.
+  -- This is a higher-resolution abstraction of @{FAPI events on_player_changed_position}.
+  -- 
+  -- @tfield uint player_index
+  -- @tfield ChunkPosition old_chunk
+  -- @tfield ChunkPosition new_chunk
+  --
+  -- @table on_player_changed_chunk
+  --
+  new_uid 'on_player_changed_chunk'
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-do (STDOUT or log or print)('  Loaded → event.test_dynamic_endisable_endequeue') end
+do (STDOUT or log or print)('  Loaded → event.Template') end
 end
 

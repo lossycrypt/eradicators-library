@@ -5,12 +5,29 @@ Date: 2020-xx-xx
     - Make pure lua parts of the library seperately loadable.
     - Make the library loadable in a "static" manner where it does not configure itself.
     - Add auto-config function to set up the full library once inside a mod. Including dev-flags.
-
+    - Include proper locale in flag mods? or is in erlib enough
 ---------------------------------------------------------------------------------------------------
-Version: 4.0.19
+Version: 4.0.22
 Date: 2020-10-x
   Internal:
     - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.0.21
+Date: 2020-10-x
+  Internal:
+    - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.0.20
+Date: 2020-10-x
+  Internal:
+    - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.0.19
+Date: 2020-10-30
+  Internal:
+    - New module Remote
+    - New class Remote.PackedInterfaceGroup
+    - New function Filter.table_value
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.18
 Date: 2020-10-21

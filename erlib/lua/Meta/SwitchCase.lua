@@ -17,7 +17,6 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Locals / Init                                                              --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
-local Filter = elreq('erlib/lua/Filter')()
 
 
 -- -------------------------------------------------------------------------- --
@@ -66,7 +65,7 @@ local _SwitchCase = function(analyzer,cases)
   Verify('non_empty_table',cases)
   end
 local function SwitchCase (analyzer,cases)
-  local default = cases.default or Filter.SKIP
+  local default = cases.default or ercfg.SKIP
   return function(...)    
     local f = cases[analyzer(...)] or default
     return f(...)

@@ -43,8 +43,14 @@ file = {
     root..'/erlib/lua/Coding/LibDeflate.lua', -- LDoc compatible but not exposed in release
     root..'/erlib/lua/Coding/Sha2.lua', -- not LDoc compatible
     root..'/erlib/test/_DocTest.lua' ,
+    
+    -- template copies
     root..'/erlib/test/_TemplateModule.lua',
+    root..'/erlib/lua/_TemplateModule.lua',
+    root..'/erlib/factorio/_TemplateModule.lua',
+    
     root..'/erlib/test/_TemplateTest.lua',
+    
     root..'/erlib/factorio/EventManager/_TemplateEvent.lua',
     },
   
@@ -65,6 +71,10 @@ sort=false
 
 --Include local functions in the documentation? (can't be set per module?)
 all=true
+
+--Merge identically named modules
+--Prevents weird unchangeable section names that occur when using @submodule
+merge=true
 
 
 no_space_before_args = true --no space between function and ()
@@ -194,6 +204,25 @@ local function ErlibConcepts(name)
 custom_see_handler('^erlib (.*)',ErlibConcepts)
 
 -- -------------------------------------------------------------------------- --
+-- Translators                                                                --
+-- -------------------------------------------------------------------------- --
+
+-- Translates "key" + arror + "value" with trailing text.
+-- @{key -> value pair}
+-- @{(key -> value) mappings}
+local key_value_formats = {
+  ['->'] = '→', ['<->'] = '↔', ['<-'] = '←',
+  }
+-- @param full capture, arrow capture, tail capture
+local function KeyValuePair(_,key_value_spec, tail)
+  local arrow = key_value_formats[key_value_spec] or key_value_spec
+  local url  = url.local_modules:format('Types','KeyValuePair')
+  return '(key '..arrow..' value)'..tail, url --@future: non-breaking space.
+  end
+custom_see_handler('^(%(?key%s*([^%s]+)%s*value%)?)(.*)$',KeyValuePair)
+
+
+-- -------------------------------------------------------------------------- --
 -- Hardlinks                                                                  --
 -- -------------------------------------------------------------------------- --
 custom_see_handler('Factorio',function() return 'Factorio','https://factorio.com/' end)
@@ -205,22 +234,40 @@ custom_see_handler('Factorio',function() return 'Factorio','https://factorio.com
 
 -- Types (Eradicator's Library)
 local ErlibTypes = NamedSection(url.local_modules,'Types')
+
+-- Table
 -- ErlibTypes('^(table)$'         ) --
 -- ErlibTypes('^(set)$'           ) -- 
 -- ErlibTypes('^(array)$'         ) -- breaks module links
 ErlibTypes('^(SparseArray)$'   )
+
+-- (are these automatically generated because Types is parsed early?)
+-- ErlibTypes('^(PseudoSet)$'         )
+-- ErlibTypes('^(DenseArray)$'        )
+-- ErlibTypes('^(EmptyArray)$'        )
+-- ErlibTypes('^(MixedTable)$'        )
+-- ErlibTypes('^(KeyValuePair)$'   )
+
+-- Number
 ErlibTypes('^(Number)$'        )
 ErlibTypes('^(Float)$'         )
 ErlibTypes('^(Integer)$'       )
 ErlibTypes('^(NaturalNumber)$' )
+
+-- String
+ErlibTypes('^(Pattern)$'       ) -- replace with direct lua doc link later?
+
+-- Boolean
+ErlibTypes('^(true)$'          )
+ErlibTypes('^(false)$'         )
+
+-- Misc
 ErlibTypes('^(NotNil)$'        )
 ErlibTypes('^(AnyValue)$'      )
 ErlibTypes('^(TruthyValue)$'   )
-ErlibTypes('^(true)$'          )
-ErlibTypes('^(Pattern)$'       ) -- replace with direct lua doc link later?
-ErlibTypes('^(LoadStageName)$' )
-ErlibTypes('^(LoadPhaseName)$' )
-ErlibTypes('^(LoadStageTable)$')
+
+
+
 
 
 local ErlibError = NamedSection(url.local_modules,'Error')

@@ -598,6 +598,8 @@ function Table.first_value(tbl)
 -- @treturn NotNil|nil 
 -- 
 function Table.get(tbl,path,default)
+  -- path actually allows MixedTable
+  -- the extra data in the non-array part must be silently ignored
   local r = tbl
   for i=1,#path do
     if type(r) == 'table' then

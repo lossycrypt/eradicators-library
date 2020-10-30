@@ -3,7 +3,7 @@
 --------------------------------------------------
 -- Description is ignored for submodules.
 --
--- @submodule EventManager
+-- @module EventManager
 
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -129,7 +129,8 @@ return function (EventManager)
   -- @tfield[opt] LuaEntity clone_source The entity that this entity was cloned from.
   -- @tfield[opt] LuaEntity trigger_source The entity with a trigger prototype (such as capsules) that created this entity.
   --
-  -- @table on_entity_created
+  -- @within Built-in Custom Events
+  -- @table EventManager.on_entity_created
   
   local EVENT_UID = LuaBootstrap.generate_event_name()
   

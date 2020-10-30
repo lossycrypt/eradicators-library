@@ -66,7 +66,43 @@ function Tool.KeepArgsCall(f,...)
   local r = {[n+1] = f(...), ...}
   return table_unpack(r,1,n+1)
   end
+  
+  
+----------
+-- Calls a function when a value is nil.
+--  
+-- @tparam AnyValue value  
+-- @tparam function f
+-- @tparam AnyValue ...  
+--  
+-- @return If value was not nil it's value will be returned. Otherwise
+-- the result of calling f(...) will be returned.
+--  
+function Tool.IfNilCall(value,f,...)
+  if value == nil then return f(...) else return value end
+  end
+  
 
+----------
+-- Converts a value to a type if it is not yet of that type.
+--   
+-- @tparam AnyValue value The input value.
+-- @tparam string typ The desired type of the input value.
+-- @tparam function caster The function that converts the input value if
+-- it's not of the desired type.
+-- @tparam function typer The function that determines the type
+-- of the input value. (_default_ @{type})
+--   
+-- @treturn AnyValue The input value or the result of caster(value).
+--   
+function Tool.CastType(value, typ, caster, typer)
+  if (typer or type)(value) == typ then
+    return value
+  else
+    return caster(value)
+    end
+  end
+ 
  
 ----------
 -- Get the first non-nil value.

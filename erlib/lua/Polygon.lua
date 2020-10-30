@@ -3,9 +3,9 @@
 --------------------------------------------------
 -- Description
 --
--- @module Template
+-- @module Polygon
 -- @usage
---  local Template = require('__eradicators-library__/erlib/factorio/Template')()
+--  local Polygon = require('__eradicators-library__/erlib/factorio/Polygon')()
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -22,7 +22,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Template,_Template,_uLocale = {},{},{}
+local Polygon,_Polygon,_uLocale = {},{},{}
 
 
 -- Some methods to deal with polygons, like rotating around a point etc.
@@ -68,5 +68,5 @@ int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-do (STDOUT or log or print)('  Loaded → erlib.Template') end
-return function() return Template,_Template,_uLocale end
+do (STDOUT or log or print)('  Loaded → erlib.Polygon') end
+return function() return Polygon,_Polygon,_uLocale end

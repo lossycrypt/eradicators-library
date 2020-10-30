@@ -34,6 +34,7 @@
 <ul>
 <li><a href="#Simple">Simple </a></li>
 <li><a href="#Factory">Factory </a></li>
+<li><a href="#Factory_Draft">Factory Draft </a></li>
 </ul>
 
 
@@ -46,8 +47,8 @@
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
   <li><a href="../modules/PluginManager.html">PluginManager</a></li>
+  <li><a href="../modules/Remote.html">Remote</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
-  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
@@ -62,7 +63,7 @@
   <li><a href="../modules/Logic.html">Logic</a></li>
   <li><a href="../modules/Math.html">Math</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
-  <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Polygon.html">Polygon</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
@@ -71,8 +72,7 @@
   <li><a href="../modules/Tool.html">Tool</a></li>
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
-  <li><a href="../modules/Template.html">Template</a></li>
-  <li><a href="../modules/Remote.EventNames.html">Remote.EventNames</a></li>
+  <li><a href="../modules/get_erlib_event_uids.html">get_erlib_event_uids</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -85,14 +85,11 @@
 
 <h1>Module <code>Filter</code></h1>
 <p>Some simple filter functions.</p>
-<p>
-
-
-
-</p>
+<p> <strong>Status:</strong> In development.
+ <strong>Compatibility:</strong> Pure Lua, Factorio</p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Filter = require(&apos;__eradicators-library__.erlib.lua.Filter&apos;)()
+        <pre class="example">local Filter = require(&apos;__eradicators-library__/erlib/lua/Filter&apos;)()
 </pre>
     </ul>
 
@@ -127,7 +124,46 @@
 <h2><a href="#Factory">Factory </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#new_complex">new_complex(filter_spec)</a></td>
+	<td class="name" nowrap><a href="#string_prefix">string_prefix(prefix)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#string_postfix">string_postfix(postfix)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#string_infix">string_infix(infix)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#string_pattern">string_pattern(pattern[, init=1])</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#true_object_array">true_object_array(sarr)</a></td>
+	<td class="summary">Whitelist / Allowlist.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#false_object_array">false_object_array(sarr)</a></td>
+	<td class="summary">Blacklist / Blocklist.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#table_value">table_value(TableFilterSpecification)</a></td>
+	<td class="summary">Generates generalized table filter functions.</td>
+	</tr>
+</table>
+<h2><a href="#Factory_Draft">Factory Draft </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#table_filter_draft1">table_filter_draft1(filter_spec)</a></td>
 	<td class="summary">Creates a table filter function.</td>
 	</tr>
 </table>
@@ -276,8 +312,272 @@
 
     <dl class="function">
     <dt>
-    <a name = "new_complex"></a>
-    <strong>new_complex(filter_spec)</strong>
+    <a name = "string_prefix"></a>
+    <strong>string_prefix(prefix)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">prefix</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The exact plain prefix to look for. Not a lua pattern.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         The filter function f(str) returns true if <strong>str starts with</strong>
+ the prefix.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "string_postfix"></a>
+    <strong>string_postfix(postfix)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">postfix</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The exact plain postfix to look for. Not a lua pattern.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         The filter function f(str) returns true if <strong>str ends with</strong>
+ the postfix.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "string_infix"></a>
+    <strong>string_infix(infix)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">infix</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The exact plain infix to look for. Not a lua pattern.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         The filter function f(str) returns true if <strong>str contains</strong>
+ the infix.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "string_pattern"></a>
+    <strong>string_pattern(pattern[, init=1])</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pattern</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         A lua string <a href="../modules/Types.html#Pattern">Pattern</a>.
+        </li>
+        <li><span class="parameter">init</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         The position at which to start the search
+         (<em>default</em> 1)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         The filter function f(str) returns true if the pattern
+ matches the string.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "true_object_array"></a>
+    <strong>true_object_array(sarr)</strong>
+    </dt>
+    <dd>
+    Whitelist / Allowlist.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">sarr</span>
+            <span class="types"><a class="type" href="../modules/Types.html#SparseArray">SparseArray</a></span>
+         A list of objects that should return <a href="../modules/Types.html#true">true</a> when
+ passed to the filter. All other objects will return <a href="../modules/Types.html#false">false</a>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+        The filter function f(obj) returns a <a href="../api/Builtin-Types.html#boolean">boolean</a>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "false_object_array"></a>
+    <strong>false_object_array(sarr)</strong>
+    </dt>
+    <dd>
+    Blacklist / Blocklist.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">sarr</span>
+            <span class="types"><a class="type" href="../modules/Types.html#SparseArray">SparseArray</a></span>
+         A list of objects that should return <a href="../modules/Types.html#false">false</a> when
+ passed to the filter. All other objects will return <a href="../modules/Types.html#true">true</a>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+        The filter function f(obj) returns a <a href="../api/Builtin-Types.html#boolean">boolean</a>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "table_value"></a>
+    <strong>table_value(TableFilterSpecification)</strong>
+    </dt>
+    <dd>
+    Generates generalized table filter functions. </p>
+
+<p> The TableFilterSpecification must contain either "is" or "has" but not both.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">TableFilterSpecification</span>
+
+
+        <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a> or <a class="type" href="https://www.lua.org/pil/2.3.html">number</a></span>
+         The DenseArray part
+ of a TableFilterSpecification is a <a href="../modules/Table.html#TablePath">TablePath</a>.
+        </li>
+        <li><span class="parameter">is</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NotNil">NotNil</a> or <a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         If this is a
+ DenseArray then the filter will return true if the value at the above given
+ path in the table is equal to any of the values in the array. For convenience
+ if you're only looking for a single target value you can give it directly
+ without putting it in a table.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">has</span>
+            <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         Configures the filter
+ to look for values in the subtable found in the filtered object at the given
+ path. The [1] key in this array specifies the comparision mode and must be
+ a literal string 'or','nor','and' or 'nand'.
+ All elements [2] to [n] represent the
+ accepted values in the subtable.
+         (<em>optional</em>)
+        </li>
+        </li></ul>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         The filter function f(tbl). Calling f with anything that
+ is not a table will always return false.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> tblA = {keyA = {keyB = {<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>}, keyC = <span class="number">1</span>}}
+<span class="keyword">local</span> tblB = {keyA = {keyB = {<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>}}}
+
+<span class="comment">-- "is" is an exact comparision
+</span><span class="global">print</span>(Filter.table_value {<span class="string">'keyA'</span>,<span class="string">'keyB'</span>,is  =  <span class="number">1</span>         } (tblA) )
+&gt; <span class="keyword">false</span>
+<span class="global">print</span>(Filter.table_value {<span class="string">'keyA'</span>,<span class="string">'keyC'</span>,is  =  <span class="number">1</span>         } (tblA) )
+&gt; <span class="keyword">true</span>
+
+<span class="comment">-- "and" must have all elements given
+</span><span class="global">print</span>(Filter.table_value {<span class="string">'keyA'</span>,<span class="string">'keyB'</span>,has = {<span class="string">'and'</span>,<span class="number">1</span>,<span class="number">2</span>}} (tblA) )
+&gt; <span class="keyword">true</span>
+<span class="global">print</span>(Filter.table_value {<span class="string">'keyA'</span>,<span class="string">'keyB'</span>,has = {<span class="string">'and'</span>,<span class="number">2</span>,<span class="number">3</span>}} (tblB) )
+&gt; <span class="keyword">false</span>
+
+<span class="comment">-- "or" needs only one element
+</span><span class="global">print</span>(Filter.table_value {<span class="string">'keyA'</span>,<span class="string">'keyB'</span>,has = {<span class="string">'or'</span> ,<span class="number">1</span>,<span class="number">6</span>}} (tblA) )
+&gt; <span class="keyword">true</span>
+<span class="global">print</span>(Filter.table_value {<span class="string">'keyA'</span>,<span class="string">'keyB'</span>,has = {<span class="string">'or'</span> ,<span class="number">1</span>,<span class="number">6</span>}} (tblB) )
+&gt; <span class="keyword">true</span>
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Factory_Draft"></a>Factory Draft </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "table_filter_draft1"></a>
+    <strong>table_filter_draft1(filter_spec)</strong>
     </dt>
     <dd>
     Creates a table filter function.
@@ -304,7 +604,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-10-27 07:04:57 </i>
+<i style="float:right;">Last updated 2020-10-30 04:33:55 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

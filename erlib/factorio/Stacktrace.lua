@@ -44,7 +44,7 @@ local function _error(msg)
 --------------------------------------------------------------------------------
 -- raw.
 -- You shouldn't be using these unless you *really* know what you're doing.
--- @section 2
+-- @section
 --------------------------------------------------------------------------------
 
 -- Behavior of Lua:
@@ -125,8 +125,8 @@ function Stacktrace.print_info(l)
   end
 
 --------------------------------------------------------------------------------
--- factorio.
--- @section 3
+-- factorio generic.
+-- @section
 --------------------------------------------------------------------------------
 
 --debug.getinfo can actually see the full path to the scenario (engine bug).
@@ -297,16 +297,23 @@ local _load_stage, _load_phase = Stacktrace. _unsafe_get_stage_and_phase()
 
 
 --------------------------------------------------------------------------------
--- !Main.
--- @section 1
+-- factorio load stage + phase.
+-- @section
 --------------------------------------------------------------------------------
 
 ----------
--- Gets the current @{LoadStageName}. The stage is internally cached so these
--- are quite fast.
+-- Creates a fresh @{Stacktrace.LoadStageTable|LoadStageTable}.
+-- The stage name is internally cached so this is quite fast.
+--
+-- @treturn LoadStageTable
 --
 -- @raise It is an error if the stage could not be detected. I.e. when calling
 -- from inside a scenario or a data stage metatable.
+--
+-- @usage
+--    if Stacktrace.get_load_stage().control then
+--      script.on_event(defines.events.on_tick,function()end)
+--      end
 --
 function Stacktrace.get_load_stage()
   if flag.IS_FACTORIO then
@@ -318,11 +325,18 @@ function Stacktrace.get_load_stage()
   end
 
 ----------
--- Gets the current @{LoadPhaseTable}. The phase is internally cached so these
--- are quite fast.
+-- Creates a fresh @{Stacktrace.LoadPhaseTable|LoadPhaseTable}.
+-- The phase name is internally cached so this is quite fast.
+--
+-- @treturn LoadPhaseTable
 --
 -- @raise It is an error if the phase could not be detected. I.e. when calling
 -- from inside a scenario or a data stage metatable.
+--
+-- @usage
+--    if Stacktrace.get_load_phase().data_updates then
+--      -- do_something()
+--      end
 --
 function Stacktrace.get_load_phase()
   if flag.IS_FACTORIO then
@@ -335,17 +349,48 @@ function Stacktrace.get_load_phase()
 
 
 
--- Easier to index? -> but "different syntax for same thing"
--- @name Loading.is_phase.control
--- do
---   local ok = {name=true,any=true}
---   local magic = function(typ,f) return {__index=function(_,key)
---   if phases[key] or ok[key] then return f()
---   else _error(('Not a valid %s key:'):format(typ),key) end
---   end } end  
---   Stacktrace.is_stage = setmetatable({},magic('StageNameTable',Stacktrace.get_load_stage))
---   Stacktrace.is_phase = setmetatable({},magic('PhaseNameTable',Stacktrace.get_load_phase))
---   end
+----------
+-- The name of a load stage.
+-- One of three strings: "settings", "data" or "control".
+--
+-- @table LoadStageName
+do end
+
+
+----------
+-- The name of a load phase.
+-- This is one of 7 strings:
+--   "settings", "settings\_updates", "settings\_final\_fixes"
+--   "data", "data\_updates", "data\_final\_fixes"
+--   or "control".
+--
+-- Be aware that unlike the corresponding file names __these strings
+-- use \_ underscores instead of - dashes__ for ease of use.
+--
+-- @table LoadPhaseName
+do end
+
+----------
+-- A @{table} that contains three @{key -> value pairs}. It is used
+-- for stage based conditional code execution.
+--
+-- @tfield true LoadStageName Maps the __current__ @{Stacktrace.LoadStageName|LoadStageName} to @{true}.
+-- @tfield string name The current @{Stacktrace.LoadStageName|LoadStageName}.
+-- @tfield true any Maps the string "any" to @{true}.
+-- @table LoadStageTable
+do end
+
+
+----------
+-- A @{table} that contains three @{key -> value pairs}. It is used
+-- for stage based conditional code execution.
+--
+-- @tfield true LoadPhaseName Maps the __current__ @{Stacktrace.LoadPhaseName|LoadPhaseName} to @{true}.
+-- @tfield string name The current @{Stacktrace.LoadPhaseName|LoadPhaseName}.
+-- @tfield true any Maps the string "any" to @{true}.
+-- @table LoadPhaseTable
+do end
+
 
 
 -- -------------------------------------------------------------------------- --

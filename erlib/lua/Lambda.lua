@@ -235,7 +235,7 @@ setmetatable(Lambda,{
 -- @usage
 --   -- Nested Lambdas are a bit more complicated...
 --   Lambda('head: head = head+1 => "hair -> hair + A ",UpValA2',UpValB)
---   -- ...and produce this.
+--   -- ...and produce this:
 --   local A = UpValB
 --   return function(head)
 --     head=head+1
@@ -243,7 +243,7 @@ setmetatable(Lambda,{
 --     end
 --   -- Beware that the second Lambda function will *never* see
 --   -- the upvalues of the first one. Even if it has no upvalues itself.
---   -- You can pass them on manually of course.
+--   -- You must pass them on manually.
 
 
 
