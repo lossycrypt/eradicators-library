@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Protects tables against accidential read/write.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
+--
 -- @module Lock
 -- @usage
 --  local Lock = require('__eradicators-library__/erlib/factorio/Lock')()

@@ -3,6 +3,8 @@
 --------------------------------------------------
 --
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
+--
 -- @module String
 -- @usage
 --  local String = require('__eradicators-library__/erlib/factorio/String')()

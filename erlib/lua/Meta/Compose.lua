@@ -80,4 +80,4 @@ local function Compose(...)
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
 do (STDOUT or log or print)('  Loaded → erlib.Compose') end
-return function() return Compose,_Compose,_uLocale end
+return function() return Compose end

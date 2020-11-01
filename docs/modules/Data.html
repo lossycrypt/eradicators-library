@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Todo">Todo</a></li>
+<li><a href="#custom_input">custom-input </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Core.html">Core</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><strong>Data</strong></li>
+  <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Entity.html">Entity</a></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/Player.html">Player</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
+  <li><a href="../modules/Remote.html">Remote</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Array.html">Array</a></li>
+  <li><a href="../modules/Class.html">Class</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Compare.html">Compare</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Iter.html">Iter</a></li>
+  <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
+  <li><a href="../modules/Logic.html">Logic</a></li>
+  <li><a href="../modules/Math.html">Math</a></li>
+  <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Polygon.html">Polygon</a></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
+  <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
+  <li><a href="../modules/Time.html">Time</a></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Verificate.html">Verificate</a></li>
+  <li><a href="../modules/Version.html">Version</a></li>
+  <li><a href="../modules/remotes.html">remotes</a></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/Introduction.html">Introduction</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Data</code></h1>
+<p>Description</p>
+
+<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.</p>
+<p>
+
+
+
+</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local Data = require(&apos;__eradicators-library__/erlib/factorio/Data/!init&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#Todo">Todo</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#todo1">todo1</a></td>
+	<td class="summary">Nothing.</td>
+	</tr>
+</table>
+<h2><a href="#custom_input">custom-input </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#SimpleCustomInput">SimpleCustomInput(name_prefix, name, key[, consuming=false])</a></td>
+	<td class="summary">Creates a custom input for use with a custom event handler.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#SimpleLinkedInput">SimpleLinkedInput(...)</a></td>
+	<td class="summary">Creates a custom input that always uses the same key as a base game
+ input even if the user changes it.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Todo"></a>Todo</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "todo1"></a>
+    <strong>todo1</strong>
+    </dt>
+    <dd>
+    Nothing.
+
+
+    <ul>
+        <li><span class="parameter">todo1</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="custom_input"></a>custom-input </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "SimpleCustomInput"></a>
+    <strong>SimpleCustomInput(name_prefix, name, key[, consuming=false])</strong>
+    </dt>
+    <dd>
+
+<p>Creates a custom input for use with a custom event handler. </p>
+
+<p> <strong>Note:</strong> Key sequence detection is very strict:</p>
+
+<ul>
+    <li>All letters must be <strong>capitalized</strong>, i.e <code>A</code>, <code>B</code>, <code>SPACE</code>, <code>ENTER</code>.</li>
+    <li>Except for <code>mouse-</code> keys which use lower case, i.e. <code>mouse-button-1</code>.</li>
+    <li>"+" plus must be surrounded by space.</li>
+    <li>Modifiers are CONTROL, SHIFT and ALT.</li>
+    <li>LCTRL, RCTRL, LSHIFT, RSHIFT, LALT and RALT can only be used standalone.</li>
+    <li>Numpad keys start with <code>KP_</code>, i.e. <code>KP_MULTIPLY</code>, <code>KP_1</code>.</li>
+</ul>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name_prefix</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         Each mod should use a unique prototype name prefix
+ to avoid incompatibilities with other mods.
+        </li>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The name of every CustomInputPrototype is also an <a href="../modules/EventManager.html#EventUID">EventUID</a>.
+        </li>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The <em>default</em> key sequence. Can be changed by the player later.
+ If you want an input to use the same key as a base game control use
+ <a href="../modules/Data.html#SimpleLinkedInput">Data.SimpleLinkedInput</a> instead.
+        </li>
+        <li><span class="parameter">consuming</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         If true the input will block vanilla inputs with
+ the same key sequence.
+         (<em>default</em> false)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">CustomInputPrototype</span></span>
+         A table reference. You do <strong>not</strong> need to call
+ <code>data:extend</code> on this as it has already been added.
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../api/LuaCustomInputPrototype.html">LuaCustomInputPrototype</a>
+    </ul>
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- in data.lua
+</span>Data.SimpleCustomInput(<span class="string">'my-mod:'</span>, <span class="string">'a-new-hotkey'</span>, <span class="string">'CONTROL + N'</span>)
+
+<span class="comment">-- in control.lua
+</span>EventManager.new_handler {
+  <span class="string">'my-mod:a-new-hotkey'</span>,
+  <span class="keyword">function</span>(e)
+    <span class="keyword">local</span> player = game.players[e.player_index]
+    player.<span class="global">print</span>(<span class="string">'You have pressed the hotkey!'</span>)
+    <span class="keyword">end</span>
+  }
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "SimpleLinkedInput"></a>
+    <strong>SimpleLinkedInput(...)</strong>
+    </dt>
+    <dd>
+    Creates a custom input that always uses the same key as a base game
+ input even if the user changes it. </p>
+
+<p> The <a href="../modules/EventManager.html#EventUID">EventUID</a> and prototype name are prefixed with <code>on_linked_input_</code>
+ and <code>-</code> dashes are replaced with <code>_</code> underscores.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../modules/Types.html#InputName">InputName</a></span>
+         Any number of input names.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- in data.lua
+</span>Data.SimpleLinkedInput(<span class="string">'rotate'</span>,<span class="string">'toggle-map'</span>)
+
+<span class="comment">-- in control.lua
+</span>EventManager.new_handler {
+  <span class="string">'on_linked_input_rotate'</span>,
+  <span class="keyword">function</span>(e)
+    <span class="keyword">local</span> player = game.players[e.player_index]
+    player.<span class="global">print</span>(<span class="string">'You have pressed the rotate button!'</span>)
+    <span class="keyword">if</span> player.selected <span class="keyword">then</span>
+      game.<span class="global">print</span>(<span class="string">'Your mouse is hovering over:'</span>..player.selected.name)
+      <span class="keyword">end</span>
+    <span class="keyword">end</span>
+  }
+EventManager.new_handler {
+  <span class="string">'on_linked_input_toggle_map'</span>,
+  <span class="keyword">function</span>(e)
+    <span class="comment">-- do something here
+</span>    <span class="keyword">end</span>
+  }
+</pre>
+    </ul>
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-11-01 03:24:34 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

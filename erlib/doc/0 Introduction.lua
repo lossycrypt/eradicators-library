@@ -44,3 +44,29 @@
   @license CC Attribution-NoDerivatives 4.0 International
 
 ]]
+
+
+----------
+-- How stable an Erlib module is.
+-- 
+-- This is intended as an indicator for mod developers who are unsure
+-- if they have to expect sudden api changes.
+-- 
+--   * __Work in progress__: The module is new or undergoing refractoring.
+--   Major api changes will happen frequently and unannouncedly.
+--
+--   * __Polishing__: All current module methods are feature complete but may
+--   still need performance optimizations. New methods might be added.
+--   Some tweaks to old methods might also happen.
+--
+--   * __Experimental__: The module is feature-frozen, only bugfixes are
+--   expected. Minor changes are unlikely, but if they happen they will
+--   be announced via the changelog. The latest date of change will be documented.
+--   This is the best time to give feedback.
+--
+--   * __Stable__: The module has been unchanged and without bug-reports
+--   for at least 4 weeks. Bugfixes or optimizations will result in a
+--   status downgrade to Experimental.
+-- 
+-- @within Information about this Library
+-- @table DevelopmentStatus

@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Description
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+--
 -- @module PluginManager
 -- @usage
 --  local PluginManager = require('__eradicators-library__/erlib/factorio/PluginManager')()
@@ -96,6 +98,7 @@ local Managers = {}
 -- @tparam string config.name The name for the new manager object.
 -- @tparam table config.main_env The default environment for all plugins that
 -- this manager manages.
+-- @tparam table config.extra_shared_env Extra data for the shared environment.
 -- @tparam[opt] string config.asset_root The default root path used for
 -- @{PluginManager.plugasset|plugasset}.
 -- 
@@ -107,8 +110,9 @@ function PluginManager.new_manager(config)
   Verify(config.main_env    ,'NonEmptyTable')
   Verify(config.asset_root  ,'nil|NonEmptyString')
   -- Verify(config.plugin_root ,'nil|NonEmptyString')
+  Verify(config.extra_shared_env,'nil|tbl')
   local manager = Table.clear(config,{
-    'main_env','plugin_root','asset_root','name'
+    'main_env','plugin_root','asset_root','name','extra_shared_env'
     })
   Verify(Managers[manager.name],'nil','Duplicate manager name.')
   -- internal config
@@ -118,11 +122,19 @@ function PluginManager.new_manager(config)
   Managers[manager.name] = manager
   setmetatable(manager,_manager_mt);
   -- shared environment
-  manager:make_env {
+  local shared_env = manager:make_env {
     PLUGIN_NAME       = 'SharedEnvironment',
     PLUGIN_LUA_ROOT   = manager.plugin_root,
     PLUGIN_ASSET_ROOT = manager.asset_root ,
     }
+    
+  if config.extra_shared_env then
+    for k,v in pairs(config.extra_shared_env) do
+      -- error(k)
+      shared_env[k] = v
+      end
+    end
+    
   return manager
   end
 

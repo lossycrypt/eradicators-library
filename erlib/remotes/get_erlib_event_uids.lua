@@ -1,17 +1,33 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- Numeric event names for Erlib custom events.
+-- @module remotes
+
+--------------------------------------------------
+-- Event names and EventUIDs for events created with @{EventManager.new_event}.
 --
--- Requiring this file returns a table
--- mapping {event_name -> event_number}, just like defines.events.
--- The numbers are dynamically generated so they may change
--- every time you start the game, change mods, etc..
+-- Requiring this file returns a table of @{key -> value} pairs,
+-- just like @{FOBJ defines.events}.
+-- Because EventUIDs are dynamically generated and can change with every
+-- game start, installed mod, etc.., you must use this file if you want
+-- to access these EventUIDs.
 --
--- @module get_erlib_event_uids
+-- __Technical Details:__
+--
+-- This is equivalent to @{EventManager.event_uid} but doesn't require EventManager .
+--
+-- Requiring this file simply calls @{Remote.PackedInterfaceGroup:get_all}
+-- on the  @{Remote.PackedInterfaceGroup} named 
+-- `'eradicators-library:custom-event-uids'`.
+--
+-- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
+--
 -- @usage
 --  defines.erlib_events
---    = require('__eradicators-library__/erlib/remote/get_erlib_event_uids')
+--   = require('__eradicators-library__/erlib/remotes/get_erlib_event_uids')
+--
+-- @within Files
+-- @table remotes.get_erlib_event_uids
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -28,4 +44,5 @@ local UID_INTERFACE_NAME = 'eradicators-library:custom-event-uids'
 -- End                                                                        --
 -- Because this is a "remote" file it directly returns the desired table.
 -- -------------------------------------------------------------------------- --
-return elreq('erlib/factorio/Remote')().PackedInterfaceGroup(UID_INTERFACE_NAME):get_all()
+return elreq('erlib/factorio/Remote')()
+  .PackedInterfaceGroup(UID_INTERFACE_NAME):get_all()

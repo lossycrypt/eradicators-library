@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Comparison of "Major.Minor.Patch" triplets.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
+--
 -- @module Version
 -- @usage
 --  local Version = require('__eradicators-library__/erlib/factorio/Version')()

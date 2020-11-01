@@ -34,7 +34,6 @@
 <ul>
 <li><a href="#Simple">Simple </a></li>
 <li><a href="#Factory">Factory </a></li>
-<li><a href="#Factory_Draft">Factory Draft </a></li>
 </ul>
 
 
@@ -44,8 +43,11 @@
   <li><a href="../modules/Types.html">Types</a></li>
   <li><a href="../modules/Concepts.html">Concepts</a></li>
   <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/Data.html">Data</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/Player.html">Player</a></li>
   <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><a href="../modules/Remote.html">Remote</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
@@ -72,7 +74,7 @@
   <li><a href="../modules/Tool.html">Tool</a></li>
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
-  <li><a href="../modules/get_erlib_event_uids.html">get_erlib_event_uids</a></li>
+  <li><a href="../modules/remotes.html">remotes</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -85,6 +87,8 @@
 
 <h1>Module <code>Filter</code></h1>
 <p>Some simple filter functions.</p>
+<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Polishing.</p>
+
 <p> <strong>Status:</strong> In development.
  <strong>Compatibility:</strong> Pure Lua, Factorio</p>
     <h3>Usage:</h3>
@@ -156,15 +160,12 @@
 	<td class="summary">Blacklist / Blocklist.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#table_value">table_value(TableFilterSpecification)</a></td>
+	<td class="name" nowrap><a href="#table_value">table_value(TableValueFilterSpecification)</a></td>
 	<td class="summary">Generates generalized table filter functions.</td>
 	</tr>
-</table>
-<h2><a href="#Factory_Draft">Factory Draft </a></h2>
-<table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#table_filter_draft1">table_filter_draft1(filter_spec)</a></td>
-	<td class="summary">Creates a table filter function.</td>
+	<td class="name" nowrap><a href="#chain">chain(RecursiveFilterChainSpecification)</a></td>
+	<td class="summary">Composes multiple filters into one.</td>
 	</tr>
 </table>
 
@@ -228,7 +229,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">obj</span>
-            <span class="types"><span class="type">LuaObject</span></span>
+            <span class="types"><a class="type" href="../api/LuaObject.html">LuaObject</a></span>
 
 
 
@@ -258,7 +259,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">obj</span>
-            <span class="types"><span class="type">LuaObject</span></span>
+            <span class="types"><a class="type" href="../api/LuaObject.html">LuaObject</a></span>
 
 
 
@@ -494,24 +495,24 @@
 </dd>
     <dt>
     <a name = "table_value"></a>
-    <strong>table_value(TableFilterSpecification)</strong>
+    <strong>table_value(TableValueFilterSpecification)</strong>
     </dt>
     <dd>
     Generates generalized table filter functions. </p>
 
-<p> The TableFilterSpecification must contain either "is" or "has" but not both.
+<p> The TableValueFilterSpecification must contain either "is" or "has" but not both.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">TableFilterSpecification</span>
+        <li><span class="parameter">TableValueFilterSpecification</span>
 
 
         <ul>
         <li><span class="parameter">...</span>
             <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a> or <a class="type" href="https://www.lua.org/pil/2.3.html">number</a></span>
          The DenseArray part
- of a TableFilterSpecification is a <a href="../modules/Table.html#TablePath">TablePath</a>.
+ of a TableValueFilterSpecification is a <a href="../modules/Table.html#TablePath">TablePath</a>.
         </li>
         <li><span class="parameter">is</span>
             <span class="types"><a class="type" href="../modules/Types.html#NotNil">NotNil</a> or <a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
@@ -529,7 +530,8 @@
  path. The [1] key in this array specifies the comparision mode and must be
  a literal string 'or','nor','and' or 'nand'.
  All elements [2] to [n] represent the
- accepted values in the subtable.
+ accepted values in the subtable. When no accepted values are given
+ 'and' is always true and 'or' is always false.
          (<em>optional</em>)
         </li>
         </li></ul>
@@ -539,7 +541,7 @@
     <ol>
 
            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
-         The filter function f(tbl). Calling f with anything that
+         The TableValueFilter function f(tbl). Calling f with anything that
  is not a table will always return false.
     </ol>
 
@@ -571,30 +573,62 @@
     </ul>
 
 </dd>
-</dl>
-    <h2 class="section-header "><a name="Factory_Draft"></a>Factory Draft </h2>
-
-    <dl class="function">
     <dt>
-    <a name = "table_filter_draft1"></a>
-    <strong>table_filter_draft1(filter_spec)</strong>
+    <a name = "chain"></a>
+    <strong>chain(RecursiveFilterChainSpecification)</strong>
     </dt>
     <dd>
-    Creates a table filter function.
+    Composes multiple filters into one.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">filter_spec</span>
+        <li><span class="parameter">RecursiveFilterChainSpecification</span>
 
 
-
+        <ul>
+        <li><span class="parameter">1</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         How the filters should be combined. Must be one of the
+ literal combination mode strings "and", "nand", "or" or "nor".
         </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a> or <a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         The filters to be combined. Each value can be either a custom filter
+ function f(obj), a <a href="../modules/Filter.html#table_value">TableValueFilterSpecification</a>
+ or another RecursiveFilterChainSpecification.</p>
+
+<p> <strong>Note:</strong> The first path key in an in-line TableValueFilterSpecification
+ can not be a filter chain combination mode string ("and", "or", etc.).
+ Cou have to pre-compile the TableValueFilter in that case.
+        </li>
+        </li></ul>
     </ul>
 
 
 
 
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> f = Filter.chain { <span class="comment">-- RecursiveFilterChainSpecification
+</span>  <span class="string">'or'</span>,
+  <span class="keyword">function</span>(x) <span class="keyword">return</span> (<span class="global">type</span>(x) == <span class="string">'number'</span>) <span class="keyword">and</span> (x &gt; <span class="number">5</span>) <span class="keyword">end</span>, <span class="comment">-- custom function
+</span>  { <span class="comment">-- another RecursiveFilterChainSpecification
+</span>    <span class="string">'and'</span>,
+    {<span class="string">'number'</span>, is ={<span class="number">5</span>,<span class="number">42</span>} },                   <span class="comment">-- TableValueFilterSpecification
+</span>    {<span class="string">'names'</span> , has={<span class="string">'or'</span>,<span class="string">'Michiko'</span>,<span class="string">'Tarou'</span>} }, <span class="comment">-- TableValueFilterSpecification
+</span>    }
+  }
+<span class="global">print</span>( f(<span class="number">5</span>) ) <span class="comment">-- not x &gt; 5
+</span>&gt; <span class="keyword">false</span>
+<span class="global">print</span>( f(<span class="number">6</span>) ) <span class="comment">-- x &gt; 5
+</span>&gt; <span class="keyword">true</span>
+<span class="global">print</span>( f{number = <span class="number">5</span> , names = {<span class="string">'Mamoru'</span> } } ) <span class="comment">-- wrong name
+</span>&gt; <span class="keyword">false</span>
+<span class="global">print</span>( f{number = <span class="number">42</span>, names = {<span class="string">'Michiko'</span>} } ) <span class="comment">-- number and name ok
+</span>&gt; <span class="keyword">true</span>
+</pre>
+    </ul>
 
 </dd>
 </dl>
@@ -604,7 +638,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-10-30 04:33:55 </i>
+<i style="float:right;">Last updated 2020-11-01 03:24:34 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

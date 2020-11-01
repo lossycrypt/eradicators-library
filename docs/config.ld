@@ -116,6 +116,10 @@ local url = {
   remote_lua    = 'https://www.lua.org/pil/%s.html%s',
   --CustomUrlHandler
   wikipedia     = 'https://en.wikipedia.org/wiki/%s', -- @{wiki <page_name>|Title}
+  --KewordPage
+  keyword = {
+    local_lua_method = '../lua-5.2/doc/manual.html#pdf-%s', -- @{LMAN ...}
+    }
   }
   
 -- -------------------------------------------------------------------------- --
@@ -152,10 +156,32 @@ local function NamedSection(url,page)
   return function(pattern) custom_see_handler(pattern,f) end
   end
 
+
+-- A pattern of the form @{KEYWORD custom values}.
+--
+-- @param main_pattern Detects the keyword. The capture will be used as
+-- the input for name and url patterns.
+--
+-- @param url_template Will be formatted with the result of url_pattern.
+-- @param name_template Will be formatted with the result of name_pattern.
+--
+-- @param url_pattern Extracts url data from the output of main_pattern.
+-- @param name_pattern Extracts name data from the output of main_pattern
+--
+local function KeywordPage(
+  main_pattern, url_template, url_pattern, name_template, name_pattern
+  )
+  name_template = name_template or '%s'
+  name_pattern  = name_pattern  or '.*'
+  local f = function(main_result)
+    local name = name_template:format(main_result:match(name_pattern))
+    return
+      (name ~= '') and name or 'Name was empty string!'
+      ,url_template:format(main_result:match(url_pattern ))
+    end
+  custom_see_handler(main_pattern,f)
+  end
   
--- local function NamedPage(url)
-  -- return function(n) return n, url:format(n) end
-  -- end
 
   
 -- -------------------------------------------------------------------------- --
@@ -172,6 +198,8 @@ local function Wiki(page)
   return name:gsub('_',' '),url.wikipedia:format(page)
   end
 custom_see_handler('^wiki (.+)', Wiki)
+
+--[[ FOBJ + FAPI reimplemented with KeywordPage
 
 -- Simple Factorio Api urls "Page.html#section"
 local function FactApi(page,section)
@@ -196,12 +224,75 @@ local function FactObj(obj,section)
 -- Pattern: Object name with or without method name
 custom_see_handler('^FOBJ ([%w_]+)%.?([%w_]*)$',FactObj) -- @{FOBJ LuaEntity.valid}
 
+--]]
 
 --Erlib "Concepts.html#section"
 local function ErlibConcepts(name)
   return name, url.local_modules:format('Concepts',name)
   end
 custom_see_handler('^erlib (.*)',ErlibConcepts)
+
+
+  
+-- -------------------------------------------------------------------------- --
+-- Keywords                                                                   --
+-- -------------------------------------------------------------------------- --
+
+-- Common format is @{KEYWORD word word tail } 
+-- The tail allows including descriptions without altering the link.
+-- Removes up to ONE SPACE between the last word and the tail.
+-- Thus you can use TWO SPACES to force everything afterwards to be the tail.
+
+
+-- Keyword: LMAN
+-- Page   : manual.html#module.method
+-- Name   : module.method
+KeywordPage(
+  '^LMAN (.*)$'
+  ,'../lua-5.2/doc/manual.html#pdf-%s', '^([%w_]+%.?[%w_]*) ?'
+  ,'%s%s', '^([%w_]+%.?[%w_]*) ?(.-)$' -- remove UP TO ONE space
+  )
+
+
+-- Keyword: FOBJ
+-- Page   : LuaObject.html#LuaObject.method
+-- Name   : LuaObject.method
+KeywordPage(
+  '^FOBJ (.*)$'
+  -- enforcing a . colon into the url makes non-method links go to the top of the page
+  ,'../api/%s.html#%s.%s','^(([%w_]+))[%. ]?([%w_]*) ?'
+  ,'%s%s%s%s', '^([%w_]+)([%. ]?)([%w_]*) ?(.-)$'
+  )
+
+
+-- Keyword: FAPI
+-- Page   : Page.html#Section
+-- Name   : Section
+KeywordPage(
+  '^FAPI (.*)$'
+  ,'../api/%s.html#%s','^([%w_]+)[%. ]?([%w_]*) ?'
+  ,'%s%s', '^[%w_]+[%. ]?([%w_]*) ?(.-)$'
+  )
+  
+  
+-- -- Keyword: Lua.*Prototype
+-- -- Page   : Lua.*Prototype.html
+-- -- Name   : Lua.*Prototype
+-- KeywordPage(
+--   '^(Lua%a+Prototype)$',
+--   '../api/%s.html', '.*'
+--   )
+  
+
+-- Keyword: LuaCamelCase
+-- Page   : LuaCamelCase.html
+-- Name   : LuaCamelCase
+-- (To work with @tparam this can't use spaces or custom keywords.)
+KeywordPage(
+  '^(Lua%u%a+)$',
+  '../api/%s.html', '.*'
+  )
+  
 
 -- -------------------------------------------------------------------------- --
 -- Translators                                                                --
@@ -267,6 +358,11 @@ ErlibTypes('^(AnyValue)$'      )
 ErlibTypes('^(TruthyValue)$'   )
 
 
+local ErlibModuleSpecificTypes = function(mod, pattern)
+  NamedSection(url.local_modules, mod)(pattern)
+  end
+  
+ErlibModuleSpecificTypes('EventManager', 'EventUID')
 
 
 
@@ -284,6 +380,9 @@ FactorioBuiltinTypes('^(string)$' )
 FactorioBuiltinTypes('^(float)$'  )
 FactorioBuiltinTypes('^(double)$' )
 
+
+-- @future: Deprecate and replace by @{LMAN ...}
+--
 -- Lua Manual (cos LDoc manual_url option ain't werki'n! wtf!)
 local keywords = {
   'assert','collectgarbage','dofile','error','getmetatable','ipairs','load',
@@ -318,6 +417,7 @@ local keywords = {
   }
 local LuaManual = NamedSection(url.local_lua_doc,'manual')
 for i=1,#keywords do LuaManual('^('..keywords[i]..')$') end
+
 
 
 

@@ -16,6 +16,8 @@
 -- __Note:__ This module inherits all @{Table} module methods. Same-named
 -- Array methods override inherited Table methods.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Polishing.
+--
 -- @module Array
 -- @usage
 --  local Array = require('__eradicators-library__/erlib/lua/Array')()
@@ -267,30 +269,58 @@ function Array.compress(arr,target,i,j)
 
 ----------
 -- __In-place.__ Applies a function to all elements of an array. This function
--- __never changes the keys__ of an array. If the result is sparse or dense depends
--- on if f() ever returns nil, or if the input array or partial range include
--- nil values.
+-- __does not change__ the @{key -> value} relationship. Thus if the input array or
+-- partial range includes nil values, or f() returns nil values then the output
+-- will be sparse.
 -- 
--- __Note:__ Due to the inherit extra overhead of one function call per element
--- this will always be slower than a simple for-pairs loop.
+-- __Note:__ Due to the inherit overhead of one extra function call per element
+-- performance impact should be carefully considered before using this to
+-- replace normal for-ipairs loops.
+--
+-- __Experts only:__ Copy mode supports key reassignment like @{Table.map}.
 -- 
 -- @tparam DenseArray|SparseArray arr
 -- @tparam function f The function f(value,index,arr) that is applied to every
 -- key→value mapping in the array.
--- @tparam[opt=nil] table target __Copy Mode.__ This table will be changed and arr remains unchanged.
+-- @tparam[opt=nil] table target __Copy Mode.__ This table will be changed and
+-- arr remains unchanged.
 --
 -- @tparam[opt=1]    NaturalNumber i First index to process. Mandatory for sparse input.
 -- @tparam[opt=#arr] NaturalNumber j Last index to process. Mandatory for sparse input.
 --
 -- @treturn DenseArray|SparseArray
 function Array.map(arr,f,target,i,j)
-  target = target or arr
-  for k=(i or 1),(j or #arr) do
-    target[k] = f(arr[k],k,arr)
+  -- in-place
+  if not target then
+    for k=(i or 1),(j or #arr) do
+      arr[k] = f(arr[k],k,arr)
+      end
+    return _toArray(arr)
+  -- copy
+  else
+    for k=(i or 1), (j or #arr) do
+      local v2, k2 = f(arr[k], k, arr)
+      if k2 == nil then
+        target[k ] = v2
+      else
+        target[k2] = v2
+        end
+      end
+    return _toArray(target)
     end
-  return _toArray(target)
   end
- 
+
+-- V1 archived 2020-10-30
+--
+-- function Array.map_1(arr,f,target,i,j)
+--   target = target or arr
+--   for k=(i or 1),(j or #arr) do
+--     target[k] = f(arr[k],k,arr)
+--     end
+--   return _toArray(target)
+--   end
+
+  
  
 ----------
 -- __In-place.__ Removes elements from an array based on a filter function.

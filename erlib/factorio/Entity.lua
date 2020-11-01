@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- [Control Stage] LuaEntity manipulation.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+--
 -- @module Entity
 -- @usage
 --  local Entity = require('__eradicators-library__/erlib/factorio/Entity')()
@@ -42,8 +44,32 @@ function Entity.find_unit_number(unit_number)
     end
   end
 
+-- -------------------------------------------------------------------------- --
+-- Draft                                                                      --
+-- -------------------------------------------------------------------------- --
+
+----------
+-- @tparam LuaEntity vehicle
+-- @treturn LuaPlayer|nil
+-- @function Entity.get_vehicle_driver_player
+do
+  local _isvehicle = {['car'] = true, ['spider-vehicle'] = true}
+function Entity.get_vehicle_driver_player(vehicle)
+  if type(vehicle) == 'table'
+  and _isvehicle[vehicle.type]
+  then
+    local driver = vehicle .get_driver() -- Character or Player or nil
+    if driver.is_player() then return driver end
+    return driver.player --can be nil
+    end
+  end
+  end
 
 
+
+  
+  
+  
 --  * as of 2020-10-19 (creation of thread) i can't get this to work
 --
 --  * [1] https://forums.factorio.com/viewtopic.php?p=518189#p518189
@@ -78,7 +104,7 @@ function Entity.set_ignored_by_enemy_units(onoff) -- ignored_by_biters()
 -- @section
 --------------------------------------------------------------------------------
 
-----------
+-- -------
 -- Nothing.
 -- @within Todo
 -- @field todo1

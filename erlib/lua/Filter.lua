@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Some simple filter functions.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Polishing.
+--
 -- __Status:__ In development.
 -- __Compatibility:__ Pure Lua, Factorio
 --
@@ -30,6 +32,8 @@ local Array      = elreq('erlib/lua/Array'     )()
 local Set        = elreq('erlib/lua/Set'       )()
 
 local Logic      = elreq('erlib/lua/Logic'     )()
+local Tool       = elreq('erlib/lua/Tool'      )()
+local L          = elreq('erlib/lua/Lambda'    )()
 
 local Table_get
     = Table.get
@@ -46,11 +50,11 @@ local string_find, string_sub
 -- Set->Table->String->Meta->SwitchCase
 -- local Set = elreq('erlib/lua/Set')()
 
-local function Set_from_values(tbl)
-  local s = {}
-  for _,v in pairs(tbl) do s[v] = true end
-  return s
-  end
+-- local function Set_from_values(tbl)
+  -- local s = {}
+  -- for _,v in pairs(tbl) do s[v] = true end
+  -- return s
+  -- end
     
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -188,7 +192,7 @@ function Filter.true_object_array(sarr)
 -- @treturn function The filter function f(obj) returns a @{boolean}.
 -- 
 function Filter.false_object_array(sarr)
-  local not_ok = Set_from_values(sarr)
+  local not_ok = Set.from_values(sarr)
   return function (obj)
     return not not_ok[obj]
     end
@@ -198,27 +202,28 @@ function Filter.false_object_array(sarr)
 ----------
 -- Generates generalized table filter functions.
 -- 
--- The TableFilterSpecification must contain either "is" or "has" but not both.
+-- The TableValueFilterSpecification must contain either "is" or "has" but not both.
 -- 
--- @tparam MixedTable TableFilterSpecification
+-- @tparam MixedTable TableValueFilterSpecification
 -- 
--- @tparam string|number TableFilterSpecification.... The DenseArray part
--- of a TableFilterSpecification is a @{Table.TablePath|TablePath}.
+-- @tparam string|number TableValueFilterSpecification.... The DenseArray part
+-- of a TableValueFilterSpecification is a @{Table.TablePath|TablePath}.
 -- 
--- @tparam[opt] NotNil|DenseArray TableFilterSpecification.is If this is a
+-- @tparam[opt] NotNil|DenseArray TableValueFilterSpecification.is If this is a
 -- DenseArray then the filter will return true if the value at the above given
 -- path in the table is equal to any of the values in the array. For convenience
 -- if you're only looking for a single target value you can give it directly
 -- without putting it in a table.
 --
--- @tparam[opt] DenseArray TableFilterSpecification.has Configures the filter
+-- @tparam[opt] DenseArray TableValueFilterSpecification.has Configures the filter
 -- to look for values in the subtable found in the filtered object at the given
 -- path. The [1] key in this array specifies the comparision mode and must be
 -- a literal string 'or','nor','and' or 'nand'.
 -- All elements [2] to [n] represent the
--- accepted values in the subtable.
+-- accepted values in the subtable. When no accepted values are given
+-- 'and' is always true and 'or' is always false.
 --
--- @treturn function The filter function f(tbl). Calling f with anything that
+-- @treturn function The TableValueFilter function f(tbl). Calling f with anything that
 -- is not a table will always return false.
 --
 -- @usage
@@ -245,8 +250,10 @@ function Filter.false_object_array(sarr)
 -- 
 -- @function Filter.table_value
 do
-  -- @future: "nor", "nand"?
-  -- @future: truthy -> path must simply be truthy (or NotNil?) when no extra mode is given
+  
+  --@future: "NotNil" -> no specific value, Just *any* value.
+  -- by specifying neither .is not .has? What about "truthy"?
+
   local cmps = {
     -- equal(value,ok) or superset(value,ok)
     ['and'] = function(value,ok)
@@ -261,8 +268,7 @@ do
       end,
     -- at least one element of value is also an element of ok
     ['or'] = function(value,ok)
-      -- mode keyword 'or' is not ok!
-      -- ok = Set.from_values(ok); ok['or'] = nil -- now converted before call.
+      if type(value) ~= 'table' then return false end
       for _,v in pairs(value) do
         if ok[v] then return true end
         end
@@ -273,11 +279,29 @@ do
       for i=1,#ok do if ok[i] == value then return true end end
       return false
       end,
+      
+      
+    -- EXPERIMENTAL -> Tomorrow!
+    -- only works for tables not .is values
+    -- actually *does* work for the ".is" *concept*
+    -- just that it needs a .has={'truthy'} style spec.
+    -- which breaks the ".has means table" rule.
+    --> But putting it in real .is collides with
+    -- user input when they actually *want* the litteral strings
+    -- and not the mode.
+    ['truthy'] = function(value)
+      if value then return true else return false end
+      end,
+    ['NotNil'] = function(value)
+      return value ~= nil
+      end,
+      
+      
     }
-    
   cmps['nor' ] = function(value,ok) return not cmps['or' ](value,ok) end
   cmps['nand'] = function(value,ok) return not cmps['and'](value,ok) end
-    
+  -- these comparators need the ok-table to be
+  -- pre-converted to a Set and the mode keyword removed.
   local okToSet = { ['or'] = true, ['nor'] = true }
     
 function Filter.table_value(spec)
@@ -312,269 +336,102 @@ function Filter.table_value(spec)
   end
   end
   
+
+----------
+-- Composes multiple filters into one.
+-- 
+-- @tparam DenseArray RecursiveFilterChainSpecification
+-- @tparam string RecursiveFilterChainSpecification.1
+-- How the filters should be combined. Must be one of the
+-- literal combination mode strings "and", "nand", "or" or "nor".
+-- @tparam table|function RecursiveFilterChainSpecification....
+-- The filters to be combined. Each value can be either a custom filter
+-- function f(obj), a @{Filter.table_value|TableValueFilterSpecification}
+-- or another RecursiveFilterChainSpecification.
+-- 
+-- __Note:__ The first path key in an in-line TableValueFilterSpecification
+-- can not be a filter chain combination mode string ("and", "or", etc.).
+-- Cou have to pre-compile the TableValueFilter in that case.
+-- 
+-- @usage
+--   local f = Filter.chain { -- RecursiveFilterChainSpecification
+--     'or',
+--     function(x) return (type(x) == 'number') and (x > 5) end, -- custom function
+--     { -- another RecursiveFilterChainSpecification
+--       'and',
+--       {'number', is ={5,42} },                   -- TableValueFilterSpecification
+--       {'names' , has={'or','Michiko','Tarou'} }, -- TableValueFilterSpecification
+--       }
+--     }
+--   print( f(5) ) -- not x > 5
+--   > false
+--   print( f(6) ) -- x > 5
+--   > true
+--   print( f{number = 5 , names = {'Mamoru' } } ) -- wrong name
+--   > false
+--   print( f{number = 42, names = {'Michiko'} } ) -- number and name ok
+--   > true
+--
+-- @function Filter.chain
+do
+  --load_erlib(); Filter.chain{'or',function(x) return x > 5 end, function(x) return x <2 end}
+  --load_erlib(); print( Filter.chain{'or', {'a',is=5}, {'and',{'b',is=7},{'c',is=7}} } (7))
+  --load_erlib(); print( Filter.chain{'or', {'a',is=5}, {'and',{'b',is=7},{'c',has={'and',6,5}}} } ({a=4,b=7,c={5,3,6}}))
+  local cmps = {
+    -- @future: xand, xor?
+    ['or'] = function(_spec) return function(obj)
+      for i=1,#_spec do
+        if _spec[i](obj) then return true end
+        end
+      return false
+      end end,
+    ['and'] = function(_spec) return function(obj)
+      local ok = true
+      for i=1,#_spec do 
+        ok = ok and _spec[i](obj)
+        if not ok then return false end
+        end
+      return true
+      end end,
+    }
+  cmps['nor' ] = function(_spec) return L('x->not A(x)',cmps['or '](_spec)) end
+  cmps['nand'] = function(_spec) return L('x->not A(x)',cmps['and'](_spec)) end
+  
+function Filter.chain(user_spec)
+  -- resurses into the spec and composes a tree function
+  local function _norm(spec)
+    -- user-supplied filter
+    if type(spec) == 'function' then
+      return spec
+    -- only tables and functions allowed
+    elseif type(spec) ~= 'table' then
+      stop('Not a valid RecursiveFilterChainSpec:\n',spec)
+    -- TableValueFilterSpec or RecursiveFilterChainSpec
+    elseif type(spec) == 'table' then
+      -- Is this a known comparator mode?
+      local cmp = cmps[ spec[1] ]
+      -- No. -> Assume in-line TableValueFilterSpec
+      if cmp == nil then
+        return Filter.table_value(spec)
+      -- Yes. -> RecursiveFilterChainSpec
+      else
+        -- remove mode keyword and convert to functions
+        return cmp(Array.map(spec, L('s,i->A(s),i-1', _norm), {}, 2))
+        end
+      end
+    end
+  return _norm(user_spec)
+  end
+  end
+
+  
+  
 --------------------------------------------------------------------------------
 -- Factory Draft.
 -- @section
 --------------------------------------------------------------------------------
 
-
-function Filter.chain(RecursiveFilterChainSpec)
-
-  -- builds a filter from functions
   
-  -- thus Filter.table_path only needs to deal with one 
-  -- path spec and not recursion.
-  
-  -- And recursion can be done in Filter.chain which only
-  -- has to deal with functions!
-
-  -- Makes the filter a bit more expensive to run
-  -- but very powerful (arbitrary functions)
-  -- and easy to implement.
-  
-  local op = {
-    ['and'] = function(spec)
-      local ok = true
-      for i=2,#spec do -- must ignore mode key [1]
-        -- V1 allow only functions?
-        ok = ok and spec[i](obj)
-        -- V2 allow implicit table filters
-        ok = ok and Cast(spec[i],'function',Filter.table_filter)(obj)
-        if not ok then return false end
-        end
-      return true
-      end,
-    
-    ['or'] = function()
-      end,
-    
-    }
-  
-  
-  
-  local nodespec = {
-    'and', --mode: and, or, xand, xor -> lookup table of recursive functions
-    
-    function()end or table_filter_spec, -- allow in-lining auto-constructing table filters.
-    
-    }
-  
-  A = Filter.table_filter {'path','path',is={},has={} }
-  return Compose(
-    Filter.filter_chain(
-    
-      {'and',A,B},
-      
-      
-        
-      {'or',{'and',A,B},{'and',C,D,E,F}}
-      ))
-  end
-      
-
-
-  
-
-  
-  
-
-function Filter.table_value_draft3(spec)
-
-  -- difference between "is" and "has_or"? -> value vs table
-
-  local op = {
-  
-    -- value is (equal to) or (superset of) ok
-    ['and'] = function(value,ok)
-      if type(value) ~= 'table' then return false end
-      value = Set.from_values(value)
-      
-      -- ok[1],ok[#ok] = ok[#ok],nil -- remove the "and" node at pos 1
-      
-      local r = true
-      for i=2,#ok do -- first ok is "and"
-        r = r and value[ ok[i] ]
-        if not r then return false end
-        end
-      return true
-      end,
-      
-    -- at least one element of value is also element of ok
-    ['or'] = function(value,ok)
-      ok = Set.from_values(ok)
-      ok['or']=nil
-      for _,v in pairs(value) do
-        if ok[v] then return true end
-        end
-      return false
-      end,
-      
-      
-    ['is'] = function(value,ok)
-      for i=1,#ok do if ok[i] == value then return true end end
-      return false
-      end,
-    }
-
-  
-  local mode
-  if spec.is and spec.has then err('not both') end
-  if not (spec.is or spec.has) then err('wrong mode combo') end
-  
-  if spec.is then mode = op['is']
-    else mode = op[ spec.has[1] ]
-    end
-  if not mode then err('invalid has mode') end
-  
-  local ok = Tool.First(spec.is,spec.has)
-  
-  
-  if #spec == 1 and type(ok) ~= 'table' and mode == op['is'] then
-    -- The most common case is a paths of length one
-    -- compared with a single value. So this deserves special optimization.
-    local key = spec[1]
-    printl(1)
-    return function(obj) return obj[key] == ok end
-    
-  elseif #spec == 1 then
-    printl(2)
-    local key = spec[1]
-    ok = Table.plural(ok)
-    return function(obj) return mode(obj[key],ok) end    
-    
-  else
-    printl(3)
-    ok = Table.plural(ok)
-    return function(obj) return mode(Table.get(obj,spec),ok) end
-      
-    
-    end
-
-    
-  end
-      
-      
-function Filter.table_filter_draft2(filter_spec)
-
-
-  -- POC but functionally complete
-  
-  -- test
-  
-  -- load_erlib(); print(  Filter.table_filter({'a','b','c',is=5,has=5}) ({a={b={c=5}}})  )
-  
-  -- load_erlib(); print(  Filter.table_filter({'a','b','c',is={5,2},has={1,1,1}}) ({a={b={c=5}}})  )
-  
-  -- load_erlib(); print(  Filter.table_filter({'a','b','c',is={5,2},has={'or',1,1,1}}) ({a={b={c=5}}})  )
-  
-  -- is and has are both value ARRAYS
-  
-  -- "is" means that the obj to test is a non-table
-  -- "is" array is tautologically "or" mode
-  
-  -- "has" means that the obj to test is a table
-  -- "has" array ... needs a fucking mode cos it could be "and" or "or" or whatever
-  
-  local value, has = filter_spec.is, filter_spec.has
-  
-  if value and has then
-    stop('not both at once')
-  elseif value then
-    if #filter_spec == 0 then
-      stop('missing path')
-    elseif #filter_spec == 1 then -- short path
-      local key = filter_spec[1]
-      -- @future: this is probably *the* most frequent case
-      -- so load()'ing an optimized version with hardcoded key might be worth it?
-      return function(obj) return obj[key] == value end
-    elseif #filter_spec > 2 then
-      return function(obj) return Table.get(obj,filter_spec) == value end
-      end
-    
-  elseif has then
-    local ok = Set.from_values(has)
-    if #filter_spec == 0 then
-      stop('missing path')
-    elseif #filter_spec == 1 then -- short path
-      local key = filter_spec[1]
-      return function(obj)
-        for _,v in pairs(obj[key]) do
-          if ok[v] then return true end
-          end
-        return false
-        end
-        
-    elseif #filter_spec > 2 then
-      return function(obj) return not not ok[ Table.get(obj,filter_spec) ] end
-      end
-
-  
-  else
-    stop('missing mode')
-    end
- 
- 
-  end
-
--- return function(obj)      
-      
-  
-----------
--- Creates a table filter function.
-function Filter.table_filter_draft1(filter_spec) return function(obj)
-
-  -- OPTIMIZE: one-key-paths can be done by a much less complex function!
-
-  local example = {
-    mode='and',
-    {'my','path',is ={'value1','value2'}}, -- value exquals exactly
-    {'my','path',has={'or','value1','value2'}}, -- value in table
-    }
-    
-  -- local ex2 = {
-    -- And = {
-      -- f1,
-      -- f2,
-      -- {Or={ f3,f4 }}
-      -- {mode='or',f3,f4 }
-      -- }
-    -- }
-    
-    
-  local ex2 = { --recursive spec
-    'or', 
-  
-    { 'and',
-      {'my','path',is ={'value1','value2'}}, -- value exquals exactly
-      {'my','path',has={'or','value1','value2'}}, -- value in table
-      {'my','path',is ={'value1','value2'}}, 
-      {'my','path',has={mode='and','value1','value2'}},
-      {'my','path',has={mode='or' ,'value1','value2'}},
-      },
-    
-    { 'and',
-      {'my','path',is ={'value1','value2'}}, -- value exquals exactly
-      {'my','path',has={'or','value1','value2'}}, -- value in table
-      },
-  
-  
-    }
-
-  -- local ex3 = Chain {
-    -- 'and',
-    -- {'or',
-      -- {'path',is=5},
-      -- {'path',is=6},
-      -- {'path',is=7},
-      -- },
-    -- {'and'},
-      -- {'path',has=
-    
-    -- }
-    
-
-  return nil
-  end end
    
 
 

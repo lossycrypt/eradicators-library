@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Reusable class creation patterns.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Polishing.
+--
 -- @module Class
 -- @usage
 --  local Class = require('__eradicators-library__/erlib/lua/Class')()

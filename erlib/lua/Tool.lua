@@ -9,6 +9,8 @@
 -- When a new module is added that is a good fit for one of these they
 -- will be moved there on short notice so __watch the changelog carefully__.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Work in progress forever.
+--
 -- @module Tool
 -- @usage
 --  local Tool = require('__eradicators-library__/erlib/factorio/Tool')()

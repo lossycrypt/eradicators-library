@@ -23,11 +23,20 @@ Date: 2020-10-x
     - ?
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.19
-Date: 2020-10-30
-  Internal:
+Date: 2020-10-31
+  Modules:
     - New module Remote
     - New class Remote.PackedInterfaceGroup
+    - New module Data
+    - Introduced per-module development status indicator.
+  Functions:
     - New function Filter.table_value
+    - New function Filter.chain
+    - New function Data.SimpleCustomInput
+    - New function Data.SimpleLinkedInput
+    - Added key reassignment to Array.map copy-mode.
+    - Added InputName to Verificate.isType
+    - Added automatic Or-Type generation to Verificate.isType
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.18
 Date: 2020-10-21

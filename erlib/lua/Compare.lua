@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Description
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Polishing.
+--
 -- @module Compare
 -- @usage
 --  local Compare = require('__eradicators-library__/erlib/lua/Compare')()

@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- (This module is not factorio compatible.)
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+--
 -- @module Time
 -- @usage
 --  local Time = require('__eradicators-library__/erlib/factorio/Time')()

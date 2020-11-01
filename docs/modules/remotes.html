@@ -32,7 +32,7 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Functions">Functions</a></li>
+<li><a href="#Files">Files</a></li>
 </ul>
 
 
@@ -44,7 +44,7 @@
   <li><a href="../modules/Cache.html">Cache</a></li>
   <li><a href="../modules/Data.html">Data</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
-  <li><strong>Entity</strong></li>
+  <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
   <li><a href="../modules/Player.html">Player</a></li>
   <li><a href="../modules/PluginManager.html">PluginManager</a></li>
@@ -73,7 +73,7 @@
   <li><a href="../modules/Tool.html">Tool</a></li>
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
-  <li><a href="../modules/remotes.html">remotes</a></li>
+  <li><strong>remotes</strong></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -84,27 +84,20 @@
 
 <div id="content">
 
-<h1>Module <code>Entity</code></h1>
-<p>[Control Stage] LuaEntity manipulation.</p>
-<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.</p>
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example">local Entity = require(&apos;__eradicators-library__/erlib/factorio/Entity&apos;)()
-</pre>
-    </ul>
+<h1>Module <code>remotes</code></h1>
+<p>Easy remote data access for other mods.</p>
+<p> The "remotes" subdirectory of Erlib contains several files
+ that can be <a href="../lua-5.2/doc/manual.html#pdf-require">required</a> by other mods to get easy access
+ to certain data.</p>
+
+<p> Most of these are wrappers around <a href="../api/LuaRemote.html#LuaRemote.">LuaRemote interfaces</a> that Erlib provides.</p>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#Files">Files</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#find_unit_number">find_unit_number(unit_number)</a></td>
-	<td class="summary">Brute force searches through all surfaces to find an entity.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#get_vehicle_driver_player">get_vehicle_driver_player(vehicle)</a></td>
-	<td class="summary">
-
-</td>
+	<td class="name" nowrap><a href="#get_erlib_event_uids">get_erlib_event_uids</a></td>
+	<td class="summary">Event names and EventUIDs for events created with <a href="../modules/EventManager.html#new_event">EventManager.new_event</a>.</td>
 	</tr>
 </table>
 
@@ -112,69 +105,43 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="Files"></a>Files</h2>
 
     <dl class="function">
     <dt>
-    <a name = "find_unit_number"></a>
-    <strong>find_unit_number(unit_number)</strong>
+    <a name = "get_erlib_event_uids"></a>
+    <strong>get_erlib_event_uids</strong>
     </dt>
     <dd>
-    Brute force searches through all surfaces to find an entity.
+    Event names and EventUIDs for events created with <a href="../modules/EventManager.html#new_event">EventManager.new_event</a>. </p>
+
+<p> Requiring this file returns a table of <a href="../modules/Types.html#KeyValuePair">(key → value)</a> pairs,
+ just like <a href="../api/defines.html#defines.events">defines.events</a>.
+ Because EventUIDs are dynamically generated and can change with every
+ game start, installed mod, etc.., you must use this file if you want
+ to access these EventUIDs.</p>
+
+<p> <strong>Technical Details:</strong></p>
+
+<p> This is equivalent to <a href="../modules/EventManager.html#event_uid">EventManager.event_uid</a> but doesn't require EventManager .</p>
+
+<p> Requiring this file simply calls <a href="../modules/Remote.html#PackedInterfaceGroup:get_all">get_all</a>
+ on the  <a href="../modules/Remote.html#PackedInterfaceGroup">Remote.PackedInterfaceGroup</a> named
+ <code>&apos;eradicators-library:custom-event-uids&apos;</code>.</p>
+
+<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Experimental 2020-10-31.
 
 
-    <h3>Parameters:</h3>
+
+
+
+
+    <h3>Usage:</h3>
     <ul>
-        <li><span class="parameter">unit_number</span>
-            <span class="types"><a class="type" href="../api/Builtin-Types.html#uint">uint</a></span>
-         The LuaEntity.unit_number of the target entity.
-        </li>
+        <pre class="example">defines.erlib_events
+ = <span class="global">require</span>(<span class="string">'__eradicators-library__/erlib/remotes/get_erlib_event_uids'</span>)
+</pre>
     </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../api/LuaEntity.html">LuaEntity</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
-
-
-
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "get_vehicle_driver_player"></a>
-    <strong>get_vehicle_driver_player(vehicle)</strong>
-    </dt>
-    <dd>
-
-
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">vehicle</span>
-            <span class="types"><a class="type" href="../api/LuaEntity.html">LuaEntity</a></span>
-
-
-
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../api/LuaPlayer.html">LuaPlayer</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
-
-
-
-    </ol>
-
-
-
 
 </dd>
 </dl>

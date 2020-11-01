@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- N-Argument logic operators.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
+--
 -- @module Logic
 -- @usage
 --  local Logic = require('__eradicators-library__/erlib/factorio/Logic')()

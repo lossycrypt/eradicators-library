@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Inline replication of object references.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Polishing.
+--
 -- @module Replicate
 -- @usage
 --  local Replicate = require('__eradicators-library__/erlib/lua/Replicate')()
@@ -54,13 +56,20 @@ Replicate.FourtyTwo = function(v)
 -- @tparam AnyValue v
 -- @usage local A,B,C,E,F,G = Replicate(6,LuaEntity)
 Replicate.Replicate = function(n,v)
+  -- V1
   local r = {}; for i=1,n do r[#r+1] = v end
   return unpack(r)
-  -- @future use memoized lambda sub-function for speed?
-  -- local f = Memoize.one_arg(function(n) return L('_1'..string.rep(',_1',n)) end)
-  -- return f(n)(v)
   end
 
+-- 2020-10-31, works, but is it worth requiring two additional modules?
+-- do 
+--   -- V2, memoized Lambda with [0]
+--   local fn = Memoize(function(n) return L['_->_' .. (',_'):rep(n-1)] end)
+--   fn[0] = ercfg.SKIP
+-- function Replicate.Replicate (n,v)
+--   return fn[n](v)
+--   end
+--   end
 
 
 -- -------------------------------------------------------------------------- --

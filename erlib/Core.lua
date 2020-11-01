@@ -7,6 +7,8 @@
   into your environment. If you only want to use a selected few modules that's
   probably a waste of RAM though.
  
+  @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+
   @module Core
   @usage local erlib = require('__eradicators-library__/erlib/Core')()
 ]]
@@ -104,9 +106,12 @@ local Modules = {
 
   -- factorio
   -- (tests do their own checks)
-  Cache      = control_only 'erlib/factorio/Cache',
+  Cache      = control_only 'erlib/factorio/Cache' ,
   Entity     = control_only 'erlib/factorio/Entity',
   Remote     = control_only 'erlib/factorio/Remote',
+  Player     = control_only 'erlib/factorio/Player',
+  
+  Data       = startup_only 'erlib/factorio/Data/!init',
   }
   
 -- require() does not support multiple return values. So every module
@@ -197,6 +202,7 @@ local function EradicatorsLibraryMain(options)
       stop('Public injection is not supported during startup.')
       end
     -- string
+    -- @future: __add, __substract?
     local mt_string = getmetatable('').__index
     mt_string.f = ENV.string.format
     for name, method in pairs(erlib.String) do
@@ -244,6 +250,7 @@ local function EradicatorsLibraryMain(options)
     --extra constants
     setter(ENV, 'LOAD_STAGE', Const.load_stage)
     setter(ENV, 'LOAD_PHASE', Const.load_phase)
+    setter(ENV, 'flag'      , flag            )
     return ENV
     end
   

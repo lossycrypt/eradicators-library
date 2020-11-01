@@ -31,6 +31,8 @@ local type,pairs,next = type,pairs,next
 --   particular, you may clear existing fields.
 --
 --
+-- @{Introduction.DevelopmentStatus|Development Status}: Work in progress.
+--
 -- @tparam table tbl the table to be iterated.
 -- @tparam deep_pair_options|nil opt
 -- @function Iter.deep_pairs

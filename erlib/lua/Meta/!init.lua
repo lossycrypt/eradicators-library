@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Produce function wrappers from other functions.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
+--
 -- @module Meta
 -- @usage
 --  local Meta = require('__eradicators-library__/erlib/lua/Meta/!init')()

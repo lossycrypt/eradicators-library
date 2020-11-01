@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Description
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+--
 -- @module Math
 -- @usage
 --  local Math = require('__eradicators-library__/erlib/lua/Math')()

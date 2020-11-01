@@ -4,6 +4,8 @@
 -- En-/Decodes to/from various formats.
 -- You can require all sub-modules at once by requiring "!all".
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
+--
 -- @module Coding
 -- @usage
 --  local Coding = require('__eradicators-library__/erlib/lua/Coding/!init')()

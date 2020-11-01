@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Description
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Polishing.
+--
 -- @module Remote
 -- @usage
 --  local Remote = require('__eradicators-library__/erlib/factorio/Remote')()
@@ -51,7 +53,7 @@ local Remote,_Remote,_uLocale = {},{},{}
 --------------------------------------------------------------------------------
 
 ----------
--- A table distributed in parts accross multiple remote interfaces.
+-- __Concept.__ A table distributed in parts accross multiple remote interfaces.
 --
 -- A PackedInterfaceGroup encodes static data into the method names of
 -- multiple remote interfaces. One @{key->value} pair is encoded per method.
@@ -141,7 +143,7 @@ local function pull_pig_data(prefix, ignore_list)
   for iname, interface in filter_pairs(
     remote.interfaces, iname_filterer(prefix, ignore_list)
   ) do
-    log:debug('PIG <',iname,'>:pull().')
+    -- log:debug('PIG <',iname,'>:pull().') -- too verbose
     for k, v in pairs(_decode_interface(nil, interface)) do
       Verify(r[k], 'nil',
         'PIG data has a duplicate key:'
@@ -182,6 +184,9 @@ local _pig_mt = {
   __newindex = function(self,key,value)
     return PackedInterfaceGroup.set(self,key,value)
     end,
+  __pairs = function(self)
+    return pairs(PackedInterfaceGroup.get_all(self))
+    end
   }
 
 setmetatable(PackedInterfaceGroup,{__call=function(_,name)
@@ -218,7 +223,9 @@ function PackedInterfaceGroup:update_cache()
 -- 
 -- @treturn string|number|table|nil Returns nil if there is no such key.
 -- 
-function PackedInterfaceGroup:get(key)
+-- @function PackedInterfaceGroup:get
+function PackedInterfaceGroup:get(key,silent)
+  -- @tparam boolean silent Hidden internal setting to skip logging nil.
   Verify(key,'NotNil')
   local value = self.cached_data[key]
   -- check remote data if local doesn't know key (yet)
@@ -227,8 +234,8 @@ function PackedInterfaceGroup:get(key)
     value = self.cached_data[key]
     end
   -- if it's *still* nil at least log it...
-  if value == nil then
-    log:debug('PIG <',self.prefix,'>:get(',key,') returned nil.')
+  if value == nil and silent ~= true then
+    log:debug('PIG <',self.prefix,'>:get("',key,'") returned nil.')
   else
     return Table.dcopy(value) -- don't need to copy nil
     end
@@ -263,13 +270,13 @@ function PackedInterfaceGroup:set(key,value)
   Verify(value,'str|num|tbl','Unsupported value data type.')
   -- _pig_mt.__index priorizes PIG keys, so proper reading would not be guaranteed.
   Verify(PackedInterfaceGroup[key],'nil','PIG method names can not be used as keys.')
-  log:debug('PIG <',self.prefix,'>:set(',key,',',value,')')
   -- data *must* be up-to-date before checking if value already exists
   self:update_cache()
   -- ignore writing of identical value
   -- error on different value
   -- table value identity is conveniently destroyed by Hydra during update_cache()
-  if  self.cached_data[key] == nil then
+  if self.cached_data[key] == nil then
+    log:debug('PIG <',self.prefix,'>:set("',key,'",',value,')')
     self.cached_data[key               ] = value
     self.interface  [_encode(key,value)] = ercfg.SKIP
   elseif self.cached_data[key] ~= value then
@@ -280,6 +287,8 @@ function PackedInterfaceGroup:set(key,value)
       ,'\n  old_val = ', self.cached_data[key]
       ,'\n  new_val = ', value
       )
+  else -- key == value
+    log:debug('PIG <',self.prefix,'>:set("',key,'",',value,') skipped, same value already present.')
     end
   end
   

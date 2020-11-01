@@ -11,6 +11,8 @@
 --
 -- __Note:__ This module inherits all @{Table} module methods.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Polishing.
+--
 -- @module Set
 -- @usage
 --  local Set = require('__eradicators-library__/erlib/lua/Set')()

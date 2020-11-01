@@ -1,16 +1,13 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- Specialized iteration of tables and other objects.
--- 
--- "pairs" methods take a single input table.
--- "touples" methods take an arbitrary number of tables.
--- 
--- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
+-- Description
 --
--- @module Iter
+-- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+--
+-- @module Player
 -- @usage
---  local Iter = require('__eradicators-library__/erlib/lua/Iter')()
+--  local Player = require('__eradicators-library__/erlib/factorio/Player')()
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -22,57 +19,35 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Locals / Init                                                              --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
--- local import = function(path) return (require(elroot..path))() end --unpacking
-
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Iter,_Iter,_uLocale = {},{},{}
+local Player,_Player,_uLocale = {},{},{}
 
+-- Quick and dirty copy/paste from legacy lib (for rotate-car-button plugin)
+function Player .try_reach(p,obj)
+  if p.can_reach_entity(obj) then return true end
+  p.create_local_flying_text{text={'cant-reach'},position=obj.position}
+  end
 
-
-Iter.array_pairs = elreq('erlib/lua/Iter/array_pairs')()
-
-Iter.combinations = elreq('erlib/lua/Iter/combinations')()
-Iter.permutations = elreq('erlib/lua/Iter/permutations')()
-Iter.subsets      = elreq('erlib/lua/Iter/subsets')()
-
-Iter.deep_pairs  = elreq('erlib/lua/Iter/deep_pairs' )()
-Iter.sync_tuples = elreq('erlib/lua/Iter/sync_tuples')()
-
-
-Iter.filter_pairs  = elreq('erlib/lua/Iter/filter_pairs' )()
--- Iter.map_tuples  = elreq('erlib/lua/Iter/map_tuples' )()
-
--- Iter.map_tuples is trivial to emulate with sync_tuples so
--- no extra module is required.
---
--- for k,v1,v2,v3 in sync_tuples(t1,t2,t3,t4) do
---   local result = f(v1,v2,v3)
---   DoStuff()
---   end
-
-
-
-
-
+function Player .notify(p,pos,msg)  
+  p.create_local_flying_text{text=msg,position=pos}
+  end
 
 --------------------------------------------------------------------------------
--- Section
+-- Section.
 -- @section
 --------------------------------------------------------------------------------
 
-
 ----------
--- Find out how to make LDoc obey custom names for
--- sections and iterators.
+-- Nothing.
 -- @within Todo
--- @field todo-1
+-- @field todo1
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-do (STDOUT or log or print)('  Loaded → erlib.Iter') end
-return function() return Iter,_Iter,_uLocale end
+do (STDOUT or log or print)('  Loaded → erlib.Player') end
+return function() return Player,_Player,_uLocale end

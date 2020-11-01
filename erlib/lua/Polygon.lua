@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Description
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+--
 -- @module Polygon
 -- @usage
 --  local Polygon = require('__eradicators-library__/erlib/factorio/Polygon')()

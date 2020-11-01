@@ -4,6 +4,8 @@
 -- Useful cache constructors. For when you don't want to spam
 -- global savedata with lots of outdated junk.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
+--
 -- @module Cache
 -- @usage
 --  local Cache = require('__eradicators-library__/erlib/factorio/Cache')()

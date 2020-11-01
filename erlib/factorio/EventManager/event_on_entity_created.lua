@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Description is ignored for submodules.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+--
 -- @module EventManager
 
 -- -------------------------------------------------------------------------- --
@@ -132,13 +134,18 @@ return function (EventManager)
   -- @within Built-in Custom Events
   -- @table EventManager.on_entity_created
   
-  local EVENT_UID = LuaBootstrap.generate_event_name()
+  -- local EVENT_UID = LuaBootstrap.generate_event_name()
+  
+  local EVENT_UID = EventManager.new_event('on_entity_created_multiplex')
   
   
   local function raise_event(e)
     --??
     
-    e.name = EVENT_UID -- leaving the original id is faster and more versatile?
+    e.real_name, e.name = e.name, EVENT_UID
+    -- e.name      = EVENT_UID
+    
+    -- e.real_name
     
     -- EventManager.raise_private(EVENT_UID,e,p)
     

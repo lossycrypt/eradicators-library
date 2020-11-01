@@ -58,9 +58,25 @@ local function Test()
     assert(false == F{'a','b',has={'or',-1}}  (t2) )
     assert(false == F{'a','b',has={'and',-1}} (t2) )
     
-    
     end
 
+  -- Filter.chain
+  do
+    assert(true  == Filter.chain{'or',function(x) return x > 5 end, function(x) return x <2 end} (1) )
+    assert(true  == Filter.chain{'or',function(x) return x > 5 end, function(x) return x <2 end} (7) )
+    assert(false == Filter.chain{'or',function(x) return x > 5 end, function(x) return x <2 end} (4) )
+
+    assert(false == Filter.chain{'or', {'a',is=5}, {'and',{'b',is=7},{'c',is=7}} } (7))
+    
+    assert(true  == Filter.chain{'or', {'a',is=5}, {'and',{'b',is=7},{'c',has={'and',6,5}}} } ({a=5              }))
+    assert(false == Filter.chain{'or', {'a',is=5}, {'and',{'b',is=7},{'c',has={'and',6,5}}} } ({a=0              }))
+    
+    assert(true  == Filter.chain{'or', {'a',is=5}, {'and',{'b',is=7},{'c',has={'or' ,6,5}}} } ({a=0,b=7,c={0,0,6}}))
+    assert(true  == Filter.chain{'or', {'a',is=5}, {'and',{'b',is=7},{'c',has={'or' ,6,5}}} } ({a=0,b=7,c={0,5,0}}))
+    assert(true  == Filter.chain{'or', {'a',is=5}, {'and',{'b',is=7},{'c',has={'and',6,5}}} } ({a=0,b=7,c={5,3,6}}))
+    assert(false == Filter.chain{'or', {'a',is=5}, {'and',{'b',is=7},{'c',has={'and',6,5}}} } ({a=0,b=0,c={5,3,0}}))
+    end
+  
 
 
 

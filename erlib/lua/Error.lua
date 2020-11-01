@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Produces auto-formatting auto-serializing errors handlers.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
+--
 -- @module Error
 --
 -- @usage

@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Description
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+--
 -- @module Log
 -- @usage
 --  local Log = require('__eradicators-library__/erlib/lua/Log')()
@@ -187,7 +189,8 @@ local function get_log_level_setting_value(mod_name)
     if flag.IS_DEV_MODE then
       return const.level.DEV_MODE
     else
-      return const.level.Errors
+      -- return const.level.Errors
+      return const.level.Warnings
       end
     end
   -- search mod settings
@@ -202,7 +205,8 @@ local function get_log_level_setting_value(mod_name)
   --
   -- print('Log level gotten:'..value)
   -- return value or const.level.Errors
-  return value or const.level.DEV_MODE
+  return value
+      or (flag.IS_DEV_MODE and const.level.DEV_MODE or const.level.Warnings)
   -- return value or const.level.Warnings
   end
 

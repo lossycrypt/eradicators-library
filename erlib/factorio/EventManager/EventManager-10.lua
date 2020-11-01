@@ -7,7 +7,7 @@
 -- @{FOBJ LuaBootstrap}. To ensure smooth operations it replaces `script`
 -- with a wrapper that behaves like the real script as close as possible,
 -- but not all functionality is available (yet). Keeping local references
--- to `script` is not supported.
+-- to `script` is not supported and will break EventManager.
 --
 -- __Note:__ EventManager stores it's private data in __global.event_manager__.
 -- Messing with that data will break EventManager.
@@ -20,10 +20,11 @@
 --   * Only actions take extra queue arguments, but normal handlers can be
 --   @{EventManager.call|called} with extra arguments.
 --
---   * OnTicks can not be registered to multiple events.
+--   * OnTicks can not be registered to other events.
 --
 --   * Actions use en/dequeue. OnTicks use en/disable.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
 --
 -- @module EventManager
 -- @usage
@@ -35,11 +36,12 @@
 --------------------------------------------------------------------------------
 
 ----------
--- Continue integration of event-manager-8 from line 1250
+-- Continue integration of event-manager-8 from line 1287
 --
 -- @table todo0
       
 ----------
+-- New Event
 -- Replace event groups with stand-alone wrappers that
 -- pre-filter and re-structure the event tables.
 --
@@ -55,35 +57,6 @@
 -- @table todo1
 
 
-----------
--- EventManager.new_event_uid
---
--- Possibility to register new custom events.
--- Is that still useful?
---
--- Would be nicer if EventManager stays agnostic and works automatically.
--- This might require auto-detecting valid event names.
---
--- -> get_new_event_uid()
--- Simultaenously creates a new id and makes it available via remote interface.
---
--- @table todo2
-  
-----------
--- Retro-gen event
--- 
--- starts a series of re-generation chunk events (tick distributed?) to which the mod can then react
--- 
--- last chunk event must carry {e.final=true}
--- 
--- must be different event than normal chunk_generated.
--- 
--- include LuaRendering debug marker? (i.e. a square on the chunk)
--- 
--- (does gui update during tick_paused? can force update one tick -> show progress bar?)
---   
--- @table todo3
-  
 ----------  
 -- EventManagerScript.on_event
 -- 
@@ -99,14 +72,6 @@
 -- @table todo4
   
   
-----------
--- DebugOncePerLoad Event
--- -> needs EventManager.new_event_name?  .private_event_name?
--- -> needs EventManager.are_there_any_handlers_for_this_event(event_name)
---   to prevent pointlessly registering on_tick when nobody uses it 
--- @table todo5
-  
-
 ----------  
 -- EventManager.supress_logging_event_id(event_uid)
 --
@@ -114,25 +79,38 @@
 -- on_tick, on_chunk_generated, etc?
 -- @table todo6
 
+      
 
 
-
+  
 ----------
--- enqueue should deepcopy/shallow (?) to prevent putting 
--- desync-unsafe table references into args. and prevent
--- putting bullshit like functions into args.
--- @table todo8
-
-
-----------
--- "Unsafe" mode -> allowing to use new_handler at runtime
--- should be disabled by default and only enabled if explicitly requested.
--- EventManager.disable_desync_protection()
---
---
--- As long as this *isn*t used EventManager should be completely desync safe.
+-- New Event
+-- Retro-gen event
 -- 
--- @table todo9
+-- starts a series of re-generation chunk events (tick distributed?) to which the mod can then react
+-- 
+-- last chunk event must carry {e.final=true}
+-- 
+-- must be different event than normal chunk_generated.
+-- 
+-- include LuaRendering debug marker? (i.e. a square on the chunk)
+-- 
+-- (does gui update during tick_paused? can force update one tick -> show progress bar?)
+--   
+-- @table todo3
+  
+
+  
+----------
+-- New Event
+-- DebugOncePerLoad Event
+-- -> needs EventManager.new_event_name?  .private_event_name?
+-- -> needs EventManager.are_there_any_handlers_for_this_event(event_name)
+--   to prevent pointlessly registering on_tick when nobody uses it 
+-- @table todo5
+  
+
+
   
 --------------------------------------------------------------------------------
 -- Concepts. 
@@ -142,23 +120,24 @@
 ----------
 -- The unique identifier of an event.
 -- 
--- An event_uid is any @{number} or @{string} that could be used to register
--- an event handler with script.on\_event(event\_uid,handler\_function).
+-- An EventUID is any @{NaturalNumber} or @{string} that could be used to register
+-- an event handler with @{FOBJ LuaBootstrap.on_event|script.on_event()}.
 -- 
--- That means any number from @{FAPI defines defines.events},
--- any number generated with script.generate\_event\_name(),
--- any string that is the name of a @{FOBJ LuaCustomInputPrototype},
+-- That means any NaturalNumber from @{FAPI defines defines.events},
+-- any NaturalNumber number generated with
+-- @{FOBJ LuaBootstrap.generate_event_name|script.generate_event_name}(),
+-- any name of a @{FOBJ LuaCustomInputPrototype},
 -- or one of the literal strings
 -- `"action"`, `"on_init"`, `"on_load`" and `"on_config`".
 -- 
 -- @within Concepts
--- @table event_uid
+-- @table EventUID
 do end
 
 ----------
 -- A handler subscribed to 'action' instead of to an event.
 -- 
--- Actions are event handlers that are registered for the event_uid `"action"`.
+-- Actions are event handlers that are registered for the EventUID `"action"`.
 -- Actions __do not happen naturally__. Instead they are used with
 -- @{EventManager.enqueue} and @{EventManager.dequeue} to manually
 -- schedule __future__ script actions that do not depend on events.
@@ -252,8 +231,8 @@ do end
 --   -- Low level events use string names.
 --   -- Multiple events can be registered simultaenously.
 --   EventManager.new_handler {
---     {'on_init',    -- script.on_init
---      'on_config'}, -- script.on_configuration_changed
+--     {EventManager.event_uid.on_init,    -- script.on_init
+--      EventManager.event_uid.on_config}, -- script.on_configuration_changed
 --     function()
 --       global.my_mod_data = global.my_mod_data or {}
 --       end
@@ -294,6 +273,7 @@ local Crc32      = elreq('erlib/lua/Coding/Crc32')()
 
 local Cache      = elreq('erlib/factorio/Cache')()
 
+local Compose    = elreq('erlib/lua/Meta/Compose')()
 local L          = elreq('erlib/lua/Lambda'    )()
 
 
@@ -316,31 +296,6 @@ local UID_INTERFACE_NAME = 'eradicators-library:custom-event-uids'
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
--- do
---  Draft: auto fetch correct copy of manager?
--- 
---   -- local this_file_name = Stacktrace.get_file_name(1)
---   -- local this_directory = Stacktrace.get_directory(1)
---   
---   local relative_path = 
---     ( Stacktrace.get_directory(1)
---         :gsub(Stacktrace.get_mod_root(1),'')
---     ..
---       Stacktrace.get_file_name(1)
---       )
---     :gsub('/','.')
---   
---   
---   for path, chunk in pairs(package.loaded) do
---     if path:find(relative_path) then
---       error('found: '..path)
---       end
---     end
--- 
---   end
-
-
-
 local EventManager,_EventManager,_uLocale = {},{},{}
 local Private = {} -- Not exported to outside scripts.
 
@@ -355,6 +310,7 @@ if not Stacktrace.get_load_stage().control then
 
 if rawget(_ENV,'EVENT_MANAGER_ACTIVE') == nil then
   rawset(_ENV,'EVENT_MANAGER_ACTIVE',true)
+  
 else
   stop('EventManager can only be loaded once per mod.')
   end
@@ -365,9 +321,9 @@ else
 -- as they might see the empty invalid global Savedata table,
 -- that exists before the game loads the real Savedata
 -- into this mods lua state.
-
+--
 -- The "global" table that exists before on_load is garbage.
-
+--
 -- This flag must toggled "true" at the end of 
 -- on_init, on_config and on_load.
 local isOnLoadFinished = false
@@ -377,6 +333,8 @@ local function VerifyIsOnLoadFinished(...)
     end
   end
   
+  
+  
 --------------------------------------------------------------------------------
 -- Expert Methods.
 -- @section
@@ -385,6 +343,10 @@ local function VerifyIsOnLoadFinished(...)
 -- -------------------------------------------------------------------------- --
 -- Desync Protection                                                          --
 -- -------------------------------------------------------------------------- --
+
+-- EventManager should be guaranteed to be desync free by default.
+-- Anything that *might* cause desyncs should be blocked until the
+-- user choses to unblock it.
 
 local isDesyncAllowed = false
 local function VerifyIsBeforeOnLoadOrIsDesyncAllowed(...)
@@ -459,97 +421,97 @@ local SavedataMigrations = {
     end,
   }  
 
+  
+-- -------------------------------------------------------------------------- --
+-- Misc / Logging                                                             --
+-- -------------------------------------------------------------------------- --
+
+-- Reverse lookup for logging, {number -> string}.
+local EventUidToName = setmetatable(
+  Table.map  (defines.events, L['id,name -> name,id'], {}),
+  -- if it's not a defines just return it verbatim
+  {__index = Tool.Select_second}
+  )
+
+  
+  
 -- -------------------------------------------------------------------------- --
 -- Custom Shared Event UIDs                                                   --
 -- -------------------------------------------------------------------------- --
-
--- Private.event_uid = require('__eradicators-library__/erlib/remote/shared_event_uids')
--- 
--- -- Secure the table against accidential wrong access.
--- EventManager.event_uid = setmetatable({},{
---   __index    = function(_, key)
---     return Verify(Private.event_uid[key], 'NaturalNumber', 'Invalid event name: ', key)
---     end,
---   __newindex = function(_, k, v)
---     stop('Can not manually add event id:\n', k, ' = ', v)
---     end,
---   })
--- 
   
---- DRAFT BELOW THIS  
-  
-
-local event_uid_pig
+-- Create + Get shared UIDs
+Private.event_uid_pig
   = Remote.PackedInterfaceGroup('eradicators-library:custom-event-uids')
-  
-  
--- A meta-layer between the PIG and event_uid automatically
--- creates new event uids on read access.
+
+
+----------
+-- A table like @{FAPI defines defines.events} for custom and modded events.
+-- 
+-- This accesses a @{Remote.PackedInterfaceGroup|PackedInterfaceGroup} named
+-- `"eradicators-library:custom-event-uids"`. It contains @{key->value} pairs
+-- for all event names that __any__ mod has regiestered with @{EventManager.new_event}.
+-- This is the __recommended__ way of accessing shared EventUIDs of other mods.
+-- 
+-- __Note:__ If your mod doesn't use EventManager you can use 
+-- @{remotes.get_erlib_event_uids} instead.
+-- 
+-- @usage
+--   EventManager.new_handler{
+--     EventManager.event_uid.on_other_mods_custom_event,
+--     function(e)
+--       print("I'm using a shared event!")
+--       end
+--     }
+-- 
+-- @within Custom Event Management
+-- @table event_uid
 EventManager.event_uid = setmetatable({},{
-  --@future: is this too much meta-magic?
-  __index = function(self,event_name)
-    return event_uid_pig[event_name] or EventManager.new_event(event_name)
+  __index = function(self, event_name)
+    return Private.event_uid_pig:get(event_name)
+        or stop('Unknown event name:\n', event_name)
     end,
-  __newindex = function(self,event_name, event_uid)
-    EventManager.new_event(event_name, event_uid)
+  __newindex = function(self, event_name, event_uid)
+    stop('Please use EventManager.new_event("', event_name, '",', event_uid, ')')
     end,
+  -- Allow other mods to build reverse name-lookup tables.
+  __pairs = function() return pairs(Private.event_uid_pig) end
   })
 
-error('produces some kind of infinite recursion')
 
 ----------
 -- Tells EventManager about mod-created event names.
 --
 -- @tparam string event_name
 -- @tparam[opt] NaturalNumber event_uid If you have an id from somewhere else
--- you can pass it along, otherwise a new uid will be generated.
+-- you can pass it along. Otherwise EventManager will check if it __already has__
+-- a uid for the given event name (i.e. from another mod)
+-- and if not __generate__ a __new__ one.
 --
--- @treturn NaturalNumber event_uid
+-- @treturn EventUID The new uid is automatically included in
+-- @{EventManager.event_uid}.
+--
+-- @within Custom Event Management
 function EventManager.new_event(event_name, event_uid)
-  local uid = event_uid
-    or EventManager.event_uid[event_name]
-    or LuaBootstrap.generate_event_name() -- generate only if nessecary
-  -- store if new
-  if EventManager.event_uid[event_name] == nil then
-    EventManager.event_uid[event_name] = uid
-  -- error if different
-  elseif EventManager.event_uid[event_name] ~= uid then
-    stop(
-      'That event name is already in use with a different uid:'
-      , '\nevent_name: ', event_name
-      , '\nevent_uid : ', event_uid
-      )
-    end
+  Verify(event_name, 'str')
+  Verify(event_uid , 'nil|str|Integer')
+  local uid = event_uid                           -- user given (other mod generated)
+    or Private.event_uid_pig:get(event_name,true) -- already known
+    or LuaBootstrap.generate_event_name()         -- generate new
+  Private.event_uid_pig:set(event_name, uid)
+  EventUidToName[uid] = event_name
+  -- Logs as "new event" but the uid might also be an old one from the PIG.
+  log:debug('New event, event_name = "', event_name, '", event_uid = ', uid)
   return uid
   end
 
   
-  
--- -------------------------------------------------------------------------- --
--- Misc / Logging                                                             --
--- -------------------------------------------------------------------------- --
-
--- {string -> number}
--- local EventNameToUid = Table.scopy(defines.events)
-
--- {number -> string}
-local EventUidToName = setmetatable(
-  -- lookup for log messages and printing
-  Table.map  (defines.events, L['id,name -> name,id'], {}),
-  -- if it's not a defines just return it verbatim
-  {__index = function(_,key) return event_uid_pig[key] or key end}
-  )
-
-
--- lookup for log messages and printing
--- local EventUidToName = Table.map(defines.events, L['id,name -> name,id'], {})
-
--- Fetch custom uids
--- for name,uid in pairs(Private.event_uid) do EventUidToName[uid] = name end
-  
--- if it's not a known number just return it verbatim
--- setmetatable(EventUidToName, {__index = function(_,key) return key end})
--- setmetatable(EventUidToName, {__index = function(_,key) return event_uid_pig[key] or key end})
+-- Reserved UIDs.
+-- EventManager must NEVER subscribe LuaBootstrap.on_event for these.
+EventManager.new_event('on_init'                 , -1 )
+EventManager.new_event('on_load'                 , -2 )
+EventManager.new_event('on_config'               , -3 )
+EventManager.new_event('on_configuration_changed', -3 )
+EventManager.new_event('action'                  , 'action' )
 
 
 
@@ -603,43 +565,40 @@ function Private.on_event(event_uid,f)
   return ok or stop('script.on_event error:\n\n', msg)
   end
 
--- Exceptions for on_tick and internal names.
-local doNotRegisterTheseEventUids = Set.from_values {
-  'on_init',
-  'on_load',
-  'on_config',
-  }
-
 
 -- Registration Order == Execution Order
 local OrderedHandlers = setmetatable({
-
-  -- on_tick must always be active to support actions
-  -- [defines.events.on_tick] = {n=0},
 
   },{
 
   -- OrderedHandlers should behave like a normal table
   -- for iteration and index. In particular for returning
   -- nil when the index has no registered handlers.
+  --
+  -- Thus a special sget() function is used for the
+  -- on-the-fly construction.
   __index = {
   
     -- On-the-fly constructs per-event-uid subtables
-    -- and registers the generic handler.
-
+    -- and registers the generic handler wrappers.
+    --
     -- Direct registration makes invalid handlers crash
     -- instantly, thus produces better error messages
     -- than conditional-registration in on_load.
-
+    --
     -- It also shifts the burdern of correct on_load 
     -- re-registration to the mod using the library,
     -- so no special handling is required here.
-  
+    --
     sget = function(self, event_uid)
       local event_handlers = rawget(self,event_uid)
       if event_handlers == nil then
         event_handlers = Table.sget(self,{event_uid},{n=0})
-        if not doNotRegisterTheseEventUids[event_uid] then
+        -- String    : action or CustomInput
+        -- Number ==0: on_tick
+        -- Number >=0: normal handler
+        -- Number <=0: internal-use-only handlers, on_init, on_load, on_config
+        if type(event_uid) == 'string' or event_uid >= 0 then
           if event_uid == 'action'
           or event_uid == defines.events.on_tick 
           then Private.on_event(
@@ -721,11 +680,19 @@ local Queue_mt = {__index={
   enqueue_action = function(self,ticks,handler_data,...)
     local queued_handler = {handler_data.uid}
     local n = select('#',...)
-    -- only create args-table when args are given
-    if n > 0 then queued_handler[2] = {n=n,...} end
+    -- Only create args-table when args are given.
+    --
+    -- The whole argument table is deep-copied to prevent
+    -- potentially desync-unsafe references to outside data,
+    -- while still allowing simultaenously enqueued Actions
+    -- to share table references.
+    if n > 0 then queued_handler[2] = Table.dcopy{n=n,...} end
     local r, current_tick = {}, game.tick
     for i=1,#ticks do
       local tick = ticks[i] + current_tick
+      if tick <= current_tick then
+        stop('Attempt to enqueue an action into the past!')
+        end
       r[#r+1]    = tick
       log:debug('Action enqueued: ', handler_data.name,', tick: ', tick)
       -- enqueues the same table for all requested ticks (saves space)
@@ -884,6 +851,27 @@ for _, method in pairs {
       end
   end
 
+  
+-- error('Can OnTicks be created live? Is this really important? Event wrappers should be done first.')
+--
+-- function EventManagerScript.on_event(event_uids, event_handler)
+--   for _, event_uid in pairs(Table.plural(event_uids)) do
+--     local name = 'EventManagerScript:on-event-'..EventUidToName[event_uid]
+--     -- Directly manipulate the registry.
+--     -- All tables are the same so we only need one entry point!
+--     local handler_data = HandlersByName[name]
+--     if handler_data then
+--       handler_data.f = event_handler
+--     else
+--       EventManager.new_handler {
+--         name       = name,
+--         persistent = true,
+--         event_uid        ,
+--         event_handler    ,
+--         }
+--       end
+--     end
+--   end
 
 --------------------------------------------------------------------------------
 -- Handler Methods.
@@ -942,6 +930,9 @@ for _, method in pairs {
 -- If you enqueue an Action with a period > 0 you have to manually dequeue it
 -- later or it will repeat forever.
 --
+-- @treturn string args.name, Returned for easy access to dynamically
+-- generated Action names.
+--
 -- @function EventManager.new_handler
 
 do
@@ -968,7 +959,7 @@ do
     -- Registering new handlers at runtime is not safe.
     -- The user must register before on_load or disable desync protection.
     VerifyIsBeforeOnLoadOrIsDesyncAllowed(
-      'Creating new handlers at runtime is not supported.'
+      'Creating new handlers at runtime is not desync safe.'
       )
   
     -- container table
@@ -1030,7 +1021,6 @@ do
     handler_data.enabled = nil
 
     -- persistent
-    -- This parameter is undocumented becaue 
     Verify(handler_data.persistent,'nil|bool','Invalid persistent type.')
     if handler_data.persistent == true then
       -- Can not be en/disabled and thus false makes no sense.
@@ -1091,6 +1081,9 @@ do
     if handler_data.uid == nil then handler_data.uid = false end --read is allowed
     if handler_data.filter == nil then handler_data.filter = false end --read is allowed
     setmetatable(handler_data,no_invalid_read_mt)
+    
+    -- @future: dynamically generated names might be useful to return for actions?
+    return rawget(handler_data,'name') or nil
     
     end
   end
@@ -1185,20 +1178,22 @@ function EventManager.disable(handler_name)
 --
 -- __Note:__ Can only be called from inside event handlers.
 -- 
--- @tparam NaturalNumber|DenseArray tick_delay How many ticks in the future this
+-- @tparam NaturalNumber|DenseArray ticks How many ticks in the future this
 -- should be executed.
 -- 
 -- @tparam string action_name The name used to register the handler you want
 -- to call.
 -- 
 -- @tparam AnyValue ... Additional arguments that will be passed to the handler.
--- The exact values will be passed. In particular __table references will not
--- be protected__ against manipulation from multiple handlers.
+-- A __copy__ of these will be given to the handler on execution. It is the
+-- __same__ copy for all ticks given. Thus actions that occur on multiple
+-- ticks or have a period can safely store intermediate data in args tables,
+-- however this data can not be accessed from outside the action handler.
 --
 -- @treturn DenseArray All ticks that the handler has been queued for. Useful
 -- if you later want to dequeue it from specific ticks.
 --
-function EventManager.enqueue(tick_delay,action_name,...)
+function EventManager.enqueue(ticks,action_name,...)
   -- The UnifiedQueue does not handle name collisions between 
   -- OnTick and action handlers. It is thus nessecary that only
   -- actions can be enqueued. EventManager.new_handler enforces
@@ -1208,8 +1203,8 @@ function EventManager.enqueue(tick_delay,action_name,...)
   local handler_data = Private.get_handler_data_from_name(action_name)
   Verify(handler_data.event_uids['action'], 'true', 'Can only enqueue actions.')
 
-  local ticks = Table.plural(tick_delay)
-  Verify(ticks,'NonEmptyDenseArrayOfNaturalNumber','Invalid tick_delay.')
+  local ticks = Table.plural(ticks)
+  Verify(ticks,'NonEmptyDenseArrayOfNaturalNumber','Invalid ticks.')
   return Queue:enqueue_action(ticks,handler_data,...)
   end
 
@@ -1274,9 +1269,7 @@ do
 
   -- Handles all events except OnTick.
   function Private.on_every_event(e,filter)
-    -- "custom_name" can be used to override which handlers are called
-    -- while passing the real name on to the handler function.
-    local event_uid = e.custom_name or e.input_name or e.name
+    local event_uid = e.input_name or e.name
     local handlers  = OrderedHandlers[event_uid]
     
     -- @future: Allow selectively calling a subset of handlers.
@@ -1351,19 +1344,21 @@ function Private.on_every_tick (e)
       local queued_handler = queue[i]
       local uid, args      = queued_handler[1], queued_handler[2]
       local handler_data   = HandlersByUid[uid]
-      -- get next queue
       
-      -- Queue:raw_enqueue(e.tick+handler_data.period, queued_handler) --@future
+      -- V1, enqueue next
+      -- local next_period  = e.tick + handler_data.period -- period can be 0
+      -- local next_queue   = Queue[next_period] or {n = 0}
+      -- Queue[next_period] = next_queue
+      -- next_queue.n             = next_queue.n + 1
+      -- next_queue[next_queue.n] = queued_handler
       
-      local next_period  = e.tick + handler_data.period -- period can be 0
-      local next_queue   = Queue[next_period] or {n = 0}
-      Queue[next_period] = next_queue
-      -- enqueue next
-      next_queue.n             = next_queue.n + 1
-      next_queue[next_queue.n] = queued_handler
+      -- V2
+      Queue:raw_enqueue(
+        e.tick + handler_data.period, -- period can be 0
+        queued_handler
+        )
+      
       -- call handler
-      
-      
       log:debug(
         '[tick ', e.tick, '] ',
         'Event handled  : on_tick, Handler: ', handler_data.log_name
@@ -1372,14 +1367,9 @@ function Private.on_every_tick (e)
       --   handler_data.profiler.restart()
       --   end
       if args then
-        -- V1 private args copy for every call
-        -- deep-copy? shallow-copy?
-        -- handler_data.f(e.tick,table_unpack(Table_scopy(args),1,args.n))
-
-        -- V2 shared data, no copy
-        -- References to local upvalues shouldn't be in args? But if
-        -- they were then deep-copy would destroy them.
-        -- @future: there might be usecases where actions need to share data?
+        -- Arguments are deep-copied upon being enqueued. Actions enqueued
+        -- for multiple ticks (or periodically) are allowed to keep their
+        -- table reference. This allows actions to build their own Savedata.
         handler_data.f(e.tick,table_unpack(args,1,args.n))
       else
         handler_data.f(e.tick)
@@ -1402,23 +1392,34 @@ function Private.on_every_tick (e)
 -- Raise Event                                                                --
 -- -------------------------------------------------------------------------- --
 
--- Raises an event that is private to this mods lua state.
--- @tparam EventUid event_uid
--- @tparam table event_data extra data to be passed to all event handlers
+----------
+-- Raises an event only for the current mod.
+-- 
+-- @tparam EventUID event_uid
+-- @tparam table event_data Extra data to be passed to all event handlers.
 --
+-- @function EventManager.raise_private
+do  
+  local on_load_uid = EventManager.event_uid.on_load
+  local can_raise = function(event_uid)
+    return (event_uid ~= defines.events.on_tick) -- Queue self-deletes.
+       and (event_uid ~= 'action') -- Would unconditionally raise all Actions.
+    end
 function EventManager.raise_private(event_uid, event_data)
-  if event_uid == defines.events.on_tick then stop('Can not raise on_tick.') end
-  local tick = (event_uid ~= 'on_load') and game.tick or -1
+  Verify(can_raise(event_uid), 'true',
+    'Can not raise on_tick or action.\n',
+    EventUidToName[event_uid], '\n', event_data)
+  local tick = (event_uid ~= on_load_uid) and game.tick or -1
   if OrderedHandlers[event_uid] then
     log:debug(
       '[tick ', tick, '] ',
       'Event raised   : ', EventUidToName[event_uid], ' (private)'
       )
-    Private.on_every_event( Table.smerge( {
-      name    = event_uid,
-      tick    = tick,
-      private = true, -- Allows ignoring public events. I.e. for wrappers.
-      }, event_data or nil ) )
+    event_data         = event_data and Table.scopy(event_data) or {}
+    event_data.name    = event_uid -- Must overwrite possible event_data.name!
+    event_data.tick    = tick
+    event_data.private = true -- Allows ignoring public events. I.e. for wrappers.
+    Private.on_every_event(event_data)
   else
     log:debug(
       '[tick ', tick, '] ',
@@ -1427,7 +1428,7 @@ function EventManager.raise_private(event_uid, event_data)
       )
     end
   end  
-
+  end
   
 
   
@@ -1556,7 +1557,7 @@ function Private.on_load()
   -- Private.register_manager_event_handlers()
   Private.restore_handler_status()
   -- log:tell('Full Registry at end of on_load:',OrderedHandlers)
-  EventManager.raise_private('on_load', nil)
+  EventManager.raise_private(EventManager.event_uid.on_load, nil)
   isOnLoadFinished = true
   end
 
@@ -1598,13 +1599,13 @@ LuaBootstrap.on_init (function()
   log:debug('Bootstrap      : on_init')
   Verify(global.event_manager,'nil','Savedata found before on_init!?')
   Private.on_confinit()
-  EventManager.raise_private('on_init')
+  EventManager.raise_private(EventManager.event_uid.on_init)
   end)
   
 LuaBootstrap.on_configuration_changed(function()
   log:debug('Bootstrap      : on_config')
   Private.on_confinit()
-  EventManager.raise_private('on_config')
+  EventManager.raise_private(EventManager.event_uid.on_config)
   end)
 
 -- Paranoia / Assumption: EventManager must have full control.
@@ -1710,7 +1711,7 @@ local function CreateSimulation(
     end
 
   NewHandler{
-    'on_load',
+    EventManager.event_uid.on_load,
     link_savedata
     }
     
@@ -1728,7 +1729,7 @@ local function CreateSimulation(
     
   -- Simulate indexes when other mods might have overshadowed them.
   NewHandler {
-    {'on_init','on_config'},
+    {EventManager.event_uid.on_init,EventManager.event_uid.on_config},
     function(e)
     
       -- create/read savedata
@@ -1820,6 +1821,8 @@ CreateSimulation(
 do
 
   local SAVEDATA_PATH = {'event_manager','simulation','technologies'}
+  
+  EventManager.new_event('on_research_reset')
 
   local NewHandler = function(tbl)
     EventManager.new_handler(Table.smerge(tbl,{
@@ -1909,7 +1912,7 @@ do
 
   -- Beware on_load before on_config.
   NewHandler{
-    'on_load',
+    EventManager.event_uid.on_load,
     function() Savedata = Table.get(global,SAVEDATA_PATH) end
     }
 
@@ -1938,7 +1941,7 @@ do
 
   -- Simulate un/research when other mods might have overshadowed it.
   NewHandler {
-    {'on_init','on_config'},
+    {EventManager.event_uid.on_init,EventManager.event_uid.on_config},
     function(e)
       Savedata = Table.sget(global, SAVEDATA_PATH, {})
       for _,force in pairs(game.forces) do check_force(e, force, true) end

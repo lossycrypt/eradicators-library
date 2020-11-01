@@ -3,9 +3,13 @@
 --------------------------------------------------
 -- Automatic mod-name and load-stage/phase detection.
 --
+-- Negative stack levels indicate a relative offset from the bottom.
+--
 -- Level  0 is any Stacktrace.* function.
 -- Level  1 is the function that called any public Stacktrace.* function.
 -- Level -1 is the bottom of the stack.
+--
+-- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
 --
 -- @module Stacktrace
 -- @usage local Stacktrace = require('__eradicators-library__/erlib/factorio/Stacktrace')()

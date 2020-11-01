@@ -4,6 +4,8 @@
 -- Performance optimized multi- and complex-type detection and comparison.
 -- See @{Verificate.isType|isType} for details.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Polishing.
+--
 -- @module Verificate
 -- @usage
 --  local Verificate = require('__eradicators-library__/erlib/lua/Verificate')()
@@ -19,8 +21,8 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 
-local type, pairs
-    = type, pairs
+local type, pairs, rawget
+    = type, pairs, rawget
     
 local table_concat
     = table.concat
@@ -109,6 +111,12 @@ local Verificate,_Verificate,_uLocale = {},{},{}
 -- If you expect the object to be @{NotNil} most of the time then
 -- you should put nil at the end of the combination, i.e. "str|nil", "num|str|nil".
 -- 
+-- __Experimental:__ You can now use the "|" pipe syntax for __any combination__
+-- of types. A combined function will be transparently generated the
+-- first time you use a combination. You should always use the exact same string
+-- for each combination if you do not want multiple functions to be generated.
+--
+-- 
 -- @usage
 --   local isNumStr = Verificate.isType['number|string']
 --
@@ -134,13 +142,39 @@ Verificate.isType = isType
 local _mt_isType = {
 
   -- Typo protection.
-  __index=function(_,typ) err(('isType: unknown type "%s".'):format(typ)) end,
+  -- __index=function(_,typ) err(('isType: unknown type "%s".'):format(typ)) end,
   
   -- Call is nice syntactic suger when the user wants to cache data locally
   -- but it is always slower and might lead to accidential slowdowns in
   -- situations where table lookup should be used instead. Thus it is better
   -- to not offer it in the first place.
   -- __call =function(self,key) return self[key]      end,
+  
+  -- Typo protection + Generate arbitrary type combinations.
+  __index = function(self,types)
+    say('  Generated new isType: "'.. types.. '".')
+    -- split string by "|" pipe
+    local r, n = {}, 0
+    local _types = types:gsub('[^|]+', function(typ)
+      local f = rawget(self,typ)
+      if f then
+        n = n + 1
+        r[n] = f
+        return '' -- remove found names
+        end
+      end)
+    -- String must be fully consumed and contain at least TWO types.
+    -- If it was just one type then __index should never have been called.
+    if (n < 2) or (_types:gsub('|','') ~= '') then 
+      err(('isType: unknown type "%s".'):format(types))
+      end
+    -- Memoize.
+    isType[types] = function(obj)
+      for i=1,n do if r[i](obj) then return true end end
+      return false
+      end
+    return isType[types]
+    end,
   
   }
 
@@ -311,6 +345,8 @@ for k,v in pairs(isTypePrimaryCheckers) do
 do
   
   -- @2020-10-06: Factorio Version 1.0.0
+  -- @future: Integrate into isType.__index auto-generation function
+  -- via string pattern "Lua%u%a+"? (at least one upper case character)
   local FactorioTypes = {
     -- from index.html#Classes
     'LuaAISettings','LuaAccumulatorControlBehavior','LuaAchievementPrototype',
@@ -623,8 +659,99 @@ function isType.TablePath (obj)
   return not empty
   end
 
+-- -------------------------------------------------------------------------- --
+-- isType → List of Things.
+-- -------------------------------------------------------------------------- --
 
-
+--- @{InputName}
+--- @function isType.InputName
+do
+  -- \data\core\locale\en\core.cfg
+  -- Version: 1.0.0                    ,  Find   : ^([\w-]+)=.*$
+  -- Section: [controls]               ,  Replace: '$1'
+  local valid_input_names =
+  -- Set.from_values
+  (function(r, arr) for i=1, #arr do r[arr[i]] = true end return r end)({}, {
+  'move-up'                            , 'quick-bar-button-7-secondary'       ,
+  'move-right'                         , 'quick-bar-button-8-secondary'       ,
+  'move-down'                          , 'quick-bar-button-9-secondary'       ,
+  'move-left'                          , 'quick-bar-button-10-secondary'      ,
+  'shoot-enemy'                        , 'action-bar-select-page-1'           ,
+  'shoot-selected'                     , 'action-bar-select-page-2'           ,
+  'open-character-gui'                 , 'action-bar-select-page-3'           ,
+  'open-technology-gui'                , 'action-bar-select-page-4'           ,
+  'rotate'                             , 'action-bar-select-page-5'           ,
+  'reverse-rotate'                     , 'action-bar-select-page-6'           ,
+  'pick-items'                         , 'action-bar-select-page-7'           ,
+  'close-gui'                          , 'action-bar-select-page-8'           ,
+  'cycle-blueprint-forwards'           , 'action-bar-select-page-9'           ,
+  'cycle-blueprint-backwards'          , 'action-bar-select-page-10'          ,
+  'cycle-clipboard-forwards'           , 'rotate-active-quick-bars'           ,
+  'cycle-clipboard-backwards'          , 'next-active-quick-bar'              ,
+  'zoom-in'                            , 'previous-active-quick-bar'          ,
+  'zoom-out'                           , 'toggle-filter'                      ,
+  'alt-zoom-in'                        , 'show-info'                          ,
+  'alt-zoom-out'                       , 'next-weapon'                        ,
+  'toggle-menu'                        , 'activate-tooltip'                   ,
+  'production-statistics'              , 'confirm-message'                    ,
+  'kill-statistics'                    , 'connect-train'                      ,
+  'toggle-map'                         , 'disconnect-train'                   ,
+  'toggle-driving'                     , 'editor-clone-item'                  ,
+  'clean-cursor'                       , 'editor-delete-item'                 ,
+  'smart-pipette'                      , 'editor-next-variation'              ,
+  'mine'                               , 'editor-previous-variation'          ,
+  'select-for-blueprint'               , 'editor-toggle-pause'                ,
+  'select-for-cancel-deconstruct'      , 'editor-tick-once'                   ,
+  'reverse-select'                     , 'pause-game'                         ,
+  'build'                              , 'editor-speed-up'                    ,
+  'copy-entity-settings'               , 'editor-speed-down'                  ,
+  'paste-entity-settings'              , 'editor-reset-speed'                 ,
+  'copy'                               , 'editor-set-clone-brush-source'      ,
+  'cut'                                , 'editor-set-clone-brush-destination' ,
+  'paste'                              , 'editor-switch-to-surface'           ,
+  'undo'                               , 'editor-remove-scripting-object'     ,
+  'remove-pole-cables'                 , 'open-item'                          ,
+  'build-ghost'                        , 'add-station-modifier'               ,
+  'build-with-obstacle-avoidance'      , 'temporary-station-modifier'         ,
+  'open-gui'                           , 'toggle-console'                     ,
+  'drop-cursor'                        , 'drag-map'                           ,
+  'pick-item'                          , 'place-tag'                          ,
+  'cursor-split'                       , 'place-ping'                         ,
+  'stack-transfer'                     , 'place-in-chat'                      ,
+  'stack-split'                        , 'larger-terrain-building-area'       ,
+  'inventory-transfer'                 , 'smaller-terrain-building-area'      ,
+  'fast-entity-transfer'               , 'not-set'                            ,
+  'inventory-split'                    , 'unknown'                            ,
+  'fast-entity-split'                  , 'focus-search'                       ,
+  'craft'                              , 'previous-technology'                ,
+  'craft-5'                            , 'previous-mod'                       ,
+  'craft-all'                          , 'logistic-networks'                  ,
+  'cancel-craft'                       , 'toggle-blueprint-library'           ,
+  'cancel-craft-5'                     , 'debug-toggle-atlas-gui'             ,
+  'cancel-craft-all'                   , 'debug-toggle-debug-settings'        ,
+  'quick-bar-button-1'                 , 'debug-toggle-basic'                 ,
+  'quick-bar-button-2'                 , 'debug-reset-zoom'                   ,
+  'quick-bar-button-3'                 , 'debug-reset-zoom-2x'                ,
+  'quick-bar-button-4'                 , 'toggle-tips-and-tricks'             ,
+  'quick-bar-button-5'                 , 'controller-gui-crafting-tab'        ,
+  'quick-bar-button-6'                 , 'controller-gui-logistics-tab'       ,
+  'quick-bar-button-7'                 , 'controller-gui-character-tab'       ,
+  'quick-bar-button-8'                 , 'toggle-gui-debug'                   ,
+  'quick-bar-button-9'                 , 'toggle-gui-style-view'              ,
+  'quick-bar-button-10'                , 'toggle-gui-shadows'                 ,
+  'quick-bar-button-1-secondary'       , 'toggle-gui-glows'                   ,
+  'quick-bar-button-2-secondary'       , 'open-prototypes-gui'                ,
+  'quick-bar-button-3-secondary'       , 'open-prototype-explorer-gui'        ,
+  'quick-bar-button-4-secondary'       , 'increase-ui-scale'                  ,
+  'quick-bar-button-5-secondary'       , 'decrease-ui-scale'                  ,
+  'quick-bar-button-6-secondary'       , 'reset-ui-scale'                     ,
+  })
+  
+function isType.InputName (obj)
+  return not not valid_input_names[obj]
+  end
+  end
+  
 --------------------------------------------------------------------------------
 -- isType → or nil.
 -- @section
@@ -756,6 +883,13 @@ function Verificate.verify_and(obj,types,...)
     end
   end
   
+----------
+-- Shorthand for @{Verificate.verify}(obj,'true',...).
+-- Allows fully serialized multi-part error messages
+-- with the same syntax as @{LMAN assert}.
+function Verificate.assert(obj,...)
+  return Verificate.verify(obj,'true',...)
+  end
 
 ----------
 -- Provides function input-checking wrappers.

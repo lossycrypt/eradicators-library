@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Short in-line definition of functions, similar to Python.
 -- 
+-- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
+--
 -- @module Lambda
 -- @usage
 --  local Lambda = require('__eradicators-library__/erlib/lua/Lambda')()
@@ -218,7 +220,7 @@ setmetatable(Lambda,{
 -- double arrow then everything after that arrow is considered to be
 -- *another* Lambda function call.
 --
--- __Note__: Lambda-nesting with "=>" is an experimental feature subject to change.
+-- __Note__: Lambda-nesting with "=>" is an __experimental feature subject to change__.
 --
 -- @table Lambda.LambdaFunctionSpecification
 -- 

@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Manipulation of upvalues and locals.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+--
 -- @module Debug
 -- @usage
 --  local Debug = require('__eradicators-library__/erlib/lua/Debug')()

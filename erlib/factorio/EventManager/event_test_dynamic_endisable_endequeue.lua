@@ -3,6 +3,8 @@
 --------------------------------------------------
 -- Description is ignored for submodules.
 --
+-- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+--
 -- @module EventManager
 
 -- -------------------------------------------------------------------------- --

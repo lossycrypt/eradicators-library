@@ -6,7 +6,7 @@
 -- __Note:__ This module inherits all native-Lua @{table} module methods unless
 -- overwritten by same-named local methods.
 --
---
+-- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
 --
 -- @module Table
 -- @usage
