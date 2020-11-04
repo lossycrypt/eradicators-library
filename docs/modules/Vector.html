@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Todo">Todo </a></li>
+<li><a href="#Concepts">Concepts</a></li>
+<li><a href="#Copy">Copy </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Core.html">Core</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/Data.html">Data</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Entity.html">Entity</a></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/Player.html">Player</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
+  <li><a href="../modules/Remote.html">Remote</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Array.html">Array</a></li>
+  <li><a href="../modules/Class.html">Class</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Compare.html">Compare</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Iter.html">Iter</a></li>
+  <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/LocalisedString.html">LocalisedString</a></li>
+  <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
+  <li><a href="../modules/Logic.html">Logic</a></li>
+  <li><a href="../modules/Math.html">Math</a></li>
+  <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Polygon.html">Polygon</a></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
+  <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
+  <li><a href="../modules/Time.html">Time</a></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><strong>Vector</strong></li>
+  <li><a href="../modules/Verificate.html">Verificate</a></li>
+  <li><a href="../modules/Version.html">Version</a></li>
+  <li><a href="../modules/remotes.html">remotes</a></li>
+  <li><a href="../modules/snippet.html">snippet</a></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/Introduction.html">Introduction</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Vector</code></h1>
+<p>Point-to-Point 2D Vectors.</p>
+<p> All Vector methods manipulate the vector in-place.
+ A new instance can be created with Vector:copy().</p>
+
+<p> Conversion to other formats via Vector.to_* will obviously not
+ return a Vector ;).</p>
+
+<p> Vector.to_area() output contains the aliases "lt" and "rb" in
+ addition to the standard format.</p>
+
+<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.
+ <a href="../source/Introduction.html#Compatibility">Compatibility</a>: Pure Lua.</p>
+
+
+<p> <strong>Naming convention:</strong></p>
+
+<p> All outputting methods are called to_*.</p>
+
+<p> All methods that take two vectors take the vector <code>v</code> that the transformation
+ will be applied to first, and the vector <code>w</code> that contains the transformation
+ is taken as a VectorSpec <code>&quot;...&quot;</code>.</p>
+
+<p> In transformation methods that have two component or derivate names in their
+ name the first refers to <code>w</code> and the second to <code>v</code>.</p>
+
+<p> i.e <code>add_offset_to_origin</code>
+   adds the raw offset of <code>w</code> to the raw origin of <code>v</code> (often called "shift").</p>
+
+<p> i.e. <code>set_origin_to_target</code>
+   moves the origin of <code>v</code> to the absolute coordinates of the target of <code>w</code>.</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local Vector = require(&apos;__eradicators-library__/erlib/factorio/Vector&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#Todo">Todo </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#todo1">todo1</a></td>
+	<td class="summary">make <code>:to_offset_uid(&apos;spiral&apos;)</code> reversible</td>
+	</tr>
+</table>
+<h2><a href="#Concepts">Concepts</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Vector">Vector</a></td>
+	<td class="summary">A two-component Vector.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#VectorSpec">VectorSpec</a></td>
+	<td class="summary">Data that can be transformed into a Vector.</td>
+	</tr>
+</table>
+<h2><a href="#Copy">Copy </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#copy">copy(v)</a></td>
+	<td class="summary">A plain copy of the vector.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Todo"></a>Todo </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "todo1"></a>
+    <strong>todo1</strong>
+    </dt>
+    <dd>
+    make <code>:to_offset_uid(&apos;spiral&apos;)</code> reversible
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Concepts"></a>Concepts</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Vector"></a>
+    <strong>Vector</strong>
+    </dt>
+    <dd>
+    A two-component Vector. </p>
+
+<p> A Vector is a <a href="../modules/Types.html#DenseArray">DenseArray</a> <code>{dx, dy, ox, oy}</code>,
+ it does not have named keys or subtables.</p>
+
+<p> <strong>Components:</strong></p>
+
+<p> <strong>The offset:</strong>
+ <code>(dx, dy)</code> is the <em>relative</em> vector from the origin to the target.</p>
+
+<p> <strong>The origin:</strong>
+ <code>(ox, oy)</code> is the <em>absolute</em> point on the grid where the Vector starts. Usually <code>(0,0)</code>.</p>
+
+<p> <strong>Derivates:</strong></p>
+
+<p> <strong>The target:</strong>
+ <code>(ox+dx, oy+dy)</code> is the absolute point on the grid that the Vector points at.</p>
+
+<p> <strong>The center:</strong>
+ <code>(ox+(dx/2), oy+(dy/2))</code> is the middle of the "line" between a Vectors origin and target.</p>
+
+<p> <strong>Other:</strong></p>
+
+<p> <strong>The grid origin:</strong>
+ The origin of a grid (aka coordinate system) is always <code>(0,0)</code>.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "VectorSpec"></a>
+    <strong>VectorSpec</strong>
+    </dt>
+    <dd>
+    Data that can be transformed into a Vector. </p>
+
+<p> Explicit or shorthand <a href="../api/Concepts.html#BoundingBox">BoundingBox</a>, explicit <a href="../api/Concepts.html#Position">Position</a>, <a href="../api/Concepts.html#Vector">Vector</a>,
+ <a href="../api/Concepts.html#Vector">SimpleVector</a> or up-to-four component varargs
+ <code>number, number or nil, number or nil, number or nil</code>.</p>
+
+<p> Shorthand Position and SimpleVector are equivalent.</p>
+
+<p> Up-to-four component varargs defaults are:
+ <code>dx or 0, dy or dx or 0, ox or 0, oy or 0</code>.
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Copy"></a>Copy </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "copy"></a>
+    <strong>copy(v)</strong>
+    </dt>
+    <dd>
+    A plain copy of the vector.
+ (in case the original is still needed)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-11-04 03:04:01 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

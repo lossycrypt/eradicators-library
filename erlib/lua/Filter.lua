@@ -4,9 +4,7 @@
 -- Some simple filter functions.
 --
 -- @{Introduction.DevelopmentStatus|Module Status}: Polishing.
---
--- __Status:__ In development.
--- __Compatibility:__ Pure Lua, Factorio
+-- @{Introduction.Compatibility|Compatibility}: Pure Lua.
 --
 -- @module Filter
 -- @usage

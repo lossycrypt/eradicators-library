@@ -895,7 +895,7 @@ function Verificate.assert(obj,...)
 -- Provides function input-checking wrappers.
 -- When a wrapped function is called then first the checker function is called
 -- with all arguments. Only if the checker function returns
--- @{Concepts.truthy|truthy} is the real function called.
+-- @{truthy} is the real function called.
 -- 
 -- __Note:__ The checker is expected to raise an error if the check failed.
 -- If it does not then Verificate.Wrap will raise a generic error. It is not

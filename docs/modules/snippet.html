@@ -32,7 +32,8 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Methods">Methods </a></li>
+<li><a href="#Section">Section </a></li>
+<li><a href="#Todo">Todo </a></li>
 </ul>
 
 
@@ -46,7 +47,7 @@
   <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
-  <li><strong>Player</strong></li>
+  <li><a href="../modules/Player.html">Player</a></li>
   <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><a href="../modules/Remote.html">Remote</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
@@ -76,7 +77,7 @@
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
   <li><a href="../modules/remotes.html">remotes</a></li>
-  <li><a href="../modules/snippet.html">snippet</a></li>
+  <li><strong>snippet</strong></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -87,27 +88,29 @@
 
 <div id="content">
 
-<h1>Module <code>Player</code></h1>
-<p>LuaPlayer methods.</p>
-<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.
- <a href="../source/Introduction.html#Compatibility">Compatibility</a>: Factorio Runtime.</p>
+<h1>Module <code>snippet</code></h1>
+<p>Random junk.</p>
+<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress forever.</p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Player = require(&apos;__eradicators-library__/erlib/factorio/Player&apos;)()
+        <pre class="example">local snippet = require(&apos;__eradicators-library__/erlib/factorio/snippet&apos;)()
 </pre>
     </ul>
 
 
-<h2><a href="#Methods">Methods </a></h2>
+<h2><a href="#Section">Section </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#try_reach_entity">try_reach_entity(p, entity, text)</a></td>
-	<td class="summary">Calls <a href="../api/LuaControl.html#LuaControl.can_reach_entity">LuaControl.can_reach_entity</a> and automatically
- creates a local flying text at the entity position if not.</td>
+	<td class="name" nowrap><a href="#compact_repr_arr_of_string">compact_repr_arr_of_string(arr, target_length)</a></td>
+	<td class="summary">Compresses an array of random strings to fit into as fewest lines of
+ as code possible.</td>
 	</tr>
+</table>
+<h2><a href="#Todo">Todo </a></h2>
+<table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#notify">notify(p, text, position)</a></td>
-	<td class="summary">Creates a localized flying text for a player.</td>
+	<td class="name" nowrap><a href="#todo1">todo1</a></td>
+	<td class="summary">Nothing.</td>
 	</tr>
 </table>
 
@@ -115,42 +118,39 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Methods"></a>Methods </h2>
+    <h2 class="section-header "><a name="Section"></a>Section </h2>
 
     <dl class="function">
     <dt>
-    <a name = "try_reach_entity"></a>
-    <strong>try_reach_entity(p, entity, text)</strong>
+    <a name = "compact_repr_arr_of_string"></a>
+    <strong>compact_repr_arr_of_string(arr, target_length)</strong>
     </dt>
     <dd>
-    Calls <a href="../api/LuaControl.html#LuaControl.can_reach_entity">LuaControl.can_reach_entity</a> and automatically
- creates a local flying text at the entity position if not.
+    Compresses an array of random strings to fit into as fewest lines of
+ as code possible.  Does not respect element order obviouly. Used to better
+ encode long lists of stuff.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">p</span>
-            <span class="types"><a class="type" href="../api/LuaPlayer.html">LuaPlayer</a></span>
+        <li><span class="parameter">arr</span>
+            <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
 
 
 
         </li>
-        <li><span class="parameter">entity</span>
-            <span class="types"><a class="type" href="../api/LuaEntity.html">LuaEntity</a></span>
+        <li><span class="parameter">target_length</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
 
 
 
-        </li>
-        <li><span class="parameter">text</span>
-            <span class="types"><a class="type" href="../api/Concepts.html#LocalisedString">LocalisedString</a></span>
-         (<em>default:</em> <code>{&quot;cant-reach&quot;}</code>)
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
 
 
 
@@ -158,32 +158,35 @@
 
 
 
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> r={}; <span class="keyword">for</span> i=<span class="number">1</span>,<span class="number">10</span> <span class="keyword">do</span> r[#r+<span class="number">1</span>] = (<span class="string">'0'</span>):rep(i) <span class="keyword">end</span>
+<span class="global">print</span>(snippet.compact_repr_arr_of_string(r,<span class="number">22</span>))
+
+&gt; {
+<span class="string">"0000000000"</span>,<span class="string">"000000"</span>,
+<span class="string">"000000000"</span>,<span class="string">"0000000"</span>,
+<span class="string">"00000000"</span>,<span class="string">"00000"</span>,
+<span class="string">"0000"</span>,<span class="string">"000"</span>,<span class="string">"00"</span>,<span class="string">"0"</span>,
+}
+</pre>
+    </ul>
 
 </dd>
+</dl>
+    <h2 class="section-header "><a name="Todo"></a>Todo </h2>
+
+    <dl class="function">
     <dt>
-    <a name = "notify"></a>
-    <strong>notify(p, text, position)</strong>
+    <a name = "todo1"></a>
+    <strong>todo1</strong>
     </dt>
     <dd>
-    Creates a localized flying text for a player.
+    Nothing.
 
 
-    <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">p</span>
-            <span class="types"><a class="type" href="../api/LuaPlayer.html">LuaPlayer</a></span>
-
-
-
-        </li>
-        <li><span class="parameter">text</span>
-            <span class="types"><a class="type" href="../api/Concepts.html#LocalisedString">LocalisedString</a></span>
-
-
-
-        </li>
-        <li><span class="parameter">position</span>
-            <span class="types"><a class="type" href="../api/Concepts.html#Position">Position</a></span>
+        <li><span class="parameter">todo1</span>
 
 
 

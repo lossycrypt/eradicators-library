@@ -39,6 +39,8 @@ local Class     = elreq('erlib/lua/Class'    )()
 
 local Lambda    = elreq('erlib/lua/Lambda'   )()
 
+local Filter    = elreq('erlib/lua/Filter'   )()
+
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --

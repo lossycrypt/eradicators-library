@@ -70,3 +70,24 @@
 -- 
 -- @within Information about this Library
 -- @table DevelopmentStatus
+
+----------
+-- In what context an Erlib module can be safely @{LMAN require()'ed}.
+--
+--   * __Pure Lua__: These modules contain generic lua methods that do not
+--   depend on factorio in any way. They can be used in any Factorio loading
+--   stage or even in your local non-Factorio lua installation.
+--   Some methods do however have special
+--   Factorio compatibility built-in. For example @{Table.dcopy}
+--   does not copy factorio LuaObjects even though they are lua tables.
+--
+--   * __Factorio Startup__: Factorio settings or data stages. Aka before the
+--   main menu shows. Methods intended for settings stage will cause errors in
+--   data stage and vice versa, but require'ing the module as such is safe in
+--   both stages.
+--
+--   * __Factorio Runtime__: Factorio control stage. Aka after a map has been
+--   created or loaded or joined.
+--
+-- @within Information about this Library
+-- @table Compatibility

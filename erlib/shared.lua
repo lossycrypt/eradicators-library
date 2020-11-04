@@ -12,12 +12,14 @@
       is pcall interfering with registering the package after load?
   ]]
 
+  
+  
 -- -------------------------------------------------------------------------- --
 -- Locals / Init                                                              --
 -- -------------------------------------------------------------------------- --
   
 -- This is the first thing the library will say.
-do (STDOUT or log or print)('ErLib is booting now.') end
+-- do (STDOUT or log or print)('ErLib is booting now.') end
 
 -- Outside of factorio '__eradicators-library__' is not a valid absolute path!
 local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
@@ -30,6 +32,8 @@ local does_file_exist = function(path) return (pcall(require,path)) end
 -- local sha = '' for i=1,5 do sha = erlib.Coding.Sha256(sha) print(sha) end
 local NIL  = '2a132dbfe4784627b86aa3807cd19cfeff487aab3dd7a60d0ab119a72e736936'
 local SKIP = function()end
+
+
 
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -51,6 +55,7 @@ local shared = {
   [6] = {
     NIL  = NIL ,
     SKIP = SKIP,
+    --@future: include LOAD_PHASE/STAGE? too much code?
     }
   }
   
@@ -87,9 +92,7 @@ local flag = shared[5]
      :match'^__eradicators%-library__')
     )
 
-    
 
-  
   
 -- -------------------------------------------------------------------------- --
 -- Log Level                                                                  --
@@ -99,6 +102,13 @@ local flag = shared[5]
   -- Mute low-level logging
   STDOUT = flag.IS_DEV_MODE and print or SKIP
  
- 
+  -- This is the first thing the library will say.
+  if flag.IS_DEV_MODE then
+    print(('―'):rep(100)..'\nshared.lua\n' )
+  else
+    -- log('ErLib is booting now.') -- Just don't. Not Warn or Error -> not important.
+    end
+
+    
   
 return shared

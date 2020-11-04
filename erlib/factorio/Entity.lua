@@ -4,6 +4,7 @@
 -- [Control Stage] LuaEntity manipulation.
 --
 -- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+-- @{Introduction.Compatibility|Compatibility}: Factorio Runtime.
 --
 -- @module Entity
 -- @usage
@@ -19,6 +20,24 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Locals / Init                                                              --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
+
+-- local Stacktrace = elreq('erlib/factorio/Stacktrace')()
+
+-- local Verificate = elreq('erlib/lua/Verificate')()
+-- local Verify           , Verify_Or
+--     = Verificate.verify, Verificate.verify_or
+
+-- local Tool       = elreq('erlib/lua/Tool'      )()
+    
+-- local Table      = elreq('erlib/lua/Table'     )()
+-- local Array      = elreq('erlib/lua/Array'     )()
+-- local Set        = elreq('erlib/lua/Set'       )()
+
+-- local Compose    = elreq('erlib/lua/Meta/Compose')()
+-- local L          = elreq('erlib/lua/Lambda'    )()
+
+
+
 local pairs = pairs
 
 -- -------------------------------------------------------------------------- --
@@ -27,16 +46,25 @@ local pairs = pairs
 
 local Entity,_Entity,_uLocale = {},{},{}
 
+-- -------
+-- Nothing.
+-- @within Todo
+-- @field todo1
 
-
+--------------------------------------------------------------------------------
+-- Methods.
+-- @section
+--------------------------------------------------------------------------------
 
 ----------
--- Brute force searches through all surfaces to find an entity.
+-- Brute force searches through all surfaces to find an entity. 
+-- The holy grail of de-optimizing your mods performance. 
 -- 
 -- @tparam uint unit_number The LuaEntity.unit_number of the target entity.
 -- @treturn LuaEntity|nil
 -- 
 function Entity.find_unit_number(unit_number)
+  -- No, this is not a non-joke.
   for _,surface in pairs(game.surfaces) do
   for _,entity  in pairs(surface.find_entities()) do
     if entity.unit_number == unit_number then return entity end
@@ -44,9 +72,27 @@ function Entity.find_unit_number(unit_number)
     end
   end
 
--- -------------------------------------------------------------------------- --
--- Draft                                                                      --
--- -------------------------------------------------------------------------- --
+
+  
+--------------------------------------------------------------------------------
+-- Simple Methods.
+-- Should be self-explanatory.
+-- @section
+--------------------------------------------------------------------------------
+  
+----------
+-- car or spider-vehicle.
+-- @tparam LuaEntity entity
+-- @treturn boolean
+-- @function Entity.is_vehicle
+do
+  local _isvehicle = {['car'] = true, ['spider-vehicle'] = true}
+function Entity.is_vehicle (entity)
+  return (type(entity) == 'table')
+     and not not _isvehicle[entity.type]
+  end
+  end
+
 
 ----------
 -- @tparam LuaEntity vehicle
@@ -55,9 +101,7 @@ function Entity.find_unit_number(unit_number)
 do
   local _isvehicle = {['car'] = true, ['spider-vehicle'] = true}
 function Entity.get_vehicle_driver_player(vehicle)
-  if type(vehicle) == 'table'
-  and _isvehicle[vehicle.type]
-  then
+  if Entity.is_vehicle(vehicle) then
     local driver = vehicle .get_driver() -- Character or Player or nil
     if driver.is_player() then return driver end
     return driver.player --can be nil
@@ -65,9 +109,18 @@ function Entity.get_vehicle_driver_player(vehicle)
   end
   end
 
-
-
   
+  
+-- -------------------------------------------------------------------------- --
+-- Draft                                                                      --
+-- -------------------------------------------------------------------------- --
+
+
+--------------------------------------------------------------------------------
+-- Draft.
+-- @section
+--------------------------------------------------------------------------------
+ 
   
   
 --  * as of 2020-10-19 (creation of thread) i can't get this to work
@@ -95,19 +148,14 @@ function Entity.set_ignored_by_enemy_units(onoff) -- ignored_by_biters()
   
   --> Because to turn it "off" it needs to destroy the projectile
 
+  --@future: teleporting back and forth between two surfaces does reset enemy interest
+  
   err()
   end
   
   
---------------------------------------------------------------------------------
--- Section
--- @section
---------------------------------------------------------------------------------
 
--- -------
--- Nothing.
--- @within Todo
--- @field todo1
+
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

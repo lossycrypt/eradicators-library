@@ -27,7 +27,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 
 -- local Tool       = elreq('erlib/lua/Tool'      )()
 
--- local Table      = elreq('erlib/lua/Table'     )()
+local Table      = elreq('erlib/lua/Table'     )()
 -- local Array      = elreq('erlib/lua/Array'     )()
 -- local Set        = elreq('erlib/lua/Set'       )()
 
@@ -107,12 +107,13 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- different "path" strings causing package.loaded to
 -- be unable to catch the subsequent require calls.
 --
-return function (EventManager)
+return function (EventManager, Private)
 
 
   ----------
-  -- Combines all entity building related events into one.
+  -- All-in-one entity building event.
   --
+  -- Combines the following events:  
   -- @{FAPI Events on_built_entity}  
   -- @{FAPI Events on_robot_built_entity}  
   -- @{FAPI Events script_raised_built}  
@@ -122,6 +123,8 @@ return function (EventManager)
   --
   --
   -- @tfield LuaEntity created_entity The entity built.
+  -- @tfield string created_entity_name
+  -- @tfield string created_entity_type
   -- @tfield[opt] LuaEntity robot The robot that did the building.
   -- @tfield[opt] LuaPlayer player The player who did the building. 
   -- @tfield[opt] uint player_index
@@ -131,82 +134,80 @@ return function (EventManager)
   -- @tfield[opt] LuaEntity clone_source The entity that this entity was cloned from.
   -- @tfield[opt] LuaEntity trigger_source The entity with a trigger prototype (such as capsules) that created this entity.
   --
-  -- @within Built-in Custom Events
+  -- @within Built-in Meta-Events
   -- @table EventManager.on_entity_created
   
-  -- local EVENT_UID = LuaBootstrap.generate_event_name()
   
-  local EVENT_UID = EventManager.new_event('on_entity_created_multiplex')
+  -- Use manual negative UID to prevent public exposure.
+  -- Because public exposure means that other mods could raise the event
+  -- which would mean event data becomes untrusted.
+  local event_uid   = EventManager.new_event(
+    'on_entity_created',
+    Private.new_private_event_uid() )
   
-  
-  local function raise_event(e)
-    --??
+  local raise_event = Private.raise_private_wrapped_event
     
-    e.real_name, e.name = e.name, EVENT_UID
-    -- e.name      = EVENT_UID
-    
-    -- e.real_name
-    
-    -- EventManager.raise_private(EVENT_UID,e,p)
-    
-    return Private.on_every_event(e) -- Allow direct access for speed?
-    end
-  
-  local function event_remapper (mappings)
+  local function remapping_event_raiser (mappings)
     local remapper = Table.remapper(mappings)
-    return function(e) return raise_event(remapper(e)) end
+    return function(e)
+      -- Pre-fetching name and type should make up for the slowdown
+      -- caused by the wrapper itself by making the filters faster.
+      e.created_entity_name = e.created_entity.name
+      e.created_entity_type = e.created_entity.type
+      return raise_event(event_uid, remapper(e))
+      end
     end
 
-
-  -- Conditionally create these handlers
-  -- only *if* at least one handler has been registered to the event.
-  Private.new_event_wrapper{
     
-    -- event name
-    'on_normalized_built_entity',
-    
-    -- event id?
-    EVENT_UID,
-    
-    
-    -- arbitary number of new_handler() argument tables
-    
--- PLAYER / ROBOT
-    { -- created_entity, player_index, stack, item[opt], tags[opt]
-      {defines.events.on_built_entity      ,
-      -- created_entity, robot, stack, tags[opt]
+  Private.new_event_wrapper(event_uid, {
+        
+    -- PLAYER / ROBOT
+    {
+      -- {created_entity=, player_index=, stack=, item[opt]=, tags[opt]=}
+     {defines.events.on_built_entity      ,
+      -- {created_entity=, robot=, stack=, tags[opt]=}
       defines.events.on_robot_built_entity },
+      
       -- This is the most common event so it's best
       -- for performance if it can stay un-remapped.
-      raise_event
+      function(e)
+        e.created_entity_name = e.created_entity.name
+        e.created_entity_type = e.created_entity.type
+        return raise_event(event_uid, e)
+        end
+      
+      -- raise_event,
+      -- event_passthrough
+      
       },
 
--- SCRIPT
-    { -- entity
+    -- SCRIPT
+    {
+      -- {entity=}
       {defines.events.script_raised_built,
-      -- entity, tags[opt]
+      -- {entity=, tags[opt]=}
       defines.events.script_raised_revive},
-      event_remapper { entity = 'created_entity' }
+      
+      remapping_event_raiser { entity = 'created_entity' }
       },
 
--- CLONE
-    { -- source, destination
+    -- CLONE
+    { 
+      -- {source=, destination=}
       defines.events.on_entity_cloned,
-      event_remapper { destination = 'created_entity', source = 'clone_source'}
+      
+      remapping_event_raiser { destination = 'created_entity', source = 'clone_source'}
       },
 
--- TRIGGER
-    { -- entity, source[opt]
+    -- TRIGGER
+    { 
+      -- {entity=, source[opt]=}
       defines.events.on_trigger_created_entity,
-      event_remapper { entity = 'created_entity', source = 'trigger_source'}
+      
+      remapping_event_raiser { entity = 'created_entity', source = 'trigger_source'}
       },
 
-    }
-
-  -- ------------------------------------------------------------------------ --
-  -- on_entity_created                                                        --
-  -- ------------------------------------------------------------------------ --
-
+    })
 
   
 

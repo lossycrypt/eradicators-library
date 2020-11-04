@@ -63,6 +63,7 @@
   <li><a href="../modules/Filter.html">Filter</a></li>
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/LocalisedString.html">LocalisedString</a></li>
   <li><a href="../modules/Lock.html">Lock</a></li>
   <li><a href="../modules/Log.html">Log</a></li>
   <li><a href="../modules/Logic.html">Logic</a></li>
@@ -75,9 +76,11 @@
   <li><a href="../modules/Table.html">Table</a></li>
   <li><a href="../modules/Time.html">Time</a></li>
   <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Vector.html">Vector</a></li>
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
   <li><a href="../modules/remotes.html">remotes</a></li>
+  <li><a href="../modules/snippet.html">snippet</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -155,7 +158,7 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#NaturalNumber">NaturalNumber</a></td>
-	<td class="summary">An <a href="../modules/Types.html#Integer">Integer</a> >= 0.</td>
+	<td class="summary">An <a href="../modules/Types.html#Integer">Integer</a> > 0.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#NegativeInteger">NegativeInteger</a></td>
@@ -182,6 +185,15 @@
 	<tr>
 	<td class="name" nowrap><a href="#false">false</a></td>
 	<td class="summary">The <a href="../api/Builtin-Types.html#boolean">boolean</a> value false.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#truthy">truthy</a></td>
+	<td class="summary">In contexts where an <a href="../modules/Types.html#AnyValue">AnyValue</a> is treated as a <a href="../api/Builtin-Types.html#boolean">boolean</a> it is said
+ to be truthy if it evaluates to true, and falsy if it evaluates to false.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#falsy">falsy</a></td>
+	<td class="summary">The opposite of <a href="../modules/Types.html#truthy">truthy</a></td>
 	</tr>
 </table>
 <h2><a href="#Misc">Misc </a></h2>
@@ -518,7 +530,7 @@
     <strong>NaturalNumber</strong>
     </dt>
     <dd>
-    An <a href="../modules/Types.html#Integer">Integer</a> >= 0.  Also called a PositiveInteger.
+    An <a href="../modules/Types.html#Integer">Integer</a> > 0.  Also called a PositiveInteger.
 
 
 
@@ -607,6 +619,49 @@
 
 
 </dd>
+    <dt>
+    <a name = "truthy"></a>
+    <strong>truthy</strong>
+    </dt>
+    <dd>
+    In contexts where an <a href="../modules/Types.html#AnyValue">AnyValue</a> is treated as a <a href="../api/Builtin-Types.html#boolean">boolean</a> it is said
+ to be truthy if it evaluates to true, and falsy if it evaluates to false.
+ This means that doubly-negating the value will convert it to <a href="../modules/Types.html#true">true</a>.
+ In Lua this applies to any string, <a href="https://www.lua.org/pil/2.3.html">number</a>, <a href="../modules/Types.html#true">true</a>, <a href="../lua-5.2/doc/manual.html#pdf-table">table</a>, function or
+ userdata. But not <a href="../modules/Types.html#false">false</a> or nil.
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example"><span class="keyword">if</span> (<span class="number">0</span> <span class="keyword">and</span> <span class="string">''</span> <span class="keyword">and</span> {}) <span class="keyword">then</span> <span class="global">print</span>(<span class="string">'truthy!'</span>) <span class="keyword">end</span>
+  &gt; truthy!
+</pre></li>
+        <li><pre class="example"><span class="keyword">if</span> <span class="keyword">not</span> <span class="keyword">nil</span> <span class="keyword">then</span> <span class="global">print</span>(<span class="string">'negation of falsy is true!'</span>) <span class="keyword">end</span>
+  &gt; negation of falsy is <span class="keyword">true</span>!
+</pre></li>
+        <li><pre class="example"><span class="global">print</span>( (<span class="keyword">not</span> <span class="keyword">not</span> TruthyValue) == <span class="keyword">true</span> )
+   &gt; <span class="keyword">true</span></pre></li>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "falsy"></a>
+    <strong>falsy</strong>
+    </dt>
+    <dd>
+    The opposite of <a href="../modules/Types.html#truthy">truthy</a>
+
+
+
+
+
+
+
+</dd>
 </dl>
     <h2 class="section-header "><a name="Misc"></a>Misc </h2>
 
@@ -644,20 +699,17 @@
     <strong>TruthyValue</strong>
     </dt>
     <dd>
-    Any value that when negated twice evaluates to <a href="../modules/Types.html#true">true</a>.  In Lua this is
- any string, <a href="https://www.lua.org/pil/2.3.html">number</a>, <a href="../modules/Types.html#true">true</a>, <a href="../lua-5.2/doc/manual.html#pdf-table">table</a>, function or userdata. But not
- boolean false or nil.
+    Any value that when negated twice evaluates to <a href="../modules/Types.html#true">true</a>.
 
 
 
 
 
-
-    <h3>Usage:</h3>
+    <h3>See also:</h3>
     <ul>
-        <li><pre class="example"><span class="keyword">local</span> yes = ((<span class="keyword">not</span> <span class="keyword">not</span> TruthyValue) == <span class="keyword">true</span>)</pre></li>
-        <li><pre class="example"><span class="keyword">local</span> yes = (TruthyValue <span class="keyword">and</span> <span class="keyword">true</span>)</pre></li>
+         <a href="../modules/Types.html#truthy">truthy</a>
     </ul>
+
 
 </dd>
     <dt>
@@ -762,7 +814,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-11-01 03:24:34 </i>
+<i style="float:right;">Last updated 2020-11-04 03:04:01 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

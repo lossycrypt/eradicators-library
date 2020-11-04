@@ -165,7 +165,7 @@
   
   
 ----------
--- An @{Integer} >= 0. Also called a PositiveInteger.
+-- An @{Integer} > 0. Also called a PositiveInteger.
 --
 -- @name NaturalNumber
 -- @class field
@@ -219,6 +219,29 @@
 -- @class field
 
 
+----------
+-- In contexts where an @{AnyValue} is treated as a @{boolean} it is said
+-- to be truthy if it evaluates to true, and falsy if it evaluates to false.
+-- This means that doubly-negating the value will convert it to @{true}.
+-- In Lua this applies to any string, @{number}, @{true}, @{table}, function or
+-- userdata. But not @{false} or nil.
+-- 
+-- @name truthy
+-- @class field
+--
+-- @usage if (0 and '' and {}) then print('truthy!') end
+--   > truthy!
+--
+-- @usage if not nil then print('negation of falsy is true!') end
+--   > negation of falsy is true!
+--
+-- @usage print( (not not TruthyValue) == true )
+--   > true
+
+----------
+-- The opposite of @{truthy}
+-- @name falsy
+-- @class field
 
 --------------------------------------------------------------------------------
 -- Misc.
@@ -239,15 +262,11 @@
 -- @class field
 
 ----------
--- Any value that when negated twice evaluates to @{true}. In Lua this is
--- any string, @{number}, @{true}, @{table}, function or userdata. But not
--- boolean false or nil.
+-- Any value that when negated twice evaluates to @{true}. 
+-- @see truthy
 --
 -- @name TruthyValue
 -- @class field
---
--- @usage local yes = ((not not TruthyValue) == true)
--- @usage local yes = (TruthyValue and true)
 
 ----------
 -- The name of a base game input. Usable with @{Data.SimpleLinkedInput}.  

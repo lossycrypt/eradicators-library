@@ -54,7 +54,7 @@ return function (EventManager)
   -- Template                                                                  --
   -- ------------------------------------------------------------------------ --
 
-  ----------
+  -- -------
   -- Custom Event Description
   --
   -- @table Template

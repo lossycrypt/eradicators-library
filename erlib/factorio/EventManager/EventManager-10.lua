@@ -36,72 +36,6 @@
 --------------------------------------------------------------------------------
 
 ----------
--- Continue integration of event-manager-8 from line 1287
---
--- @table todo0
-      
-----------
--- New Event
--- Replace event groups with stand-alone wrappers that
--- pre-filter and re-structure the event tables.
---
--- Make them "built-in events" inside this file.
---
--- How can that be compatible with event filtering?
--- As long as it does NOT use any C-side calls it should be really
--- cheap to change the table strucuture even for all events that never need it?
---
--- If the wrapper pre-fetches i.e. e.entity_name = entity.name
--- it can significantly speed up the filters after it!
---
--- @table todo1
-
-
-----------  
--- EventManagerScript.on_event
--- 
--- Add bootstrap one-handler-per-event emulation. (for sudo?)
--- Should automatically work with new immediately registering structure.
--- 
--- just give it a fixed name and overwrite ordered handlers?
--- maybe cleaner with EM.remove_handler.
--- 
--- Needs to call enqueue_new_onticks
--- needs to override .enabled status.
---
--- @table todo4
-  
-  
-----------  
--- EventManager.supress_logging_event_id(event_uid)
---
--- Selectively disable logging for certain event types?
--- on_tick, on_chunk_generated, etc?
--- @table todo6
-
-      
-
-
-  
-----------
--- New Event
--- Retro-gen event
--- 
--- starts a series of re-generation chunk events (tick distributed?) to which the mod can then react
--- 
--- last chunk event must carry {e.final=true}
--- 
--- must be different event than normal chunk_generated.
--- 
--- include LuaRendering debug marker? (i.e. a square on the chunk)
--- 
--- (does gui update during tick_paused? can force update one tick -> show progress bar?)
---   
--- @table todo3
-  
-
-  
-----------
 -- New Event
 -- DebugOncePerLoad Event
 -- -> needs EventManager.new_event_name?  .private_event_name?
@@ -110,6 +44,26 @@
 -- @table todo5
   
 
+
+
+----------
+-- New Event
+-- Retro-gen event
+-- 
+-- starts a series of re-generation chunk events (tick distributed?) to which the mod can then react
+-- 
+-- last chunk event must carry {e.final=true}
+-- 
+-- must be different event than normal chunk_generated. -> does it? on_retrogen_chunk
+-- 
+-- include LuaRendering debug marker? (i.e. a square on the chunk)
+-- 
+-- (does gui update during tick_paused? can force update one tick -> show progress bar?)
+--
+-- Better to do a series of actions for one specific handler?
+--   
+-- @table todo3
+  
 
   
 --------------------------------------------------------------------------------
@@ -254,6 +208,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 
+local Log  = elreq('erlib/lua/Log'  )()
 local log  = elreq('erlib/lua/Log'  )().Logger  'EventManager'
 local stop = elreq('erlib/lua/Error')().Stopper 'EventManager'
 
@@ -271,11 +226,11 @@ local Set        = elreq('erlib/lua/Set'       )()
 
 local Crc32      = elreq('erlib/lua/Coding/Crc32')()
 
-local Cache      = elreq('erlib/factorio/Cache')()
 
 local Compose    = elreq('erlib/lua/Meta/Compose')()
 local L          = elreq('erlib/lua/Lambda'    )()
 
+local Remote     = elreq('erlib/factorio/Remote')()
 
 local LuaBootstrap = script
 
@@ -434,6 +389,35 @@ local EventUidToName = setmetatable(
   )
 
   
+-- Seperate loggers for each event.
+-- Defaults to EventManager global logger.
+local LoggersByEventUid = setmetatable({},{
+  __index = function(self,event_uid)
+    return Table.set(self,{event_uid},log)
+    end,
+  })
+  
+  
+----------
+-- Selectively disable logging for specific events.
+-- Useful when `on_tick`, `on_chunk_generated` or similar events log-spam too much.
+-- 
+-- @tparam EventUID event_uid
+-- @function EventManager.suppress_logging
+do
+  local _disabled_logger = Log.Logger('EventManagerDisabledLogger')
+  _disabled_logger:set_log_level(0) -- @future: Implement constant exposure in Log
+function EventManager.suppress_logging(event_uid)
+  LoggersByEventUid[event_uid] = _disabled_logger
+  end
+  end
+
+
+-- Example:
+-- EventManager.suppress_logging(defines.events.on_tick)
+-- EventManager.suppress_logging(defines.events.on_chunk_generated)
+
+
   
 -- -------------------------------------------------------------------------- --
 -- Custom Shared Event UIDs                                                   --
@@ -468,7 +452,7 @@ Private.event_uid_pig
 EventManager.event_uid = setmetatable({},{
   __index = function(self, event_name)
     return Private.event_uid_pig:get(event_name)
-        or stop('Unknown event name:\n', event_name)
+        or stop('EventManager.event_uid, unknown event name:\n', event_name)
     end,
   __newindex = function(self, event_name, event_uid)
     stop('Please use EventManager.new_event("', event_name, '",', event_uid, ')')
@@ -513,7 +497,14 @@ EventManager.new_event('on_config'               , -3 )
 EventManager.new_event('on_configuration_changed', -3 )
 EventManager.new_event('action'                  , 'action' )
 
-
+-- Creates new UIDs for event wrappers.
+do
+  local _last = -3 -- on_config
+function Private.new_private_event_uid()
+  _last = _last - 1
+  return _last
+  end
+  end
 
 -- -------------------------------------------------------------------------- --
 -- OrderedHandlers + script.on_event                                          --
@@ -844,7 +835,7 @@ for _, method in pairs {
     EventManagerScript[method] = function(...)
       stop(
         'Function call blocked by EventManager.\n',
-        'Wrapping is not implemented for:\n\n',
+        'LuaBootstrap based event management is disabled while EventManager is active:\n\n',
         'script.', method, '()\n',
         ...
         )
@@ -852,8 +843,12 @@ for _, method in pairs {
   end
 
   
--- error('Can OnTicks be created live? Is this really important? Event wrappers should be done first.')
---
+-- Abandoned. Because this essentially circumvents enabled/disable status
+-- it requires too many changes in unrelated code to be worth it.
+-- Also handlers vanishing in on_load cause on_every_* to crash due to no
+-- handler_data etc.
+-- Sudo can use vanilla LuaBootstrap and be done with it.
+-- 
 -- function EventManagerScript.on_event(event_uids, event_handler)
 --   for _, event_uid in pairs(Table.plural(event_uids)) do
 --     local name = 'EventManagerScript:on-event-'..EventUidToName[event_uid]
@@ -861,15 +856,18 @@ for _, method in pairs {
 --     -- All tables are the same so we only need one entry point!
 --     local handler_data = HandlersByName[name]
 --     if handler_data then
---       handler_data.f = event_handler
+--       handler_data.f = event_handler or ercfg.SKIP
 --     else
 --       EventManager.new_handler {
 --         name       = name,
 --         persistent = true,
+--         period     =    1,
 --         event_uid        ,
 --         event_handler    ,
 --         }
 --       end
+--       Private.on_load()
+--       Private.enqueue_new_onticks()
 --     end
 --   end
 
@@ -1071,6 +1069,7 @@ do
     
     -- store iterable for each event
     for event_uid in pairs(handler_data.event_uids) do
+      Private.try_actiate_wrapper(event_uid)
       local this   = OrderedHandlers:sget(event_uid) -- auto-constructed + registered
       this.n       = this.n + 1
       this[this.n] = handler_data
@@ -1271,6 +1270,7 @@ do
   function Private.on_every_event(e,filter)
     local event_uid = e.input_name or e.name
     local handlers  = OrderedHandlers[event_uid]
+    local log       = LoggersByEventUid[event_uid]
     
     -- @future: Allow selectively calling a subset of handlers.
     -- I.e. to simulate events only for a specific plugin.
@@ -1332,7 +1332,6 @@ do
     end
   end
   
-
 function Private.on_every_tick (e)
   -- Most ticks will finish with a single failed table lookup!
   if Queue[e.tick] then
@@ -1359,7 +1358,7 @@ function Private.on_every_tick (e)
         )
       
       -- call handler
-      log:debug(
+      LoggersByEventUid[0]:debug(
         '[tick ', e.tick, '] ',
         'Event handled  : on_tick, Handler: ', handler_data.log_name
         )
@@ -1385,7 +1384,6 @@ function Private.on_every_tick (e)
     Queue[e.tick] = nil
     end
   end
-
   
   
 -- -------------------------------------------------------------------------- --
@@ -1431,6 +1429,19 @@ function EventManager.raise_private(event_uid, event_data)
   end
   
 
+-- Allows direct unverified raising of wrapped events.
+-- Because wrapping needs to be fast.
+--
+-- @tparam wrapper_uid The EventUID of the event wrapper.
+-- @tparam table event_data
+function Private.raise_private_wrapped_event(wrapper_uid, event_data)
+  -- event data is expected to already contain game.tick
+  event_data.real_name = event_data.input_name or event_data.name
+  event_data.name      = wrapper_uid
+  event_data.private   = true
+  Private.on_every_event(event_data)
+  end
+  
   
 -- -------------------------------------------------------------------------- --
 -- Legacy Inherited                                                           --
@@ -1561,7 +1572,7 @@ function Private.on_load()
   isOnLoadFinished = true
   end
 
-  
+
 -- Handles both init and config to be able to load in-dev worlds
 -- that originally didn't have the EventManager.  
 function Private.on_confinit()
@@ -1576,7 +1587,7 @@ function Private.on_confinit()
   Queue    = Savedata.Queue
   --
   Private.clear_outdated_savedata()
-  Private.on_load()
+  Private.on_load() -- Must be raised here to compensate skipping on_load before on_config.
   Private.enqueue_new_onticks() -- after restore_handler_status() in on_load
   end
 
@@ -1586,6 +1597,7 @@ function Private.on_confinit()
 -- -------------------------------------------------------------------------- --  
 
 LuaBootstrap.on_load(function()
+  log:header('EventManager : on_load')
   if not Private.isSavedataUpToDate() then
     -- on_load before on_config
     log:info('Skipping on_load: Savedata.event_manager missing or outdated.')
@@ -1593,20 +1605,28 @@ LuaBootstrap.on_load(function()
     end
   log:debug('Bootstrap      : on_load')
   Private.on_load()
+  log:footer()
   end)
 
+  
 LuaBootstrap.on_init (function()
-  log:debug('Bootstrap      : on_init')
+  log:header('EventManager : on_init')
+  log:debug('Bootstrap      : on_init') -- debug is one log level lower than header!
   Verify(global.event_manager,'nil','Savedata found before on_init!?')
   Private.on_confinit()
   EventManager.raise_private(EventManager.event_uid.on_init)
+  log:footer()
   end)
   
+  
 LuaBootstrap.on_configuration_changed(function()
+  log:header('EventManager : on_config')
   log:debug('Bootstrap      : on_config')
   Private.on_confinit()
   EventManager.raise_private(EventManager.event_uid.on_config)
+  log:footer()
   end)
+
 
 -- Paranoia / Assumption: EventManager must have full control.
 for _,uid in pairs(defines.events) do
@@ -1622,358 +1642,72 @@ for _,uid in pairs(defines.events) do
     end
   end
 
-
-  
--- -------------------------------------------------------------------------- --
--- Simulation : surfaces, forces, players                                     --
--- -------------------------------------------------------------------------- --
-
-----------
--- Enforces raising of easily missable events.
--- 
--- Because of certain quirks of the factorio engine a mod might not 
--- recieve an event even if it has a handler for that event.
---
--- Specifically a mod will not recieve __any__ events before it's own
--- on\_init handler has finished. Thus any events raised by __other mods__
--- during their on\_init will be missed. I call this __overshadowing__.
--- 
--- Simulation aims to reduce edge cases and make event handlers more reliable.
--- For this EventManager simulates __some__ of these
--- overshadowed events when it detects them in it's own on_init. 
---
--- Namely EventManager detects the creation and deletition of surfaces,
--- forces and players. And the researching and __un__researching of technologies.
---
--- All simulated events are raised with the additional event data
--- `{simulated = true}` to make them distingusishable from natural events.
---
--- Simulation also happens when the mod is first added to a map. This means
--- even __if your mod is added to an old map__ you will still recieve i.e.
--- on\_player\_created for __all__ players that already exist in the map.
--- Removing the need to manually detect which players, forces or surfaces
--- already existed before.
---
--- __Known Issue:__ Simulated on\_forces\_merged events only contains `source_index`,
--- but not `source_name` or `destination` because that information is lost for
--- overshadowed force mergers.
--- 
--- 
--- @within Concepts
--- @table Simulation
-
-
---[[
-
-  on_force_created   -> force         :: LuaForce
-  on_forces_merged   -> source_name   :: string
-                        source_index  :: uint
-                        destination   :: LuaForce
-
-  on_surface_created -> surface_index :: uint
-  on_surface_deleted -> surface_index :: uint
-
-  on_player_created  -> player_index  :: uint
-  on_player_removed  -> player_index  :: uint
-
---]]
-
-local function CreateSimulation(
-    created_event,   created_event_index_path,
-  destroyed_event, destroyed_event_index_path,
-  game_key,
-  
-  sim_create_event_key, sim_create_obj_value_path,
-  sim_remove_event_key
-  
-  )
-
-  local NAME_PREFIX = 'em-simulation:'..game_key
-  local SAVEDATA_PATH = {'event_manager','simulation',game_key}
-
-  local NewHandler = function(tbl)
-    EventManager.new_handler(Table.smerge(tbl,{
-      name_prefix = NAME_PREFIX,
-      persistent  = true,
-      }))
-    end
-  
-  local Savedata
-  local function remember_index (index)
-    Array.insert_once(Savedata.known_indexes, index)
-    end
-  local function forget_index (index)
-    Array.unsorted_remove_value(Savedata.known_indexes, index)
-    end
-  local function link_savedata()
-    -- beware on_load before on_config
-    Savedata = Table.get(global,SAVEDATA_PATH)
-    end
-
-  NewHandler{
-    EventManager.event_uid.on_load,
-    link_savedata
-    }
-    
-  -- Store indexes on naturally occuring events.
-  NewHandler {
-    defines.events[created_event],
-    filter = function(e) return not e.simulated end,
-    function(e) remember_index(Table.get(e,created_event_index_path)) end
-    }
-  NewHandler {
-    defines.events[destroyed_event],
-    filter = function(e) return not e.simulated end,
-    function(e) forget_index(Table.get(e,destroyed_event_index_path)) end
-    }
-    
-  -- Simulate indexes when other mods might have overshadowed them.
-  NewHandler {
-    {EventManager.event_uid.on_init,EventManager.event_uid.on_config},
-    function(e)
-    
-      -- create/read savedata
-      Savedata = Table.sget(global,SAVEDATA_PATH,{})
-      Table.sget(Savedata,{'known_indexes'},{});
-      local known = Set.from_values(Savedata.known_indexes)
-      
-      -- missed object removal?
-      for index in pairs(known) do
-        if game.players[index] == nil then
-          log:debug(
-            '[tick ', e.tick, '] ',
-            'Event simulated: ', destroyed_event, ' → Index: ', index
-            )
-          forget_index(index)
-          local e = {simulated = true}
-          Table.set(e, sim_remove_event_key, index)
-          EventManager.raise_private(defines.events[destroyed_event], e)
-          end
-        end
-      
-      -- missed new object?
-      for _,obj in pairs(Table.get(game,{game_key})) do
-        if not known[obj.index] then
-          log:debug(
-            '[tick ', e.tick, '] ',
-            'Event simulated: ', created_event,
-            ' → Index: ', obj.index, ', Name: "', obj.name,'"'
-            )
-          remember_index(obj.index)
-          local e = {simulated = true}
-          Table.set(e, sim_create_event_key, 
-            Table.get(obj, sim_create_obj_value_path)
-            )
-          EventManager.raise_private(defines.events[created_event], e)
-          end
-        end
-
-      end
-    }
-  end
-  
-
--- Order is important! surface → force → player   
-
-CreateSimulation(
-  'on_surface_created',{'surface_index'},
-  'on_surface_deleted',{'surface_index'},
-  'surfaces',
-  {'surface_index'}, {'index'},
-  {'surface_index'}
-  )
- 
-CreateSimulation(
-  'on_force_created',{'force','index'},
-  'on_forces_merged',{'source_index'},
-  'forces',
-  {'force'}, {}, -- empty path == object itself
-  {'source_index'} -- is always index
-  -- name and destination are unknown for overshadowed force removal!
-  -- @future: Create a seperate event just for this?
-  -- EventManager.event_uid.on_force_removed
-  )
-
-CreateSimulation(
-  'on_player_created',{'player_index'},
-  'on_player_removed',{'player_index'},
-  'players',
-  {'player_index'}, {'index'},
-  {'player_index'}
-  )
-  
--- -------------------------------------------------------------------------- --
--- Simulation : technology                                                    --
--- -------------------------------------------------------------------------- --
-
--- Stores an array of Crc32(technology.name) for each force.
--- Compares the array to actual research status in on_init, on_config
--- and on_force_reset.
-
---[[
-
-  on_technology_effects_reset -> force :: LuaForce, Preserves research state of technologies.
-  on_force_reset              -> force :: LuaForce
-  on_research_finished        -> research :: LuaTechnology
-                              -> by_script :: boolean
---]]
-
-do
-
-  local SAVEDATA_PATH = {'event_manager','simulation','technologies'}
-  
-  EventManager.new_event('on_research_reset')
-
-  local NewHandler = function(tbl)
-    EventManager.new_handler(Table.smerge(tbl,{
-      name_prefix = 'em-simulation:technologies',
-      persistent  = true,
-      }))
-    end
-    
-  -- Maps {uid -> name} and {name -> uid}.
-  local _map = Cache.AutoCache(function(r)
-    for _,t in pairs(game.technology_prototypes) do
-      -- Storing all technology names for every force would
-      -- waste too much space. So only the crc32 is stored.
-      local uid = Crc32.encode(t.name)
-      if r[uid] ~= nil then
-        stop('Technology name crc32 collision!\n', uid, '\n', t.name)
-        end
-      r[t.name], r[uid] = uid, t.name -- double lookup
-      end
-    end)
-    
-  local Savedata
-  
-  -- get force researched_uids
-  local function get_fuids(force)
-    local x = Table.sget(Savedata,{force.index,'researched_uids'},{})
-    return x
-    end
-  
-  local function store_tech_uid(force,technology)
-    Array.insert_once(get_fuids(force),_map[technology.name])
-    end
-    
-  local function forget_tech_uid(force,technology)
-    Array.unsorted_remove_value(get_fuids(force),_map[technology.name])
-    end
-  
-  -- Compares the researched_uids of a force with the current technology
-  -- state and if nessecary updates savedata and raises un/research events.
-  local function check_force(e,force,simulated)
-    -- remove uids if the technology no longer exists
-    local researched_uids_array = Array(get_fuids(force))
-    for i,uid in pairs(researched_uids_array) do
-      if _map[uid] == nil then
-        researched_uids_array:unsorted_remove_key(i)
-        end
-      end
-    -- iter all technologies and compare with known state
-    local researched_uids = Table.map( -- Set {name -> uid}
-      get_fuids(force), function(v) return v,_map[v] end, {}
-      )
-    for _,tech in pairs(force.technologies) do
-      -- missed research?
-      if tech.researched and not researched_uids[tech.name] then
-        log:debug(
-          '[tick ', e.tick, '] ',
-          'Event simulated: on_research_finished, ',
-          ' → Force: ', force.name,
-          ', Technology: ', tech.name
-          )
-        store_tech_uid(force,tech)
-        EventManager.raise_private(
-          defines.events.on_research_finished,
-          {
-            research  = tech ,
-            by_script = false,
-            -- source of research is unknown
-            --
-            -- @future: If the mod is added to the map for the first time
-            -- it could be assumed that all old techs are not by_script, 
-            -- and after that it could be assumed that all overshadowed
-            -- events *are* by_script.
-            --
-            simulated = true, -- is tautologically always simulated
-            }
-          )
-      -- missed un-research?
-      elseif (not tech.researched) and (researched_uids[tech.name]) then
-        forget_tech_uid(force,tech)
-        EventManager.raise_private(
-          EventManager.event_uid.on_research_reset,
-          {research  = tech, simulated = not not simulated}
-          )
-        end
-      end
-    end
-
-  -- Beware on_load before on_config.
-  NewHandler{
-    EventManager.event_uid.on_load,
-    function() Savedata = Table.get(global,SAVEDATA_PATH) end
-    }
-
-  -- Remove savedata when forces are removed.
-  -- Creation of new forces is handled implicitly by get_fuids().
-  NewHandler {
-    defines.events.on_forces_merged,
-    function(e)
-      Table.set(Savedata,{e.source_index},nil)
-      if e.destination then check_force(e, e.destination, false) end
-      end
-    }
-
-  -- Store indexes on naturally occuring events.
-  NewHandler {
-    defines.events.on_research_finished,
-    filter = function(e) return not e.simulated end,
-    function(e) store_tech_uid(e.research.force, e.research) end
-    }
-    
-  -- Convert: "on_force_reset" -> "on_research_reset"
-  NewHandler {
-    defines.events.on_force_reset,
-    function(e) check_force(e, e.force, false) end
-    }
-
-  -- Simulate un/research when other mods might have overshadowed it.
-  NewHandler {
-    {EventManager.event_uid.on_init,EventManager.event_uid.on_config},
-    function(e)
-      Savedata = Table.sget(global, SAVEDATA_PATH, {})
-      for _,force in pairs(game.forces) do check_force(e, force, true) end
-      end
-    }
-    
-    
-  end
-  
  
   
 --------------------------------------------------------------------------------
--- Built-in Custom Events.
+-- Built-in Wrapped Custom Events.
 -- @section
 --------------------------------------------------------------------------------
   
-----------
--- dummy
--- @within Built-in Custom Events
--- @table dummy
+-- Event Wrappers should only be created when at least one outside handler
+-- wants to use them.
+--
+-- Event Wrappers do not automatically deactivate if all handlers using them
+-- are disabled. This would be difficult to detect and also it's expected
+-- that handlers that need wrappers are constantly active anyway.
+
+
+-- Stores wrappers to which no handler has yet been subscribed.
+local InactiveEventWrappersByEventUID = {}
   
-if flag.IS_DEV_MODE then
-  Tool.Import('event_test_dynamic_endisable_endequeue')(EventManager)
+  
+-- Event wrappers should only be activated if at least one handler subscribes to them.
+function Private.new_event_wrapper(event_uid, new_handler_args)
+  Verify(event_uid,'number')
+  Verify(event_uid < -3,'true') -- Negative UIDs should be used to prevent other mods influence.
+  local wrapper = {
+    event_name = Verify(EventUidToName[event_uid],'string','Invalid wrapper event_uid'),
+    event_uid  = event_uid ,
+    new_handler_args = new_handler_args,
+    }
+  InactiveEventWrappersByEventUID[wrapper.event_uid] = wrapper
   end
+
+  
+-- Tries to activate a wrapper. Only works once.
+-- Silently ignores all other EventUIDs so there's no need to check
+-- if a UID is a wrapper UID or not.
+-- 
+-- @tparam EventUID wrapper_uid
+-- 
+function Private.try_actiate_wrapper(wrapper_uid)
+  local wrapper = InactiveEventWrappersByEventUID[wrapper_uid]
+  if wrapper then
+    -- Remove wrapper from standby array so it's not activated again.
+    InactiveEventWrappersByEventUID[wrapper_uid] = nil
+    log:debug('Enabled event wrapper: "', wrapper.event_name, '".')
+    for j=1,#wrapper.new_handler_args do
+      EventManager.new_handler(wrapper.new_handler_args[j])
+      end    
+    end
+  end
+  
 
 if true then -- EventManager.enable_extra_events()?
-
-  -- Each event must detect if there are subscriptions to it.
-
-  -- Tool.Import('event_on_entity_created')(EventManager)
+  --
+  Tool.Import('simulation_surface_force_player')(EventManager)
+  Tool.Import('simulation_technology')(EventManager)
+  --
+  Tool.Import('event_on_entity_created')(EventManager, Private)
+  Tool.Import('event_on_player_changed_chunk')(EventManager, Private)
   end
 
+  
+if flag.IS_DEV_MODE then
+  Tool.Import('event_test_dynamic_endisable_endequeue')(EventManager,Private)
+  end
+  
+  
   
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

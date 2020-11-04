@@ -41,7 +41,7 @@
 <li><a href="#Custom_Event_Management">Custom Event Management</a></li>
 <li><a href="#Event_groups">Event groups </a></li>
 <li><a href="#Handler_Methods">Handler Methods </a></li>
-<li><a href="#Built_in_Custom_Events">Built-in Custom Events</a></li>
+<li><a href="#Built_in_Meta_Events">Built-in Meta-Events</a></li>
 </ul>
 
 
@@ -68,6 +68,7 @@
   <li><a href="../modules/Filter.html">Filter</a></li>
   <li><a href="../modules/Iter.html">Iter</a></li>
   <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/LocalisedString.html">LocalisedString</a></li>
   <li><a href="../modules/Lock.html">Lock</a></li>
   <li><a href="../modules/Log.html">Log</a></li>
   <li><a href="../modules/Logic.html">Logic</a></li>
@@ -80,9 +81,11 @@
   <li><a href="../modules/Table.html">Table</a></li>
   <li><a href="../modules/Time.html">Time</a></li>
   <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Vector.html">Vector</a></li>
   <li><a href="../modules/Verificate.html">Verificate</a></li>
   <li><a href="../modules/Version.html">Version</a></li>
   <li><a href="../modules/remotes.html">remotes</a></li>
+  <li><a href="../modules/snippet.html">snippet</a></li>
 </ul>
 <h2>Source</h2>
 <ul class="nowrap">
@@ -126,18 +129,6 @@
 <h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Template">Template</a></td>
-	<td class="summary">Custom Event Description</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#on_player_changed_chunk">on_player_changed_chunk</a></td>
-	<td class="summary">Raised when the player moves or is teleported across a chunk border.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#Template">Template</a></td>
-	<td class="summary">Custom Event Description</td>
-	</tr>
-	<tr>
 	<td class="name" nowrap><a href="#on_research_reset">on_research_reset</a></td>
 	<td class="summary">Raised when the researched state of a technology has changed from true to
  false.</td>
@@ -146,26 +137,10 @@
 <h2><a href="#Todo">Todo </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#todo0">todo0</a></td>
-	<td class="summary">Continue integration of event-manager-8 from line 1287</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#todo1">todo1</a></td>
+	<td class="name" nowrap><a href="#todo5">todo5</a></td>
 	<td class="summary">New Event
- Replace event groups with stand-alone wrappers that
- pre-filter and re-structure the event tables.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#todo4">todo4</a></td>
-	<td class="summary">EventManagerScript.on_event</p>
-
-<p> Add bootstrap one-handler-per-event emulation.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#todo6">todo6</a></td>
-	<td class="summary">EventManager.supress<em>logging</em>event<em>id(event</em>uid)</p>
-
-<p> Selectively disable logging for certain event types?</td>
+ DebugOncePerLoad Event
+ -> needs EventManager.new<em>event</em>name?</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#todo3">todo3</a></td>
@@ -177,12 +152,6 @@
 <p> last chunk event must carry {e.final=true}</p>
 
 <p> must be different event than normal chunk_generated.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#todo5">todo5</a></td>
-	<td class="summary">New Event
- DebugOncePerLoad Event
- -> needs EventManager.new<em>event</em>name?</td>
 	</tr>
 </table>
 <h2><a href="#Concepts">Concepts</a></h2>
@@ -233,6 +202,10 @@
 	<tr>
 	<td class="name" nowrap><a href="#disable_desync_protection">disable_desync_protection()</a></td>
 	<td class="summary"><strong>Warranty void if removed</strong>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#suppress_logging">suppress_logging(event_uid)</a></td>
+	<td class="summary">Selectively disable logging for specific events.</td>
 	</tr>
 </table>
 <h2><a href="#Custom_Event_Management">Custom Event Management</a></h2>
@@ -296,19 +269,16 @@
 	<td class="summary">Raises an event only for the current mod.</td>
 	</tr>
 </table>
-<h2><a href="#Built_in_Custom_Events">Built-in Custom Events</a></h2>
+<h2><a href="#Built_in_Meta_Events">Built-in Meta-Events</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#dummy">dummy</a></td>
-	<td class="summary">dummy</td>
-	</tr>
-	<tr>
 	<td class="name" nowrap><a href="#on_entity_created">on_entity_created</a></td>
-	<td class="summary">Combines all entity building related events into one.</td>
+	<td class="summary">All-in-one entity building event.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#test_dynamic_endisable_endequeue">test_dynamic_endisable_endequeue</a></td>
-	<td class="summary">Custom Event Description</td>
+	<td class="name" nowrap><a href="#on_player_changed_chunk">on_player_changed_chunk</a></td>
+	<td class="summary">Raised when the player moves or is teleported across a chunk border on
+ the same surfaces or has moved to another surface.</td>
 	</tr>
 </table>
 
@@ -319,70 +289,6 @@
     <h2 class="section-header "><a name="Tables"></a>Tables</h2>
 
     <dl class="function">
-    <dt>
-    <a name = "Template"></a>
-    <strong>Template</strong>
-    </dt>
-    <dd>
-    Custom Event Description
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "on_player_changed_chunk"></a>
-    <strong>on_player_changed_chunk</strong>
-    </dt>
-    <dd>
-    Raised when the player moves or is teleported across a chunk border.
- This is a higher-resolution abstraction of <a href="../api/events.html#on_player_changed_position">on_player_changed_position</a>.
-
-
-    <h3>Fields:</h3>
-    <ul>
-        <li><span class="parameter">player_index</span>
-            <span class="types"><a class="type" href="../api/Builtin-Types.html#uint">uint</a></span>
-
-
-
-        </li>
-        <li><span class="parameter">old_chunk</span>
-            <span class="types"><span class="type">ChunkPosition</span></span>
-
-
-
-        </li>
-        <li><span class="parameter">new_chunk</span>
-            <span class="types"><span class="type">ChunkPosition</span></span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Template"></a>
-    <strong>Template</strong>
-    </dt>
-    <dd>
-    Custom Event Description
-
-
-
-
-
-
-
-</dd>
     <dt>
     <a name = "on_research_reset"></a>
     <strong>on_research_reset</strong>
@@ -412,76 +318,15 @@
 
     <dl class="function">
     <dt>
-    <a name = "todo0"></a>
-    <strong>todo0</strong>
-    </dt>
-    <dd>
-    Continue integration of event-manager-8 from line 1287
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "todo1"></a>
-    <strong>todo1</strong>
+    <a name = "todo5"></a>
+    <strong>todo5</strong>
     </dt>
     <dd>
     New Event
- Replace event groups with stand-alone wrappers that
- pre-filter and re-structure the event tables. </p>
-
-<p> Make them "built-in events" inside this file.</p>
-
-<p> How can that be compatible with event filtering?
- As long as it does NOT use any C-side calls it should be really
- cheap to change the table strucuture even for all events that never need it?</p>
-
-<p> If the wrapper pre-fetches i.e. e.entity_name = entity.name
- it can significantly speed up the filters after it!
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "todo4"></a>
-    <strong>todo4</strong>
-    </dt>
-    <dd>
-    EventManagerScript.on_event</p>
-
-<p> Add bootstrap one-handler-per-event emulation.  (for sudo?)
- Should automatically work with new immediately registering structure.</p>
-
-<p> just give it a fixed name and overwrite ordered handlers?
- maybe cleaner with EM.remove_handler.</p>
-
-<p> Needs to call enqueue<em>new</em>onticks
- needs to override .enabled status.
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "todo6"></a>
-    <strong>todo6</strong>
-    </dt>
-    <dd>
-    EventManager.supress<em>logging</em>event<em>id(event</em>uid)</p>
-
-<p> Selectively disable logging for certain event types?
- on<em>tick, on</em>chunk_generated, etc?
+ DebugOncePerLoad Event
+ -> needs EventManager.new<em>event</em>name?   .private<em>event</em>name?
+ -> needs EventManager.are<em>there</em>any<em>handlers</em>for<em>this</em>event(event<em>name)
+   to prevent pointlessly registering on</em>tick when nobody uses it
 
 
 
@@ -502,29 +347,13 @@
 
 <p> last chunk event must carry {e.final=true}</p>
 
-<p> must be different event than normal chunk_generated. </p>
+<p> must be different event than normal chunk_generated.  -> does it? on<em>retrogen</em>chunk</p>
 
 <p> include LuaRendering debug marker? (i.e. a square on the chunk)</p>
 
-<p> (does gui update during tick_paused? can force update one tick -> show progress bar?)
+<p> (does gui update during tick_paused? can force update one tick -> show progress bar?)</p>
 
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "todo5"></a>
-    <strong>todo5</strong>
-    </dt>
-    <dd>
-    New Event
- DebugOncePerLoad Event
- -> needs EventManager.new<em>event</em>name?   .private<em>event</em>name?
- -> needs EventManager.are<em>there</em>any<em>handlers</em>for<em>this</em>event(event<em>name)
-   to prevent pointlessly registering on</em>tick when nobody uses it
+<p> Better to do a series of actions for one specific handler?
 
 
 
@@ -779,6 +608,30 @@ StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_init+ON_LOAD   -   
  Turns all desync prevention measures off.
 
 
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "suppress_logging"></a>
+    <strong>suppress_logging(event_uid)</strong>
+    </dt>
+    <dd>
+    Selectively disable logging for specific events.
+ Useful when <code>on_tick</code>, <code>on_chunk_generated</code> or similar events log-spam too much.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">event_uid</span>
+            <span class="types"><a class="type" href="../modules/EventManager.html#EventUID">EventUID</a></span>
+
+
+
+        </li>
+    </ul>
 
 
 
@@ -1234,31 +1087,18 @@ StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_init+ON_LOAD   -   
 
 </dd>
 </dl>
-    <h2 class="section-header "><a name="Built_in_Custom_Events"></a>Built-in Custom Events</h2>
+    <h2 class="section-header "><a name="Built_in_Meta_Events"></a>Built-in Meta-Events</h2>
 
     <dl class="function">
-    <dt>
-    <a name = "dummy"></a>
-    <strong>dummy</strong>
-    </dt>
-    <dd>
-    dummy
-
-
-
-
-
-
-
-</dd>
     <dt>
     <a name = "on_entity_created"></a>
     <strong>on_entity_created</strong>
     </dt>
     <dd>
-    Combines all entity building related events into one. </p>
+    All-in-one entity building event. </p>
 
-<p> <a href="../api/Events.html#on_built_entity">on_built_entity</a> <br/>
+<p> Combines the following events: <br/>
+ <a href="../api/Events.html#on_built_entity">on_built_entity</a> <br/>
  <a href="../api/Events.html#on_robot_built_entity">on_robot_built_entity</a> <br/>
  <a href="../api/Events.html#script_raised_built">script_raised_built</a> <br/>
  <a href="../api/Events.html#script_raised_revive">script_raised_revive</a> <br/>
@@ -1271,6 +1111,18 @@ StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_init+ON_LOAD   -   
         <li><span class="parameter">created_entity</span>
             <span class="types"><a class="type" href="../api/LuaEntity.html">LuaEntity</a></span>
          The entity built.
+        </li>
+        <li><span class="parameter">created_entity_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">created_entity_type</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
         </li>
         <li><span class="parameter">robot</span>
             <span class="types"><a class="type" href="../api/LuaEntity.html">LuaEntity</a></span>
@@ -1300,7 +1152,7 @@ StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_init+ON_LOAD   -   
          (<em>optional</em>)
         </li>
         <li><span class="parameter">tags</span>
-            <span class="types"><span class="type">Tags</span></span>
+            <span class="types"><a class="type" href="../api/Concepts.html#Tags">Tags</a></span>
          The tags associated with this entity.
          (<em>optional</em>)
         </li>
@@ -1322,13 +1174,44 @@ StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_init+ON_LOAD   -   
 
 </dd>
     <dt>
-    <a name = "test_dynamic_endisable_endequeue"></a>
-    <strong>test_dynamic_endisable_endequeue</strong>
+    <a name = "on_player_changed_chunk"></a>
+    <strong>on_player_changed_chunk</strong>
     </dt>
     <dd>
-    Custom Event Description
+    Raised when the player moves or is teleported across a chunk border on
+ the same surfaces or has moved to another surface. </p>
+
+<p> Abstracts: <br/>
+ <a href="../api/Events.html#on_player_changed_position">on_player_changed_position</a> <br/>
+ <a href="../api/Events.html#on_player_changed_surface">on_player_changed_surface</a>
 
 
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">player_index</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#uint">uint</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">surface_index</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#uint">uint</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+         <em>If</em> the player changed surfaces then this is
+ the old surfaces index.
+        </li>
+        <li><span class="parameter">old_chunk</span>
+            <span class="types"><a class="type" href="../api/Concepts.html#ChunkPositionAndArea">ChunkPositionAndArea</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">new_chunk</span>
+            <span class="types"><a class="type" href="../api/Concepts.html#ChunkPositionAndArea">ChunkPositionAndArea</a></span>
+
+
+
+        </li>
+    </ul>
 
 
 
@@ -1342,7 +1225,7 @@ StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_init+ON_LOAD   -   
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-11-01 03:24:34 </i>
+<i style="float:right;">Last updated 2020-11-04 03:04:01 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

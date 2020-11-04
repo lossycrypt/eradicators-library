@@ -330,7 +330,7 @@ function Array.map(arr,f,target,i,j)
 --
 -- @tparam DenseArray|SparseArray arr
 -- @tparam function f Any elements for which the filter function f(value,index,arr)
--- does not return @{Concepts.truthy|truthy} are removed from the array. And any
+-- does not return @{truthy} are removed from the array. And any
 -- following indexes are shifted down.
 -- @tparam[opt=nil] table target __Copy Mode.__ This table will be changed and arr remains unchanged.
 --

@@ -294,6 +294,9 @@ KeywordPage(
   )
   
 
+
+  
+  
 -- -------------------------------------------------------------------------- --
 -- Translators                                                                --
 -- -------------------------------------------------------------------------- --
@@ -381,39 +384,70 @@ FactorioBuiltinTypes('^(float)$'  )
 FactorioBuiltinTypes('^(double)$' )
 
 
+
+local factorio_types = {
+  "ProgrammableSpeakerCircuitParameters","VehicleAutomaticTargetingParameters",
+  "ProgrammableSpeakerAlertParameters","ArithmeticCombinatorParameters","Offer",
+  "ProgrammableSpeakerParameters","ProgrammableSpeakerInstrument","TriggerItem",
+  "CircuitConditionSpecification","EntityPrototypeSpecification","TilePosition",
+  "ConstantCombinatorParameters","ModConfigurationChangedData","TileProperties",
+  "DeciderCombinatorParameters","AchievementPrototypeFilters","TriggerDelivery",
+  "TechnologyPrototypeFilters","PersonalLogisticParameters","TriggerTargetMask",
+  "ModSettingPrototypeFilters","ItemPrototypeSpecification","TriggerEffectItem",
+  "DecorativePrototypeFilters","EquipmentPrototypeFilters","SelectionModeFlags",
+  "ConfigurationChangedData","TechnologySpecification","RecipePrototypeFilters",
+  "InfinityInventoryFilter","ItemStackSpecification","EntityPrototypeFilters",
+  "CollisionMaskWithFlags","CliffPlacementSettings","AutoplaceSpecification",
+  "MapExchangeStringData","GuiArrowSpecification","FluidPrototypeFilters","Any",
+  "TilePrototypeFilters","SurfaceSpecification","RaiseEventParameters","Vector",
+  "ItemPrototypeFilters","EntityPrototypeFlags","ChunkPositionAndArea","Signal",
+  "TrainScheduleRecord","PlayerSpecification","CursorBoxRenderType","SoundPath",
+  "ScriptRenderTarget","OldTileAndPosition","ItemPrototypeFlags","NthTickEvent",
+  "InfinityPipeFilter","ForceSpecification","FluidSpecification","SmokeSource",
+  "FluidBoxConnection","DifficultySettings","CollisionMaskLayer","RidingState",
+  "PlaceAsTileResult","ItemStackLocation","DisplayResolution","SimpleItemStack",
+  "AutoplaceSettings","MouseButtonFlags","GameViewSettings","ComparatorString",
+  "CliffOrientation","CircuitCondition","AttackParameters","NoiseExpression",
+  "MapViewSettings","LocalisedString","ScriptPosition","MapGenSettings","Fluid",
+  "LogisticFilter","ForceCondition","WaitCondition","UpgradeFilter","Alignment",
+  "TrainSchedule","PathfindFlags","PathFindFlags","ColorModifier","Resistances",
+  "CollisionMask","ChunkPosition","CapsuleAction","RenderLayer","MapSettings",
+  "HeatSetting","GuiLocation","EffectValue","BoundingBox","SpritePath","Filter",
+  "ScriptArea","ModSetting","MapGenSize","Ingredient","BeamTarget","SignalID",
+  "Position","Modifier","AmmoType","Trigger","Product","Effects","Command",
+  "Color","Tags","Loot",
+  }
+local FactorioTypes = NamedSection(url.local_api, 'Concepts')
+for i=1, #factorio_types do
+  FactorioTypes('^('..factorio_types[i]..')$')
+  end
+
+
+
 -- @future: Deprecate and replace by @{LMAN ...}
 --
 -- Lua Manual (cos LDoc manual_url option ain't werki'n! wtf!)
 local keywords = {
-  'assert','collectgarbage','dofile','error','getmetatable','ipairs','load',
-  'loadfile','next','pairs','pcall','print','rawequal','rawget','rawlen',
-  'rawset','require','select','setmetatable','tonumber','tostring','type',
-  'xpcall',
-  
-  'bit32','bit32.arshift','bit32.band','bit32.bnot','bit32.bor',
-  'bit32.btest','bit32.bxor','bit32.extract','bit32.lrotate','bit32.lshift',
-  'bit32.replace','bit32.rrotate','bit32.rshift',
-  
-  'debug','debug.debug','debug.getuservalue','debug.gethook','debug.getinfo',
-  'debug.getlocal','debug.getmetatable','debug.getregistry','debug.getupvalue',
-  'debug.setuservalue','debug.sethook','debug.setlocal','debug.setmetatable',
-  'debug.setupvalue','debug.traceback','debug.upvalueid','debug.upvaluejoin',
-
-  'math','math.abs','math.acos','math.asin','math.atan','math.atan2',
-  'math.ceil','math.cos','math.cosh','math.deg','math.exp','math.floor',
-  'math.fmod','math.frexp','math.huge','math.ldexp','math.log','math.max',
-  'math.min','math.modf','math.pi','math.pow','math.rad','math.random',
-  'math.randomseed','math.sin','math.sinh','math.sqrt','math.tan','math.tanh',
-
-  'package','package.config','package.cpath','package.loaded','package.loadlib',
-  'package.path','package.preload','package.searchers','package.searchpath',
-
-  'string','string.byte','string.char','string.dump','string.find',
-  'string.format','string.gmatch','string.gsub','string.len','string.lower',
-  'string.match','string.rep','string.reverse','string.sub','string.upper',
-
-  'table','table.concat','table.insert','table.pack',
-  'table.remove','table.sort','table.unpack',
+  "package.searchpath","debug.setuservalue","debug.setmetatable","table.unpack",
+  "debug.getuservalue","debug.getmetatable","package.searchers","string.gmatch",
+  "debug.upvaluejoin","debug.getregistry","debug.setupvalue","debug.getupvalue",
+  "package.preload","package.loadlib","math.randomseed","debug.upvalueid",
+  "debug.traceback","string.reverse","package.loaded","package.config","xpcall",
+  "debug.setlocal","debug.getlocal","collectgarbage","string.format","tostring",
+  "package.cpath","debug.sethook","debug.getinfo","debug.gethook","string.gsub",
+  "bit32.rrotate","bit32.replace","bit32.lrotate","bit32.extract","string.find",
+  "bit32.arshift","table.remove","table.insert","table.concat","string.upper",
+  "string.match","string.lower","setmetatable","package.path","getmetatable",
+  "bit32.rshift","bit32.lshift","string.dump","string.char","string.byte",
+  "math.random","debug.debug","bit32.btest","table.sort","table.pack","require",
+  "string.sub","string.rep","string.len","math.ldexp","math.frexp","math.floor",
+  "math.atan2","bit32.bxor","bit32.bnot","bit32.band","math.tanh","math.sqrt",
+  "math.sinh","math.modf","math.huge","math.fmod","math.cosh","math.ceil",
+  "math.atan","math.asin","math.acos","bit32.bor","tonumber","rawequal","table",
+  "math.tan","math.sin","math.rad","math.pow","math.min","math.max","math.log",
+  "math.exp","math.deg","math.cos","math.abs","loadfile","package","math.pi",
+  "string","select","rawset","rawlen","rawget","ipairs","dofile","assert",
+  "print","pcall","pairs","error","debug","bit32","type","next","math","load",
   }
 local LuaManual = NamedSection(url.local_lua_doc,'manual')
 for i=1,#keywords do LuaManual('^('..keywords[i]..')$') end

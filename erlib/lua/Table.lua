@@ -787,7 +787,7 @@ function Table.map(tbl,f,target)
 -- __In-place.__ Removes elements from a table based on a filter function.
 -- 
 -- @tparam table tbl
--- @tparam function f If calling f(value,key,tbl) does not return @{Concepts.truthy|truthy} 
+-- @tparam function f If calling f(value,key,tbl) does not return @{truthy} 
 -- then the value will be removed from the table.
 -- 
 -- @tparam[opt=nil] table target __Copy Mode.__ The result of the operation will

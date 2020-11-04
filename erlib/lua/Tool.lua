@@ -86,6 +86,23 @@ function Tool.IfNilCall(value,f,...)
   
 
 ----------
+-- Calls one of two functions depending on a condition.
+--
+-- @tparam AnyValue condition If this is @{truthy} calls f1, else calls f2.
+-- @tparam function f1
+-- @tparam function f2
+-- @tparam AnyValue ... Extra arguments for the functions.
+--
+-- @treturn AnyValue The return value of calling f1(...) or f2(...).
+function Tool.SelectCall(condition, f1, f2, ...)
+  if condition then
+    return f1(...)
+  else
+    return f2(...)
+    end
+  end
+  
+----------
 -- Converts a value to a type if it is not yet of that type.
 --   
 -- @tparam AnyValue value The input value.
@@ -144,7 +161,7 @@ function Tool.Last(...)
 --
 -- Not to be confused with @{select}.
 --
--- @tparam AnyValue condition If this is a @{Concepts.truthy|truty} value then
+-- @tparam AnyValue condition If this is a @{truthy} value then
 -- the true\_value will be returned, else the false\_value will be returned.
 --
 -- @tparam AnyValue true_value

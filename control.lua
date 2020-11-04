@@ -8,8 +8,8 @@ local _ENV = require '__eradicators-library__/erlib/Core'().Core.install_to_env(
 Core.run_tests()
 
 -- Log testing
-local log = Log.Logger('testlogger')
-log:warn('warn') log:info('info') log:debug('deb') log:say('say')
+-- local log = Log.Logger('testlogger')
+-- log:warn('warn') log:info('info') log:debug('deb') log:say('say')
 
 -- Create shared event uids
 -- require('__eradicators-library__/erlib/remote/shared_event_uids')

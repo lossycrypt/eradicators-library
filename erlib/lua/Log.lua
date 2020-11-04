@@ -60,8 +60,11 @@ local const = {
     warn  = 1            ,
     info  = 2            ,
     debug = 3            ,
+    --
     say   = 4            ,
     tell  = 4            ,
+    header= 4            , --seperator
+    footer= 4            , --seperator
     },
 
   log_prefix = {
@@ -231,7 +234,7 @@ local function _do_log_raw(stdout,self,level,msg)
     self.prefix[level],      
     -- Name of the mod that *created* the logger.
     -- Possibly different of mod that calls the logger.
-    self.mod_name,
+    self.user_mod_name,
     -- Factorio logger only shows *this* file location when logging,
     -- so it's always nessecary to include the *executing* file:line.
     (not info) and '' or info.short_src:gsub('__[%a-_]+__/',''):gsub('%.lua$',''):sub(-19),
@@ -261,6 +264,16 @@ function Log:do_log_block(level,...)
     )
   end
 
+
+-- Log:header, Log:footer
+function Log:do_log_seperator(sep, ...)
+  --@future: Mod name? File name?
+  if select('#', ...) > 0 then
+    return print(sep.. table_concat(_to_table_of_strings(...), '').. '\n')
+  else
+    return print(sep)
+    end
+  end
   
   
 --------------------------------------------------------------------------------
@@ -290,7 +303,9 @@ function Log.Logger(logger_name,opts)
   -- local new = setmetatable({},_obj_mt)
   local new = {}
 
-  new .mod_name = Stacktrace.get_mod_name(2)
+  new .module_mod_name = Stacktrace.get_mod_name(2) -- Results in library most of the time
+  new .user_mod_name = Stacktrace.get_mod_name(-1) -- The mod that *uses* the library.
+  
   new .logger_name = logger_name
   
   Log.update_log_level(new) -- applies leveled metatable
@@ -340,7 +355,7 @@ function Log:err(...)
   -- Tail call removes this function from the
   -- stack, resulting in correct file:line info
   -- for the caller.
-  return Error.Error('Logger',self.mod_name,...)
+  return Error.Error('Logger',self.module_mod_name,...)
   end
   
 function Log:warn  (...) return self:do_log_line (const.level['Warnings'   ],...) end 
@@ -349,14 +364,22 @@ function Log:debug (...) return self:do_log_line (const.level['Everything' ],...
 function Log:say   (...) return self:do_log_line (const.level['DEV_MODE'   ],...) end
 function Log:tell  (...) return self:do_log_block(const.level['DEV_MODE'   ],...) end
 
+local _head, _foot = ('―'):rep(100)..'\n', ('.'):rep(200)..'\n'
+function Log:header(...) return self:do_log_seperator(_head, ...) end
+function Log:footer(...) return self:do_log_seperator(_foot, ...) end
+
+
+
 --------------------------------------------------------------------------------
 -- Methods.
 -- @section
 --------------------------------------------------------------------------------
 
 
+-- Should log level be from module or user... or always library?
+-- I thought the point was to try user first and then try library!
 function Log:update_log_level()
-  return Log.set_log_level(self,get_log_level_setting_value(self.mod_name))
+  return Log.set_log_level(self,get_log_level_setting_value(self.module_mod_name))
   end
 
 

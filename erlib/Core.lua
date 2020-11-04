@@ -70,7 +70,7 @@ local stop = Error .Stopper 'Core' -- local to each plugin in the future
 -- stage limitation (default is "always")
 local startup_only = function(path) if not Const.load_stage.control then return path end end
 local control_only = function(path) if     Const.load_stage.control then return path end end
-
+local dev_only     = function(path) if flag.IS_DEV_MODE then return path end end
 
 local Modules = {
   --determines load order
@@ -94,7 +94,9 @@ local Modules = {
   Class      = 'erlib/lua/Class',
   Compare    = 'erlib/lua/Compare',
   Math       = 'erlib/lua/Math',
+  Vector     = 'erlib/lua/Vector',
   
+  snippet    = dev_only 'erlib/remotes/snippets',
   
   -- groups
   Coding     = 'erlib/lua/Coding/!init',
@@ -174,6 +176,8 @@ local function uplift(target,names,setter)
 -- -------------------------------------------------------------------------- --
 say('<<< Erlib Core Boot Sequence Finished <<<')
 
+
+if flag.IS_DEV_MODE then print(('.'):rep(200)..'\n') end -- log:footer()
 
 
 local function EradicatorsLibraryMain(options)
@@ -259,7 +263,8 @@ local function EradicatorsLibraryMain(options)
   -- Does not run in non-erlib mods.
   Core.run_tests = function()
     if flag.DO_TESTS and (flag.IS_LIBRARY_MOD or not flag.IS_FACTORIO) then
-      -- print('here',erlib.Stacktrace.get_pos())
+      local log = erlib.Log.Logger('ErLibCore Self-Test')
+      log:header('Eradicators Library Self-Test')
       local Tester = elreq('erlib/test/!init')()
       if not Const.load_stage.control then
         Tester()
@@ -269,8 +274,10 @@ local function EradicatorsLibraryMain(options)
           Tester()
           end end
         --> event manager internal event "on_debug_once_per_session"
+        --> Preferrably the library itself should never require EventManager.
         script.on_nth_tick(61,function()only_once()end) --must be identical function
         end
+      log:footer()
       end
     end
     
@@ -322,9 +329,9 @@ local function __init__(PublicENV,options)
 ----OPTIONS----------------------------------------------------------------------------------------
   options = options or {}
   local OVERRIDE = pcall(require,'__zz-toggle-to-enable-dev-mode__/empty')
-  -- IS_DEV_BUILD      = options.is_dev_build      or false
+  -- IS_DEV_MODE      = options.is_dev_build      or false
   -- DEBUG_MODE        = options.debug_mode        or false
-  IS_DEV_BUILD      = OVERRIDE --what is the use-case for toggling these on a per-mod basis?
+  IS_DEV_MODE      = OVERRIDE --what is the use-case for toggling these on a per-mod basis?
   DEBUG_MODE        = OVERRIDE --what is the use-case for toggling these on a per-mod basis?
   LEGACY_MODE       = true --hardcoded until the library itself is fully updated
   STRICT_MODE       = options.strict_mode       or false --TODO: mod setting "better error messages"
@@ -378,7 +385,7 @@ local function __init__(PublicENV,options)
   end
   
 ----ANNOUNCE--------------------------------------------------------------------------------------- 
-  if IS_DEV_BUILD then
+  if IS_DEV_MODE then
     print(('―'):rep(100))
     if Load_phase.control then print(('―'):rep(100)) end --second line
     print(('%s : %s                     \n'..
@@ -388,10 +395,10 @@ local function __init__(PublicENV,options)
            _Lib_name       ,_Lib_root      ,
            _Mod_name       ,_Mod_root      ))
     print(('     LEGACY_MODE  = %.5s, STRICT_MODE       = %.5s\n'..
-           '     IS_DEV_BUILD = %.5s, USE_EVENT_MANAGER = %.5s\n'..
+           '     IS_DEV_MODE  = %.5s, USE_EVENT_MANAGER = %.5s\n'..
            '     DEBUG_MODE   = %.5s, USE_PLUGINS       = %.5s\n'):format
           (LEGACY_MODE         , STRICT_MODE                ,
-           IS_DEV_BUILD        , USE_EVENT_MANAGER          ,
+           IS_DEV_MODE        , USE_EVENT_MANAGER          ,
            DEBUG_MODE          , USE_PLUGINS                ))
     end
   
@@ -474,7 +481,7 @@ local function __init__(PublicENV,options)
   Voodoo .switch_case  = Import(_Lib_root..'/voodoo/switch_case.lua' )(_LIB)
 
 ----LOGGER-----------------------------------------------------------------------------------------
-  lib3 'Log' ('/debug/Log-3.lua','elog') --IS_DEV_BUILD, libtable, libstring, Load_phase, Load_stage
+  lib3 'Log' ('/debug/Log-3.lua','elog') --IS_DEV_MODE, libtable, libstring, Load_phase, Load_stage
   GLOBAL('say'  ,Log.say  )
   GLOBAL('tell' ,Log.tell )
   -- GLOBAL('stop' ,Log.error) --deprecated by built-in standalone Stop
@@ -526,7 +533,7 @@ local function __init__(PublicENV,options)
   --stage aware (low quality)
   lib3 'Sprite'       ('/legacy/libsprite.lua'   ,'libsprite') --elog
   lib3 'Tech'         ('/legacy/libtech.lua'     ,'libtech') --load_stage
-  lib3 'Data1'        ('/legacy/libdata.lua'     ,'libdata') --IS_DEV_BUILD,elog,libtable,librecipe,libsprite,class_helper
+  lib3 'Data1'        ('/legacy/libdata.lua'     ,'libdata') --IS_DEV_MODE,elog,libtable,librecipe,libsprite,class_helper
   GLOBAL('Inscribe',libdata.inscribe)
   
   --control stage
@@ -579,15 +586,15 @@ local function __init__(PublicENV,options)
     local LIBPM = Plugin_manager(_LIB,_Lib_root..'/assets','library_plugins')
     local library_plugin_list = require(_Lib_root ..'/plugins.lua')()
     AMap(library_plugin_list,F('a.load_plugin(x,b)',LIBPM,_Lib_root..'/plugins'))
-    if IS_DEV_BUILD and Load_phase.settings then
+    if IS_DEV_MODE and Load_phase.settings then
       Log.debug('LIBRARY','Active plugins:')
       for _,path in pairs(library_plugin_list) do raw_print(' ',path) end
       raw_print()
       end
 
 ----LOCALES 3.0------------------------------------------------------------------------------------
-    if IS_DEV_BUILD and Load_stage .control then
-    -- Stop(Load_stage,IS_DEV_BUILD)
+    if IS_DEV_MODE and Load_stage .control then
+    -- Stop(Load_stage,IS_DEV_MODE)
       local z = '__zz-universal-locale__/remote'
       if remote.interfaces[z] then
         require(z)({_LIB.Log   .locale},'library') --Logger locale

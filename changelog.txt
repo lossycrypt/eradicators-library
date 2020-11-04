@@ -23,12 +23,14 @@ Date: 2020-10-x
     - ?
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.19
-Date: 2020-10-31
+Date: 2020-11-02
   Modules:
     - New module Remote
     - New class Remote.PackedInterfaceGroup
     - New module Data
     - Introduced per-module development status indicator.
+    - Added EventManager on_entity_created wrapped custom event
+    - Added EventManager on_player_changed_chunk wrapped custom event
   Functions:
     - New function Filter.table_value
     - New function Filter.chain

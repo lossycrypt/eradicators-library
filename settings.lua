@@ -5,7 +5,6 @@
 local _ENV = require '__eradicators-library__/erlib/Core'().Core.install_to_env()
 Core.run_tests()
 
-
 if true then return end
 -- -------------------------------------------------------------------------- --
 -- Draft                                                                      --
