@@ -42,8 +42,8 @@ local LocalisedString,_LocalisedString,_uLocale = {},{},{}
 -- Legacy Draft (Power String)                                                --
 -- -------------------------------------------------------------------------- --
 
----convert between actual numbers and "10GW" "200kW" style strings.
----see also https://forums.factorio.com/viewtopic.php?p=446016#p446016
+-- convert between actual numbers and "10GW" "200kW" style strings.
+-- see also https://forums.factorio.com/viewtopic.php?p=446016#p446016
 --@number: the input number (or number string) to be formatted
 --@unit: "W" Watt, or whatever"
 --@precision: the number of decimal points to keep
@@ -73,7 +73,7 @@ end
 -- test(misc .power_string_from_number(12345600000000000000000000000007890,{"si-unit-symbol-watt"},2))
 -- test(misc .power_string_from_number(-12.6667,{"si-unit-symbol-watt"},2))
 -- test(misc .power_string_from_number("a",{"si-unit-symbol-watt"},-2))
----testing
+-- testing
 
 function misc .power_string_to_number()
   end

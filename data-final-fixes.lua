@@ -14,6 +14,9 @@ local _ENV = require '__eradicators-library__/erlib/Core'().Core.install_to_env(
 Core.run_tests()
 
 
+
+Data.SimpleCustomInput('er:','interact-button','mouse-button-3')
+
 if true then return end
 -- -------------------------------------------------------------------------- --
 -- Draft                                                                      --

@@ -31,7 +31,7 @@ local Verify           , Verify_Or
 
 local Tool       = elreq('erlib/lua/Tool'      )()
     
--- local Table      = elreq('erlib/lua/Table'     )()
+local Table      = elreq('erlib/lua/Table'     )()
 -- local Array      = elreq('erlib/lua/Array'     )()
 -- local Set        = elreq('erlib/lua/Set'       )()
 
@@ -43,7 +43,7 @@ local Tool       = elreq('erlib/lua/Tool'      )()
 local L          = elreq('erlib/lua/Lambda'    )()
 
 
--- local LuaBootstrap = script
+local Color = elreq('erlib/lua/Color')()
 
 -- local Table_dcopy
     -- = Table.dcopy
@@ -64,6 +64,10 @@ local Data,_Data,_uLocale = {},{},{}
 
 
 
+-- -------
+-- Nothing.
+-- @within Todo
+-- @field todo1
 
 --------------------------------------------------------------------------------
 -- custom-input.
@@ -236,10 +240,133 @@ function Data.SimpleSetting()
 function Data.SimpleShortcut()
   end
 
+  
+--------------------------------------------------------------------------------
+-- path.
+-- @section
+--------------------------------------------------------------------------------
+Data.Path = {}
+
 ----------
--- Nothing.
--- @within Todo
--- @field todo1
+-- Joins several partial paths into a single string.
+-- 
+-- @tparam string ... Any number of partial paths. They will be joined with '/'
+-- and any erroneously duplicated slashes will be removed.
+-- 
+-- @treturn string The joined path.
+-- 
+function Data.Path.join(...)
+  return table.concat({...},'/'):gsub('/+','/')
+  end
+  
+  
+  
+--------------------------------------------------------------------------------
+-- icon.
+-- @section
+--------------------------------------------------------------------------------
+Data.Icon = {}
+
+----------
+-- Creates a basic icon table.
+-- 
+-- @tparam string root The path of the folder containing the image.
+-- @tparam string filename The name of the image file without the path.
+-- @tparam[opt] NaturalNumber size If the filename ends in a squared number
+-- like `32²` then the size can be omitted.
+-- @tparam[opt] ColorSpecification tint
+--
+-- @treturn table
+--
+-- @usage
+--   local icon = Data.Icon.SimpleIconTable(
+--     '__my-mod__/', 'my-picture-32².png', nil, {r=1}
+--     )
+--   print(Hydra.lines(icon))
+--   > {
+--   >   icon = "__my-mod__/my-picture-32².png",
+--   >   icon_size = 32,
+--   >   tint = {a = 1, b = 1, g = 1, r = 1}
+--   > }
+--
+function Data.Icon.SimpleIconTable(root, filename, size, tint)
+  local size = size or tonumber(filename:match'(%d+)²%.png$')
+  Verify(size, 'number', 'Missing icon size.')
+
+  return {
+    icon      = Data.Path.join(root, filename),
+    icon_size = size,
+    tint      = (tint and Color(tint) or nil), -- Color.ColorSpecification
+    }
+  end
+
+  
+  
+--------------------------------------------------------------------------------
+-- all prototypes.
+-- @section
+--------------------------------------------------------------------------------
+
+----------
+-- Advanced prototype creation and forking.
+--
+-- Processing order:  
+--   - Deep-copy the input table.  
+--   - Shallow merge with parent deep-copy.  
+--   - Apply `magic.post_patches`.  
+--   - Apply @{Table.remove_nil}.  
+--
+-- @tparam table prototype A normal prototype table like you would pass to
+-- `data:extend{}`.
+-- 
+-- @tparam[opt] table prototype.magic A table of advanced inscription instructions.
+-- @tparam[opt] string prototype.magic.parent_name
+-- @tparam[opt] string prototype.magic.parent_type
+-- If name or type or both are given then prototype will be @{Table.smerge|merged}
+-- onto a @{Table.dcopy|deep copy} of the parent before any further processing.
+-- @tparam[opt] string prototype.magic.post_patches A DenseArray of @{TablePatch},
+-- applied _after_ forking via @{Table.patch}.  
+-- 
+-- @treturn table A reference to the prototype table after it was added to data.raw.
+-- 
+function Data.Inscribe (prototype)
+  
+  local prototype = Table.dcopy (prototype)
+  local magic     = Table.remove(prototype, {'magic'}) or {}
+  
+  --
+  -- Table.patch(prototype, new.pre_patches or {}) -- was this ever used?
+  
+  -- fork?
+  local new
+  if magic.parent_name or magic.parent_type then
+    local parent_name = magic.parent_name or prototype.name
+    local parent_type = magic.parent_type or prototype.type
+    local parent      = Table.dcopy(data.raw[parent_type][parent_name])
+    new = Table.smerge(parent, prototype)
+  else
+    new = prototype
+    end
+  
+  --
+  Table.patch(new, magic.post_patches or {})
+  Table.remove_nil(new)
+  
+  --
+  data:extend{new}
+  return new
+  end
+  
+-- -------------------------------------------------------------------------- --
+-- Draft                                                                      --
+-- -------------------------------------------------------------------------- --
+
+
+
+
+
+
+
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

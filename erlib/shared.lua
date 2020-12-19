@@ -92,8 +92,14 @@ local flag = shared[5]
      :match'^__eradicators%-library__')
     )
 
+  flag.IS_FACTORIO_CONTROL =
+    (flag.IS_FACTORIO
+    and
+    (nil ~= (debug.traceback():match('^.*\n%s*.*/(control%.lua):')))
+    )
 
-  
+
+    
 -- -------------------------------------------------------------------------- --
 -- Log Level                                                                  --
 -- (@todo implement this properly...)

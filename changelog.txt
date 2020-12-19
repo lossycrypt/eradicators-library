@@ -7,23 +7,25 @@ Date: 2020-xx-xx
     - Add auto-config function to set up the full library once inside a mod. Including dev-flags.
     - Include proper locale in flag mods? or is in erlib enough
 ---------------------------------------------------------------------------------------------------
-Version: 4.0.22
-Date: 2020-10-x
+Version: 4.1.2
+Date: 2020-12-x
   Internal:
     - ?
 ---------------------------------------------------------------------------------------------------
-Version: 4.0.21
-Date: 2020-10-x
+Version: 4.1.1
+Date: 2020-12-x
   Internal:
     - ?
 ---------------------------------------------------------------------------------------------------
-Version: 4.0.20
-Date: 2020-10-x
-  Internal:
-    - ?
+Version: 4.1.0
+Date: 2020-12-19
+  Features:
+    - Updated to factorio base version 1.1.
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.19
 Date: 2020-11-02
+  Features:
+    - Final version for factorio base version 1.0.
   Modules:
     - New module Remote
     - New class Remote.PackedInterfaceGroup

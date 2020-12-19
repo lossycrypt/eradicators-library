@@ -30,8 +30,11 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 
-local log  = elreq('erlib/lua/Log'  )().Logger  'PluginManager'
-local stop = elreq('erlib/lua/Error')().Stopper 'PluginManager'
+local Log   = elreq('erlib/lua/Log'  )()
+local Error = elreq('erlib/lua/Error')()
+
+local log   = Log.Logger    'PluginManager'
+local stop  = Error.Stopper 'PluginManager'
 
 local Verificate = elreq('erlib/lua/Verificate')()
 local Verify           , Verify_Or
@@ -39,9 +42,11 @@ local Verify           , Verify_Or
 
 -- local Tool       = elreq('erlib/lua/Tool'      )()
     
+local Lock       = elreq('erlib/lua/Lock')()
+    
 local Table      = elreq('erlib/lua/Table'     )()
 -- local Array      = elreq('erlib/lua/Array'     )()
--- local Set        = elreq('erlib/lua/Set'       )()
+local Set        = elreq('erlib/lua/Set'       )()
 
 -- local Crc32      = elreq('erlib/lua/Coding/Crc32')()
 
@@ -68,6 +73,8 @@ local Table      = elreq('erlib/lua/Table'     )()
 
 local PluginManager,_PluginManager,_uLocale = {},{},{}
 
+
+
 -- -------------------------------------------------------------------------- --
 -- Metatable                                                                  --
 -- -------------------------------------------------------------------------- --
@@ -84,6 +91,110 @@ local function try_is_manager(obj)
 
 local Managers = {}
 
+-- -------------------------------------------------------------------------- --
+-- Helper Functions                                                           --
+-- -------------------------------------------------------------------------- --
+
+local function make_locked_savedata_dummy (name)
+  return setmetatable({},{
+    __index = function() stop(
+      'Savedata *read* access not available for plugin "', name, '".'
+      ) end,
+    __newindex = function() stop(
+      'Savedata *write* access not available for plugin "', name, '".'
+      ) end,
+    })
+  end
+
+--@tparam PluginManager self A PM table.
+local function create_manager_savedata_events (self)
+  -- Savedata
+    
+  if not rawget(_ENV,'EventManager') then
+    -- Can not require because EventManager has side-effects that
+    -- the user must conciously accept.
+    stop('PluginManager requires "EventManager" to be in public _ENV.')
+    end
+  
+  log:debug('Activating Savedata management events for manager: "', self.name, '".')
+    
+  -- automatic object instance indexed subtables
+  local function auto_subindexes(tbl, category, plugin_name)
+    return setmetatable(tbl, {
+      __index = function(self,key)
+        if type(key) == 'number' then
+          log:debug('Created new index ', category,'[', key,'] for plugin "', plugin_name, '".')
+          return Table.set(self, {key}, {})
+          end
+        end
+      })
+    end
+
+  -- automatic category subtables
+  local auto_keys = Set.from_values{'players', 'surfaces', 'forces', 'map'}
+  local function auto_subtables(tbl, plugin_name)
+    setmetatable(tbl, {
+      __index = function(self, key)
+        if auto_keys[key] then
+          log:debug('Created new subtable ', key,' for plugin "', plugin_name, '".')
+          -- return Table.set(self, {key}, {})
+          return Table.set(self, {key}, auto_subindexes({}, key, plugin_name) )
+          end
+        end
+      })
+    end
+    
+  local function apply_savedata_meta(Savedata, plugin_name)
+    -- log:tell('Before apply_savedata_meta', Savedata)
+    if Savedata then
+      setmetatable(Savedata, nil) -- on_load before on_config, aaargg...
+      for category in pairs(auto_keys) do
+        if Savedata[category] then
+    -- log:tell('Before apply_savedata_meta', Savedata,auto_keys,category)
+          -- log:debug('type',type(Savedata[category]))
+          auto_subindexes(Savedata[category], category, plugin_name);
+          end
+        end
+      auto_subtables(Savedata, plugin_name)
+      end
+    end
+  
+
+  
+  EventManager.new_handler {
+    EventManager.event_uid.on_load,
+    name_prefix = self.name..'-plugin-manager',
+    function()
+      for plugin_name, env in pairs(self.plugin_envs) do
+        local Savedata = Table.get(_ENV.global, {'plugin_manager','plugins', plugin_name})
+        if Savedata then 
+          env.Savedata = Savedata
+          apply_savedata_meta(Savedata, plugin_name)
+        else
+          env.Savedata = make_locked_savedata_dummy(plugin_name)
+          end
+        
+        end
+      -- log:tell('GLOBAL after on_load', global)
+      end
+    }
+    
+  EventManager.new_handler {
+    {EventManager.event_uid.on_init  ,
+     EventManager.event_uid.on_config},
+    name_prefix = self.name..'-plugin-manager',
+    function()
+      for plugin_name, env in pairs(self.plugin_envs) do
+        env.Savedata = Table.sget(_ENV.global, {'plugin_manager','plugins', plugin_name}, {})
+        apply_savedata_meta(env.Savedata, plugin_name)
+        end
+      end
+    }
+  
+  --@future: subscribe to removal events
+  
+  
+  end
 
 --------------------------------------------------------------------------------
 -- Creation.
@@ -128,12 +239,22 @@ function PluginManager.new_manager(config)
     PLUGIN_ASSET_ROOT = manager.asset_root ,
     }
     
+  -- Savedata must be per-plugin. Block shared.
+  shared_env.Savedata = Lock.AutoLock({},'SharedEnvironment Savedata')
+  
+  manager.shared_env = shared_env
+    
   if config.extra_shared_env then
     for k,v in pairs(config.extra_shared_env) do
       -- error(k)
       shared_env[k] = v
       end
     end
+    
+  if flag.IS_FACTORIO_CONTROL then
+    create_manager_savedata_events(manager)
+    end
+    
     
   return manager
   end
@@ -177,18 +298,28 @@ function PluginManager:make_env(plugin_config)
   Verify(plugin_config.PLUGIN_ASSET_ROOT,'nil|NonEmptyString','Invalid plugin asset root.')
   Verify(self.plugin_envs[plugin_name]  ,'nil','Duplicate plugin name:',plugin_name)
   
+  log:debug('New plugin environment "', plugin_name, '" for manager "', self.name, '".')
+  
   plugin_config = Table.scopy(plugin_config):clear{
     'PLUGIN_LUA_ROOT','PLUGIN_NAME','PLUGIN_ASSET_ROOT'
     }
   
   -- copy main_env + store
-  local env = Table.set(
-    self.plugin_envs, {plugin_name},
-    Table.scopy(self.main_env)
-    )
+  -- local env = Table.set(
+    -- self.plugin_envs, {plugin_name},
+    -- Table.scopy(self.main_env)
+    -- )
+  
+  -- copy main_env + store
+  local env = Table.scopy(self.main_env)
+  if plugin_name ~= 'SharedEnvironment' then
+    self.plugin_envs[plugin_name] = env
+    end
   
   -- link to main_env
-  env.MainENV = self.main_env
+  env.MainEnv = self.main_env
+  env.PublicEnv = _ENV
+  
   
   -- include config constants in _ENV
   env:smerge(plugin_config)
@@ -207,9 +338,25 @@ function PluginManager:make_env(plugin_config)
     and function(path) return env.PLUGIN_ASSET_ROOT .. path end
     or  function(path) stop('No plugin asset root given.') end
   
-  env.Savedata = nil
+  if plugin_name == 'SharedEnvironment' then
+    -- has to block in on_load and after!
+    -- env.Savedata = Lock.AutoLock({},'Pre-OnLoad Savedata')
+    env.Savedata = make_locked_savedata_dummy(plugin_name)
+
+    env.log   = Log.Logger    (self.name..' (SharedEnv)')
+    env.stop  = Error.Stopper (self.name..' (SharedEnv)')    
+  else
+    env.log   = Log.Logger    (plugin_name)
+    env.stop  = Error.Stopper (plugin_name)
+    end
   
-  return setmetatable(env,self.plugin_env_mt)
+  -- Cleanup
+  
+  -- Prevent leaking of empty pre-on-load "global" table.
+  -- Otherwise plugins can't see the real global.
+  env.global = nil
+  
+  return setmetatable(env, self.plugin_env_mt)
   end
 
 
@@ -225,6 +372,11 @@ function PluginManager:make_env(plugin_config)
 function PluginManager:get_env(plugin_name)
   try_is_manager(self)
   Verify(plugin_name,'NonEmptyString')
+  
+  if plugin_name == 'SharedEnvironment' then
+    return self.shared_env
+    end
+  
   return self.plugin_envs[plugin_name]
       or stop('No such plugin environment: ', plugin_name)
   end

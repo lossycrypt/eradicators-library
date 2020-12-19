@@ -55,13 +55,16 @@
   <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/Force.html">Force</a></li>
   <li><a href="../modules/Player.html">Player</a></li>
   <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><a href="../modules/Remote.html">Remote</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Train.html">Train</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Color.html">Color</a></li>
   <li><a href="../modules/Compare.html">Compare</a></li>
   <li><a href="../modules/Debug.html">Debug</a></li>
   <li><a href="../modules/Error.html">Error</a></li>
@@ -124,7 +127,7 @@
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#size">size(tbl)</a></td>
-	<td class="summary">Counts keys→value pairs.</td>
+	<td class="summary">Counts <a href="../modules/Types.html#KeyValuePair">(key → value) pairs</a>.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#array_size">array_size(tbl)</a></td>
@@ -144,7 +147,7 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#flip">flip(tbl)</a></td>
-	<td class="summary">Creates a new table in which keys↔values mappings are swapped.</td>
+	<td class="summary">Creates a new table in which <a href="../modules/Types.html#KeyValuePair">(key ↔ value) mappings</a> are swapped.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#plural">plural(obj)</a></td>
@@ -302,7 +305,7 @@
 	<td class="name" nowrap><a href="#TablePatch">TablePatch</a></td>
 	<td class="summary"><strong>Concept.</strong>
  A <a href="../modules/Types.html#DenseArray">DenseArray</a> consisting of a <a href="../modules/Table.html#TablePath">TablePath</a> followed by a
- <a href="../modules/Table.html#TablePatchValue">TablePatchValue</a>.</td>
+ <a href="../modules/Table.html#TablePatch">TablePatchValue</a>.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#TablePatchValue">TablePatchValue</a></td>
@@ -314,6 +317,10 @@
 	<tr>
 	<td class="name" nowrap><a href="#patch">patch(tbl, patches)</a></td>
 	<td class="summary">Takes an array of patches and applies them to a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#remove">remove(tbl, path)</a></td>
+	<td class="summary">Removes and returns a value from a table.</td>
 	</tr>
 </table>
 <h2><a href="#Factories">Factories </a></h2>
@@ -400,7 +407,7 @@
     <strong>size(tbl)</strong>
     </dt>
     <dd>
-    Counts keys→value pairs.  Uses factorio <a href="../api/Libraries.html#table_size">table_size</a> when
+    Counts <a href="../modules/Types.html#KeyValuePair">(key → value) pairs</a>.  Uses factorio <a href="../api/Libraries.html#table_size">table_size</a> when
  available.
 
 
@@ -577,7 +584,7 @@
     <strong>flip(tbl)</strong>
     </dt>
     <dd>
-    Creates a new table in which keys↔values mappings are swapped.
+    Creates a new table in which <a href="../modules/Types.html#KeyValuePair">(key ↔ value) mappings</a> are swapped.
  Duplicate values will be mapped to the <strong>last</strong> key that references them
  but due to the behavior of <a href="../lua-5.2/doc/manual.html#pdf-next">next</a> it's undefind behavior which key that
  will be. In factorio pairs is deterministic and it should thus be the
@@ -1936,7 +1943,7 @@ Table.deep_clear_metatables(test)
     <dd>
     <strong>Concept.</strong>
  A <a href="../modules/Types.html#DenseArray">DenseArray</a> consisting of a <a href="../modules/Table.html#TablePath">TablePath</a> followed by a
- <a href="../modules/Table.html#TablePatchValue">TablePatchValue</a>.
+ <a href="../modules/Table.html#TablePatch">TablePatchValue</a>.
 
 
 
@@ -2022,6 +2029,47 @@ test:patch({
 &gt; {deeper = {one = <span class="number">1</span>, two = <span class="number">2</span>}, one = <span class="number">1</span>, two = <span class="number">2</span>}
 </pre>
     </ul>
+
+</dd>
+    <dt>
+    <a name = "remove"></a>
+    <strong>remove(tbl, path)</strong>
+    </dt>
+    <dd>
+    Removes and returns a value from a table. </p>
+
+<p> Does <em>not</em> remove empty sub-tables left behind after removing all keys.</p>
+
+<p> <strong>Note:</strong> Not to be confused with <a href="../lua-5.2/doc/manual.html#pdf-table.remove">table.remove</a> which only works on arrays.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">path</span>
+            <span class="types"><a class="type" href="../modules/Table.html#TablePath">TablePath</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+
+
+
+    </ol>
+
+
+
 
 </dd>
 </dl>
@@ -2178,7 +2226,7 @@ test:patch({
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-11-04 03:04:01 </i>
+<i style="float:right;">Last updated 2020-12-10 22:12:10 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

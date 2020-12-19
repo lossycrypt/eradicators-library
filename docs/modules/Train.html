@@ -1,0 +1,389 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#LuaTrain">LuaTrain </a></li>
+<li><a href="#TrainSchedule">TrainSchedule </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Core.html">Core</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/Data.html">Data</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Entity.html">Entity</a></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/Force.html">Force</a></li>
+  <li><a href="../modules/Player.html">Player</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
+  <li><a href="../modules/Remote.html">Remote</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><strong>Train</strong></li>
+  <li><a href="../modules/Array.html">Array</a></li>
+  <li><a href="../modules/Class.html">Class</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Color.html">Color</a></li>
+  <li><a href="../modules/Compare.html">Compare</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Iter.html">Iter</a></li>
+  <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/LocalisedString.html">LocalisedString</a></li>
+  <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
+  <li><a href="../modules/Logic.html">Logic</a></li>
+  <li><a href="../modules/Math.html">Math</a></li>
+  <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Polygon.html">Polygon</a></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
+  <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
+  <li><a href="../modules/Time.html">Time</a></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Vector.html">Vector</a></li>
+  <li><a href="../modules/Verificate.html">Verificate</a></li>
+  <li><a href="../modules/Version.html">Version</a></li>
+  <li><a href="../modules/remotes.html">remotes</a></li>
+  <li><a href="../modules/snippet.html">snippet</a></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/Introduction.html">Introduction</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Train</code></h1>
+<p>Description</p>
+
+<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.</p>
+<p>
+
+
+
+</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local Train = require(&apos;__eradicators-library__/erlib/factorio/Train&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#LuaTrain">LuaTrain </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#get_first_locomotive">get_first_locomotive(train)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_force">get_force(train)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_position">get_position(train)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#TrainSchedule">TrainSchedule </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Train.Schedule.remove_record">Train.Schedule.remove_record(train_schedule, index)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Train.Schedule.add_record">Train.Schedule.add_record(train_schedule[, index], record)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Train.Schedule.remove_all_temporary_stops">Train.Schedule.remove_all_temporary_stops(train_schedule)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="LuaTrain"></a>LuaTrain </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "get_first_locomotive"></a>
+    <strong>get_first_locomotive(train)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">train</span>
+            <span class="types"><a class="type" href="../api/LuaTrain.html">LuaTrain</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/LuaEntity.html">LuaEntity</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_force"></a>
+    <strong>get_force(train)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">train</span>
+            <span class="types"><a class="type" href="../api/LuaTrain.html">LuaTrain</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/LuaForce.html">LuaForce</a></span>
+        The force of the first locomotive.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_position"></a>
+    <strong>get_position(train)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">train</span>
+            <span class="types"><a class="type" href="../api/LuaTrain.html">LuaTrain</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/LuaPosition.html">LuaPosition</a></span>
+        The position of the first locomotive.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="TrainSchedule"></a>TrainSchedule </h2>
+
+          <div class="section-description">
+           <strong>Important Note:</strong> Lua <a href="https://www.lua.org/pil/2.1.html">nil</a> is a valid TrainSchedule, it represents a
+ schedule without any stations.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "Train.Schedule.remove_record"></a>
+    <strong>Train.Schedule.remove_record(train_schedule, index)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">train_schedule</span>
+            <span class="types"><a class="type" href="../api/Concepts.html#TrainSchedule">TrainSchedule</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">index</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a> or <a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         Accepts string <code>&quot;current&quot;</code> instead of a number.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Concepts.html#TrainSchedule">TrainSchedule</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Train.Schedule.add_record"></a>
+    <strong>Train.Schedule.add_record(train_schedule[, index], record)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">train_schedule</span>
+            <span class="types"><a class="type" href="../api/Concepts.html#TrainSchedule">TrainSchedule</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">index</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a> or <a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         Adds at end if not given, or
+ at current position if string <code>&quot;current&quot;</code>.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">record</span>
+            <span class="types"><a class="type" href="../api/Concepts.html#TrainScheduleRecord">TrainScheduleRecord</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Concepts.html#TrainSchedule">TrainSchedule</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Train.Schedule.remove_all_temporary_stops"></a>
+    <strong>Train.Schedule.remove_all_temporary_stops(train_schedule)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">train_schedule</span>
+            <span class="types"><a class="type" href="../api/Concepts.html#TrainSchedule">TrainSchedule</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Concepts.html#TrainSchedule">TrainSchedule</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-12-10 22:12:10 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

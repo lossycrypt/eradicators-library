@@ -26,6 +26,12 @@ local root = '..'
 -- dir=".\\..\\docs"
 dir  = root..'/docs'
 style = root..'/docs/template'
+
+
+-- stdlib/flib stylesheets
+-- template = root..'/docs/template'
+-- template_escape = '>'
+
 file = {
 
   --includes
@@ -307,11 +313,13 @@ KeywordPage(
 local key_value_formats = {
   ['->'] = '→', ['<->'] = '↔', ['<-'] = '←',
   }
+local nbsp = " " -- non breaking space in Lua 5.3+: print('"'..utf8.char(160)..'"')
+
 -- @param full capture, arrow capture, tail capture
 local function KeyValuePair(_,key_value_spec, tail)
   local arrow = key_value_formats[key_value_spec] or key_value_spec
   local url  = url.local_modules:format('Types','KeyValuePair')
-  return '(key '..arrow..' value)'..tail, url --@future: non-breaking space.
+  return '(key '..arrow..' value)'..tail, url -- non-breaking space!
   end
 custom_see_handler('^(%(?key%s*([^%s]+)%s*value%)?)(.*)$',KeyValuePair)
 
@@ -366,6 +374,11 @@ local ErlibModuleSpecificTypes = function(mod, pattern)
   end
   
 ErlibModuleSpecificTypes('EventManager', 'EventUID')
+ErlibModuleSpecificTypes('Color', 'ColorSpecification')
+ErlibModuleSpecificTypes('Color', 'NormalizedColor')
+ErlibModuleSpecificTypes('Table', 'TablePath')
+ErlibModuleSpecificTypes('Table', 'TablePatch')
+ErlibModuleSpecificTypes('Table', 'TablePatchValue')
 
 
 

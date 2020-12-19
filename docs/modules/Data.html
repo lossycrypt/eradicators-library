@@ -32,8 +32,10 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Todo">Todo</a></li>
 <li><a href="#custom_input">custom-input </a></li>
+<li><a href="#path">path </a></li>
+<li><a href="#icon">icon </a></li>
+<li><a href="#all_prototypes">all prototypes </a></li>
 </ul>
 
 
@@ -47,13 +49,16 @@
   <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/Force.html">Force</a></li>
   <li><a href="../modules/Player.html">Player</a></li>
   <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><a href="../modules/Remote.html">Remote</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Train.html">Train</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Color.html">Color</a></li>
   <li><a href="../modules/Compare.html">Compare</a></li>
   <li><a href="../modules/Debug.html">Debug</a></li>
   <li><a href="../modules/Error.html">Error</a></li>
@@ -104,13 +109,6 @@
     </ul>
 
 
-<h2><a href="#Todo">Todo</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#todo1">todo1</a></td>
-	<td class="summary">Nothing.</td>
-	</tr>
-</table>
 <h2><a href="#custom_input">custom-input </a></h2>
 <table class="function_list">
 	<tr>
@@ -123,36 +121,32 @@
  input even if the user changes it.</td>
 	</tr>
 </table>
+<h2><a href="#path">path </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Data.Path.join">Data.Path.join(...)</a></td>
+	<td class="summary">Joins several partial paths into a single string.</td>
+	</tr>
+</table>
+<h2><a href="#icon">icon </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Data.Icon.SimpleIconTable">Data.Icon.SimpleIconTable(root, filename[, size[, tint]])</a></td>
+	<td class="summary">Creates a basic icon table.</td>
+	</tr>
+</table>
+<h2><a href="#all_prototypes">all prototypes </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Inscribe">Inscribe(prototype)</a></td>
+	<td class="summary">Advanced prototype creation and forking.</td>
+	</tr>
+</table>
 
 <br/>
 <br/>
 
 
-    <h2 class="section-header "><a name="Todo"></a>Todo</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "todo1"></a>
-    <strong>todo1</strong>
-    </dt>
-    <dd>
-    Nothing.
-
-
-    <ul>
-        <li><span class="parameter">todo1</span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-</dl>
     <h2 class="section-header "><a name="custom_input"></a>custom-input </h2>
 
     <dl class="function">
@@ -285,13 +279,169 @@ EventManager.new_handler {
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="path"></a>path </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Data.Path.join"></a>
+    <strong>Data.Path.join(...)</strong>
+    </dt>
+    <dd>
+    Joins several partial paths into a single string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         Any number of partial paths. They will be joined with '/'
+ and any erroneously duplicated slashes will be removed.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+        The joined path.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="icon"></a>icon </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Data.Icon.SimpleIconTable"></a>
+    <strong>Data.Icon.SimpleIconTable(root, filename[, size[, tint]])</strong>
+    </dt>
+    <dd>
+    Creates a basic icon table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">root</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The path of the folder containing the image.
+        </li>
+        <li><span class="parameter">filename</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The name of the image file without the path.
+        </li>
+        <li><span class="parameter">size</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         If the filename ends in a squared number
+ like <code>32²</code> then the size can be omitted.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">tint</span>
+            <span class="types"><a class="type" href="../modules/Color.html#ColorSpecification">ColorSpecification</a></span>
+
+
+
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> icon = Data.Icon.SimpleIconTable(
+  <span class="string">'__my-mod__/'</span>, <span class="string">'my-picture-32².png'</span>, <span class="keyword">nil</span>, {r=<span class="number">1</span>}
+  )
+<span class="global">print</span>(Hydra.lines(icon))
+&gt; {
+&gt;   icon = <span class="string">"__my-mod__/my-picture-32².png"</span>,
+&gt;   icon_size = <span class="number">32</span>,
+&gt;   tint = {a = <span class="number">1</span>, b = <span class="number">1</span>, g = <span class="number">1</span>, r = <span class="number">1</span>}
+&gt; }
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="all_prototypes"></a>all prototypes </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Inscribe"></a>
+    <strong>Inscribe(prototype)</strong>
+    </dt>
+    <dd>
+    Advanced prototype creation and forking. </p>
+
+<p> Processing order: <br/>
+   - Deep-copy the input table. <br/>
+   - Shallow merge with parent deep-copy. <br/>
+   - Apply <code>magic.post_patches</code>. <br/>
+   - Apply <a href="../modules/Table.html#remove_nil">Table.remove_nil</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">prototype</span> A normal prototype table like you would pass to
+ <code>data:extend{}</code>.
+        <ul>
+        <li><span class="parameter">magic</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         A table of advanced inscription instructions.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">magic.parent_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">magic.parent_type</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         If name or type or both are given then prototype will be <a href="../modules/Table.html#smerge">merged</a>
+ onto a <a href="../modules/Table.html#dcopy">deep copy</a> of the parent before any further processing.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">magic.post_patches</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         A DenseArray of <a href="../modules/Table.html#TablePatch">TablePatch</a>,
+ applied <em>after</em> forking via <a href="../modules/Table.html#patch">Table.patch</a>.
+         (<em>optional</em>)
+        </li>
+        </li></ul>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        A reference to the prototype table after it was added to data.raw.
+    </ol>
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-11-04 03:04:01 </i>
+<i style="float:right;">Last updated 2020-12-10 22:12:10 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

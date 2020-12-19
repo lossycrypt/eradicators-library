@@ -29,6 +29,7 @@ local string_gsub,string_gmatch,string_find,string_format,
 local Hydra    = elreq ('erlib/lua/Coding/Hydra')()
 local Meta     = elreq ('erlib/lua/Meta/!init')()
 
+local stop = elreq('erlib/lua/Error')().Stopper('String')
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -36,7 +37,6 @@ local Meta     = elreq ('erlib/lua/Meta/!init')()
 
 local String,_String,_uLocale = {},{},{}
 
-local stop = elreq('erlib/lua/Error')().Stopper('String')
 
 --------------------------------------------------------------------------------
 -- Constants.
@@ -419,6 +419,29 @@ function String.remove_rich_text_tags(str)
 -- Proof of Concepts / Drafts / Other Garbage
 -- @section
 --------------------------------------------------------------------------------
+
+----------
+-- Converts multi-line functions to one-line.
+--
+-- Removes new-lines and simple end-of-line comments.
+-- 
+-- Intended for including local copies of library functions into very
+-- simply stand-alone mods.
+-- 
+-- Does not have any complex handling whatsoever. You have to manually
+-- remove multi-line comments, strings containing newlines, strings
+-- containing `--`, or anything complicated like that.
+--
+-- @tparam string str A string representing a function.
+-- @treturn The string without new lines.
+function String.to_one_line_function(str)
+  -- don't forget: gsub returns two values!
+  return (str
+    -- end-of-line comments
+    :gsub('[^\r\n]+',function(s) return s:gsub('%-%-.*$','') end)
+    -- remove multi-new-line
+    :gsub('%s*[\r\n]+%s*',';'))
+  end
 
 ----------
 -- __PROOF OF CONCEPT__. __SLOW__. Do not use in production.   

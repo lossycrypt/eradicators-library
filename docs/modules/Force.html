@@ -32,7 +32,7 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Functions">Functions</a></li>
+<li><a href="#Section">Section </a></li>
 </ul>
 
 
@@ -46,7 +46,7 @@
   <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
-  <li><a href="../modules/Force.html">Force</a></li>
+  <li><strong>Force</strong></li>
   <li><a href="../modules/Player.html">Player</a></li>
   <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><a href="../modules/Remote.html">Remote</a></li>
@@ -73,7 +73,7 @@
   <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
   <li><a href="../modules/Table.html">Table</a></li>
-  <li><strong>Time</strong></li>
+  <li><a href="../modules/Time.html">Time</a></li>
   <li><a href="../modules/Tool.html">Tool</a></li>
   <li><a href="../modules/Vector.html">Vector</a></li>
   <li><a href="../modules/Verificate.html">Verificate</a></li>
@@ -90,8 +90,8 @@
 
 <div id="content">
 
-<h1>Module <code>Time</code></h1>
-<p>(This module is not factorio compatible.)</p>
+<h1>Module <code>Force</code></h1>
+<p>Description</p>
 
 <p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.</p>
 <p>
@@ -101,16 +101,16 @@
 </p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Time = require(&apos;__eradicators-library__/erlib/factorio/Time&apos;)()
+        <pre class="example">local Force = require(&apos;__eradicators-library__/erlib/factorio/Force&apos;)()
 </pre>
     </ul>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#Section">Section </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#wait">wait(ms)</a></td>
-	<td class="summary">Waits until the time it up.</td>
+	<td class="name" nowrap><a href="#create_local_flying_text">create_local_flying_text(force, args)</a></td>
+	<td class="summary">Creates a local flying text for every player in the force.</td>
 	</tr>
 </table>
 
@@ -118,30 +118,29 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="Section"></a>Section </h2>
 
     <dl class="function">
     <dt>
-    <a name = "wait"></a>
-    <strong>wait(ms)</strong>
+    <a name = "create_local_flying_text"></a>
+    <strong>create_local_flying_text(force, args)</strong>
     </dt>
     <dd>
-    Waits until the time it up. </p>
-
-<p> Uses os.clock() outside of factorio.</p>
-
-<p> Inside of factorio uses a busy wait loop to <strong>approximate</strong> the wait time.
- The approximation is based on a 2.35Ghz CPU. Depending on your CPU speed
- the actually waited time will  be off by a factor of 2-3.</p>
-
-<p> <strong>Note:</strong> Inside of factorio only waits if flag.IS_DEV_MODE is true.
+    Creates a local flying text for every player in the force.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">ms</span>
-            <span class="types"><a class="type" href="../api/Builtin-Types.html#int">int</a></span>
-         milliseconds.
+        <li><span class="parameter">force</span>
+            <span class="types"><a class="type" href="../api/LuaForce.html">LuaForce</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">args</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         Same as <a href="../api/LuaPlayer.html#LuaPlayer.create_local_flying_text">LuaPlayer.create_local_flying_text</a>, except
+ that <code>args.position</code> defaults to each players current <a href="../api/Concepts.html#Position">Position</a>.
         </li>
     </ul>
 

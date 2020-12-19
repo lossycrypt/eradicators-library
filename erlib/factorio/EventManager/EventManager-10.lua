@@ -35,6 +35,11 @@
 -- @section
 --------------------------------------------------------------------------------
 
+
+----------
+-- BUG: new_private_event_uid is not unique to the PIG
+-- @table todo1
+
 ----------
 -- New Event
 -- DebugOncePerLoad Event
@@ -65,6 +70,19 @@
 -- @table todo3
   
 
+----------
+-- Disable on_tick when not needed.
+-- 
+-- Periodically (every 5/10/15 minutes?) check if the queue contains anything
+-- and disable it if not. -> Requires on_load checks, en/disable en/dequeue checks.
+-- 
+-- "Periodically" means on_load must emulate exact behavior. -> Easier
+-- to track if queue has at least one tick (every time it does something).
+-- 
+-- EventManager.activate_queue_if_not_active() deactivate_queue_if_active()
+-- 
+-- @table todo10
+  
   
 --------------------------------------------------------------------------------
 -- Concepts. 
@@ -1308,7 +1326,7 @@ do
           -- Private event table for each handler.
           -- Filter is explicitly allowed to change it.
           local _e = Table_dcopy(e)
-          if (not handler_data.filter) or (handler_data.filter(_e)) then
+          if (not handler_data.filter) or (handler_data.filter(_e,_e.player)) then
             log:debug(
               '[tick ', e.tick, '] ',
               'Event handled  : ', EventUidToName[event_uid]

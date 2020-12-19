@@ -113,7 +113,7 @@ do end
 --------------------------------------------------------------------------------
 
 ----------
--- Counts keys→value pairs. Uses factorio @{FAPI Libraries table_size} when
+-- Counts @{key -> value pairs}. Uses factorio @{FAPI Libraries table_size} when
 -- available.
 --
 -- @tparam table tbl
@@ -216,7 +216,7 @@ function Table.keys(tbl)
 
 
 ----------
--- Creates a new table in which keys↔values mappings are swapped.
+-- Creates a new table in which @{key <-> value mappings} are swapped.
 -- Duplicate values will be mapped to the __last__ key that references them
 -- but due to the behavior of @{next} it's undefind behavior which key that
 -- will be. In factorio pairs is deterministic and it should thus be the
@@ -735,6 +735,25 @@ function Table.patch(tbl,patches)
   return _toTable(tbl)
   end
 
+  
+----------
+-- Removes and returns a value from a table.
+--
+-- Does _not_ remove empty sub-tables left behind after removing all keys.
+--
+-- __Note:__ Not to be confused with @{LMAN table.remove} which only works on arrays.
+--
+-- @tparam table tbl
+-- @tparam TablePath path
+--
+-- @treturn AnyValue
+--
+function Table.remove(tbl, path)
+  local value = Table.get(tbl, path)
+  Table.set(tbl, path, nil);
+  return value
+  end
+  
   
   
 --------------------------------------------------------------------------------

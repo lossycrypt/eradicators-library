@@ -95,6 +95,7 @@ local Modules = {
   Compare    = 'erlib/lua/Compare',
   Math       = 'erlib/lua/Math',
   Vector     = 'erlib/lua/Vector',
+  Color      = 'erlib/lua/Color', 
   
   snippet    = dev_only 'erlib/remotes/snippets',
   
@@ -112,6 +113,8 @@ local Modules = {
   Entity     = control_only 'erlib/factorio/Entity',
   Remote     = control_only 'erlib/factorio/Remote',
   Player     = control_only 'erlib/factorio/Player',
+  Force      = control_only 'erlib/factorio/Force' ,
+  Train      = control_only 'erlib/factorio/Train' ,
   
   Data       = startup_only 'erlib/factorio/Data/!init',
   }
@@ -246,7 +249,7 @@ local function EradicatorsLibraryMain(options)
       setter(ENV, k, opt.strict and erlib_strict[k] or erlib[k])
       end
     --uplift
-    uplift(ENV, {'Coding', 'Meta', 'Logic', 'Tool'}, setter)
+    uplift(ENV, {'Coding', 'Meta', 'Logic', 'Tool', 'Replicate'}, setter)
     setter(ENV, 'L' ,erlib .Lambda)
     setter(ENV, 'F' ,erlib .String.smart_format)
     -- @future: Tool -> CamelCase

@@ -238,6 +238,31 @@ function Tool.Import(relative_path)
   return chunk
   end
  
+
+----------
+-- Converts a factorio tick to hours, minutes and seconds.
+-- 
+-- @tparam NaturalNumber tick
+-- 
+-- @treturn table A table `{h=,m=,s=}` of @{NaturalNumber}s.
+-- 
+function Tool.tick_to_time(tick)
+  local seconds = tick / 60
+  return {
+    h = math.floor(seconds / (60^2)     ),
+    m = math.floor(seconds % (60^2) / 60),
+    s = math.floor(seconds %  60        ),
+    }
+  -- Test:
+  -- for h = 1,3 do for m = 1,3 do for s = 1,3 do
+  --   local tick = h*60*60*60+m*60*60+s*60+17
+  --   printt(Tool.tick_to_time(tick), tick)
+  --   end end end
+  end
+  
+ 
+ 
+ 
 --------------------------------------------------------------------------------
 -- Draft.
 -- @section

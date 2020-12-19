@@ -7,7 +7,7 @@
 --
 -- @module Lock
 -- @usage
---  local Lock = require('__eradicators-library__/erlib/factorio/Lock')()
+--  local Lock = require('__eradicators-library__/erlib/lua/Lock')()
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -58,6 +58,8 @@ local Lock,_Lock,_uLocale = {},{},{}
 -- @tparam[opt] string passphrase → usage examples are below.
 -- @tparam[opt] function err_write A custom error handler. f(tbl,key,value)
 -- @tparam[opt] function err_read A custom error handler. f(tbl,key)
+-- 
+-- @treturn table The now locked table `tbl`.
 -- 
 -- @usage
 --   -- Apply the lock to any table.
@@ -129,6 +131,7 @@ function Lock.AutoLock (tbl,name,passphrase,err_write,err_read)
       __index = function(_,key) err_read(tbl,key) end,
     })
     
+  return tbl
   end
   
   
