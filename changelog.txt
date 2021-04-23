@@ -19,12 +19,18 @@ Date: 2020-12-x
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.0
 Date: 2020-12-19
-  Features:
+  Functions:
+    - Added Table.pop
+    - Added Math.floor and Math.ceil
+    - Added Vector.draw for debugging.
+    - Added Vector.to_strict_direction.
+  Internal:
     - Updated to factorio base version 1.1.
+    - Added decorations to Vector to make it fully parsable by LDoc.
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.19
 Date: 2020-11-02
-  Features:
+  Internal:
     - Final version for factorio base version 1.0.
   Modules:
     - New module Remote

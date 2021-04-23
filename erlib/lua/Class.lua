@@ -90,7 +90,7 @@ _Class.SimpleClass = {
   [1] = 'function',
   [2] = 'function',
   }
-function Class.SimpleClass(initializer,finalizer)
+function Class.SimpleClass(initializer, finalizer)
   local class, class_mt = {}, {}
   local object_mt = {__index=class}
 

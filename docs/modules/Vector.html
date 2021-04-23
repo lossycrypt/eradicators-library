@@ -34,7 +34,20 @@
 <ul>
 <li><a href="#Todo">Todo </a></li>
 <li><a href="#Concepts">Concepts</a></li>
+<li><a href="#Examples">Examples </a></li>
+<li><a href="#Class_Parent">Class Parent </a></li>
 <li><a href="#Copy">Copy </a></li>
+<li><a href="#Unpacking_of_Vector_coordinates">Unpacking of Vector coordinates </a></li>
+<li><a href="#Raw_coordinate_manipulation">Raw coordinate manipulation </a></li>
+<li><a href="#Mirror">Mirror </a></li>
+<li><a href="#Retargeting">Retargeting </a></li>
+<li><a href="#Linear_Transformation">Linear Transformation </a></li>
+<li><a href="#Angle_Calculation">Angle Calculation </a></li>
+<li><a href="#Rotational_Transformation">Rotational Transformation </a></li>
+<li><a href="#UID___Z__Z___N_Pairing_Wrappers">UID / Z×Z→N Pairing Wrappers </a></li>
+<li><a href="#Comparision_of_Vectors">Comparision of Vectors </a></li>
+<li><a href="#Conversion_to_other_formats">Conversion to other formats </a></li>
+<li><a href="#Debugging">Debugging </a></li>
 </ul>
 
 
@@ -94,14 +107,12 @@
 
 <h1>Module <code>Vector</code></h1>
 <p>Point-to-Point 2D Vectors.</p>
-<p> All Vector methods manipulate the vector in-place.
- A new instance can be created with Vector:copy().</p>
+<p> <strong>All Vector methods manipulate the vector in-place <em>AND</em> return it.</strong></p>
+
+<p> A new instance can be created with Vector:copy().</p>
 
 <p> Conversion to other formats via Vector.to_* will obviously not
  return a Vector ;).</p>
-
-<p> Vector.to_area() output contains the aliases "lt" and "rb" in
- addition to the standard format.</p>
 
 <p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.
  <a href="../source/Introduction.html#Compatibility">Compatibility</a>: Pure Lua.</p>
@@ -125,7 +136,7 @@
    moves the origin of <code>v</code> to the absolute coordinates of the target of <code>w</code>.</p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Vector = require(&apos;__eradicators-library__/erlib/factorio/Vector&apos;)()
+        <pre class="example">local Vector = require(&apos;__eradicators-library__/erlib/lua/Vector&apos;)()
 </pre>
     </ul>
 
@@ -148,11 +159,329 @@
 	<td class="summary">Data that can be transformed into a Vector.</td>
 	</tr>
 </table>
+<h2><a href="#Examples">Examples </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Example1">Example1</a></td>
+	<td class="summary">Create a simple area.</td>
+	</tr>
+</table>
+<h2><a href="#Class_Parent">Class Parent </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Vector">Vector(...)</a></td>
+	<td class="summary">Initializes a new vector.</td>
+	</tr>
+</table>
 <h2><a href="#Copy">Copy </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#copy">copy(v)</a></td>
 	<td class="summary">A plain copy of the vector.</td>
+	</tr>
+</table>
+<h2><a href="#Unpacking_of_Vector_coordinates">Unpacking of Vector coordinates </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#get_target">get_target(v)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_offset">get_offset(v)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_origin">get_origin(v)</a></td>
+	<td class="summary">　</td>
+	</tr>
+</table>
+<h2><a href="#Raw_coordinate_manipulation">Raw coordinate manipulation </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#null_offset">null_offset(v)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#null_origin">null_origin(v)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_offset_to_offset">set_offset_to_offset(v, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_offset_to_target">set_offset_to_target(v, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_offset_to_origin">set_offset_to_origin(v, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_origin_to_offset">set_origin_to_offset(v, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_origin_to_target">set_origin_to_target(v, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_origin_to_origin">set_origin_to_origin(v, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+</table>
+<h2><a href="#Mirror">Mirror </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#mirror_offset_x">mirror_offset_x(v)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mirror_offset_y">mirror_offset_y(v)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mirror_offset_xy">mirror_offset_xy(v)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mirror_origin_x">mirror_origin_x(v)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mirror_origin_y">mirror_origin_y(v)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mirror_origin_xy">mirror_origin_xy(v)</a></td>
+	<td class="summary">　</td>
+	</tr>
+</table>
+<h2><a href="#Retargeting">Retargeting </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#set_origin_to_target_keep_target">set_origin_to_target_keep_target(v, ...)</a></td>
+	<td class="summary">recalculates the vector to point to the same target from the new origin
+input vectors with non-0,0 origin will be treated as absolute positions</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#null_origin_keep_target">null_origin_keep_target(v)</a></td>
+	<td class="summary">shortcut for the common null operation.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_target_to_target_keep_origin">set_target_to_target_keep_origin(v, ...)</a></td>
+	<td class="summary">recalculates the offset to point at the target of @w</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_target_to_target_and_set_origin_to_own_target">set_target_to_target_and_set_origin_to_own_target(v, ...)</a></td>
+	<td class="summary">in-place replaces the old vector with a new vector (target of @v -> target of @w)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#swap_origin_with_target">swap_origin_with_target(v)</a></td>
+	<td class="summary">move the origin of @v to it's own target, and mirrors
+the offset so that the new target is the old origin.</td>
+	</tr>
+</table>
+<h2><a href="#Linear_Transformation">Linear Transformation </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#add_offset_to_offset">add_offset_to_offset(v, ...)</a></td>
+	<td class="summary">adds components of @w to components of @v</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#add_target_to_offset">add_target_to_offset(v, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#add_offset_to_origin">add_offset_to_origin(v, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#add_target_to_origin">add_target_to_origin(v, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#add_offset_both_ways">add_offset_both_ways(v, ...)</a></td>
+	<td class="summary">adds the vector @w to <em>both</em> sides of the vector (i.e.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#add_target_both_ways">add_target_both_ways(v, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#scale_offset">scale_offset(v, n)</a></td>
+	<td class="summary">multiplies the offset/origin with a fixed factor</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#scale_origin">scale_origin(v, n)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#scale_both_ways">scale_both_ways(v, n)</a></td>
+	<td class="summary">scales the offset length by n/2 in each direction
+useful for expanding boxes</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_center_to_target">set_center_to_target(v, ...)</a></td>
+	<td class="summary">moves the origin of @v so that the center of the line @v_offset -> @v_target
+is positioned on the target of @w</td>
+	</tr>
+</table>
+<h2><a href="#Angle_Calculation">Angle Calculation </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#to_radians">to_radians(v)</a></td>
+	<td class="summary">null is right, anti-clockwise</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_degrees">to_degrees(v)</a></td>
+	<td class="summary">null is up, clockwise</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_orientation">to_orientation(v)</a></td>
+	<td class="summary">null is up, clockwise</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_direction">to_direction(v)</a></td>
+	<td class="summary">null is up, clockwise.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_strict_direction">to_strict_direction(v)</a></td>
+	<td class="summary">null is up, clockwise.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_degrees">from_degrees(theta, len)</a></td>
+	<td class="summary">these return a vector of length 1 (i.e.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_radians">from_radians(theta, len)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_orientation">from_orientation(o, len)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_direction">from_direction(d, len)</a></td>
+	<td class="summary">　</td>
+	</tr>
+</table>
+<h2><a href="#Rotational_Transformation">Rotational Transformation </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#rotate_offset_by_degrees">rotate_offset_by_degrees(v, deg)</a></td>
+	<td class="summary">rotates only the /offset/ part of @v</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rotate_origin_by_degrees">rotate_origin_by_degrees(v, deg, ...)</a></td>
+	<td class="summary">rotates the /current origin/ of @v around the given VectorSpecification</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rotate_both_by_degrees">rotate_both_by_degrees(v, deg, ...)</a></td>
+	<td class="summary">rotates both the origin and target of @v around @w</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rotate_offset_by_direction">rotate_offset_by_direction(v, dir)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rotate_origin_by_direction">rotate_origin_by_direction(v, dir, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rotate_both_by_direction">rotate_both_by_direction(v, dir, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rotate_offset_by_orientation">rotate_offset_by_orientation(v, ori)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rotate_origin_by_orientation">rotate_origin_by_orientation(v, ori, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rotate_both_by_orientation">rotate_both_by_orientation(v, ori, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+</table>
+<h2><a href="#UID___Z__Z___N_Pairing_Wrappers">UID / Z×Z→N Pairing Wrappers </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#to_offset_uid">to_offset_uid(v, mode)</a></td>
+	<td class="summary">offset → UID</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_origin_uid">to_origin_uid(v, mode)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_target_uid">to_target_uid(v, mode)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_offset_from_uid">set_offset_from_uid(v, uid, mode)</a></td>
+	<td class="summary">UID → offset, origin, new</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_origin_from_uid">set_origin_from_uid(v, uid, mode)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_uid">from_uid(...)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#Comparision_of_Vectors">Comparision of Vectors </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#is_offset_equal">is_offset_equal(v, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_origin_equal">is_origin_equal(v, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_target_equal">is_target_equal(v, ...)</a></td>
+	<td class="summary">　</td>
+	</tr>
+</table>
+<h2><a href="#Conversion_to_other_formats">Conversion to other formats </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#to_box">to_box(v)</a></td>
+	<td class="summary">an undecorated box (nested table) like used in data stage prototypes</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_area">to_area(v)</a></td>
+	<td class="summary">a factorio runtime area (includes "lt" and "rb" as linked shortcuts)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_target_position">to_target_position(v)</a></td>
+	<td class="summary">the position of the end-point of the vector
+add factorio {x=,y=} table position</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_origin_position">to_origin_position(v)</a></td>
+	<td class="summary">the position of the origin of the vector</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_simple_vector">to_simple_vector(v)</a></td>
+	<td class="summary">an undecorated vector required by some functions like teleport()</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_point">to_point(v, ...)</a></td>
+	<td class="summary">makes the vector a point (null vector) at the position it was pointing</td>
+	</tr>
+</table>
+<h2><a href="#Debugging">Debugging </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#draw">draw(v[, ttl=60])</a></td>
+	<td class="summary">draws the vector into the world on the first surface with an admin player.</td>
 	</tr>
 </table>
 
@@ -243,6 +572,76 @@
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="Examples"></a>Examples </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Example1"></a>
+    <strong>Example1</strong>
+    </dt>
+    <dd>
+    Create a simple area.
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> my_vector = Vector(<span class="number">1</span>,<span class="number">1</span>) :set_center_to_target(<span class="number">0</span>,<span class="number">0</span>) :to_area()
+<span class="global">print</span>(Hydra.line(my_vector))
+&gt; {
+&gt;   left_top     = {x = -<span class="number">0.5</span>, y = -<span class="number">0.5</span>},
+&gt;   right_bottom = {x =  <span class="number">0.5</span>, y =  <span class="number">0.5</span>}
+&gt;   lt = <span class="keyword">nil</span> <span class="comment">--[[ self.left_top     ]]</span>,
+&gt;   rb = <span class="keyword">nil</span> <span class="comment">--[[ self.right_bottom ]]</span>,
+&gt; }
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Class_Parent"></a>Class Parent </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Vector"></a>
+    <strong>Vector(...)</strong>
+    </dt>
+    <dd>
+    Initializes a new vector.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">Vector(Area) :: a factorio area box {left_top={x=,y=},right_bottom={x=,y=}}
+Vector(BoundingBox) :: a factorio bounding box {{x,y},{x,y}}
+Vector(Position) :: a factorio position {x=,y=}
+Vector(Vector) :: a four component vector created by this library
+Vector(SimpleVector) :: a factorio two component vector {x,y}
+Vector(Number,Number <span class="keyword">or</span> <span class="keyword">nil</span>,Number <span class="keyword">or</span> <span class="keyword">nil</span>,Number <span class="keyword">or</span> <span class="keyword">nil</span>) 
+  :: Numbers are dx, dy, ox, oy
+  :: origin defaults to (<span class="number">0</span>,<span class="number">0</span>)
+  :: dy defaults to dx
+  :: dx is mandatory
+</pre>
+    </ul>
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Copy"></a>Copy </h2>
 
     <dl class="function">
@@ -270,13 +669,1769 @@
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="Unpacking_of_Vector_coordinates"></a>Unpacking of Vector coordinates </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "get_target"></a>
+    <strong>get_target(v)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_offset"></a>
+    <strong>get_offset(v)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_origin"></a>
+    <strong>get_origin(v)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Raw_coordinate_manipulation"></a>Raw coordinate manipulation </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "null_offset"></a>
+    <strong>null_offset(v)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "null_origin"></a>
+    <strong>null_origin(v)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_offset_to_offset"></a>
+    <strong>set_offset_to_offset(v, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_offset_to_target"></a>
+    <strong>set_offset_to_target(v, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_offset_to_origin"></a>
+    <strong>set_offset_to_origin(v, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_origin_to_offset"></a>
+    <strong>set_origin_to_offset(v, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_origin_to_target"></a>
+    <strong>set_origin_to_target(v, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_origin_to_origin"></a>
+    <strong>set_origin_to_origin(v, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Mirror"></a>Mirror </h2>
+
+          <div class="section-description">
+
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "mirror_offset_x"></a>
+    <strong>mirror_offset_x(v)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "mirror_offset_y"></a>
+    <strong>mirror_offset_y(v)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "mirror_offset_xy"></a>
+    <strong>mirror_offset_xy(v)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "mirror_origin_x"></a>
+    <strong>mirror_origin_x(v)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "mirror_origin_y"></a>
+    <strong>mirror_origin_y(v)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "mirror_origin_xy"></a>
+    <strong>mirror_origin_xy(v)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Retargeting"></a>Retargeting </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "set_origin_to_target_keep_target"></a>
+    <strong>set_origin_to_target_keep_target(v, ...)</strong>
+    </dt>
+    <dd>
+    recalculates the vector to point to the same target from the new origin
+input vectors with non-0,0 origin will be treated as absolute positions
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "null_origin_keep_target"></a>
+    <strong>null_origin_keep_target(v)</strong>
+    </dt>
+    <dd>
+    shortcut for the common null operation.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_target_to_target_keep_origin"></a>
+    <strong>set_target_to_target_keep_origin(v, ...)</strong>
+    </dt>
+    <dd>
+    recalculates the offset to point at the target of @w
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_target_to_target_and_set_origin_to_own_target"></a>
+    <strong>set_target_to_target_and_set_origin_to_own_target(v, ...)</strong>
+    </dt>
+    <dd>
+    in-place replaces the old vector with a new vector (target of @v -> target of @w)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "swap_origin_with_target"></a>
+    <strong>swap_origin_with_target(v)</strong>
+    </dt>
+    <dd>
+    move the origin of @v to it's own target, and mirrors
+the offset so that the new target is the old origin.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Linear_Transformation"></a>Linear Transformation </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "add_offset_to_offset"></a>
+    <strong>add_offset_to_offset(v, ...)</strong>
+    </dt>
+    <dd>
+    adds components of @w to components of @v
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "add_target_to_offset"></a>
+    <strong>add_target_to_offset(v, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "add_offset_to_origin"></a>
+    <strong>add_offset_to_origin(v, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "add_target_to_origin"></a>
+    <strong>add_target_to_origin(v, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "add_offset_both_ways"></a>
+    <strong>add_offset_both_ways(v, ...)</strong>
+    </dt>
+    <dd>
+    adds the vector @w to <em>both</em> sides of the vector (i.e.  twice)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "add_target_both_ways"></a>
+    <strong>add_target_both_ways(v, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "scale_offset"></a>
+    <strong>scale_offset(v, n)</strong>
+    </dt>
+    <dd>
+    multiplies the offset/origin with a fixed factor
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">n</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "scale_origin"></a>
+    <strong>scale_origin(v, n)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">n</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "scale_both_ways"></a>
+    <strong>scale_both_ways(v, n)</strong>
+    </dt>
+    <dd>
+    scales the offset length by n/2 in each direction
+useful for expanding boxes
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+            <span class="types"><span class="type">return v</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">n</span>
+        add<em>offset</em>to<em>origin(v:copy():mirror</em>offset<em>xy():scale</em>offset(0.5*n - 0.5)):scale_offset(n)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_center_to_target"></a>
+    <strong>set_center_to_target(v, ...)</strong>
+    </dt>
+    <dd>
+    moves the origin of @v so that the center of the line @v_offset -> @v_target
+is positioned on the target of @w
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Angle_Calculation"></a>Angle Calculation </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "to_radians"></a>
+    <strong>to_radians(v)</strong>
+    </dt>
+    <dd>
+    null is right, anti-clockwise
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_degrees"></a>
+    <strong>to_degrees(v)</strong>
+    </dt>
+    <dd>
+    null is up, clockwise
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_orientation"></a>
+    <strong>to_orientation(v)</strong>
+    </dt>
+    <dd>
+    null is up, clockwise
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_direction"></a>
+    <strong>to_direction(v)</strong>
+    </dt>
+    <dd>
+    null is up, clockwise.
+Approximate direction from eight 45° octants.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_strict_direction"></a>
+    <strong>to_strict_direction(v)</strong>
+    </dt>
+    <dd>
+    null is up, clockwise.
+Precise direction from four straight lines and four 90° quadrants.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_degrees"></a>
+    <strong>from_degrees(theta, len)</strong>
+    </dt>
+    <dd>
+    these return a vector of length 1 (i.e.  the vector {0,-1} rotated accordingly)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">theta</span>
+
+
+
+        </li>
+        <li><span class="parameter">len</span>
+        up/clockwise
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_radians"></a>
+    <strong>from_radians(theta, len)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">theta</span>
+
+
+
+        </li>
+        <li><span class="parameter">len</span>
+        right anti-clockwise
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_orientation"></a>
+    <strong>from_orientation(o, len)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">o</span>
+
+
+
+        </li>
+        <li><span class="parameter">len</span>
+        up/clockwise
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_direction"></a>
+    <strong>from_direction(d, len)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">d</span>
+
+
+
+        </li>
+        <li><span class="parameter">len</span>
+        up/clockwise
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Rotational_Transformation"></a>Rotational Transformation </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "rotate_offset_by_degrees"></a>
+    <strong>rotate_offset_by_degrees(v, deg)</strong>
+    </dt>
+    <dd>
+    rotates only the /offset/ part of @v
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">deg</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "rotate_origin_by_degrees"></a>
+    <strong>rotate_origin_by_degrees(v, deg, ...)</strong>
+    </dt>
+    <dd>
+    rotates the /current origin/ of @v around the given VectorSpecification
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">deg</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "rotate_both_by_degrees"></a>
+    <strong>rotate_both_by_degrees(v, deg, ...)</strong>
+    </dt>
+    <dd>
+    rotates both the origin and target of @v around @w
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">deg</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "rotate_offset_by_direction"></a>
+    <strong>rotate_offset_by_direction(v, dir)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">dir</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "rotate_origin_by_direction"></a>
+    <strong>rotate_origin_by_direction(v, dir, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">dir</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "rotate_both_by_direction"></a>
+    <strong>rotate_both_by_direction(v, dir, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">dir</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "rotate_offset_by_orientation"></a>
+    <strong>rotate_offset_by_orientation(v, ori)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">ori</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "rotate_origin_by_orientation"></a>
+    <strong>rotate_origin_by_orientation(v, ori, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">ori</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "rotate_both_by_orientation"></a>
+    <strong>rotate_both_by_orientation(v, ori, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">ori</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="UID___Z__Z___N_Pairing_Wrappers"></a>UID / Z×Z→N Pairing Wrappers </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "to_offset_uid"></a>
+    <strong>to_offset_uid(v, mode)</strong>
+    </dt>
+    <dd>
+    offset → UID
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+            <span class="types"><a class="type" href="../api/Concepts.html#Vector">Vector</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">mode</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+        , 'square', 'cantor' or 'spiral'
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_origin_uid"></a>
+    <strong>to_origin_uid(v, mode)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">mode</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_target_uid"></a>
+    <strong>to_target_uid(v, mode)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">mode</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_offset_from_uid"></a>
+    <strong>set_offset_from_uid(v, uid, mode)</strong>
+    </dt>
+    <dd>
+    UID → offset, origin, new
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">uid</span>
+
+
+
+        </li>
+        <li><span class="parameter">mode</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_origin_from_uid"></a>
+    <strong>set_origin_from_uid(v, uid, mode)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">uid</span>
+
+
+
+        </li>
+        <li><span class="parameter">mode</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_uid"></a>
+    <strong>from_uid(...)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Concepts.html#Vector">Vector</a></span>
+        a fresh vector from the null point to UID
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Comparision_of_Vectors"></a>Comparision of Vectors </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "is_offset_equal"></a>
+    <strong>is_offset_equal(v, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_origin_equal"></a>
+    <strong>is_origin_equal(v, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_target_equal"></a>
+    <strong>is_target_equal(v, ...)</strong>
+    </dt>
+    <dd>
+    　
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Conversion_to_other_formats"></a>Conversion to other formats </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "to_box"></a>
+    <strong>to_box(v)</strong>
+    </dt>
+    <dd>
+    an undecorated box (nested table) like used in data stage prototypes
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_area"></a>
+    <strong>to_area(v)</strong>
+    </dt>
+    <dd>
+    a factorio runtime area (includes "lt" and "rb" as linked shortcuts)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_target_position"></a>
+    <strong>to_target_position(v)</strong>
+    </dt>
+    <dd>
+    the position of the end-point of the vector
+add factorio {x=,y=} table position
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_origin_position"></a>
+    <strong>to_origin_position(v)</strong>
+    </dt>
+    <dd>
+    the position of the origin of the vector
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_simple_vector"></a>
+    <strong>to_simple_vector(v)</strong>
+    </dt>
+    <dd>
+    an undecorated vector required by some functions like teleport()
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_point"></a>
+    <strong>to_point(v, ...)</strong>
+    </dt>
+    <dd>
+    makes the vector a point (null vector) at the position it was pointing
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Debugging"></a>Debugging </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "draw"></a>
+    <strong>draw(v[, ttl=60])</strong>
+    </dt>
+    <dd>
+    draws the vector into the world on the first surface with an admin player.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+            <span class="types"><a class="type" href="../api/Concepts.html#Vector">Vector</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">ttl</span>
+            <span class="types"><a class="type" href="../modules/Types.html#Integer">Integer</a></span>
+         How long the render will live.
+         (<em>default</em> 60)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-12-10 22:12:10 </i>
+<i style="float:right;">Last updated 2021-04-23 16:05:18 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

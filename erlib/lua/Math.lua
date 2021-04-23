@@ -23,7 +23,8 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 local table_unpack
     = table.unpack
 
-local floor = math.floor
+local floor     , ceil
+    = math.floor, math.ceil
     
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -59,6 +60,39 @@ function Math.factorial(n)
   return r*sign
   end
 
+  
+----------
+-- Floor of n for non-decimal bases.
+--
+-- @tparam Integer n
+-- @tparam NaturalNumber base
+--
+-- @treturn Integer
+--
+-- @usage
+--   print(Math.floor(33, 16))
+--   >  32
+--   print(Math.floor(-1, 32)
+--   > -32
+--  
+function Math.floor(n, base)
+  -- No input checking. Garbage in garbage out.
+  return floor(n/base) * base -- No attempt at optimization made yet.
+  end
+
+
+----------
+-- Ceil of n for non-decimal bases.
+--
+-- @tparam Integer n
+-- @tparam NaturalNumber base
+--
+-- @treturn Integer
+--
+function Math.ceil(n, base)
+  return ceil(n/base) * base -- No attempt at optimization made yet.
+  end  
+  
   
   
 --------------------------------------------------------------------------------

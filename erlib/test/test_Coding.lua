@@ -56,12 +56,15 @@ local function Test()
   -- At runtime BLuestring automatically uses factorio built-in C functions.
   -- So it is important to run this test at startup too.
   
-  local recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(OKBP))
-  assert(#recompress > 100) --not a nil value
-  
   -- Quirk/Bug? The resulting Base64 representation fluctuates
   -- between exactly TWO different states for infinite en/decode loops
   -- in NP++, but stabilizes after the first cycle in Factorio.
+  
+  -- Future: Assert using the decompressed table instead. (table deep-compare)
+  
+  local recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(OKBP))
+  assert(#recompress > 100) --not a nil value
+  
   -- 
   -- recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) -- print(recompress) 
   -- recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) -- print(recompress) 
@@ -70,10 +73,22 @@ local function Test()
   recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) -- print(recompress) 
   recompress = Coding.Bluestring.encode(Coding.Bluestring.decode(recompress)) -- print(recompress) 
   
-  assert( recompress == -- weird shit sometimes bugs out in NP++. No idea why.
-  Coding.Bluestring.encode(Coding.Bluestring.decode(
-  Coding.Bluestring.encode(Coding.Bluestring.decode(
-  recompress)))) )
+  assert(
+    (recompress == -- weird shit sometimes bugs out in NP++. No idea why.
+      Coding.Bluestring.encode(Coding.Bluestring.decode(
+      Coding.Bluestring.encode(Coding.Bluestring.decode(
+      recompress))))
+      )
+    or 
+    (recompress == -- Even in NP++ either double or quad cycle should work.
+      Coding.Bluestring.encode(Coding.Bluestring.decode(
+      Coding.Bluestring.encode(Coding.Bluestring.decode(
+      Coding.Bluestring.encode(Coding.Bluestring.decode(
+      Coding.Bluestring.encode(Coding.Bluestring.decode(
+      recompress))))))))
+      )
+    )
+
   
   -- alter test: deflate ist nicht stabil in np++
   -- assert( Coding.Bluestring.encode(Coding.Bluestring.decode(OKBP))

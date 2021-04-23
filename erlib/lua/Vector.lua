@@ -3,14 +3,12 @@
 --------------------------------------------------
 -- Point-to-Point 2D Vectors.
 --
--- All Vector methods manipulate the vector in-place.
+-- __All Vector methods manipulate the vector in-place *AND* return it.__
+--
 -- A new instance can be created with Vector:copy().
 -- 
 -- Conversion to other formats via Vector.to_* will obviously not
 -- return a Vector ;).
--- 
--- Vector.to_area() output contains the aliases "lt" and "rb" in
--- addition to the standard format.
 --
 -- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
 -- @{Introduction.Compatibility|Compatibility}: Pure Lua.
@@ -37,8 +35,7 @@
 --
 -- @module Vector
 -- @usage
---  local Vector = require('__eradicators-library__/erlib/factorio/Vector')()
-  
+--  local Vector = require('__eradicators-library__/erlib/lua/Vector')()
   
 -- -------------------------------------------------------------------------- --
 -- Internal Documentation                                                     --
@@ -144,6 +141,27 @@ local function revectorize(v) return setmetatable(v,Vector.class_mt) end
 -- @table todo1
 
 
+
+--------------------------------------------------------------------------------
+-- Examples.
+-- @section
+--------------------------------------------------------------------------------
+
+----------
+-- Create a simple area.
+--
+-- @usage
+--   local my_vector = Vector(1,1) :set_center_to_target(0,0) :to_area()
+--   print(Hydra.line(my_vector))
+--   > {
+--   >   left_top     = {x = -0.5, y = -0.5},
+--   >   right_bottom = {x =  0.5, y =  0.5}
+--   >   lt = nil --[[ self.left_top     ]],
+--   >   rb = nil --[[ self.right_bottom ]],
+--   > }
+--
+--
+-- @table Example1
   
 --------------------------------------------------------------------------------
 -- Concepts.
@@ -202,19 +220,23 @@ local function revectorize(v) return setmetatable(v,Vector.class_mt) end
 -- @section
 --------------------------------------------------------------------------------
 
---[[
-  Usage
-    Vector(Area) :: a factorio area box {left_top={x=,y=},right_bottom={x=,y=}}
-    Vector(BoundingBox) :: a factorio bounding box {{x,y},{x,y}}
-    Vector(Position) :: a factorio position {x=,y=}
-    Vector(Vector) :: a four component vector created by this library
-    Vector(SimpleVector) :: a factorio two component vector {x,y}
-    Vector(Number,Number or nil,Number or nil,Number or nil) 
-      :: Numbers are dx,dy,ox,oy
-      :: if nil then origin defaults to (0,0)
-      :: and dy defaults to dx
-      :: dx is mandatory
-  ]]
+--- Initializes a new vector.
+--
+-- @usage
+-- Vector(Area) :: a factorio area box {left_top={x=,y=},right_bottom={x=,y=}}
+-- Vector(BoundingBox) :: a factorio bounding box {{x,y},{x,y}}
+-- Vector(Position) :: a factorio position {x=,y=}
+-- Vector(Vector) :: a four component vector created by this library
+-- Vector(SimpleVector) :: a factorio two component vector {x,y}
+-- Vector(Number,Number or nil,Number or nil,Number or nil) 
+--   :: Numbers are dx, dy, ox, oy
+--   :: origin defaults to (0,0)
+--   :: dy defaults to dx
+--   :: dx is mandatory
+--
+-- @function Vector
+-- @param ...
+--
 _VectorMeta.__call = {
   [2] = function(x) return isType('number_or_nil')(x) or isType('non_empty_table')(x) or 'VectorSpec' end,
   [3] = 'number_or_nil',
@@ -287,8 +309,11 @@ function Vector.copy(v) return revectorize{v[1],v[2],v[3],v[4]} end
 -- @section
 --------------------------------------------------------------------------------
 
+---　
 function Vector.get_target(v) return v[3]+v[1], v[4]+v[2] end
+---　
 function Vector.get_offset(v) return v[1],v[2]            end
+---　
 function Vector.get_origin(v) return            v[3],v[4] end
 
 --------------------------------------------------------------------------------
@@ -296,15 +321,24 @@ function Vector.get_origin(v) return            v[3],v[4] end
 -- @section
 --------------------------------------------------------------------------------
 
+---　
 function Vector.null_offset(v    ) v[1],v[2] = 0,0 return v end
+---　
 function Vector.null_origin(v    ) v[3],v[4] = 0,0 return v end
---
+
+
+---　
 function Vector.set_offset_to_offset (v,...) v[1],v[2] = Vector(...):get_offset() return v end
+---　
 function Vector.set_offset_to_target (v,...) v[1],v[2] = Vector(...):get_target() return v end
+---　
 function Vector.set_offset_to_origin (v,...) v[1],v[2] = Vector(...):get_origin() return v end
---
+
+---　
 function Vector.set_origin_to_offset (v,...) v[3],v[4] = Vector(...):get_offset() return v end
+---　
 function Vector.set_origin_to_target (v,...) v[3],v[4] = Vector(...):get_target() return v end
+---　
 function Vector.set_origin_to_origin (v,...) v[3],v[4] = Vector(...):get_origin() return v end
 
 --------------------------------------------------------------------------------
@@ -312,11 +346,17 @@ function Vector.set_origin_to_origin (v,...) v[3],v[4] = Vector(...):get_origin(
 -- @section
 --------------------------------------------------------------------------------
 
+---　
 function Vector.mirror_offset_x (v) v[1],v[2] =  v[1],-v[2] return v end
+---　
 function Vector.mirror_offset_y (v) v[1],v[2] = -v[1], v[2] return v end
+---　
 function Vector.mirror_offset_xy(v) v[1],v[2] = -v[1],-v[2] return v end
+---　
 function Vector.mirror_origin_x (v) v[3],v[4] =  v[3],-v[4] return v end
+---　
 function Vector.mirror_origin_y (v) v[3],v[4] = -v[3], v[4] return v end
+---　
 function Vector.mirror_origin_xy(v) v[3],v[4] = -v[3],-v[4] return v end
 
 --------------------------------------------------------------------------------
@@ -324,30 +364,30 @@ function Vector.mirror_origin_xy(v) v[3],v[4] = -v[3],-v[4] return v end
 -- @section
 --------------------------------------------------------------------------------
 
---recalculates the vector to point to the same target from the new origin
---input vectors with non-0,0 origin will be treated as absolute positions
+---recalculates the vector to point to the same target from the new origin
+---input vectors with non-0,0 origin will be treated as absolute positions
 function Vector.set_origin_to_target_keep_target(v,...)
   local wx,wy = Vector(...):get_target()
   v[1],v[2] = v[3]+v[1]-wx,v[4]+v[2]-wy
   v[3],v[4] = wx,wy
   return v end
---shortcut for the common null operation.
+---shortcut for the common null operation.
 function Vector.null_origin_keep_target(v)
   if v[3]~=0 or v[4]~=0 then return v:set_origin_keep_target(0,0) end
   return v end
---recalculates the offset to point at the target of @w
+---recalculates the offset to point at the target of @w
 function Vector.set_target_to_target_keep_origin(v,...)
   local wx,wy = Vector(...):get_target()
   v[1],v[2] = wx-v[3], wy-v[4]
   return v end
---in-place replaces the old vector with a new vector (target of @v -> target of @w)
+---in-place replaces the old vector with a new vector (target of @v -> target of @w)
 function Vector.set_target_to_target_and_set_origin_to_own_target(v,...)
   local wx,wy = Vector(...):get_target()
   v[3],v[4] = v:get_target()
   v[1],v[2] = wx-v[3], wy-v[4]
   return v end
---move the origin of @v to it's own target, and mirrors
---the offset so that the new target is the old origin.
+---move the origin of @v to it's own target, and mirrors
+---the offset so that the new target is the old origin.
 function Vector.swap_origin_with_target(v)
   v[1],v[2],v[3],v[4] = -v[1], -v[2], v[3]+v[1], v[4]+v[2]
   return v end
@@ -357,45 +397,50 @@ function Vector.swap_origin_with_target(v)
 -- @section
 --------------------------------------------------------------------------------
 
---adds components of @w to components of @v
+---adds components of @w to components of @v
 function Vector.add_offset_to_offset(v,...) 
   local wx,wy = Vector(...):get_offset()
   v[1],v[2] = v[1]+wx,v[2]+wy
   return v end
+---　
 function Vector.add_target_to_offset(v,...)
   local wx,wy = Vector(...):get_target()
   v[1],v[2] = v[1]+wx,v[2]+wy
   return v end
+---　
 function Vector.add_offset_to_origin(v,...) 
   local wx,wy = Vector(...):get_offset()
   v[3],v[4] = v[3]+wx,v[4]+wy
   return v end
+---　
 function Vector.add_target_to_origin(v,...)
   local wx,wy = Vector(...):get_target()
   v[3],v[4] = v[3]+wx,v[4]+wy
   return v end
---adds the vector @w to *both* sides of the vector (i.e. twice)
+---adds the vector @w to *both* sides of the vector (i.e. twice)
 function Vector.add_offset_both_ways(v,...)
   local w = Vector(...)
   return
   v:add_offset_to_offset(w:copy():scale_offset(2))
    :add_offset_to_origin(w:mirror_offset_xy()    )
   end
+---　
 function Vector.add_target_both_ways(v,...)
   local w = Vector(...)
   return
   v:add_target_to_offset(w:copy():scale_offset(2))
    :add_target_to_origin(w:mirror_offset_xy()    )
   end
---multiplies the offset/origin with a fixed factor
+---multiplies the offset/origin with a fixed factor
 function Vector.scale_offset(v,n)
   v[1],v[2] = n*v[1],n*v[2]
   return v end
+---　
 function Vector.scale_origin(v,n)
   v[3],v[4] = n*v[3],n*v[4]
   return v end
---scales the offset length by n/2 in each direction
---useful for expanding boxes
+---scales the offset length by n/2 in each direction
+---useful for expanding boxes
 function Vector.scale_both_ways(v,n)
   -- return v:add_offset_to_origin(v:copy():mirror_offset_xy():scale_offset(0.5*n - 0.5)):scale_offset(n)
   v[1],v[2],v[3],v[4] = 
@@ -404,8 +449,8 @@ function Vector.scale_both_ways(v,n)
     v[3] - ( (0.5*n-0.5) * v[1] )   ,
     v[4] - ( (0.5*n-0.5) * v[2] )   
   return v end
---moves the origin of @v so that the center of the line @v_offset -> @v_target
---is positioned on the target of @w
+---moves the origin of @v so that the center of the line @v_offset -> @v_target
+---is positioned on the target of @w
 function Vector.set_center_to_target(v,...)
   local wx,wy = Vector(...):get_target()
   v[3],v[4] = wx - v[1]/2, wy - v[2]/2
@@ -449,7 +494,6 @@ function Vector.set_center_to_target(v,...)
   ]]
   
 --[[ This is a mapping of directions to their factorio number
-
   [0] = defines.direction.north     , -- is 0
   [1] = defines.direction.northeast , -- is 1
   [2] = defines.direction.east      , -- is 2
@@ -459,28 +503,44 @@ function Vector.set_center_to_target(v,...)
   [6] = defines.direction.west      , -- is 6
   [7] = defines.direction.northwest , -- is 7
   [8] = defines.direction.north     , -- is 0 -- eight equals zero
-  ]]
-  
-function Vector.to_radians    (v) return           pi + atan2( v[2],-v[1])            end --right anti-clockwise
-function Vector.to_degrees    (v) return rad2deg ( pi + atan2(-v[1], v[2]) )          end --up/clockwise
-function Vector.to_orientation(v) return         ( pi + atan2(-v[1], v[2]) ) / (2*pi) end --up/clockwise
-function Vector.to_direction  (v) return floor   (v:to_orientation() * 8 + 0.5) % 8   end --up/clockwise
---these return a vector of length 1 (i.e. the vector {0,-1} rotated accordingly)
+--]]
+
+
+---null is right, anti-clockwise
+function Vector.to_radians    (v) return           pi + atan2( v[2],-v[1])            end
+---null is up, clockwise
+function Vector.to_degrees    (v) return rad2deg ( pi + atan2(-v[1], v[2]) )          end
+---null is up, clockwise
+function Vector.to_orientation(v) return         ( pi + atan2(-v[1], v[2]) ) / (2*pi) end
+---null is up, clockwise.
+---Approximate direction from eight 45° octants.
+function Vector.to_direction  (v) return floor   (v:to_orientation() * 8 + 0.5) % 8   end
+---null is up, clockwise.
+---Precise direction from four straight lines and four 90° quadrants.
+function Vector.to_strict_direction(v)
+  local o = v:to_orientation()
+  if o % 0.25 == 0 then return o * 8 else return floor(o * 4) * 2 + 1 end
+  end
+
 _Vector.from_degrees     = { [1] = 'number', [2] = 'number_or_nil' }
 _Vector.from_radians     = { [1] = 'number', [2] = 'number_or_nil' }
 _Vector.from_orientation = { [1] = 'number', [2] = 'number_or_nil' }
 _Vector.from_direction   = { [1] = 'number', [2] = 'number_or_nil' }
+---these return a vector of length 1 (i.e. the vector {0,-1} rotated accordingly)
 function Vector.from_degrees (theta,len) --up/clockwise
   theta = deg2rad(theta)
   return Vector(sin(theta),-cos(theta)):scale_offset(len or 1)
   end
+---　
 function Vector.from_radians (theta,len) -- right anti-clockwise
   return Vector(cos(theta),-sin(theta)):scale_offset(len or 1)
   end
+---　
 function Vector.from_orientation(o,len) --up/clockwise
   local theta = o * 2*math.pi
   return Vector( sin(theta),-cos(theta) ):scale_offset(len or 1)
   end
+---　
 function Vector.from_direction(d,len) --up/clockwise
   return Vector.from_orientation(d/8,len)
   end
@@ -509,20 +569,20 @@ function Vector.raw_rotate (deg,dx,dy,ox,oy)
     return ox + cos_b*dx - sin_b*dy, oy + sin_b*dx + cos_b*dy
     end  
   end  
---rotates only the /offset/ part of @v
 _Vector.rotate_offset_by_degrees = {
   [1] = 'vector', [2] = 'number', }
+---rotates only the /offset/ part of @v
 function Vector.rotate_offset_by_degrees(v,deg)
   v[1],v[2] = Vector.raw_rotate(deg,v[1],v[2],0,0)
   return v end
---rotates the /current origin/ of @v around the given VectorSpecification
 _Vector.rotate_origin_by_degrees = {
   [1] = 'vector', [2] = 'number', }
+---rotates the /current origin/ of @v around the given VectorSpecification
 function Vector.rotate_origin_by_degrees(v,deg,...)
   local wx,wy = Vector(...):get_target()
   v[3],v[4] = Vector.raw_rotate(deg,v[3]-wx,v[4]-wy,wx,wy)
   return v end
---rotates both the origin and target of @v around @w  
+---rotates both the origin and target of @v around @w  
 function Vector.rotate_both_by_degrees (v,deg,...)
   local wx,wy = Vector(...):get_target()
   v[1],v[2] = Vector.raw_rotate(deg,v[1],v[2],0,0)
@@ -535,17 +595,23 @@ function Vector.rotate_both_by_degrees (v,deg,...)
 -- Rotational Transformation (Wrappers)                                       --
 -- -------------------------------------------------------------------------- --
 
+---　
 function Vector.rotate_offset_by_direction(v,dir)
   return Vector.rotate_offset_by_degrees(v,Math.dir2deg(dir)) end
+---　
 function Vector.rotate_origin_by_direction(v,dir,...)
   return Vector.rotate_origin_by_degrees(v,Math.dir2deg(dir),...) end
+---　
 function Vector.rotate_both_by_direction(v,dir,...)
   return Vector.rotate_both_by_degrees(v,Math.dir2deg(dir),...) end
   
+---　
 function Vector.rotate_offset_by_orientation(v,ori)
   return Vector.rotate_offset_by_degrees(v,Math.ori2deg(ori)) end
+---　
 function Vector.rotate_origin_by_orientation(v,ori,...)
   return Vector.rotate_origin_by_degrees(v,Math.ori2deg(ori),...) end
+---　
 function Vector.rotate_both_by_orientation(v,ori,...)
   return Vector.rotate_both_by_degrees(v,Math.ori2deg(ori),...) end
 
@@ -667,7 +733,7 @@ function unpair.cantor(uid)
   return NtoZ(x),NtoZ(y) end
 
 --[[
-  The "elegant" or "square" UID maps (x,y) to ever expansing
+  The "elegant" or "square" UID maps (x,y) to ever expanding
   squares. While it does only support N, the square shape
   remains after mapping Z→N even though the distribution order
   of numbers within each square isn't nicely ordered anymore.
@@ -711,13 +777,19 @@ _Vector.set_origin_from_uid = {'vector','natural_number','nil_or_string'}
 _Vector.from_uid            = {         'natural_number','nil_or_string'}
 do-->
   local default = 'square'
-  --offset → UID
+  ---offset → UID
+  -- @tparam Vector v
+  -- @tparam string mode, 'square', 'cantor' or 'spiral'
   function Vector.to_offset_uid(v,mode) return pair[mode or default](v:get_offset()) end
+  ---　
   function Vector.to_origin_uid(v,mode) return pair[mode or default](v:get_origin()) end
+  ---　
   function Vector.to_target_uid(v,mode) return pair[mode or default](v:get_target()) end
-  --UID → offset,origin,new
+  ---UID → offset, origin, new
   function Vector.set_offset_from_uid(v,uid,mode) v[1],v[2] = unpair[mode or default](uid) return v end
+  ---　
   function Vector.set_origin_from_uid(v,uid,mode) v[1],v[2] = unpair[mode or default](uid) return v end
+  --- @treturn Vector a fresh vector from the null point to UID
   function Vector.from_uid(...) return Vector():set_offset_from_uid(...) end
 end--<
 
@@ -728,14 +800,17 @@ end--<
 -- @section
 --------------------------------------------------------------------------------
 
+---　
 function Vector.is_offset_equal(v,...)
   local w = Vector(...)
   return (v[1]==w[1]) and (v[2]==w[2])
   end
+---　
 function Vector.is_origin_equal(v,...)
   local w = Vector(...)
   return (v[3]==w[3]) and (v[4]==w[4])
   end
+---　
 function Vector.is_target_equal(v,...)
   local wx,wy = Vector(...):get_target()
   local vx,vy = v          :get_target()
@@ -750,40 +825,38 @@ function Vector.is_target_equal(v,...)
 --------------------------------------------------------------------------------
 
 --converts a Vector to a fresh differently formatted table
-do-->
-  local function swap_if_gtr (a,b)
-    if a < b then return a,b
-    else          return b,a
-      end
+do
+  local function swap_if_gtr(a,b)
+    if a < b then return a, b else return b, a end
     end
---an undecorate box like used in data stage prototypes
+---an undecorated box (nested table) like used in data stage prototypes
 function Vector.to_box(v)
   local l,r = swap_if_gtr(v[3]+v[1],v[3])
   local t,b = swap_if_gtr(v[4]+v[2],v[4])
   return {{l,t},{r,b}}
   end
-  end--<
---a factorio runtime area (includes linked shortcuts)
+  end
+---a factorio runtime area (includes "lt" and "rb" as linked shortcuts)
 function Vector.to_area(v)
   local b = v:to_box()
   local lt = {x=b[1][1],y=b[1][2]}
   local rb = {x=b[2][1],y=b[2][2]}
   return {left_top=lt,right_bottom=rb,lt=lt,rb=rb}
   end
---the position of the end-point of the vector
---add factorio {x=,y=} table position
+---the position of the end-point of the vector
+---add factorio {x=,y=} table position
 function Vector.to_target_position(v)
   return {x=v[3]+v[1],y=v[4]+v[2]}
   end
---the position of the origin of the vector
+---the position of the origin of the vector
 function Vector.to_origin_position(v)
   return {x=v[3],y=v[4]}
   end
---an undecorated vector required by some functions like teleport()
+---an undecorated vector required by some functions like teleport()
 function Vector.to_simple_vector(v)
   return {v[3]+v[1],v[4]+v[2]} 
   end
---makes the vector a point (null vector) at the position it was pointing
+---makes the vector a point (null vector) at the position it was pointing
 function Vector.to_point (v,...)
   v[3],v[4] = v[3]+v[1],v[4]+v[2] -- v:set_origin_to_target(v)
   v[1],v[2] = 0,0
@@ -807,6 +880,26 @@ do local mt = getmetatable(Vector)
   end
 
   
+--------------------------------------------------------------------------------
+-- Debugging.
+-- @section
+--------------------------------------------------------------------------------
+
+---draws the vector into the world on the first surface with an admin player.
+-- @tparam Vector v
+-- @tparam[opt=60] Integer ttl How long the render will live.
+function Vector.draw(v, ttl)
+  local i,p=0; repeat i=i+1; p=game.players[i] until (p.connected and p.admin)
+  local rnd = function() return math.random(100,255) end
+  rendering.draw_line {
+    color        = {r = rnd(), g = rnd(), b = rnd()},
+    width        = 1                                ,
+    from         = v:to_origin_position()           ,
+    to           = v:to_target_position()           ,
+    surface      = p.surface                        ,
+    time_to_live = ttl or 60                        ,
+    }
+  return v end
   
 -- -------------------------------------------------------------------------- --
 -- Strict Mode                                                                --

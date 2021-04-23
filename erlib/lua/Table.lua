@@ -648,7 +648,7 @@ function Table.set(tbl,path,value)
 -- @tparam table path
 -- @tparam AnyValue default
 -- 
--- @treturn AnyValue A reference to found value or the default value.
+-- @treturn AnyValue A reference to the found value or the default value.
 -- 
 function Table.sget(tbl,path,default)
   local r = tbl
@@ -760,6 +760,22 @@ function Table.remove(tbl, path)
 -- In-Place Methods.
 -- @section
 --------------------------------------------------------------------------------
+
+----------
+-- __In-place.__ Removes a @{key->value pair} and returns the value.
+-- Alternatively replaces the old value with a new value.
+-- Does not change the order of the remaining elements.
+--
+-- @tparam table tbl
+-- @tparam NotNil key
+-- @tparam[opt=nil] AnyValue value The new value to put into the table.
+--
+-- @treturn AnyValue 
+--
+function Table.pop(tbl, key, value)
+  value, tbl[key] = tbl[key], value
+  return value
+  end
 
   
 ----------
