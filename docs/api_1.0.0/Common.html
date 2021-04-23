@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"><head ><title >Common</title><meta charset="UTF-8"/><link rel="stylesheet" type="text/css" href="lua-doc.css"/><script rel="stylesheet" type="text/javascript" src="lua-doc.js"></script></head><body ><div class="navigation-bar"><span class="navigation"><a href="index.html">Factorio</a> &raquo; Common</span><span class="version">Factorio 1.0.0</span></div><h1 >Common</h1><p ></p><p >
+</p><div class="brief-description"><p >
+  The <code >valid</code> and <code >help</code> members are present in many other types (though not all of them). The meaning of the members is
+  the same across all types.</p><p >  </p><p >  </p><p >  </p><p >
+</p></div><div class="brief-listing"><div class="brief-listing" id="Common.brief"> <span class="type-name">Common</span> - <a class="sort" href="javascript:void(0)" onclick="sort('Common.brief');">sort</a><table class="brief-members"><tr ><td class="header"><span class="element-name"><a href="Common.html#Common.help">help</a>() &rarr; <span class="return-type"><span class="param-type"><a href="Builtin-Types.html#string">string</a></span></span></span></td><td class="description">
+        All methods, and properties that this object supports.</td></tr><tr ><td class="header"><span class="element-name"><a href="Common.html#Common.valid">valid</a></span><span class="attribute-type"> :: <span class="param-type"><a href="Builtin-Types.html#boolean">boolean</a></span></span><span class="attribute-mode"> [R]</span></td><td class="description">
+        Is this object valid?</td></tr><tr ><td class="header"><span class="element-name"><a href="Common.html#Common.object_name">object_name</a></span><span class="attribute-type"> :: <span class="param-type"><a href="Builtin-Types.html#string">string</a></span></span><span class="attribute-mode"> [R]</span></td><td class="description">
+        The class name of this object.</td></tr></table></div></div><div class="element" id="Common"><div class="element" id="Common.help"><div class="element-header"><span class="element-name">help() &rarr; <span class="return-type"><span class="param-type"><a href="Builtin-Types.html#string">string</a></span></span></span></div><div class="element-content"><p >
+    </p><p >    All methods, and properties that this object supports.
+  </p></div></div><div class="element" id="Common.valid"><div class="element-header"><span class="element-name">valid</span><span class="attribute-type"> :: <span class="param-type"><a href="Builtin-Types.html#boolean">boolean</a></span></span><span class="attribute-mode"> [Read-only]</span></div><div class="element-content"><p >
+    </p><p >    Is this object valid? This Lua object holds a reference to an object within
+    the game engine. It is possible that the game-engine object is removed whilst
+    a mod still holds the corresponding Lua object. If that happens, the object
+    becomes invalid, i.e. this attribute will be <code >false</code>. Mods are advised to
+    check for object validity if any change to the game state might have occurred
+    between the creation of the Lua object and its access.
+  </p></div></div>
+<div class="element" id="Common.object_name"><div class="element-header"><span class="element-name">object_name</span><span class="attribute-type"> :: <span class="param-type"><a href="Builtin-Types.html#string">string</a></span></span><span class="attribute-mode"> [Read-only]</span></div><div class="element-content"><p >
+    </p><p >    The class name of this object. Available even when <code >valid</code> is false. For LuaStruct 
+    objects it may also be suffixed with a dotted path to a member of the struct.
+  </p></div></div></div></body></html>

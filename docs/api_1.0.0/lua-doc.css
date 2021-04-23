@@ -1,0 +1,154 @@
+body {
+    margin-left: 8em;
+    margin-right: 8em;
+    background-color: #262626;
+    color: #C8C8C8;
+    font-family: sans-serif;
+    font-size: 14px;
+}
+
+a {
+    color: #FF7200;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #FFFFFF;
+}
+
+ul {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.navigation-bar {
+    display: inline-block;
+    width: 100%;
+    background-color: #181818;
+    padding-right: 0.5em;
+    font-size: 90%;
+}
+
+.version {
+    float: right;
+}
+
+.navigation {
+    float: left;
+}
+
+.element {
+    margin-top: 1em;
+    padding-left: 3px;
+}
+
+.element:target {
+    border-left: 5px solid #FF7200;
+}
+
+.element-header {
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 2em;
+}
+
+.element-name {
+    font-family: monospace;
+}
+
+.element-content {
+    margin-left: 2em;
+}
+
+.detail {
+    margin-top: 1em;
+}
+
+.detail-header {
+    font-weight: bold;
+    font-size: 110%;
+    margin-bottom: 3px;
+}
+
+.detail-content {
+    margin-left: 2em;
+}
+
+.attribute-type {
+    font-family: monospace;
+}
+
+.attribute-mode {
+    font-style: italic;
+}
+
+code.block {
+    background-color: #181818;
+    display: inline-block;
+    margin-left: 1em;
+    margin-top: 5px;
+    padding: 5px;
+}
+
+.type-name {
+    font-family: monospace;
+}
+
+.brief-listing {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+.brief-listing:target {
+    border-left: 5px solid #FF7200;
+}
+
+.brief-listing-empty {
+}
+
+.brief-listing .sort {
+    color: #777;
+}
+
+.brief-members {
+    margin-left: 2em;
+    list-style-type: none;
+    border-collapse: collapse;
+}
+
+.brief-members td {
+    padding-bottom: 3px;
+    border-top: 1px dotted #363636;
+    border-bottom: 1px dotted #363636;
+}
+
+.brief-inherited {
+    margin-left: 2em;
+}
+
+.header {
+    font-family: monospace;
+    width: 25em;
+    text-indent: -2em;
+    padding-left: 2em;
+}
+
+.description {
+    margin-left: 1em;
+}
+
+.example {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    background-color: #363636;
+    padding: 5px;
+}
+
+.example-header {
+    font-weight: bold;
+}
+
+.note {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}

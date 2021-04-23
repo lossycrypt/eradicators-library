@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head ><title >Migrations</title><meta charset="UTF-8"/><link rel="stylesheet" type="text/css" href="lua-doc.css"/><script rel="stylesheet" type="text/javascript" src="lua-doc.js"></script></head><body ><div class="navigation-bar"><span class="navigation"><a href="index.html">Factorio</a> &raquo; Migrations</span><span class="version">Factorio 1.0.0</span></div><h1 >Migrations</h1><p ></p><p >
+<!DOCTYPE html><html lang="en"><head ><title >Migrations</title><meta charset="UTF-8"/><link rel="stylesheet" type="text/css" href="lua-doc.css"/><script rel="stylesheet" type="text/javascript" src="lua-doc.js"></script></head><body ><div class="navigation-bar"><span class="navigation"><a href="index.html">Factorio</a> &raquo; Migrations</span><span class="version">Factorio 1.1.32</span></div><h1 >Migrations</h1><p ></p><p >
 Migrations are a way to fix up a save file which was used in an older version of the game or mod. Migrations are any .lua file or any .json file stored in the mod&#x27;s &quot;migrations&quot; folder.</p><p >Migrations are sorted by mod order first and then by the migration file name using <a href="http://en.cppreference.com/w/cpp/algorithm/lexicographical_compare"> lexicographical comparison</a>. Each save file remembers which migrations from which mods have been applied and will not apply the same migration twice. When adding a mod to an existing save all migration scripts for that mod will be run. Migrations are typically used to but are not limited to: changing prototype types or correct research/recipe states after changes.</p><p >JSON prototype migrations allow changing one prototype to another prototype. Typically this is done when re-naming something.</p><div class="example"><div class="example-header">Example</div>
   stone-wall was previously named &quot;wall&quot; and was re-named:
   <div class="block-code-container"><code class="block">  {<br/>
@@ -20,7 +20,7 @@ Migrations are a way to fix up a save file which was used in an older version of
 <br/>
   &nbsp;&nbsp;recipes["rail-chain-signal"].enabled&nbsp;=&nbsp;technologies["rail-signals"].researched<br/>
 <br/>
-  &nbsp;&nbsp;if&nbsp;technologies["tanks"].researched&nbsp;then<br/>
+  &nbsp;&nbsp;if&nbsp;technologies["tank"].researched&nbsp;then<br/>
   &nbsp;&nbsp;&nbsp;&nbsp;recipes["explosive-cannon-shell"].enabled&nbsp;=&nbsp;true<br/>
   &nbsp;&nbsp;end<br/>
   end</code></div>
