@@ -1,32 +1,25 @@
 ---------------------------------------------------------------------------------------------------
-Version: 9.9.9
-Date: 2020-xx-xx
-  Roadmap:
-    - Make pure lua parts of the library seperately loadable.
-    - Make the library loadable in a "static" manner where it does not configure itself.
-    - Add auto-config function to set up the full library once inside a mod. Including dev-flags.
-    - Include proper locale in flag mods? or is in erlib enough
----------------------------------------------------------------------------------------------------
 Version: 4.1.2
-Date: 2020-12-x
+Date: 2021-x-x
   Internal:
     - ?
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.1
-Date: 2020-12-x
+Date: 2021-04-x
   Internal:
     - ?
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.0
-Date: 2020-12-19
+Date: 2021-04-23
   Functions:
     - Added Table.pop
+    - Added is_whitelist to Table.clear + Test. Does not affect previous usage.
     - Added Math.floor and Math.ceil
     - Added Vector.draw for debugging.
     - Added Vector.to_strict_direction.
   Internal:
     - Updated to factorio base version 1.1.
-    - Added decorations to Vector to make it fully parsable by LDoc.
+    - Added code decorations to Vector to make it fully parsable by LDoc.
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.19
 Date: 2020-11-02
@@ -176,3 +169,11 @@ Version: 3.0.0
 Date: 2020-03-10
   Internal:
     - Split into seperate mod to make it easier to update when future factorio versions start breaking stuff again.
+---------------------------------------------------------------------------------------------------
+Version: 0.0.1
+Date: 0000-00-00
+  Roadmap:
+    - Make pure lua parts of the library seperately loadable.
+    - Make the library loadable in a "static" manner where it does not configure itself.
+    - Add auto-config function to set up the full library once inside a mod. Including dev-flags.
+    - Include proper locale in flag mods? or is in erlib enough

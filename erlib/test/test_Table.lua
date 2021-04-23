@@ -286,6 +286,11 @@ local function Test()
   do
     assert(false == Table(tbl1())        :is_empty())
     assert(true  == Table(tbl1()):clear():is_empty())
+    local t3 = {'a','b','c','d','e'}
+    local t4 = {a=1,b=2,c=3,d=4,e=5}
+    assert(equ(t3, Table.clear(tbl1(), {1,2,3,4,5}, nil  ))) -- whitelist
+    assert(equ(t3, Table.clear(tbl1(), {1,2,3,4,5}, true ))) -- whitelist
+    assert(equ(t4, Table.clear(tbl1(), {1,2,3,4,5}, false))) -- blacklist
     end
     
   -- Table.overwrite

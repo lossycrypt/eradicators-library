@@ -887,17 +887,25 @@ function Table.insert_once(tbl,key,value)
 -- 
 -- @tparam table tbl
 -- @tparam DenseArray except_keys These keys will not be deleted.
+-- @tparam[opt=true] is_whitelist If set to false *only* the except_keys will be deleted.
 --
 -- @treturn table The now empty input table.
 --
-function Table.clear(tbl,except_keys)
+function Table.clear(tbl,except_keys,is_whitelist)
   if not except_keys then
     for k in pairs(tbl) do tbl[k] = nil end
     return _toTable(tbl)
   else
-    local keep = {}; for _,k in pairs(except_keys) do keep[k] = true end
-    for k in pairs(tbl) do if not keep[k] then tbl[k] = nil end end
-    return _toTable(tbl)
+    -- whitelist, keep only listed keys (default)
+    if is_whitelist ~= false then
+      local keep = {}; for _,k in pairs(except_keys) do keep[k] = true end
+      for k in pairs(tbl) do if not keep[k] then tbl[k] = nil end end
+      return _toTable(tbl)
+    -- blacklist, keep only unlisted keys
+    else
+      for _, k in pairs(except_keys) do tbl[k] = nil end
+      return _toTable(tbl)
+      end
     end
   end
 
