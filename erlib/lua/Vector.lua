@@ -126,7 +126,7 @@ local _Vector,_VectorMeta     = {},{} --verificators (legacy)
 -- -------------------------------------------------------------------------- --
 
 --shortcut to internally reattach the metatable without type detection
-local function revectorize(v) return setmetatable(v,Vector.class_mt) end
+local function revectorize(v) return setmetatable(v, Vector.object_mt) end
 
 
 
@@ -545,7 +545,7 @@ function Vector.from_direction(d,len) --up/clockwise
   return Vector.from_orientation(d/8,len)
   end
 
-  
+
   
 --------------------------------------------------------------------------------
 -- Rotational Transformation.
@@ -857,12 +857,16 @@ function Vector.to_simple_vector(v)
   return {v[3]+v[1],v[4]+v[2]} 
   end
 ---makes the vector a point (null vector) at the position it was pointing
-function Vector.to_point (v,...)
+function Vector.to_point(v)
   v[3],v[4] = v[3]+v[1],v[4]+v[2] -- v:set_origin_to_target(v)
   v[1],v[2] = 0,0
   return v end
+---The real length of the vector which replaces the __len (#) operator.
+function Vector.to_length(v) return sqrt(abs(v[1])^2 + abs(v[2])^2) end
+Vector.object_mt.__len = Vector.to_length
+---　
+function Vector.to_manhatten_distance(v) return abs(v[1]) + abs(v[2]) end
 
-  
   
 -- -------------------------------------------------------------------------- --
 -- Alias                                                                      --

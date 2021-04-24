@@ -210,7 +210,8 @@ function Class.SimpleClass(initializer, finalizer)
 function Class.SwitchCaseClass(analyzer,cases)
   local class, class_mt = {}, {}
   local object_mt = {__index=class}
-
+  class.object_mt = object_mt -- expose for outside extension
+  
   local switch = SwitchCase(analyzer,cases)
   
   ------------------------------------------------------------------------------
@@ -263,11 +264,11 @@ function Class.SwitchCaseClass(analyzer,cases)
   --
   -- @function MySwitchCaseClass.reclassify
   function class .reclassify (object)
-      return setmetatable(object,object_mt)
+      return setmetatable(object, object_mt)
       end
   
   
-  return setmetatable(class,class_mt)
+  return setmetatable(class, class_mt)
   end
 
 

@@ -273,7 +273,7 @@
 -- Depending on context they're either called _input_ or _control_.
 --
 -- @usage
---  -- Factorio Version 1.0.0
+--  -- Factorio Version 1.1.32
 --  -- Extracted from [controls] section of \data\core\locale\en\core.cfg
 --
 --  There are currently 149 different controls.
@@ -356,15 +356,39 @@
 --
 -- @table InputName
 
-local function format_controls(controls)
-  -- Formats the above list of possible controls.
-  -- Input is a string of the whole [controls] block
-  -- without the header, but including the translations.
-  local r = {}
-  for s in controls:gmatch('(.-)=.-\n') do r[#r+1] = "'"..s.."'" end
-  print(('--  There are currently %d different controls.\n--'):format(#r))
-  for i=1, #r, 2 do
-    print(("--  %-37s, %-37s,"):format(r[i],r[i+1] or ''))
+
+do -- Don't forget to also update Verificate.isType.InputName()!
+
+  local path = 'H:/factorio/instances/[shared-read]/latest/data/core/locale/en/core.cfg'
+
+  local function read_whole_file(path)
+    local file = io.open(path)
+    local data = file:read('*a')
+    file:close()
+    return data
     end
+
+  local function format_controls(controls)
+    -- Formats the above list of possible controls.
+    -- Input is a string of the whole [controls] block
+    -- without the header, but including the translations.
+    local r = {}
+    for s in controls:gmatch('(.-)=.-\n') do r[#r+1] = "'"..s.."'" end
+    local r2 = {('--  There are currently %d different controls.\n--'):format(#r)}
+    for i=1, #r, 2 do
+      r2[#r2+1] = ("\n--  %-37s, %-37s,"):format(r[i],r[i+1] or '')
+      end
+    return table.concat(r2)
+    end
+
+  local function write_to_windows_clipboard(str)
+    -- uses a pipe to the build-in "clip.exe"
+    io.popen('clip','w'):write(str):close()
+    end
+    
+  write_to_windows_clipboard(
+    format_controls(
+      read_whole_file(path):match('\n%[controls%]\n(.-)\n%[')
+      )
+    )
   end
-print('\n\n'); format_controls(controls)

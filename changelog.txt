@@ -7,7 +7,12 @@ Date: 2021-x-x
 Version: 4.1.1
 Date: 2021-04-x
   Internal:
-    - ?
+    - Updated list of input names to 1.1.32 for Types documentation
+      and Verificate.isType.InputName.
+    - Added Vector.to_length, #-operator aka __len metamethod.
+    - Added Vector.to_manhatten_distance
+  Bugfixes:
+    - Fixed Vector.copy did not set the metatable.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.0
 Date: 2021-04-23
