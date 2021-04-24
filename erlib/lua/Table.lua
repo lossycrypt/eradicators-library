@@ -887,7 +887,7 @@ function Table.insert_once(tbl,key,value)
 -- 
 -- @tparam table tbl
 -- @tparam DenseArray except_keys These keys will not be deleted.
--- @tparam[opt=true] is_whitelist If set to false *only* the except_keys will be deleted.
+-- @tparam[opt=true] boolean is_whitelist If set to false *only* the except_keys will be deleted.
 --
 -- @treturn table The now empty input table.
 --
