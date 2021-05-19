@@ -87,6 +87,16 @@ local function Test()
       Coding.Bluestring.encode(Coding.Bluestring.decode(
       recompress))))))))
       )
+    or 
+    (recompress == -- Narf.
+      Coding.Bluestring.encode(Coding.Bluestring.decode(
+      Coding.Bluestring.encode(Coding.Bluestring.decode(
+      Coding.Bluestring.encode(Coding.Bluestring.decode(
+      Coding.Bluestring.encode(Coding.Bluestring.decode(
+      Coding.Bluestring.encode(Coding.Bluestring.decode(
+      Coding.Bluestring.encode(Coding.Bluestring.decode(
+      recompress))))))))))))
+      )
     )
 
   

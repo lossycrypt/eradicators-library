@@ -101,7 +101,7 @@ function Lock.AutoLock (tbl,name,passphrase,err_write,err_read)
 
   --already locked?
   if debug.getmetatable(tbl) then
-    stop(('Can not lock "%s".'):format(name),'It already has another metatable.')
+    stop(('Can not lock "%s".'):format(name),' It already has another metatable.')
     end
     
   if type(name) ~= 'string' then

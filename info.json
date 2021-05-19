@@ -2,11 +2,11 @@
   "title"            : "Eradicator's L.I.B.R.A.R.Y.",
   "name"             : "eradicators-library",
   "author"           : "eradicator",
-  "version"          : "4.1.1",
+  "version"          : "4.1.2",
   "factorio_version" : "1.1",
   "contact"          : "Check the mod portal \"Discussions\" tab (link below).",
   "license"          : "Creative Commons Attribution-NoDerivatives 4.0 International License",
-  "description"      : "The mechanical soul of many of my mods.",
+  "description"      : "The mechanical soul my mods.",
   "dependencies"     : [
     "(?) zz-universal-locale >= 0.0.1",
     "base >= 1.1.32"

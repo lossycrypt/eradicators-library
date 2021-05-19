@@ -230,11 +230,11 @@ local function _do_log_raw(stdout,self,level,msg)
   local info = debug_getinfo(2,'Sl')
   local msg = string_format(
     --PREFIX [modname](file:line)[header] msg
-    '%s [%s](%-19s:%4s) [%-19s] %s',
+    '%s [%-19s](%-19s:%4s) [%-19s] %s',
     self.prefix[level],      
     -- Name of the mod that *created* the logger.
     -- Possibly different of mod that calls the logger.
-    self.user_mod_name,
+    self.user_mod_name:sub(-19),
     -- Factorio logger only shows *this* file location when logging,
     -- so it's always nessecary to include the *executing* file:line.
     (not info) and '' or info.short_src:gsub('__[%a-_]+__/',''):gsub('%.lua$',''):sub(-19),

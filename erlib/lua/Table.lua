@@ -764,7 +764,7 @@ function Table.remove(tbl, path)
 ----------
 -- __In-place.__ Removes a @{key->value pair} and returns the value.
 -- Alternatively replaces the old value with a new value.
--- Does not change the order of the remaining elements.
+-- Does __not__ change the order of the remaining elements.
 --
 -- @tparam table tbl
 -- @tparam NotNil key

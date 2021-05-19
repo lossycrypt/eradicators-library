@@ -536,12 +536,13 @@ isType.EmptyArray = isType.EmptyTable
 isType['true'] = function (obj)
   return obj == true
   end
-
+isType[true] = isType['true']
+  
 --- @function isType.false  
 isType['false'] = function (obj)
   return obj == false
   end
-    
+isType[false] = isType['false']
 
 --------------------------------------------------------------------------------
 -- isType → String.
@@ -766,12 +767,14 @@ function isType.InputName (obj)
 -- those alrelady have nil variants.
 
 local function isTypeOrNil(name)
-  local f = isType[name]
-  local f_nil = function(obj)
-    if obj == nil then return true end
-    return f(obj)
+  if type(name) == 'string' then -- exclude boolean true/false
+    local f = isType[name]
+    local f_nil = function(obj)
+      if obj == nil then return true end
+      return f(obj)
+      end
+    isType['nil|'..name] = f_nil
     end
-  isType['nil|'..name] = f_nil
   end
 
 for name in pairs(
@@ -813,7 +816,7 @@ local function _verification_failed(obj,typ,...)
 -- Raises an error if the input object is not of the expected type.
 -- 
 -- @tparam AnyValue obj
--- @tparam string typ An isType compatible string.
+-- @tparam string|boolean typ An isType identifier.
 -- @tparam[opt] AnyValue ... Anything you want to show up in the error message.
 --
 -- @treturn AnyValue|error If the check succeeds this returns obj, if not 
