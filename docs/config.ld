@@ -183,9 +183,9 @@ local function KeywordPage(
     local name = name_template:format(main_result:match(name_pattern))
     return
       (name ~= '') and name or 'Name was empty string!'
-      ,url_template:format(main_result:match(url_pattern ))
+      ,url_template:format(main_result:match(url_pattern))
     end
-  custom_see_handler(main_pattern,f)
+  custom_see_handler(main_pattern, f)
   end
   
 
@@ -274,11 +274,22 @@ KeywordPage(
 -- Keyword: FAPI
 -- Page   : Page.html#Section
 -- Name   : Section
+-- Example: @{FAPI Libraries table_size}
+
+-- KeywordPage(
+--   '^FAPI (.*)$'
+--   ,'../api/%s.html#%s','^([%w_]+)[%. ]?([%w_]*) ?'
+--   ,'%s%s', '^[%w_]+[%. ]?([%w_]*) ?(.-)$'
+--   ) 
+
+-- 2021-05-19: Stümperfix "%-" für "Data-lifecycle"? Macht das was kaputt?
+-- Ergebnis von mehreren Stunden Trial+Error: Keine Ahnung wie man das fixt.
 KeywordPage(
   '^FAPI (.*)$'
-  ,'../api/%s.html#%s','^([%w_]+)[%. ]?([%w_]*) ?'
+  ,'../api/%s.html#%s','^([%w%-_]+)[%. ]?([%w_]*) ?'
   ,'%s%s', '^[%w_]+[%. ]?([%w_]*) ?(.-)$'
-  )
+  ) 
+  
   
   
 -- -- Keyword: Lua.*Prototype

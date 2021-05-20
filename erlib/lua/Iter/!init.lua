@@ -39,11 +39,12 @@ Iter.combinations = elreq('erlib/lua/Iter/combinations')()
 Iter.permutations = elreq('erlib/lua/Iter/permutations')()
 Iter.subsets      = elreq('erlib/lua/Iter/subsets')()
 
-Iter.deep_pairs  = elreq('erlib/lua/Iter/deep_pairs' )()
-Iter.sync_tuples = elreq('erlib/lua/Iter/sync_tuples')()
+-- Iter.deep_pairs   = elreq('erlib/lua/Iter/deep_pairs' )() -- too complex
+Iter.sync_tuples  = elreq('erlib/lua/Iter/sync_tuples')()
+Iter.ntuples      = elreq('erlib/lua/Iter/ntuples')()
 
 
-Iter.filter_pairs  = elreq('erlib/lua/Iter/filter_pairs' )()
+Iter.filter_pairs = elreq('erlib/lua/Iter/filter_pairs' )()
 -- Iter.map_tuples  = elreq('erlib/lua/Iter/map_tuples' )()
 
 -- Iter.map_tuples is trivial to emulate with sync_tuples so
@@ -53,7 +54,6 @@ Iter.filter_pairs  = elreq('erlib/lua/Iter/filter_pairs' )()
 --   local result = f(v1,v2,v3)
 --   DoStuff()
 --   end
-
 
 
 

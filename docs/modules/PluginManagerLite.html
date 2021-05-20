@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Public_methods">Public methods </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Core.html">Core</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/Data.html">Data</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Entity.html">Entity</a></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/EventManagerLite.html">EventManagerLite</a></li>
+  <li><a href="../modules/Force.html">Force</a></li>
+  <li><a href="../modules/Player.html">Player</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
+  <li><strong>PluginManagerLite</strong></li>
+  <li><a href="../modules/Remote.html">Remote</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Train.html">Train</a></li>
+  <li><a href="../modules/Array.html">Array</a></li>
+  <li><a href="../modules/Class.html">Class</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Color.html">Color</a></li>
+  <li><a href="../modules/Compare.html">Compare</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Iter.html">Iter</a></li>
+  <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/LocalisedString.html">LocalisedString</a></li>
+  <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
+  <li><a href="../modules/Logic.html">Logic</a></li>
+  <li><a href="../modules/Math.html">Math</a></li>
+  <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Polygon.html">Polygon</a></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
+  <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
+  <li><a href="../modules/Time.html">Time</a></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Vector.html">Vector</a></li>
+  <li><a href="../modules/Verificate.html">Verificate</a></li>
+  <li><a href="../modules/Version.html">Version</a></li>
+  <li><a href="../modules/remotes.html">remotes</a></li>
+  <li><a href="../modules/snippet.html">snippet</a></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/Introduction.html">Introduction</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>PluginManagerLite</code></h1>
+<p>Helper for developing mod-like plugins and softmods.</p>
+<p> PluginManagerLite Requires unrestricted exclusive access to
+ <code>global.plugin_manager</code>. Do not touch it.</p>
+
+<p> <strong>Dependency:</strong> Implicitly loads <a href="../modules/EventManagerLite.html#">EventManagerLite</a>.</p>
+
+<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local PluginManager = require(&apos;__eradicators-library__/erlib/factorio/PluginManagerLite-1&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#Public_methods">Public methods </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Public.make_asset_getter">Public.make_asset_getter(plugin_name, mod_name)</a></td>
+	<td class="summary">A function to convert relative asset paths into absolute file paths.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Public.make_relative_require">Public.make_relative_require(plugin_name, mod_name)</a></td>
+	<td class="summary">Creates a require function that works relative to a plugins directory.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Public.manage_savedata">Public.manage_savedata(plugin_name, setter)</a></td>
+	<td class="summary">Automatically creates local references to global.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Public.classify_savedata">Public.classify_savedata(plugin_name, methods)</a></td>
+	<td class="summary">Automatically adds meta methods to Savedata.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Public.enable_savedata_garbage_collector">Public.enable_savedata_garbage_collector()</a></td>
+	<td class="summary">Must be called after all plugins have called manage_savedata.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Public_methods"></a>Public methods </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Public.make_asset_getter"></a>
+    <strong>Public.make_asset_getter(plugin_name, mod_name)</strong>
+    </dt>
+    <dd>
+    A function to convert relative asset paths into absolute file paths. </p>
+
+<p> f('/file-name.png') -> '<strong>mod-name</strong>/assets/plugin-name/file-name.png'
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">plugin_name</span>
+
+
+
+        </li>
+        <li><span class="parameter">mod_name</span>
+        if mod<em>name == 'local' then mod</em>name = erlib.Const.mod_name end
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Public.make_relative_require"></a>
+    <strong>Public.make_relative_require(plugin_name, mod_name)</strong>
+    </dt>
+    <dd>
+    Creates a require function that works relative to a plugins directory.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">plugin_name</span>
+
+
+
+        </li>
+        <li><span class="parameter">mod_name</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Public.manage_savedata"></a>
+    <strong>Public.manage_savedata(plugin_name, setter)</strong>
+    </dt>
+    <dd>
+    Automatically creates local references to global.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">plugin_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">setter</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         Will be called setter(Savedata).
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> Savedata; PM.manage_savedata(<span class="string">'my-plugin'</span>, <span class="keyword">function</span>(_) Savedata = _ <span class="keyword">end</span>)
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Public.classify_savedata"></a>
+    <strong>Public.classify_savedata(plugin_name, methods)</strong>
+    </dt>
+    <dd>
+    Automatically adds meta methods to Savedata.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">plugin_name</span>
+
+
+
+        </li>
+        <li><span class="parameter">methods</span>
+        Each plugin shares a single metatable.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Public.enable_savedata_garbage_collector"></a>
+    <strong>Public.enable_savedata_garbage_collector()</strong>
+    </dt>
+    <dd>
+    Must be called after all plugins have called manage_savedata. </p>
+
+<p> Assumes Savedata contains subtables players, surfaces and/or forces,
+ using the respective objects "index" as keys.</p>
+
+<p> Automatically deletes related subtable when the object is removed from the game.
+ Because it's really easy to forget about this.</p>
+
+<p> Can only be uesd after ???.
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2021-05-20 15:12:50 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

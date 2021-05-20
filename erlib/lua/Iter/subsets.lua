@@ -58,7 +58,7 @@ local function Table_array_size(tbl)
 --
 -- __Time complexity:__ It depends \*cough\*.
 --
--- __Note:__ Despite the name sub-"set" all in- and output use array format for
+-- __Note:__ Despite the name sub-"set" all in- and outputs use array format for
 -- better performance.
 --
 -- __See also:__ @{Iter.combinations}, @{Iter.permutations}

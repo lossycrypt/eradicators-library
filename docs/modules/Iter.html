@@ -35,8 +35,8 @@
 <li><a href="#Todo">Todo </a></li>
 <li><a href="#lua_Iter_array_pairs_Functions">lua.Iter.array_pairs Functions</a></li>
 <li><a href="#lua_Iter_combinations_Functions">lua.Iter.combinations Functions</a></li>
-<li><a href="#lua_Iter_deep_pairs_Functions">lua.Iter.deep_pairs Functions</a></li>
 <li><a href="#lua_Iter_filter_pairs_Functions">lua.Iter.filter_pairs Functions</a></li>
+<li><a href="#lua_Iter_ntuples_Functions">lua.Iter.ntuples Functions</a></li>
 <li><a href="#lua_Iter_permutations_Functions">lua.Iter.permutations Functions</a></li>
 <li><a href="#lua_Iter_subsets_Functions">lua.Iter.subsets Functions</a></li>
 <li><a href="#lua_Iter_sync_tuples_Functions">lua.Iter.sync_tuples Functions</a></li>
@@ -53,9 +53,11 @@
   <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
   <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/EventManagerLite.html">EventManagerLite</a></li>
   <li><a href="../modules/Force.html">Force</a></li>
   <li><a href="../modules/Player.html">Player</a></li>
   <li><a href="../modules/PluginManager.html">PluginManager</a></li>
+  <li><a href="../modules/PluginManagerLite.html">PluginManagerLite</a></li>
   <li><a href="../modules/Remote.html">Remote</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
   <li><a href="../modules/Train.html">Train</a></li>
@@ -132,34 +134,18 @@
 	<td class="summary">Iterates over all n-length combinations of the given values.</td>
 	</tr>
 </table>
-<h2><a href="#lua_Iter_deep_pairs_Functions">lua.Iter.deep_pairs Functions</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#deep_pairs">deep_pairs(tbl, opt)</a></td>
-	<td class="summary">A for-loop compatible depth-first non-recursive STATEFUL iterator.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#deep_pair_options">deep_pair_options</a></td>
-	<td class="summary">
-
-</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#deep_pair_options-todo5">deep_pair_options-todo5</a></td>
-	<td class="summary">add "skip redundant tables" -> never parse the same unique table twice</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#deep_pair_options-todo5-fixme6">deep_pair_options-todo5-fixme6</a></td>
-	<td class="summary"> use pairs() to get the correct iterator instaed of hardcoded next()?
- how does that affect the speed of tables without _<em>pairs metamethod?
- local key,value = (pairs(tbl))(tbl,current</em>path_keys[depth])</td>
-	</tr>
-</table>
 <h2><a href="#lua_Iter_filter_pairs_Functions">lua.Iter.filter_pairs Functions</a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#filter_pairs">filter_pairs(tbl, f)</a></td>
 	<td class="summary">Returns only <a href="../modules/Types.html#KeyValuePair">(key → value)</a> pairs for which f(value,key,tbl) returns true.</td>
+	</tr>
+</table>
+<h2><a href="#lua_Iter_ntuples_Functions">lua.Iter.ntuples Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#ntuples">ntuples(n[, tbl])</a></td>
+	<td class="summary">Iterates nested subtables in a single loop.</td>
 	</tr>
 </table>
 <h2><a href="#lua_Iter_permutations_Functions">lua.Iter.permutations Functions</a></h2>
@@ -329,113 +315,6 @@
 
 </dd>
 </dl>
-    <h2 class="section-header "><a name="lua_Iter_deep_pairs_Functions"></a>lua.Iter.deep_pairs Functions</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "deep_pairs"></a>
-    <strong>deep_pairs(tbl, opt)</strong>
-    </dt>
-    <dd>
-    A for-loop compatible depth-first non-recursive STATEFUL iterator.
- The iterator does not take any input and always returns the next items.
- Key finding uses next(). When a loop is encoutered with verbose<em>loop</em>logging != nil
- then any later found entrance points to the loop will be ignored.</p>
-
-<p> LUA MANUAL about next():
-   The behavior of next is undefined if, during the traversal, you assign any value
-   to a non-existent field in the table. You may however modify existing fields. In
-   particular, you may clear existing fields.</p>
-
-
-<p> <a href="../source/Introduction.html#DevelopmentStatus">Development Status</a>: Work in progress.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">tbl</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
-         the table to be iterated.
-        </li>
-        <li><span class="parameter">opt</span>
-            <span class="types"><span class="type">deep_pair_options</span> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "deep_pair_options"></a>
-    <strong>deep_pair_options</strong>
-    </dt>
-    <dd>
-
-
-
-
-
-    <h3>Fields:</h3>
-    <ul>
-        <li><span class="parameter">max_depth</span>
-            <span class="types"><a class="type" href="../api/Builtin-Types.html#int">int</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
-         10000, paranoia option to prevent freezing on very large objects
-        </li>
-        <li><span class="parameter">verbose_loop_logging</span>
-            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
-         nil:error,true:logging,false:silent
-        </li>
-        <li><span class="parameter">include_subtables</span>
-            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
-         false
-        </li>
-        <li><span class="parameter">return_path</span>
-            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
-         false (include copy of path table in output? slower.)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "deep_pair_options-todo5"></a>
-    <strong>deep_pair_options-todo5</strong>
-    </dt>
-    <dd>
-    add "skip redundant tables" -> never parse the same unique table twice
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "deep_pair_options-todo5-fixme6"></a>
-    <strong>deep_pair_options-todo5-fixme6</strong>
-    </dt>
-    <dd>
-     use pairs() to get the correct iterator instaed of hardcoded next()?
- how does that affect the speed of tables without _<em>pairs metamethod?
- local key,value = (pairs(tbl))(tbl,current</em>path_keys[depth])
-
-
-
-
-
-
-
-</dd>
-</dl>
     <h2 class="section-header "><a name="lua_Iter_filter_pairs_Functions"></a>lua.Iter.filter_pairs Functions</h2>
 
     <dl class="function">
@@ -478,6 +357,96 @@
 <span class="keyword">for</span> unit_number,_ <span class="keyword">in</span> <span class="global">pairs</span>(global.MyEntityData,filter) <span class="keyword">do</span>
    global.MyEntityData[unit_number] = <span class="keyword">nil</span>
    <span class="keyword">end</span>
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="lua_Iter_ntuples_Functions"></a>lua.Iter.ntuples Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "ntuples"></a>
+    <strong>ntuples(n[, tbl])</strong>
+    </dt>
+    <dd>
+    Iterates nested subtables in a single loop. </p>
+
+<p> Internally uses <a href="../lua-5.2/doc/manual.html#pdf-pairs">pairs()</a> to get each
+ sub-table's __pairs metamethod or <a href="../lua-5.2/doc/manual.html#pdf-next">next()</a>.</p>
+
+<p> If a sub-table does not contain enough sub-tables to reach
+ depth n it will be ignored. Likewise any non-table values
+ at depth &lt; n will also be ignored.</p>
+
+<p> Returns every possible path of length n. This might
+ lead to <strong>unexpected results</strong> when the input table is <strong>recursive</strong>
+ or has multiple references to the same sub-table.</p>
+
+<p> See also <a href="../lua-5.2/doc/manual.html#2.4   ">Metatables and Metamethods</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">n</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         The length of the desired tuple. Values 1 and 2
+ return pairs(tbl) instead.
+        </li>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+         There are three cases:</p>
+
+<p> When tbl == nil returns <a href="../modules/Filter.html#SKIP">Filter.SKIP</a>. <br/>
+ When n &lt;= 2 returns the three result values of calling pairs(tbl). <br/>
+ When n >  2 returns a stateful iterator function and nothing else.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> players = {
+  yurie = {
+    items = {<span class="string">'iron-plate'</span>, <span class="string">'copper-plate'</span>},
+    ammo  = {<span class="string">'piercing'</span>  , <span class="string">'uranium'</span>     },
+    play_time = <span class="number">9001</span>, <span class="comment">-- ignored because it's not a table.
+</span>    },
+  tarou = {
+    items = {<span class="string">'iron-gear'</span>, <span class="string">'copper-gear'</span>},
+    ammo  = {}, <span class="comment">-- ignored because it's not deep enough.
+</span>    play_time = <span class="number">42</span>,
+    },
+  akira = {
+    items = {},
+    ammo  = {<span class="string">'exploding'</span>, <span class="string">'magic'</span>      },
+    play_time = <span class="number">7</span>,
+    },
+  }
+
+<span class="keyword">for</span> nickname, <span class="global">type</span>, item_index, item_name <span class="keyword">in</span> Iter.ntuples(<span class="number">4</span>, players) <span class="keyword">do</span>
+  <span class="global">print</span>(nickname, <span class="global">type</span>, item_index, item_name)
+  <span class="keyword">end</span>
+
+&gt; akira  ammo   <span class="number">1</span>  exploding
+&gt; akira  ammo   <span class="number">2</span>  magic
+&gt; yurie  ammo   <span class="number">1</span>  piercing
+&gt; yurie  ammo   <span class="number">2</span>  uranium
+&gt; yurie  items  <span class="number">1</span>  iron-plate
+&gt; yurie  items  <span class="number">2</span>  copper-plate
+&gt; tarou  items  <span class="number">1</span>  iron-gear
+&gt; tarou  items  <span class="number">2</span>  copper-gear
 </pre>
     </ul>
 
@@ -557,7 +526,7 @@
 
 <p> <strong>Time complexity:</strong> It depends *cough*.</p>
 
-<p> <strong>Note:</strong> Despite the name sub-"set" all in- and output use array format for
+<p> <strong>Note:</strong> Despite the name sub-"set" all in- and outputs use array format for
  better performance.</p>
 
 <p> <strong>See also:</strong> <a href="../modules/Iter.html#combinations">Iter.combinations</a>, <a href="../modules/Iter.html#permutations">Iter.permutations</a>
@@ -676,7 +645,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-05-19 09:08:45 </i>
+<i style="float:right;">Last updated 2021-05-20 15:12:50 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

@@ -1,0 +1,673 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Todo">Todo </a></li>
+<li><a href="#Factorio_Behavior">Factorio Behavior </a></li>
+<li><a href="#Examples">Examples </a></li>
+<li><a href="#Public_methods">Public methods </a></li>
+<li><a href="#ManagedLuaBootstrap">ManagedLuaBootstrap </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Core.html">Core</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/Data.html">Data</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Entity.html">Entity</a></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><strong>EventManagerLite</strong></li>
+  <li><a href="../modules/Force.html">Force</a></li>
+  <li><a href="../modules/Player.html">Player</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
+  <li><a href="../modules/PluginManagerLite.html">PluginManagerLite</a></li>
+  <li><a href="../modules/Remote.html">Remote</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Train.html">Train</a></li>
+  <li><a href="../modules/Array.html">Array</a></li>
+  <li><a href="../modules/Class.html">Class</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Color.html">Color</a></li>
+  <li><a href="../modules/Compare.html">Compare</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Iter.html">Iter</a></li>
+  <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/LocalisedString.html">LocalisedString</a></li>
+  <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
+  <li><a href="../modules/Logic.html">Logic</a></li>
+  <li><a href="../modules/Math.html">Math</a></li>
+  <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Polygon.html">Polygon</a></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
+  <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
+  <li><a href="../modules/Time.html">Time</a></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Vector.html">Vector</a></li>
+  <li><a href="../modules/Verificate.html">Verificate</a></li>
+  <li><a href="../modules/Version.html">Version</a></li>
+  <li><a href="../modules/remotes.html">remotes</a></li>
+  <li><a href="../modules/snippet.html">snippet</a></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/Introduction.html">Introduction</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>EventManagerLite</code></h1>
+<p>Native multi-handler events.</p>
+<p> EventManagerLite mimics the <a href="../api/LuaBootstrap.html#LuaBootstrap.">LuaBootstrap</a> api to allow mods
+ to register multiple handlers to any event with only minimal code changes.</p>
+
+<p> To prevent errors EventManagerLite blocks direct access to LuaBootstrap,
+ but most functionality is available from the ManagedLuaBootstrap object.</p>
+
+<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local EventManager = require(&apos;__eradicators-library__/erlib/factorio/EventManagerLite-1&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#Todo">Todo </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#todo1">todo1</a></td>
+	<td class="summary">Consider if it's worth suppporting on_init.</td>
+	</tr>
+</table>
+<h2><a href="#Factorio_Behavior">Factorio Behavior </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#api_availability">api_availability</a></td>
+	<td class="summary">What apis are available during on_init, on_load and on_config?</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#boostrap_event_order">boostrap_event_order</a></td>
+	<td class="summary">In what order do on_init, on_load and on_config happen?</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#event_handler_order">event_handler_order</a></td>
+	<td class="summary">In what order are handlers executed?</td>
+	</tr>
+</table>
+<h2><a href="#Examples">Examples </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Examples">Examples</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#Public_methods">Public methods </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#get_managed_script">get_managed_script(module_name)</a></td>
+	<td class="summary">Creates a new ManagedLuaBootstrap instance or fetches an existing one of
+ the same name.</td>
+	</tr>
+</table>
+<h2><a href="#ManagedLuaBootstrap">ManagedLuaBootstrap </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#ManagedLuaBootstrap">ManagedLuaBootstrap</a></td>
+	<td class="summary">The main interface of EventManagerLite.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ManagedLuaBootstrap.on_event">ManagedLuaBootstrap.on_event(event_name, f, filters)</a></td>
+	<td class="summary">Register event handlers.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ManagedLuaBootstrap.on_nth_tick">ManagedLuaBootstrap.on_nth_tick(period, f)</a></td>
+	<td class="summary">Changed.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ManagedLuaBootstrap.on_init">ManagedLuaBootstrap.on_init()</a></td>
+	<td class="summary">Removed.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ManagedLuaBootstrap.on_load">ManagedLuaBootstrap.on_load(f)</a></td>
+	<td class="summary">Changed.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ManagedLuaBootstrap.on_configuration_changed">ManagedLuaBootstrap.on_configuration_changed(f)</a></td>
+	<td class="summary">Changed.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ManagedLuaBootstrap.on_config">ManagedLuaBootstrap.on_config()</a></td>
+	<td class="summary">New: Shorthand for on_configuration_changed.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ManagedLuaBootstrap.module_name">ManagedLuaBootstrap.module_name</a></td>
+	<td class="summary">New: The name that was used to create this instance.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ManagedLuaBootstrap.module_index">ManagedLuaBootstrap.module_index</a></td>
+	<td class="summary">New: The load order index of this instance.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ManagedLuaBootstrap.set_event_filter">ManagedLuaBootstrap.set_event_filter()</a></td>
+	<td class="summary">Removed.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ManagedLuaBootstrap.get_event_filter">ManagedLuaBootstrap.get_event_filter()</a></td>
+	<td class="summary">Removed.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Todo"></a>Todo </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "todo1"></a>
+    <strong>todo1</strong>
+    </dt>
+    <dd>
+    Consider if it's worth suppporting on_init.
+ This would require storing loaded module names in Savedata
+ to detect when modules get added / removed from a mod.
+ Additionally module aware ConfigurationChangedData might be needed.
+ This would be done as a seperate event module (inside this file?).
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Factorio_Behavior"></a>Factorio Behavior </h2>
+
+          <div class="section-description">
+           See also <a href="../api/Data-Lifecycle.html#">-Lifecycle</a>.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "api_availability"></a>
+    <strong>api_availability</strong>
+    </dt>
+    <dd>
+    What apis are available during on_init, on_load and on_config?
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">on_init   : remote commands settings rcon rendering script game global[R/W]
+on_load   : remote commands settings rcon           script      global[R]
+on_config : remote commands settings rcon rendering script game global[R/W]
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "boostrap_event_order"></a>
+    <strong>boostrap_event_order</strong>
+    </dt>
+    <dd>
+
+<p>In what order do on_init, on_load and on_config happen? </p>
+
+<p>  Absurdly the engine raises on_load* <em>before</em> on_config, at best causing
+  unnesscary work, at worst running it on outdated global data. There's nothing
+  I can do about that so you have to take countermeasures yourself.
+  Don't forget to use migrations if nessecary.</p>
+
+<p>  See ManagedLuaBootstrap.on_init for why EventManagerLite
+  never raises on_init.</p>
+
+<p>  Base game order:</p>
+<pre><code>InstallMod -&gt; StartMap                         : on_init      -         -
+InstallMod -&gt; StartMap -&gt; SaveMap    -&gt; LoadMap:   -        on_load     -
+InstallMod -&gt; StartMap -&gt; ChangeMod  -&gt; LoadMap:   -        on_load*  on_config
+StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_init      -       on_config
+</code></pre>
+
+<p>  EventManagerLite order:                                                </p>
+<pre><code>InstallMod -&gt; StartMap                         : on_config     -        -
+InstallMod -&gt; StartMap -&gt; SaveMap    -&gt; LoadMap:   -        on_load     -
+InstallMod -&gt; StartMap -&gt; UpdateMod  -&gt; LoadMap:   -        on_load*  on_config
+StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_config    -       on_config
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "event_handler_order"></a>
+    <strong>event_handler_order</strong>
+    </dt>
+    <dd>
+    In what order are handlers executed? </p>
+
+<p> When two mods or two ManagedLuaBootstrap instances each have a handler
+ for the same event, then the events are executed in the order that they
+ were loaded in. For ManagedLuaBootstrap this is determined by the module_index.</p>
+
+<p> When multiple On_nth_tick handlers occur on the same tick then the handlers
+ are executed in order from smallest to largest period. All on_tick handlers
+ are always executed before any on_nth_tick handlers.
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Examples"></a>Examples </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Examples"></a>
+    <strong>Examples</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example"><span class="comment">-- same basic syntax as script.on_event
+</span><span class="keyword">local</span> script = EventManagerLite.get_managed_script(<span class="string">'my-scripted-entity'</span>)
+script.on_event(defines.events.on_entity_damaged,
+  <span class="keyword">function</span>(e)
+    game.<span class="global">print</span>{<span class="string">''</span>, <span class="string">'Entity '</span>, e.entity.name, <span class="string">' was damaged.'</span>}
+    <span class="keyword">end</span>
+  }
+</pre></li>
+        <li><pre class="example"><span class="comment">-- on_config replaces on_init and on_configuration_changed
+</span><span class="keyword">local</span> script = EventManagerLite.get_managed_script(<span class="string">'my-scripted-entity'</span>)
+script.on_config(<span class="keyword">function</span>(e)
+  <span class="global">print</span>(<span class="string">'This is a shortcut to on_configuration_changed!'</span>)
+  <span class="keyword">end</span>)
+</pre></li>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Public_methods"></a>Public methods </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "get_managed_script"></a>
+    <strong>get_managed_script(module_name)</strong>
+    </dt>
+    <dd>
+    Creates a new ManagedLuaBootstrap instance or fetches an existing one of
+ the same name. </p>
+
+<p> On the <strong>first</strong> call to this function with a new module_name a unique
+ module_index is generated. Subsequent calls share the same index.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">module_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The name of your module.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">ManagedLuaBootstrap</span></span>
+         If an instance of the same name has been
+ created before you will recieve <strong>a reference</strong> to, <strong>not a copy</strong> of,
+ that exact same instance table.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="ManagedLuaBootstrap"></a>ManagedLuaBootstrap </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "ManagedLuaBootstrap"></a>
+    <strong>ManagedLuaBootstrap</strong>
+    </dt>
+    <dd>
+    The main interface of EventManagerLite.  Each instance can have <strong>one handler</strong>
+ for every event, just like a normal factorio mod can. Differently named
+ instances act like seperate mods and do not interfer with each others events.</p>
+
+<p> This section documents <strong>only the changes</strong> compared to <a href="../api/LuaBootstrap.html#LuaBootstrap.">LuaBootstrap</a>.
+ Everything not mentioned here works exactly the same as it normally does
+ (i.e. script.active_mods, script.generate_event_name, script.raise_event etc).</p>
+
+<p> Changed: ManagedLuaBootstrap is not write-protected like real LuaBootstrap.
+ Changes you make will be visible in all instances with the same name.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ManagedLuaBootstrap.on_event"></a>
+    <strong>ManagedLuaBootstrap.on_event(event_name, f, filters)</strong>
+    </dt>
+    <dd>
+    Register event handlers.
+ (See also <a href="../api/LuaBootstrap.html#LuaBootstrap.on_event">LuaBootstrap.on_event</a>.)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">event_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a>, <a class="type" href="../modules/Types.html#Integer">Integer</a> or <a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         Changed: Now works with non-arrays
+ and recognizes <code>&apos;on_load&apos;</code> and <code>&apos;on_configuration_changed&apos;</code>.
+        </li>
+        <li><span class="parameter">f</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+         Unchanged.
+        </li>
+        <li><span class="parameter">filters</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+         Removed. Because filtering would need to be done on the
+ lua side there would be no performance benefit.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        New: Returns the given function f.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> my_handler = script.on_event(defines.events, <span class="keyword">function</span>(e) <span class="keyword">end</span>)
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "ManagedLuaBootstrap.on_nth_tick"></a>
+    <strong>ManagedLuaBootstrap.on_nth_tick(period, f)</strong>
+    </dt>
+    <dd>
+    Changed.  To prevent lag spikes when several modules with handlers
+ for the same period all execute on the same tick, each handler
+ is assigned a random offset. The offset is deterministic and
+ always the same for a given combination of module_name and period.</p>
+
+<p> The offset is included in the
+ event table when the handler is called. <br/>
+ For example: <code>f{nth_tick = 30, offset = 9, tick = 39}</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">period</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         Unchanged.
+        </li>
+        <li><span class="parameter">f</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+         Unchanged.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        New: Returns the given function f.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ManagedLuaBootstrap.on_init"></a>
+    <strong>ManagedLuaBootstrap.on_init()</strong>
+    </dt>
+    <dd>
+    Removed. </p>
+
+<p> Because factorio only raises on_init once per mod this
+ is not reliable for adding new modules to an existing savegame.
+ To prevent any confusion it is completely disabled.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ManagedLuaBootstrap.on_load"></a>
+    <strong>ManagedLuaBootstrap.on_load(f)</strong>
+    </dt>
+    <dd>
+    Changed.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+         Unchanged.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        New: Returns the given function f.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ManagedLuaBootstrap.on_configuration_changed"></a>
+    <strong>ManagedLuaBootstrap.on_configuration_changed(f)</strong>
+    </dt>
+    <dd>
+    Changed.  Because on_init is not reliable, on_configuration_changed handlers
+ must also handle on_init in an agnostic manner.</p>
+
+<p> If the handler is raised during on_init it will be raised <strong>without parameters</strong>.
+ <strong>Warning:</strong> Do not try to outsmart yourself by using this to "detect"
+ on_init. There is no guarantee that this will ever happen at all.
+ It's best if you just store a private "is_initialized" flag in your
+ modules global data if you need to do heavy lifting in on_init.</p>
+
+<p> See also
+ <a href="../modules/EventManagerLite.html#boostrap_event_order">EventManagerLite.boostrap_event_order</a>,
+ <a href="../api/LuaBootstrap.html#LuaBootstrap.on_configuration_changed">LuaBootstrap.on_configuration_changed</a>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+         Changed: Will sometimes be raised f(<a href="https://www.lua.org/pil/2.1.html">nil</a>)
+ instead of f(<a href="../api/Concepts.html#ConfigurationChangedData">ConfigurationChangedData</a>).
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        New: Returns the given function f.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ManagedLuaBootstrap.on_config"></a>
+    <strong>ManagedLuaBootstrap.on_config()</strong>
+    </dt>
+    <dd>
+    New: Shorthand for on_configuration_changed.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ManagedLuaBootstrap.module_name"></a>
+    <strong>ManagedLuaBootstrap.module_name</strong>
+    </dt>
+    <dd>
+    New: The name that was used to create this instance.
+ Similar to <a href="../api/LuaBootstrap.html#LuaBootstrap.mod_name">LuaBootstrap.mod_name</a> but not the same.</p>
+
+<p> Read only. (Technically you can overwrite it but that won't affect anything.)
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ManagedLuaBootstrap.module_index"></a>
+    <strong>ManagedLuaBootstrap.module_index</strong>
+    </dt>
+    <dd>
+    New: The load order index of this instance.  When an event is subscribed to by
+ multiple instances then the handlers will be executed in this order, starting
+ from lowest going to highest.</p>
+
+<p> Read only. (Technically you can overwrite it but that won't affect anything.)</p>
+
+<p> See also <a href="../modules/EventManagerLite.html#event_handler_order">EventManagerLite.event_handler_order</a>.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ManagedLuaBootstrap.set_event_filter"></a>
+    <strong>ManagedLuaBootstrap.set_event_filter()</strong>
+    </dt>
+    <dd>
+    Removed.  Event filters are not supported.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ManagedLuaBootstrap.get_event_filter"></a>
+    <strong>ManagedLuaBootstrap.get_event_filter()</strong>
+    </dt>
+    <dd>
+    Removed.  Event filters are not supported.
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2021-05-20 15:12:50 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

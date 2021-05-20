@@ -182,6 +182,133 @@ local function Test()
     say('  TESTR  @  erlib.Iter.subsets → Ok.')
     end
     
+  do -- Iter.ntuples
+  
+    for _ in Iter.ntuples(1, nil) do
+      assert(false) -- should skip nil input.
+      end
+  
+    local test = {
+      [1] = {
+        a = {
+          [10] = {b = {c = {d = {e = {7}}}}  },
+          [20] = {b = {c = {d = {e = {7}}}}  },
+          [30] = {b = {c = {d = {e = {7}}}}  },
+            },
+          },
+      [2] = {
+        f = {
+          g = {
+            h = {
+              [10] = {i = {j = {42}}  },
+              [20] = {i = {j = {42}}  },
+              [30] = {i = {j = {42}}  },
+              [40] = {i = {j = {42}}  },
+              [40] = {i = {j = {k = {l = {42}}}}  },
+              [50] = {i = {19}  }, -- non-table object on the path -> no output
+              [60] = {i = {}  }, -- too shallow -> no output
+              }
+            }
+          }
+          },
+      }
+  
+    -- Iteration order of pairs/next - and thus ntuples is
+    -- not deterministic. So output candidates have to be
+    -- searched and removed to ensure that each candidate
+    -- is used exactly once.
+    local function find_equal_and_remove(tbl, candidates)
+      for i, v in pairs(candidates) do
+        if equ(tbl, v) then
+          print('found', i)
+          candidates[i] = nil
+          return true end
+        end
+      return false end
+  
+    local function test_ntuples(n, candidates)
+      local i = 0
+      for _1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12 in Iter.ntuples(n, test) do
+        local r = {_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12}        
+        i = i + 1
+        assert(#r == n)
+        assert(find_equal_and_remove(r, candidates))
+        end
+      assert(#candidates == 0)
+      end
+    
+    test_ntuples(2, { -- n=1 equals n=2
+      {2, test[2] },
+      {1, test[1] }
+      })
+    test_ntuples(3, {
+      {2, "f", test[2].f },
+      {1, "a", test[1].a }
+      })
+    test_ntuples(4, {
+      {2, "f", "g", test[2].f.g },
+      {1, "a", 20, test[1].a[20] },
+      {1, "a", 10, test[1].a[10] },
+      {1, "a", 30, test[1].a[30] }
+      })
+    test_ntuples(5, {
+      {2, "f", "g", "h", test[2].f.g.h },
+      {1, "a", 20, "b", test[1].a[20].b },
+      {1, "a", 10, "b", test[1].a[10].b },
+      {1, "a", 30, "b", test[1].a[30].b }
+      })
+    test_ntuples(6, {
+      {2, "f", "g", "h", 40, test[2].f.g.h[40] },
+      {2, "f", "g", "h", 10, test[2].f.g.h[10] },
+      {2, "f", "g", "h", 20, test[2].f.g.h[20] },
+      {2, "f", "g", "h", 60, test[2].f.g.h[60] },
+      {2, "f", "g", "h", 30, test[2].f.g.h[30] },
+      {2, "f", "g", "h", 50, test[2].f.g.h[50] },
+      {1, "a", 20, "b", "c", test[1].a[20].b.c },
+      {1, "a", 10, "b", "c", test[1].a[10].b.c },
+      {1, "a", 30, "b", "c", test[1].a[30].b.c }
+      })
+    test_ntuples(7, {
+      {2, "f", "g", "h", 40, "i", test[2].f.g.h[40].i },
+      {2, "f", "g", "h", 10, "i", test[2].f.g.h[10].i },
+      {2, "f", "g", "h", 20, "i", test[2].f.g.h[20].i },
+      {2, "f", "g", "h", 60, "i", test[2].f.g.h[60].i },
+      {2, "f", "g", "h", 30, "i", test[2].f.g.h[30].i },
+      {2, "f", "g", "h", 50, "i", test[2].f.g.h[50].i },
+      {1, "a", 20, "b", "c", "d", test[1].a[20].b.c.d },
+      {1, "a", 10, "b", "c", "d", test[1].a[10].b.c.d },
+      {1, "a", 30, "b", "c", "d", test[1].a[30].b.c.d }
+      })
+    test_ntuples(8, {
+      {2, "f", "g", "h", 40, "i", "j", test[2].f.g.h[40].i.j },
+      {2, "f", "g", "h", 10, "i", "j", test[2].f.g.h[10].i.j },
+      {2, "f", "g", "h", 20, "i", "j", test[2].f.g.h[20].i.j },
+      {2, "f", "g", "h", 30, "i", "j", test[2].f.g.h[30].i.j },
+      {2, "f", "g", "h", 50, "i", 1, 19  },
+      {1, "a", 20, "b", "c", "d", "e", test[1].a[20].b.c.d.e },
+      {1, "a", 10, "b", "c", "d", "e", test[1].a[10].b.c.d.e },
+      {1, "a", 30, "b", "c", "d", "e", test[1].a[30].b.c.d.e }
+      })
+    test_ntuples(9, {
+      {2, "f", "g", "h", 40, "i", "j", "k", test[2].f.g.h[40].i.j.k },
+      {2, "f", "g", "h", 10, "i", "j", 1, 42  },
+      {2, "f", "g", "h", 20, "i", "j", 1, 42  },
+      {2, "f", "g", "h", 30, "i", "j", 1, 42  },
+      {1, "a", 20, "b", "c", "d", "e", 1, 7  },
+      {1, "a", 10, "b", "c", "d", "e", 1, 7  },
+      {1, "a", 30, "b", "c", "d", "e", 1, 7  }
+      })
+    test_ntuples(10, {
+      {2, "f", "g", "h", 40, "i", "j", "k", "l", test[2].f.g.h[40].i.j.k.l }
+      })
+    test_ntuples(11, {
+      {2, "f", "g", "h", 40, "i", "j", "k", "l", 1, 42}
+      })
+    test_ntuples(12, {})
+    
+    
+    say('  TESTR  @  erlib.Iter.ntuples → Ok.')
+    end
     
 
   say('  TESTR  @  erlib.Iter.array_pairs → No test implemented.')

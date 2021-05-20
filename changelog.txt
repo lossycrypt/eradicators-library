@@ -8,6 +8,10 @@ Version: 4.1.2
 Date: 2021-05-19
   Functions:
     - Added <true> and <false> boolean type compatibility to Verificate.verify.
+    - Added Iter.ntuples + tests. Removed Iter.deep_pairs.
+    - New module EventManagerLite. A rewriten-from-scratch manager that
+      reimplements LuaBootstrap in lua.
+    - New module PluginManagerLite.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.1
 Date: 2021-04-x
