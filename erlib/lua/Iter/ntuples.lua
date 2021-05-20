@@ -49,7 +49,7 @@ local SKIP       = ercfg.SKIP
 -- -------------------------------------------------------------------------- --
 
 ----------
--- Iterates nested subtables in a single loop.
+-- Iterates n-nested sub-tables in a single for-loop.
 --
 -- Internally uses @{LMAN pairs ()} to get each
 -- sub-table's __pairs metamethod or @{LMAN next ()}.

@@ -117,6 +117,9 @@ local Modules = {
   Train      = control_only 'erlib/factorio/Train' ,
   
   Data       = startup_only 'erlib/factorio/Data/!init',
+  
+  PluginManagerLite = dev_only 'erlib/factorio/PluginManagerLite-1',
+  
   }
   
 -- require() does not support multiple return values. So every module

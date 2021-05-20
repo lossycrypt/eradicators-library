@@ -32,7 +32,9 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Public_methods">Public methods </a></li>
+<li><a href="#Startup_methods">Startup methods </a></li>
+<li><a href="#Generic_methods">Generic methods </a></li>
+<li><a href="#Savedata_management">Savedata management </a></li>
 </ul>
 
 
@@ -94,11 +96,6 @@
 
 <h1>Module <code>PluginManagerLite</code></h1>
 <p>Helper for developing mod-like plugins and softmods.</p>
-<p> PluginManagerLite Requires unrestricted exclusive access to
- <code>global.plugin_manager</code>. Do not touch it.</p>
-
-<p> <strong>Dependency:</strong> Implicitly loads <a href="../modules/EventManagerLite.html#">EventManagerLite</a>.</p>
-
 <p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.</p>
     <h3>Usage:</h3>
     <ul>
@@ -107,27 +104,42 @@
     </ul>
 
 
-<h2><a href="#Public_methods">Public methods </a></h2>
+<h2><a href="#Startup_methods">Startup methods </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Public.make_asset_getter">Public.make_asset_getter(plugin_name, mod_name)</a></td>
+	<td class="name" nowrap><a href="#Public.make_asset_getter">Public.make_asset_getter(plugin_name[, mod_name])</a></td>
 	<td class="summary">A function to convert relative asset paths into absolute file paths.</td>
 	</tr>
+</table>
+<h2><a href="#Generic_methods">Generic methods </a></h2>
+<table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Public.make_relative_require">Public.make_relative_require(plugin_name, mod_name)</a></td>
+	<td class="name" nowrap><a href="#Public.make_relative_require">Public.make_relative_require(plugin_name[, mod_name])</a></td>
 	<td class="summary">Creates a require function that works relative to a plugins directory.</td>
 	</tr>
+</table>
+<h2><a href="#Savedata_management">Savedata management </a></h2>
+<table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Public.manage_savedata">Public.manage_savedata(plugin_name, setter)</a></td>
-	<td class="summary">Automatically creates local references to global.</td>
+	<td class="name" nowrap><a href="#Savedata">Savedata</a></td>
+	<td class="summary">The save-load-cycle persistant data of a plugin.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Public.classify_savedata">Public.classify_savedata(plugin_name, methods)</a></td>
-	<td class="summary">Automatically adds meta methods to Savedata.</td>
+	<td class="name" nowrap><a href="#enable_savedata_manager">enable_savedata_manager()</a></td>
+	<td class="summary">Starts the savedata management engine.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Public.enable_savedata_garbage_collector">Public.enable_savedata_garbage_collector()</a></td>
-	<td class="summary">Must be called after all plugins have called manage_savedata.</td>
+	<td class="name" nowrap><a href="#manage_savedata">manage_savedata(plugin_name, setter)</a></td>
+	<td class="summary">Automatically loads global Savedata and assigns local references.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#classify_savedata">classify_savedata(plugin_name, methods)</a></td>
+	<td class="summary">Automatically adds meta-methods to Savedata in on_load and on_config.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#manage_garbage">manage_garbage(plugin_name)</a></td>
+	<td class="summary">Automatically deletes player, force and surface related
+ Savedata when it becomes invalid.</td>
 	</tr>
 </table>
 
@@ -135,39 +147,58 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Public_methods"></a>Public methods </h2>
+    <h2 class="section-header "><a name="Startup_methods"></a>Startup methods </h2>
 
     <dl class="function">
     <dt>
     <a name = "Public.make_asset_getter"></a>
-    <strong>Public.make_asset_getter(plugin_name, mod_name)</strong>
+    <strong>Public.make_asset_getter(plugin_name[, mod_name])</strong>
     </dt>
     <dd>
-    A function to convert relative asset paths into absolute file paths. </p>
-
-<p> f('/file-name.png') -> '<strong>mod-name</strong>/assets/plugin-name/file-name.png'
+    A function to convert relative asset paths into absolute file paths.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">plugin_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
 
 
 
         </li>
         <li><span class="parameter">mod_name</span>
-        if mod<em>name == 'local' then mod</em>name = erlib.Const.mod_name end
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         Defaults to the name of the mod that called this function.
+         (<em>optional</em>)
         </li>
     </ul>
 
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+        f(path)
+    </ol>
 
 
 
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> f = PluginManager.make_asset_getter(<span class="string">'my-plugin-name'</span>, <span class="string">'my-mod-name'</span>)
+<span class="global">print</span>(f(<span class="string">'/my-file-name.png'</span>))
+&gt; <span class="string">"__my-mod-name__/assets/my-plugin-name/my-file-name.png"</span>
+
+</pre>
+    </ul>
 
 </dd>
+</dl>
+    <h2 class="section-header "><a name="Generic_methods"></a>Generic methods </h2>
+
+    <dl class="function">
     <dt>
     <a name = "Public.make_relative_require"></a>
-    <strong>Public.make_relative_require(plugin_name, mod_name)</strong>
+    <strong>Public.make_relative_require(plugin_name[, mod_name])</strong>
     </dt>
     <dd>
     Creates a require function that works relative to a plugins directory.
@@ -176,16 +207,52 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">plugin_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
 
 
 
         </li>
         <li><span class="parameter">mod_name</span>
-
-
-
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         Defaults to the name of the mod that called this function.
+         (<em>optional</em>)
         </li>
     </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
+         f(path)
+   The function will call <a href="../lua-5.2/doc/manual.html#pdf-require">require</a> like this: <br/>
+   <code>require(&quot;__my-mod-name__/plugins/my-plugin-name/&quot;..path)</code>.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> relreq = PluginManager.make_relative_require(<span class="string">'my-plugin-name'</span>, <span class="string">'my-mod-name'</span>)
+<span class="keyword">local</span> my_module = relreq(<span class="string">'/my-module-name.lua'</span>)
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Savedata_management"></a>Savedata management </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Savedata"></a>
+    <strong>Savedata</strong>
+    </dt>
+    <dd>
+    The save-load-cycle persistant data of a plugin. </p>
+
+<p> A sub-table of the global table called <a href="../api/global.html#global">global</a>,
+ that contains all data created and stored by a single plugin.
+
+
 
 
 
@@ -193,11 +260,38 @@
 
 </dd>
     <dt>
-    <a name = "Public.manage_savedata"></a>
-    <strong>Public.manage_savedata(plugin_name, setter)</strong>
+    <a name = "enable_savedata_manager"></a>
+    <strong>enable_savedata_manager()</strong>
     </dt>
     <dd>
-    Automatically creates local references to global.
+    Starts the savedata management engine. </p>
+
+<p> This requires unrestricted exclusive access to
+ <code>global.plugin_manager</code>. Do not touch it.</p>
+
+<p> <strong>Note:</strong> Implicitly loads <a href="../modules/EventManagerLite.html#">EventManagerLite</a>. Can not be used without. <br/>
+ <strong>Note:</strong> The other savedata management methods do not exist before calling this.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "manage_savedata"></a>
+    <strong>manage_savedata(plugin_name, setter)</strong>
+    </dt>
+    <dd>
+    Automatically loads global Savedata and assigns local references. </p>
+
+<p> Multiple setters can be associated with the same plugin_name.
+ This allows using local Savedata references in all files used by a plugin.</p>
+
+
+
+<p> Can only be uesd after <a href="../modules/PluginManagerLite.html#enable_savedata_manager">PluginManagerLite.enable_savedata_manager</a>.
 
 
     <h3>Parameters:</h3>
@@ -210,7 +304,8 @@
         </li>
         <li><span class="parameter">setter</span>
             <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
-         Will be called setter(Savedata).
+         Will be called setter(Savedata) in on_load and on_config.
+ (See <a href="../modules/EventManagerLite.html#boostrap_event_order">EventManagerLite.boostrap_event_order</a> regarding on_init.)
         </li>
     </ul>
 
@@ -225,22 +320,29 @@
 
 </dd>
     <dt>
-    <a name = "Public.classify_savedata"></a>
-    <strong>Public.classify_savedata(plugin_name, methods)</strong>
+    <a name = "classify_savedata"></a>
+    <strong>classify_savedata(plugin_name, methods)</strong>
     </dt>
     <dd>
-    Automatically adds meta methods to Savedata.
+    Automatically adds meta-methods to Savedata in on_load and on_config. </p>
+
+<p> This only has to be called once per plugin_name as it affects all setters.</p>
+
+<p> Can only be uesd after <a href="../modules/PluginManagerLite.html#enable_savedata_manager">PluginManagerLite.enable_savedata_manager</a>.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">plugin_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
 
 
 
         </li>
         <li><span class="parameter">methods</span>
-        Each plugin shares a single metatable.
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         This table will be assigned as the __index metatable
+ for the Savedata table.
         </li>
     </ul>
 
@@ -250,21 +352,39 @@
 
 </dd>
     <dt>
-    <a name = "Public.enable_savedata_garbage_collector"></a>
-    <strong>Public.enable_savedata_garbage_collector()</strong>
+    <a name = "manage_garbage"></a>
+    <strong>manage_garbage(plugin_name)</strong>
     </dt>
     <dd>
-    Must be called after all plugins have called manage_savedata. </p>
+    Automatically deletes player, force and surface related
+ Savedata when it becomes invalid. </p>
 
-<p> Assumes Savedata contains subtables players, surfaces and/or forces,
+<p> Assumes Savedata contains subtables "players", "surfaces" and/or "forces",
  using the respective objects "index" as keys.</p>
 
-<p> Automatically deletes related subtable when the object is removed from the game.
- Because it's really easy to forget about this.</p>
+<p> Because it's easy to forget to always subscribe to
+ <a href="../api/events.html#on_player_removed">on_player_removed</a>,
+ <a href="../api/events.html#on_forces_merged">on_forces_merged</a> and
+ <a href="../api/events.html#on_surface_deleted">on_surface_deleted</a>.</p>
 
-<p> Can only be uesd after ???.
+<p> Garbage collection is called after all other EventManagerLite event
+ handlers have finished processing the respective event.
+ <strong>Note:</strong> Be careful when you subscribe to one of the above events
+ youself. If you create new data with the old index it will still be
+ deleted at the end of the event.</p>
+
+<p> Can only be uesd after <a href="../modules/PluginManagerLite.html#enable_savedata_manager">PluginManagerLite.enable_savedata_manager</a>.
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">plugin_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+    </ul>
 
 
 
@@ -278,7 +398,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-05-20 15:12:50 </i>
+<i style="float:right;">Last updated 2021-05-20 17:18:47 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
