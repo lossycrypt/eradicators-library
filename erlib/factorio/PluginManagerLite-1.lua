@@ -34,6 +34,9 @@ local Table       = elreq('erlib/lua/Table'     )()
 local Verificate  = elreq('erlib/lua/Verificate')()
 local verify      = Verificate.verify
 
+local join_path   = elreq('erlib/factorio/Data/!init')().Path.join
+
+local require     = _ENV. require -- keep a proper reference
 
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
@@ -66,7 +69,8 @@ local Private = {}
 function Public.make_asset_getter(plugin_name, mod_name)
   -- if mod_name == 'local' then mod_name = erlib.Const.mod_name end
   if mod_name == nil then mod_name = Stacktrace.get_mod_name(2) end
-  local root = '__' .. mod_name .. '__' .. '/assets/' .. plugin_name
+  -- local root = '__' .. mod_name .. '__' .. '/assets/' .. plugin_name
+  local root = join_path('__'..mod_name..'__', '/assets/', plugin_name)
   return function(path) return root .. path end
   end
 
@@ -91,9 +95,11 @@ function Public.make_asset_getter(plugin_name, mod_name)
 --   `require("__my-mod-name__/plugins/my-plugin-name/"..path)`.
 --
 function Public.make_relative_require(plugin_name, mod_name)
-  local root =
-    (mod_name and ('__'..mod_name..'__/') or '') ..'plugins/' ..plugin_name
-  local require = _ENV. require
+  -- local root =
+    -- (mod_name and ('__'..mod_name..'__/') or '') ..'plugins/' ..plugin_name
+  local root = join_path(
+    (mod_name and ('__'..mod_name..'__/') or nil), 'plugins/', plugin_name
+    )
   return function (path) return require(root .. path) end
   end
 

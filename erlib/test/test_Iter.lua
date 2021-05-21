@@ -220,7 +220,6 @@ local function Test()
     local function find_equal_and_remove(tbl, candidates)
       for i, v in pairs(candidates) do
         if equ(tbl, v) then
-          print('found', i)
           candidates[i] = nil
           return true end
         end

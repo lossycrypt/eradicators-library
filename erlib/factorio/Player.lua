@@ -22,9 +22,11 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 
+local stop        = elreq('erlib/lua/Error'     )().Stopper 'Player'
+
 -- local Stacktrace = elreq('erlib/factorio/Stacktrace')()
 
--- local Verificate = elreq('erlib/lua/Verificate')()
+local Verificate = elreq('erlib/lua/Verificate')()
 -- local Verify           , Verify_Or
     -- = Verificate.verify, Verificate.verify_or
 
@@ -84,7 +86,20 @@ function Player.notify(p, text, position)
   end
 
 
-
+----------
+-- Gets a LuaPlayer object.
+--
+-- @tparam PlayerSpecification spec It is an error if that player doesn't exist.
+-- @treturn LuaPlayer
+--
+function Player.get_player(spec)
+  if Verificate.isType.LuaObject(spec)
+  and spec.object_name == 'LuaPlayer'
+  then
+    if not spec.valid then stop('Given LuaPlayer object was invalid.') end
+    return spec
+    end
+  return assert(game.players[spec]) end
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

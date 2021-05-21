@@ -218,51 +218,12 @@ local function dpairs(tbl, opt)
         i = i - 1
       else
         is_seen = not not seen[value] -- unchanged till next subtable
-        next[i], tbl[i], key[i] = pairs(value)
+        next[i],  tbl[i],  key[i] = pairs(value)
         seen[tbl[i]], seen[value] = true, true
         end
       end
     until i == 0 end
   end
- 
- 
-
-local players = {
-  yurie = {
-    items = {'iron-plate', 'copper-plate'},
-    ammo  = {'piercing'  , 'uranium'     },
-    play_time = 9001, -- ignored because it's not a table.
-    }, 
-  tarou = {
-    items = {'iron-gear', 'copper-gear'},
-    ammo  = {}, -- ignored because it's not deep enough.
-    play_time = 42,
-    },
-  akira = {
-    items = {},
-    ammo  = {'exploding', 'magic'      },
-    play_time = 7,
-    },
-  }
-players.michiru = players.tarou
--- players.all = players
-players.akira.ammo[3] = players.akira.ammo
-players.akira.test = players
-
-print('\n\n\n start',os.time())
-  
-for key, value, tbl, path, seen in dpairs(players,{include_duplicates=true,ignore_recursion=true}) do
--- for key, value, tbl, path, seen in dpairs(players,{include_duplicates=true}) do
--- for key, value, tbl, path, seen in dpairs(players,{include_duplicates=false}) do
-  -- if key == 'play_time' then tbl[key] = value*2 end
-  -- print(key, value, Hydra.lines({tbl, path},{indentlevel=0}))
-  -- if seen then print('seen') end
-  print(Hydra.lines({path},{indentlevel=0}),key, value, serpent.line(seen ))
-  -- if key == 1 then tbl[5] = 'fuck you' end
-  end
-
--- print(Hydra.lines(players))
-
 
  
 -- -------------------------------------------------------------------------- --

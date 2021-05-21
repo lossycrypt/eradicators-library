@@ -437,4 +437,4 @@ function Filter.chain(user_spec)
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
 do (STDOUT or log or print)('  Loaded → erlib.Filter') end
-return function() return Filter,_Filter,_uLocale end
+return function() return Filter, nil, nil end

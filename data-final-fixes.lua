@@ -6,43 +6,31 @@
 
   ]]
 
+-- -------------------------------------------------------------------------- --
+-- Built-In                                                                   --
+-- -------------------------------------------------------------------------- --
+-- Outside of factorio '__eradicators-library__' is not a valid absolute path!
+local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
+local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
   
 -- -------------------------------------------------------------------------- --
--- Main                                                                       --
+-- Locals / Init                                                              --
 -- -------------------------------------------------------------------------- --
-local _ENV = require '__eradicators-library__/erlib/Core'().Core.install_to_env()
-Core.run_tests()
+local Data  = elreq('erlib/factorio/Data/!init')()
+  
+-- -------------------------------------------------------------------------- --
+-- Run Unit Tests                                                             --
+-- -------------------------------------------------------------------------- --
+if flag.DO_TESTS then
+  local _ENV = require '__eradicators-library__/erlib/Core'().Core.install_to_env()
+  Core.run_tests()
+  end
 
-
-
+-- -------------------------------------------------------------------------- --
+-- Create Shared Hotkeys                                                      --
+-- -------------------------------------------------------------------------- --
 Data.SimpleCustomInput('er:','interact-button','mouse-button-3')
 
-if true then return end
 -- -------------------------------------------------------------------------- --
 -- Draft                                                                      --
 -- -------------------------------------------------------------------------- --
-
-
-
-
-
--- EradicatorsLibrary.Logging.override_logging_level ('ultra-verbose')
-EradicatorsLibrary.Logging.set_default_logging_level ('ultra-verbose')
-EradicatorsLibrary.Logging.set_log_to_stdout(true) -- print() instead of log()
-
-EradicatorsLibrary.enable_strict_mode()
-EradicatorsLibrary.install_into_environment(_ENV)
-
-
-
-
-  
---to create [custom inputs] the library needs to run at least once in [data stage]
-
-local linked_inputs = {
-  'rotate' --etcpp
-  }
-
-for _,key in pairs(linked_inputs) do
-  erlib.Simple.Hotkey(key,'etc pp')
-  end

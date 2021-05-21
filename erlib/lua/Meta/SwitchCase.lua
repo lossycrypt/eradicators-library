@@ -78,4 +78,4 @@ local function SwitchCase (analyzer,cases)
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
 do (STDOUT or log or print)('  Loaded → erlib.SwitchCase') end
-return function() return SwitchCase,_SwitchCase,_uLocale end
+return function() return SwitchCase,_SwitchCase,nil end

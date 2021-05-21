@@ -309,10 +309,17 @@ KeywordPage(
   '^(Lua%u%a+)$',
   '../api/%s.html', '.*'
   )
-  
 
 
-  
+-- Keyword: URL
+-- Example: @{URL www.wikipedia.com Wiki}
+-- Url    : www.wikipedia.com
+-- Name   : Wiki
+KeywordPage(
+  '^URL (.*)$'
+  ,'%s', '^([^%|]+).-$'
+  ,'%s', '^[^%|]+(.-)$'
+  )
   
 -- -------------------------------------------------------------------------- --
 -- Translators                                                                --

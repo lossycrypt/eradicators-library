@@ -116,7 +116,8 @@ local Modules = {
   Force      = control_only 'erlib/factorio/Force' ,
   Train      = control_only 'erlib/factorio/Train' ,
   
-  Data       = startup_only 'erlib/factorio/Data/!init',
+  Data       = 'erlib/factorio/Data/!init',
+  Setting    = 'erlib/factorio/Setting'   ,
   
   PluginManagerLite = dev_only 'erlib/factorio/PluginManagerLite-1',
   

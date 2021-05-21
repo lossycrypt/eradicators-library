@@ -295,6 +295,78 @@ function PackedInterfaceGroup:set(key,value)
   end
   
 
+--------------------------------------------------------------------------------
+-- Wrapper.
+-- @section
+--------------------------------------------------------------------------------
+
+--[[------
+  Imports a @{FOBJ LuaRemote } interface as a local module.
+  Behaves identical to calling the interface manually.
+  
+  __Syntactic sugar__ for candy lovers.
+
+  @usage
+    local Freeplay = Remote.get_interface('freeplay')
+  
+    -- Native syntax.
+    for method_name in pairs(remote.interfaces['freeplay']) do
+      print(method_name)
+      end
+    
+    -- Sugar coated syntax.
+    for method_name in pairs(Freeplay) do
+      print(method_name)
+      end
+  
+    > get_created_items
+    > set_created_items
+    > get_respawn_items
+    > set_respawn_items
+    > set_skip_intro
+    > set_chart_distance
+    > set_disable_crashsite
+    > get_ship_items
+    > set_ship_items
+    > get_debris_items
+    > set_debris_items
+  
+    print(Hydra.lines(Freeplay.get_created_items()))
+  
+    > {
+    >   ["wood"] = 1
+    >   ["pistol"] = 1,
+    >   ["iron-plate"] = 8,
+    >   ["stone-furnace"] = 1,
+    >   ["firearm-magazine"] = 10,
+    >   ["burner-mining-drill"] = 1,
+    >   }
+
+  @tparam string interface_name The name of any remote interface.
+
+  @treturn table The pseudo-module wrapper.
+  
+]]
+function Remote.get_interface(interface_name)
+  local remote_call = assert(remote.call)
+  return setmetatable({},{
+    __index = function(self, key)
+      local f = function(...) return remote_call(interface_name, key, ...) end
+      rawset(self, key, f)
+      return f end,
+    __newindex = function(self, key)
+      stop(('Can not add method "%s" to remote interface "%s".')
+        :format(key, interface_name))
+      end,
+    __pairs = function()
+      return pairs(remote.interfaces[interface_name])
+      end,
+    })
+  end
+
+
+
+  
 
 -- -------------------------------------------------------------------------- --
 -- Export                                                                     --

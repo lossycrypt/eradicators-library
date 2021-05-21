@@ -32,7 +32,7 @@ local Verify           , Verify_Or
 local Tool       = elreq('erlib/lua/Tool'      )()
     
 local Table      = elreq('erlib/lua/Table'     )()
--- local Array      = elreq('erlib/lua/Array'     )()
+local Array      = elreq('erlib/lua/Array'     )()
 -- local Set        = elreq('erlib/lua/Set'       )()
 
 -- local Crc32      = elreq('erlib/lua/Coding/Crc32')()
@@ -105,7 +105,7 @@ local Data,_Data,_uLocale = {},{},{}
 ----------
 -- Creates a custom input for use with a custom event handler.
 -- 
--- __Note:__ Key sequence detection is very strict:
+-- __Note:__ Factorios key sequence detection is very strict:
 -- 
 --   - All letters must be __capitalized__, i.e `A`, `B`, `SPACE`, `ENTER`.
 --   - Except for `mouse-` keys which use lower case, i.e. `mouse-button-1`.
@@ -256,7 +256,8 @@ Data.Path = {}
 -- @treturn string The joined path.
 -- 
 function Data.Path.join(...)
-  return table.concat({...},'/'):gsub('/+','/')
+  -- remove nil values from the input to prevent starting with / when not desired
+  return (table.concat(Array.compress({...}),'/'):gsub('/+','/'))
   end
   
   

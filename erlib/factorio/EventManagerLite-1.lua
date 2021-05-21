@@ -473,7 +473,7 @@ function Private.on_nth_tick_handler(e)
     --
     local tick          = e.tick
     local next_nth_tick = math.huge
-    log_event(tick, 'on_tick', 'event-manager-nth-tick')
+    -- log_event(tick, 'on_tick', 'event-manager-nth-tick')
     --
     local handlers = {table_unpack(OrderedNthTicks.handlers)} --deterministic order
     for i=1, OrderedNthTicks.n do
@@ -486,7 +486,7 @@ function Private.on_nth_tick_handler(e)
         --
         assert(handler.next_tick >= tick) --sanity
         if tick == handler.next_tick then
-          log_event(tick, 'on_nth_tick ' .. handler.period, handler.module_name)
+          -- log_event(tick, 'on_nth_tick ' .. handler.period, handler.module_name)
           handler.f {nth_tick = handler.period, tick = tick, offset = handler.offset}
           handler.next_tick = tick + handler.period
           end

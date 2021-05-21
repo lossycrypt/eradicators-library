@@ -32,7 +32,8 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Functions">Functions</a></li>
+<li><a href="#Concepts">Concepts</a></li>
+<li><a href="#Setting">Setting </a></li>
 </ul>
 
 
@@ -52,7 +53,7 @@
   <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><a href="../modules/PluginManagerLite.html">PluginManagerLite</a></li>
   <li><a href="../modules/Remote.html">Remote</a></li>
-  <li><a href="../modules/Setting.html">Setting</a></li>
+  <li><strong>Setting</strong></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
   <li><a href="../modules/Train.html">Train</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
@@ -80,7 +81,7 @@
   <li><a href="../modules/Tool.html">Tool</a></li>
   <li><a href="../modules/Vector.html">Vector</a></li>
   <li><a href="../modules/Verificate.html">Verificate</a></li>
-  <li><strong>Version</strong></li>
+  <li><a href="../modules/Version.html">Version</a></li>
   <li><a href="../modules/remotes.html">remotes</a></li>
   <li><a href="../modules/snippet.html">snippet</a></li>
 </ul>
@@ -93,25 +94,33 @@
 
 <div id="content">
 
-<h1>Module <code>Version</code></h1>
-<p>Comparison of "Major.Minor.Patch" triplets.</p>
-<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Experimental 2020-10-31.</p>
+<h1>Module <code>Setting</code></h1>
+<p>Methods for
+ <a href="https://wiki.factorio.com/Tutorial:Mod_settings">Mod Settings</a>.</p>
+<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.</p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Version = require(&apos;__eradicators-library__/erlib/factorio/Version&apos;)()
+        <pre class="example">local Setting = require(&apos;__eradicators-library__/erlib/factorio/Setting&apos;)()
 </pre>
     </ul>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#Concepts">Concepts</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#compare">compare(versionA, operator, versionB)</a></td>
-	<td class="summary">Compares two version strings directly.</td>
+	<td class="name" nowrap><a href="#setting_type">setting_type</a></td>
+	<td class="summary">Factorio uses several different names for the <code>setting_type</code> of a setting.</td>
+	</tr>
+</table>
+<h2><a href="#Setting">Setting </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#get_value">get_value(setting_type, name)</a></td>
+	<td class="summary">Retrieve the current value of a <a href="../api/Concepts.html#ModSetting">ModSetting</a>.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#parse">parse(versionA)</a></td>
-	<td class="summary">Converts a version string to three <a href="../api/Builtin-Types.html#int">int</a> values.</td>
+	<td class="name" nowrap><a href="#set_value">set_value(setting_type, name)</a></td>
+	<td class="summary">Set a new value for a <a href="../api/Concepts.html#ModSetting">ModSetting</a>.</td>
 	</tr>
 </table>
 
@@ -119,96 +128,98 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="Concepts"></a>Concepts</h2>
 
     <dl class="function">
     <dt>
-    <a name = "compare"></a>
-    <strong>compare(versionA, operator, versionB)</strong>
+    <a name = "setting_type"></a>
+    <strong>setting_type</strong>
     </dt>
     <dd>
-    Compares two version strings directly.  If minor or patch are blank they
- are assumed to be 0.
+
+<p>Factorio uses several different names for the <code>setting_type</code> of a setting. </p>
+
+<pre><code>In-Game Menu | Erlib     | settings.lua      | data.lua  | LuaSettings
+---------------------------------------------------------------------
+Startup      | 'startup' | 'startup'         | 'startup' | 'startup'
+Map          | 'map'     | 'runtime-global'  |  -        | 'global'
+Per Player   | 'player'  | 'runtime-per-user'|  -       '| 'player'
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Setting"></a>Setting </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "get_value"></a>
+    <strong>get_value(setting_type, name)</strong>
+    </dt>
+    <dd>
+    Retrieve the current value of a <a href="../api/Concepts.html#ModSetting">ModSetting</a>. </p>
+
+<p> Available in data and control stage only.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">versionA</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-
-
+        <li><span class="parameter">setting_type</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a>, <span class="type">player_index</span> or <a class="type" href="../api/LuaPlayer.html">LuaPlayer</a></span>
+         The string can be
+ either <code>&apos;startup&apos;</code> or <code>&apos;map&apos;</code>. Only <code>&apos;startup&apos;</code> is valid in data stage.
         </li>
-        <li><span class="parameter">operator</span>
+        <li><span class="parameter">name</span>
             <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-          One of >, >=, ==, !=, ~=, &lt;=, &lt;
-        </li>
-        <li><span class="parameter">versionB</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-
-
-
+         Name of the setting.
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
-
-
-
+           <span class="types"><a class="type" href="../modules/Types.html#NotNil">NotNil</a></span>
+        Value of the setting.
     </ol>
 
 
 
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="global">print</span>(Version.compare(<span class="string">'1'</span>,<span class="string">'=='</span>,<span class="string">'1.0.0'</span>))
-&gt; <span class="keyword">true</span>
-
-<span class="global">print</span>(Version.compare(<span class="string">'2.3.5'</span>,<span class="string">'&gt;'</span>,<span class="string">'2.0'</span>))
-&gt; <span class="keyword">true</span>
-
-<span class="global">print</span>(Version.compare(<span class="string">'2.3.5'</span>,<span class="string">'&gt;'</span>,<span class="string">'2.3.5'</span>))
-&gt; <span class="keyword">false</span>
-
-<span class="global">print</span>(Version.compare(<span class="string">'555'</span>,<span class="string">'~='</span>,<span class="string">'555.0.0'</span>))
-&gt; <span class="keyword">false</span>
-</pre>
-    </ul>
 
 </dd>
     <dt>
-    <a name = "parse"></a>
-    <strong>parse(versionA)</strong>
+    <a name = "set_value"></a>
+    <strong>set_value(setting_type, name)</strong>
     </dt>
     <dd>
-    Converts a version string to three <a href="../api/Builtin-Types.html#int">int</a> values.
+    Set a new value for a <a href="../api/Concepts.html#ModSetting">ModSetting</a>.  Works only
+ when called from the same mod that created the setting.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">versionA</span>
+        <li><span class="parameter">setting_type</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a>, <span class="type">player_index</span> or <a class="type" href="../api/LuaPlayer.html">LuaPlayer</a></span>
+         The string can be
+ either <code>&apos;startup&apos;</code> or <code>&apos;map&apos;</code>. Only <code>&apos;startup&apos;</code> is valid in data stage.
+        </li>
+        <li><span class="parameter">name</span>
             <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         Name of the setting.</p>
 
+<p> Available in control stage only.</p>
 
-
+<p> See also <a href="../api/LuaSetting.html#LuaSetting.">LuaSetting </a>
         </li>
     </ul>
 
-    <h3>Returns:</h3>
-    <ol>
-        <li>
-           <span class="types"><a class="type" href="../api/Builtin-Types.html#uint">uint</a></span>
-        major</li>
-        <li>
-           <span class="types"><a class="type" href="../api/Builtin-Types.html#uint">uint</a></span>
-        minor</li>
-        <li>
-           <span class="types"><a class="type" href="../api/Builtin-Types.html#uint">uint</a></span>
-        patch</li>
-    </ol>
 
 
 
