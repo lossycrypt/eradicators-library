@@ -45,7 +45,7 @@ local dummy = {
   default_value = false          ,
   forced_value  = false          , -- Only loaded if hidden = true
   }
-  
+
 _ENV .erlib_enable_bablefish = make_enabler(
   Data.Inscribe(Table.smerge(dummy, {
     name  = 'erlib:enable-babelfish',
