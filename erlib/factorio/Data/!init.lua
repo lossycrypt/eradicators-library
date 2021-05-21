@@ -1,7 +1,7 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
--- Description
+-- Data stage helpers.
 --
 -- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
 --
@@ -301,8 +301,38 @@ function Data.Icon.SimpleIconTable(root, filename, size, tint)
     }
   end
 
-  
-  
+--------------------------------------------------------------------------------
+-- item.
+-- @section
+--------------------------------------------------------------------------------
+Data.Item = {}
+
+----------
+-- Finds an item prototype by name without having to know the type.
+--
+-- Supports all item types like `'ammo'`, `'module'`, etc.
+--
+-- @tparam string name
+-- @treturn table|nil A prototype.
+-- @function Data.Item.find_item_prototype
+local item_types = {
+  -- As of 1.1.32. https://wiki.factorio.com/Prototype/Item
+  -- In order of higest probability first for faster iteration.
+  'item','ammo','module','gun','capsule','tool','armor',
+  'item-with-label','item-with-entity-data','item-with-inventory',
+  'blueprint-book','item-with-tags','selection-tool','blueprint',
+  'copy-paste-tool','deconstruction-item','upgrade-item','rail-planner',
+  'spidertron-remote','repair-tool','mining-tool'
+  }
+function Data.Item.find_item_prototype(name)
+  -- Originally this was attached as __index metamethod to data.raw.item.
+  for i=1, #item_types do 
+    local prot = data.raw[item_types[i]]
+    if prot[name] then return prot[name] end
+    end
+  end
+
+
 --------------------------------------------------------------------------------
 -- all prototypes.
 -- @section

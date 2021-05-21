@@ -1,0 +1,12 @@
+{
+  "title"            : "!Abort loading...!",
+  "name"             : "zz-abort-loading",
+  "author"           : "eradicator",
+  "version"          : "0.1.1",
+  "factorio_version" : "1.1",
+  "contact"          : "Check the mod portal \"Discussions\" tab (link below).",
+  "license"          : "",
+  "description"      : "Aborts loading after data-final-fixes phase for easier data stage debugging.",
+  "dependencies"     : [
+  ]
+}

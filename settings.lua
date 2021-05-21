@@ -50,10 +50,14 @@ _ENV .erlib_enable_bablefish = make_enabler(
   Data.Inscribe(Table.smerge(dummy, {
     name  = 'erlib:enable-babelfish',
     order = 'ZZ9 Plural Z Alpha'    ,
-    }))
-  )
+  })))
 
 _ENV .erlib_enable_cursor_tracker = make_enabler(
-  Data.Inscribe(Table.smerge(dummy,{name  = 'erlib:enable-cursor-tracker'}))
-  )
+  Data.Inscribe(Table.smerge(dummy,{
+    name  = 'erlib:enable-cursor-tracker',
+  })))
 
+_ENV .erlib_enable_cursor_tracker = make_enabler(
+  Data.Inscribe(Table.smerge(dummy,{
+    name  = 'erlib:enable-zoom-tracker',
+  })))

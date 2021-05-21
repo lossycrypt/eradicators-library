@@ -461,21 +461,23 @@ local function Test()
     end
   end
 
-  do -- test for Lua 5.2 compiled without loadstring
-    local a = {function() return 1 end}
-
-    local load, loadstring = _G.load, _G.loadstring
-    local f = assert((loadstring or load)('load = loadstring or load; loadstring = nil; return '..serpent.line(a)),
-      "serializing table with function as a value (1/2): failed")
-    local _a = f()
-    assert(_a[1]() == a[1](), "deserialization of function value without loadstring (1/2): failed")
-    _G.load, _G.loadstring = load, loadstring
-
-    local f = assert((loadstring or load)('return '..serpent.line(a)),
-      "serializing table with function as a value (2/2): failed")
-    local _a = f()
-    assert(_a[1]() == a[1](), "deserialization of function value without loadstring (2/2): failed")
-  end
+-- lossycrypt 2021-05-21: disabled due to incompatibility with Lock.AutoLock
+--
+-- do -- test for Lua 5.2 compiled without loadstring
+--   local a = {function() return 1 end}
+-- 
+--   local load, loadstring = _G.load, _G.loadstring
+--   local f = assert((loadstring or load)('load = loadstring or load; loadstring = nil; return '..serpent.line(a)),
+--     "serializing table with function as a value (1/2): failed")
+--   local _a = f()
+--   assert(_a[1]() == a[1](), "deserialization of function value without loadstring (1/2): failed")
+--   _G.load, _G.loadstring = load, loadstring
+-- 
+--   local f = assert((loadstring or load)('return '..serpent.line(a)),
+--     "serializing table with function as a value (2/2): failed")
+--   local _a = f()
+--   assert(_a[1]() == a[1](), "deserialization of function value without loadstring (2/2): failed")
+-- end
 
   do
     local ok, res = serpent.load("do error('not allowed') end")

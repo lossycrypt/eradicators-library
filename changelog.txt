@@ -10,6 +10,9 @@ Date: 2021-05-21
     - Added Remote.get_interface
     - Added Player.get_player
     - New module Setting
+    - Added Verificate.isType.WhiteSpaceString
+  Internal:
+    - Moved utility trigger mods into the library mod so other people can use them.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.2
 Date: 2021-05-21

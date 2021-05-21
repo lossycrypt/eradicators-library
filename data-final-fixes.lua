@@ -32,5 +32,14 @@ if flag.DO_TESTS then
 Data.SimpleCustomInput('er:','interact-button','mouse-button-3')
 
 -- -------------------------------------------------------------------------- --
+-- Plugins                                                                      --
+-- -------------------------------------------------------------------------- --
+if settings.startup['erlib:enable-cursor-tracker'].value then
+  require 'plugins/cursor-tracker/data-final-fixes.lua'
+  end
+
+
+-- -------------------------------------------------------------------------- --
 -- Draft                                                                      --
 -- -------------------------------------------------------------------------- --
+

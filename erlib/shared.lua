@@ -71,7 +71,7 @@ local flag = shared[5]
     not (_ENV.os and _ENV.io)
 
   flag.IS_DEV_MODE = -- spam the log with garbage, etcpp
-    does_file_exist('__zz-toggle-to-enable-dev-mode__/empty')
+    does_file_exist('__00-toggle-to-enable-dev-mode__/empty')
     or (not flag.IS_FACTORIO)
 
   flag.VERBOSE_LOGGING = --todo: decided how/what to do with this
@@ -107,6 +107,7 @@ local flag = shared[5]
 
   -- Mute low-level logging
   STDOUT = flag.IS_DEV_MODE and print or SKIP
+  STDERR = error
  
   -- This is the first thing the library will say.
   if flag.IS_DEV_MODE then

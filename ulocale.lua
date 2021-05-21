@@ -7,7 +7,7 @@
 
 
 
-local flag = pcall(require,'__zz-toggle-to-enable-dev-mode__/empty')
+local flag = pcall(require,'__00-toggle-to-enable-dev-mode__/empty')
 
 local erlib = require '__eradicators-library__/erlib/library.lua' (_ENV,{
   is_dev_build = flag,

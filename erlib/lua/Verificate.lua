@@ -549,16 +549,22 @@ isType[false] = isType['false']
 -- @section
 --------------------------------------------------------------------------------
 
+--- The empty string of length 0.
+function isType.EmptyString (obj)
+  return obj == ''
+  end
 
---- @function isType.NonEmptyString
+--- A string, but not the empty one.
 function isType.NonEmptyString (obj)
   return type(obj) == 'string'
      and obj ~= ''
   end
-
---- @function isType.EmptyString
-function isType.EmptyString (obj)
-  return obj == ''
+ 
+--- Space of any length. Doesn't seem to work for non-Ascii
+--- space even though the lua manual says it should.
+function isType.WhiteSpaceString (obj)
+  return type(obj) == 'string'
+     and #obj:gsub('[%s　]+','') == 0 -- gotta manually enlist other spaces...
   end
  
 

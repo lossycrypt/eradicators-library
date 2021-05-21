@@ -5,7 +5,7 @@
 --
 -- @submodule Iter
 -- @usage
---  local sync_tuples = require('__eradicators-library__/erlib/lua/Iter/ntuples')()
+--  local ntuples = require('__eradicators-library__/erlib/lua/Iter/ntuples')()
   
 --[[ Lua Behavior:
 

@@ -657,7 +657,7 @@ do end
 do end
 
 ----------
--- New: Shorthand for on\_configuration\_changed.
+-- New: Shorthand for on\_configuration\_changed(f).
 -- @function ManagedLuaBootstrap.on_config
 do end
 

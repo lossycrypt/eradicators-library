@@ -1,0 +1,11 @@
+{
+  "title"            : "!Toggle to raise on_config_changed!",
+  "name"             : "00-toggle-to-raise-config",
+  "author"           : "eradicator",
+  "version"          : "0.0.3",
+  "factorio_version" : "1.1",
+  "contact"          : "Check the mod portal \"Discussions\" tab (link below).",
+  "license"          : "",
+  "description"      : "When an on_configuration_changed event is needed to trigger global data fixing but changing the version numbers of mods is not desirable this mod can be toggled on/off.",
+  "dependencies"     : []
+}

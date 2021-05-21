@@ -32,8 +32,8 @@ local function parse_version(vstr) -- string "Major.Minor.Patch"
   return major,minor,patch end
 
 local function gtr(verA,verB)
-  a,b,c = parse_version(verA)
-  x,y,z = parse_version(verB)
+  local a,b,c = parse_version(verA)
+  local x,y,z = parse_version(verB)
   return (a>x) or (a==x and b>y) or (a==x and b==y and c>z)
   end
 

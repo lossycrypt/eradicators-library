@@ -24,6 +24,10 @@ local phase = flag.IS_FACTORIO and Stacktrace.get_load_phase().name or 'lua'
 
 local toset = function(arr) local r = {} for _,v in pairs(arr) do r[v]=true end return r end
 
+
+
+
+
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --

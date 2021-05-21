@@ -283,6 +283,8 @@ local function EradicatorsLibraryMain(options)
         --> event manager internal event "on_debug_once_per_session"
         --> Preferrably the library itself should never require EventManager.
         script.on_nth_tick(61,function()only_once()end) --must be identical function
+        -- on_nth_tick is *emulated* by EventManagerLite and not actually
+        -- used directly, so this doesn't break anything.
         end
       log:footer()
       end
@@ -335,7 +337,7 @@ local function __init__(PublicENV,options)
 
 ----OPTIONS----------------------------------------------------------------------------------------
   options = options or {}
-  local OVERRIDE = pcall(require,'__zz-toggle-to-enable-dev-mode__/empty')
+  local OVERRIDE = pcall(require,'__00-toggle-to-enable-dev-mode__/empty')
   -- IS_DEV_MODE      = options.is_dev_build      or false
   -- DEBUG_MODE        = options.debug_mode        or false
   IS_DEV_MODE      = OVERRIDE --what is the use-case for toggling these on a per-mod basis?

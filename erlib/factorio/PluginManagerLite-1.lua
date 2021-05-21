@@ -13,6 +13,14 @@
 
   
   ]]
+  
+--[[ Todo:
+
+  + in on_config walk through all garbage collected Savedata
+    and clean up the mess caused by events not being raised 
+    before on_config when other mods mess stuff up. (yet again)
+    
+  ]]
 
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -30,6 +38,7 @@ local stop        = elreq('erlib/lua/Error'     )().Stopper 'PluginManagerLite'
 local Stacktrace  = elreq('erlib/factorio/Stacktrace')()
 
 local Table       = elreq('erlib/lua/Table'     )()
+local Set         = elreq('erlib/lua/Set'       )()
 
 local Verificate  = elreq('erlib/lua/Verificate')()
 local verify      = Verificate.verify
@@ -128,8 +137,8 @@ do end
 -- __Note:__ Implicitly loads @{EventManagerLite}. Can not be used without.  
 -- __Note:__ The other savedata management methods do not exist before calling this.
 --
--- @function PluginManagerLite.enable_savedata_manager
-function Public.enable_savedata_manager()
+-- @function PluginManagerLite.enable_savedata_management
+function Public.enable_savedata_management()
     
   local EventManager= elreq('erlib/factorio/EventManagerLite-1')()
   local script      = EventManager.get_managed_script('plugin-manager')
@@ -151,7 +160,7 @@ function Public.enable_savedata_manager()
   --
   -- 
   --
-  -- Can only be uesd after @{PluginManagerLite.enable_savedata_manager}.
+  -- Can only be uesd after @{PluginManagerLite.enable_savedata_management}.
   --
   -- @tparam string plugin_name
   -- @tparam function setter Will be called setter(Savedata) in on\_load and on\_config.
@@ -173,7 +182,11 @@ function Public.enable_savedata_manager()
   -- 
   -- This only has to be called once per plugin_name as it affects all setters.
   -- 
-  -- Can only be uesd after @{PluginManagerLite.enable_savedata_manager}.
+  -- This also enables automatic creation-on-first-access of Savedata sub-tables
+  -- 'players','forces','surfaces' and 'map' if the methods table
+  -- has no metatable itself.
+  -- 
+  -- Can only be uesd after @{PluginManagerLite.enable_savedata_management}.
   -- 
   -- @tparam string plugin_name
   -- @tparam table methods This table will be assigned as the __index metatable
@@ -183,6 +196,15 @@ function Public.enable_savedata_manager()
   function Public.classify_savedata(plugin_name, methods)
     local this = assert(ManagedPlugins[plugin_name], 'Unknown plugin name.')
     this.mt    = {__index = methods}
+    --
+    local auto_subtables = Set.from_values{'players','forces','surfaces','map'}
+    if not getmetatable(methods) then
+      setmetatable(methods, {__index=function(_, key)
+        if auto_subtables[key] and _ENV.game then -- not in on_load!
+          return Table.set(Table.get(_ENV.global, this.path), {key}, {})
+          end
+        end})
+      end
     end
 
   --
@@ -234,7 +256,7 @@ function Public.enable_savedata_manager()
   -- youself. If you create new data with the old index it will still be
   -- deleted at the end of the event.
   -- 
-  -- Can only be uesd after @{PluginManagerLite.enable_savedata_manager}.
+  -- Can only be uesd after @{PluginManagerLite.enable_savedata_management}.
   -- 
   -- @tparam string plugin_name
   -- 
