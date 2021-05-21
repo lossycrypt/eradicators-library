@@ -39,10 +39,11 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 
 -- local stop       = elreq('erlib/lua/Error')().Stopper('ntuples')
 
-local Verificate = elreq('erlib/lua/Verificate')()
-local verify     = Verificate.verify
+local Verificate   = elreq('erlib/lua/Verificate')()
+local isPlainTable = Verificate.isType.PlainTable
+local verify       = Verificate.verify
 
-local SKIP       = ercfg.SKIP
+local SKIP         = ercfg.SKIP
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -60,7 +61,7 @@ local SKIP       = ercfg.SKIP
 -- 
 -- Returns every possible path of length n. This might
 -- lead to __unexpected results__ when the input table is __recursive__
--- or has multiple references to the same sub-table.
+-- or has multiple references to the same sub-table. See also @{Iter.dpairs}.
 --
 -- See also @{Metatables and Metamethods}.
 --
@@ -82,13 +83,13 @@ local SKIP       = ercfg.SKIP
 --       play_time = 9001, -- ignored because it's not a table.
 --       }, 
 --     tarou = {
---       items = {'iron-gear', 'copper-gear'},
+--       items = {'iron-gear' , 'copper-gear' },
 --       ammo  = {}, -- ignored because it's not deep enough.
 --       play_time = 42,
 --       },
 --     akira = {
 --       items = {},
---       ammo  = {'exploding', 'magic'      },
+--       ammo  = {'exploding' , 'magic'       },
 --       play_time = 7,
 --       },
 --     }
@@ -124,12 +125,12 @@ local function ntuples(n, tbl)
     key[i], key[n] = next[i](tbl[i], key[i]) -- key[n] == value
     if key[n] == nil then; i = i - 1
     elseif i < max_i then; i = i + 1
-      if type(key[n]) ~= 'table' then; i = i - 1 -- the road is blocked!
+      if not isPlainTable(key[n]) then; i = i - 1 -- the road is blocked!
       else next[i], tbl[i], key[i] = pairs(key[n]) end
     else return table_unpack(key) end
     until i == 0 end
   end
- 
+
  
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

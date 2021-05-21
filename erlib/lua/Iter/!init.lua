@@ -42,6 +42,7 @@ Iter.subsets      = elreq('erlib/lua/Iter/subsets')()
 -- Iter.deep_pairs   = elreq('erlib/lua/Iter/deep_pairs' )() -- too complex
 Iter.sync_tuples  = elreq('erlib/lua/Iter/sync_tuples')()
 Iter.ntuples      = elreq('erlib/lua/Iter/ntuples')()
+Iter.dpairs       = elreq('erlib/lua/Iter/dpairs')()
 
 
 Iter.filter_pairs = elreq('erlib/lua/Iter/filter_pairs' )()

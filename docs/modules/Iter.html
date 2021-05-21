@@ -35,6 +35,7 @@
 <li><a href="#Todo">Todo </a></li>
 <li><a href="#lua_Iter_array_pairs_Functions">lua.Iter.array_pairs Functions</a></li>
 <li><a href="#lua_Iter_combinations_Functions">lua.Iter.combinations Functions</a></li>
+<li><a href="#lua_Iter_dpairs_Functions">lua.Iter.dpairs Functions</a></li>
 <li><a href="#lua_Iter_filter_pairs_Functions">lua.Iter.filter_pairs Functions</a></li>
 <li><a href="#lua_Iter_ntuples_Functions">lua.Iter.ntuples Functions</a></li>
 <li><a href="#lua_Iter_permutations_Functions">lua.Iter.permutations Functions</a></li>
@@ -132,6 +133,13 @@
 	<tr>
 	<td class="name" nowrap><a href="#combinations">combinations(length, arr)</a></td>
 	<td class="summary">Iterates over all n-length combinations of the given values.</td>
+	</tr>
+</table>
+<h2><a href="#lua_Iter_dpairs_Functions">lua.Iter.dpairs Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#dpairs">dpairs([tbl[, opt]])</a></td>
+	<td class="summary">Deep_pairs iterates all sub-tables in a single for-loop.</td>
 	</tr>
 </table>
 <h2><a href="#lua_Iter_filter_pairs_Functions">lua.Iter.filter_pairs Functions</a></h2>
@@ -315,6 +323,186 @@
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="lua_Iter_dpairs_Functions"></a>lua.Iter.dpairs Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "dpairs"></a>
+    <strong>dpairs([tbl[, opt]])</strong>
+    </dt>
+    <dd>
+    Deep_pairs iterates all sub-tables in a single for-loop. </p>
+
+<p>This is a non-fixed-path-length fork of <a href="../modules/Iter.html#ntuples">Iter.ntuples</a>.</p>
+
+<p>With default options every <a href="../modules/Types.html#KeyValuePair">(key → value)</a> pair is iterated exactly once.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         The input table.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">opt</span> (<a href="../lua-5.2/doc/manual.html#pdf-table">table</a>) Options (<em>optional</em>).
+        <ul>
+        <li><span class="parameter">include_path</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         Activates the fourth return value.
+         (<em>default</em> false)
+        </li>
+        <li><span class="parameter">include_duplicates</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         When this is false and @tbl
+has multiple references to the same sub-table, then only the first reference
+to each sub-table will be iterated and all futher reference skipped. When
+this is true all references will be iterated normally and the fifth return
+value will be true for all iterations except the first.
+         (<em>default</em> false)
+        </li>
+        <li><span class="parameter">ignore_recursion</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         Silently skip recursive
+sub-tables instead of raising an error.
+         (<em>default</em> false)
+        </li>
+        </li></ul>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><a class="type" href="../modules/Types.html#NotNil">NotNil</a></span>
+        <code>key</code></li>
+        <li>
+           <span class="types"><a class="type" href="../modules/Types.html#NotNil">NotNil</a></span>
+        <code>value</code></li>
+        <li>
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        <code>table </code> This is the sub-table that contains the returned <a href="../modules/Types.html#KeyValuePair">(key → value)</a> pair.</li>
+        <li>
+           <span class="types"><a class="type" href="../modules/Table.html#TablePath">TablePath</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        <code>path</code> This is the full path to the value
+inside the input table @tbl.</li>
+        <li>
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+        <code>is_duplicate</code></li>
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example"><span class="comment">-- Setup the example data.
+</span><span class="keyword">local</span> players = {
+  yurie = {
+    items = {<span class="string">'iron-plate'</span>, <span class="string">'copper-plate'</span>},
+    ammo  = {<span class="string">'piercing'</span>  , <span class="string">'uranium'</span>     },
+    play_time = <span class="number">9001</span>,
+    },
+  tarou = {
+    items = {<span class="string">'iron-gear'</span> , <span class="string">'copper-gear'</span> },
+    ammo  = {},
+    play_time = <span class="number">42</span>,
+    },
+  akira = {
+    items = {},
+    ammo  = {<span class="string">'exploding'</span> , <span class="string">'magic'</span>       },
+    play_time = <span class="number">7</span>,
+    },
+  }
+
+<span class="comment">-- Introduce some duplicate table references.
+</span>players.michiru           = players.tarou
+players.akira.ammo[<span class="string">'ref'</span>] = players.yurie.ammo
+
+<span class="comment">-- And an easy to read format.
+</span><span class="keyword">local</span> <span class="keyword">function</span> format_row(key, value, path, is_duplicate)
+  <span class="keyword">return</span> (<span class="string">'%-28s %-10s %-13s %-5s'</span>)
+    :format(Hydra.line(path), key, value, is_duplicate <span class="keyword">and</span> <span class="string">'(duplicate)'</span> <span class="keyword">or</span> <span class="string">''</span>)
+  <span class="keyword">end</span>
+</pre></li>
+        <li><pre class="example"><span class="comment">-- Example 1: Path. (Also notice that duplicates are ignored by default.)
+</span>
+  <span class="keyword">for</span> key, value, tbl, path <span class="keyword">in</span>
+    Iter.dpairs(players, {include_path = <span class="keyword">true</span>}) <span class="keyword">do</span>
+    <span class="global">print</span>(format_row(key, value, path))
+    <span class="keyword">end</span>
+
+<span class="comment">--[path]                       [key]      [value]
+</span>&gt; {<span class="string">"michiru"</span>, <span class="string">"items"</span>, <span class="number">1</span>}      <span class="number">1</span>          iron-gear
+&gt; {<span class="string">"michiru"</span>, <span class="string">"items"</span>, <span class="number">2</span>}      <span class="number">2</span>          copper-gear
+&gt; {<span class="string">"michiru"</span>, <span class="string">"play_time"</span>}     play_time  <span class="number">42</span>
+&gt; {<span class="string">"akira"</span>, <span class="string">"ammo"</span>, <span class="number">1</span>}         <span class="number">1</span>          exploding
+&gt; {<span class="string">"akira"</span>, <span class="string">"ammo"</span>, <span class="number">2</span>}         <span class="number">2</span>          magic
+&gt; {<span class="string">"akira"</span>, <span class="string">"play_time"</span>}       play_time  <span class="number">7</span>
+&gt; {<span class="string">"yurie"</span>, <span class="string">"ammo"</span>, <span class="number">1</span>}         <span class="number">1</span>          piercing
+&gt; {<span class="string">"yurie"</span>, <span class="string">"ammo"</span>, <span class="number">2</span>}         <span class="number">2</span>          uranium
+&gt; {<span class="string">"yurie"</span>, <span class="string">"items"</span>, <span class="number">1</span>}        <span class="number">1</span>          iron-plate
+&gt; {<span class="string">"yurie"</span>, <span class="string">"items"</span>, <span class="number">2</span>}        <span class="number">2</span>          copper-plate
+&gt; {<span class="string">"yurie"</span>, <span class="string">"play_time"</span>}       play_time  <span class="number">9001</span>
+</pre></li>
+        <li><pre class="example"><span class="comment">-- Example 2: Duplicates.
+</span>
+<span class="keyword">for</span> key, value, tbl, path, is_duplicate <span class="keyword">in</span>
+  Iter.dpairs(players, {include_path = <span class="keyword">true</span>, include_duplicates=<span class="keyword">true</span>}) <span class="keyword">do</span>
+  <span class="global">print</span>(format_row(key, value, path, is_duplicate))
+  <span class="keyword">end</span>
+
+<span class="comment">--[path]                       [key]      [value]
+</span>&gt; {<span class="string">"michiru"</span>, <span class="string">"items"</span>, <span class="number">1</span>}      <span class="number">1</span>          iron-gear
+&gt; {<span class="string">"michiru"</span>, <span class="string">"items"</span>, <span class="number">2</span>}      <span class="number">2</span>          copper-gear
+&gt; {<span class="string">"michiru"</span>, <span class="string">"play_time"</span>}     play_time  <span class="number">42</span>
+&gt; {<span class="string">"akira"</span>, <span class="string">"ammo"</span>, <span class="number">1</span>}         <span class="number">1</span>          exploding
+&gt; {<span class="string">"akira"</span>, <span class="string">"ammo"</span>, <span class="number">2</span>}         <span class="number">2</span>          magic
+&gt; {<span class="string">"akira"</span>, <span class="string">"ammo"</span>, <span class="string">"ref"</span>, <span class="number">1</span>}  <span class="number">1</span>          piercing      <span class="comment">-- notice pairs-based
+</span>&gt; {<span class="string">"akira"</span>, <span class="string">"ammo"</span>, <span class="string">"ref"</span>, <span class="number">2</span>}  <span class="number">2</span>          uranium       <span class="comment">-- random order
+</span>&gt; {<span class="string">"akira"</span>, <span class="string">"play_time"</span>}       play_time  <span class="number">7</span>
+&gt; {<span class="string">"yurie"</span>, <span class="string">"ammo"</span>, <span class="number">1</span>}         <span class="number">1</span>          piercing      (duplicate)
+&gt; {<span class="string">"yurie"</span>, <span class="string">"ammo"</span>, <span class="number">2</span>}         <span class="number">2</span>          uranium       (duplicate)
+&gt; {<span class="string">"yurie"</span>, <span class="string">"items"</span>, <span class="number">1</span>}        <span class="number">1</span>          iron-plate
+&gt; {<span class="string">"yurie"</span>, <span class="string">"items"</span>, <span class="number">2</span>}        <span class="number">2</span>          copper-plate
+&gt; {<span class="string">"yurie"</span>, <span class="string">"play_time"</span>}       play_time  <span class="number">9001</span>
+&gt; {<span class="string">"tarou"</span>, <span class="string">"items"</span>, <span class="number">1</span>}        <span class="number">1</span>          iron-gear     (duplicate)
+&gt; {<span class="string">"tarou"</span>, <span class="string">"items"</span>, <span class="number">2</span>}        <span class="number">2</span>          copper-gear   (duplicate)
+&gt; {<span class="string">"tarou"</span>, <span class="string">"play_time"</span>}       play_time  <span class="number">42</span>            (duplicate)
+
+</pre></li>
+        <li><pre class="example"><span class="comment">-- Example 3: Recursion.
+</span>
+<span class="comment">-- Let's introduce a loop...
+</span>players.tarou.loop = players
+
+<span class="comment">-- and try the same command as in Example 2...
+</span><span class="keyword">for</span> key, value, tbl, path, is_duplicate <span class="keyword">in</span>
+  Iter.dpairs(players, {include_path = <span class="keyword">true</span>, include_duplicates=<span class="keyword">true</span>}) <span class="keyword">do</span>
+  <span class="global">print</span>(format_row(key, value, path, is_duplicate))
+  <span class="keyword">end</span>
+
+&gt; Error!
+&gt; Table recursion detected but now allowed.
+&gt; path: {<span class="string">"michiru"</span>, <span class="string">"loop"</span>}
+
+<span class="comment">-- Notice that "michiru" and "tarou" reference the same sub-table.
+</span><span class="comment">-- The error message reports whichever path it found first.
+</span>
+<span class="comment">-- Now let't try again with irgnore mode...
+</span><span class="keyword">for</span> key, value, tbl, path, is_duplicate <span class="keyword">in</span>
+  Iter.dpairs(players, {
+    include_path = <span class="keyword">true</span>, include_duplicates=<span class="keyword">true</span>, ignore_recursion = <span class="keyword">true</span>
+    })
+  <span class="keyword">do</span>
+  <span class="global">print</span>(format_row(key, value, path, is_duplicate))
+  <span class="keyword">end</span>
+
+&gt; <span class="comment">--[[This produces output identical to Example 2.]]</span>
+
+</pre></li>
+    </ul>
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="lua_Iter_filter_pairs_Functions"></a>lua.Iter.filter_pairs Functions</h2>
 
     <dl class="function">
@@ -381,7 +569,7 @@
 
 <p> Returns every possible path of length n. This might
  lead to <strong>unexpected results</strong> when the input table is <strong>recursive</strong>
- or has multiple references to the same sub-table.</p>
+ or has multiple references to the same sub-table. See also <a href="../modules/Iter.html#dpairs">Iter.dpairs</a>.</p>
 
 <p> See also <a href="../lua-5.2/doc/manual.html#2.4   ">Metatables and Metamethods</a>.
 
@@ -424,13 +612,13 @@
     play_time = <span class="number">9001</span>, <span class="comment">-- ignored because it's not a table.
 </span>    },
   tarou = {
-    items = {<span class="string">'iron-gear'</span>, <span class="string">'copper-gear'</span>},
+    items = {<span class="string">'iron-gear'</span> , <span class="string">'copper-gear'</span> },
     ammo  = {}, <span class="comment">-- ignored because it's not deep enough.
 </span>    play_time = <span class="number">42</span>,
     },
   akira = {
     items = {},
-    ammo  = {<span class="string">'exploding'</span>, <span class="string">'magic'</span>      },
+    ammo  = {<span class="string">'exploding'</span> , <span class="string">'magic'</span>       },
     play_time = <span class="number">7</span>,
     },
   }
@@ -645,7 +833,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-05-20 17:18:47 </i>
+<i style="float:right;">Last updated 2021-05-21 10:07:04 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

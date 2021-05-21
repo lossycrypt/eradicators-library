@@ -5,10 +5,12 @@ Date: 2021-x-x
     - ?
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.2
-Date: 2021-05-19
+Date: 2021-05-21
   Functions:
     - Added <true> and <false> boolean type compatibility to Verificate.verify.
-    - Added Iter.ntuples + tests. Removed Iter.deep_pairs.
+    - Added Iter.ntuples + tests.
+    - Added Iter.dpairs, an ntuples based deep iterator. (No tests yet.)
+    - Removed Iter.deep_pairs.
     - New module EventManagerLite. A rewriten-from-scratch manager that
       reimplements LuaBootstrap in lua.
     - New module PluginManagerLite.

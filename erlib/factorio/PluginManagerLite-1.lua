@@ -83,8 +83,8 @@ function Public.make_asset_getter(plugin_name, mod_name)
 -- @tparam[opt] string mod_name Defaults to the name of the mod that called this function.
 --
 -- @usage
---   local relreq = PluginManager.make_relative_require('my-plugin-name', 'my-mod-name')
---   local my_module = relreq('/my-module-name.lua')
+--   local import = PluginManager.make_relative_require('my-plugin-name', 'my-mod-name')
+--   local my_module = import('/my-module-name.lua')
 --
 -- @treturn function f(path)
 --   The function will call @{LMAN require} like this:  
