@@ -15,7 +15,7 @@ return function (file_name, ulocale)
   assert(mod_name ,'[ER Universal Locale] Modname detection failed.' )
   assert(file_name,'[ER Universal Locale] Missing file name.'        )
   assert(ulocale  ,'[ER Universal Locale] Missing locale table.'     )
-  assert(file_name ~= 'plugin_name', '[ER Universal Locale] Please change the default file name ;).')
+  assert(file_name ~= 'file_name', '[ER Universal Locale] Please change the default file name ;).')
   
   local interface_name
   local i=0; repeat i = i + 1 --find the next free name

@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.0.5
+Date: 2021-05-22
+  Internal:
+    - Adjusted to new erlib.
+    - Now ships with erlid. It's still a stand-alone mod to allow seperate disabling.
+    - Restored all functionality to it's former glory.
+---------------------------------------------------------------------------------------------------
 Version: 0.0.2
 Date: 2020-03-10
   Internal:

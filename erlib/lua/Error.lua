@@ -214,6 +214,24 @@ Error.Stopper = function(prefix,postfix)
   return function(...) _error(prefix,postfix,...) end
   end
 
+  
+  
+----------
+-- Assert, but with a custom error function.
+-- @tparam ErrorRaiser error_raiser
+-- @treturn function `f(obj, ...)` When called calls error_raiser(...)
+-- if obj was not @{truthy}, else returns obj.
+Error.Asserter = function(error_raiser)
+  return function(obj, ...)
+    if obj then
+      return obj
+    else
+      error_raiser(...)
+      error('Error raiser failed to raise error?!')
+      end
+    end
+  end
+  
 --------------------------------------------------------------------------------
 -- ErrorRaiser
 -- @section

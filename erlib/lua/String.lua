@@ -7,7 +7,7 @@
 --
 -- @module String
 -- @usage
---  local String = require('__eradicators-library__/erlib/factorio/String')()
+--  local String = require('__eradicators-library__/erlib/lua/String')()
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --

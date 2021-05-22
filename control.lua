@@ -14,28 +14,14 @@ if flag.DO_TESTS then
   end
 
 -- -------------------------------------------------------------------------- --
+-- Universal Locale                                                           --
+-- -------------------------------------------------------------------------- --
+require 'erlib/ulocale'
+  
+-- -------------------------------------------------------------------------- --
 -- Plugins                                                                    --
 -- -------------------------------------------------------------------------- --
-
-local settings = {
-  enable_bablefish      = settings.startup['erlib:enable-babelfish'     ].value,
-  enable_cursor_tracker = settings.startup['erlib:enable-cursor-tracker'].value,
-  enable_zoom_tracker   = settings.startup['erlib:enable-zoom-tracker'  ].value,
-  }
-  
--- When at least one plugin has been requested.
-local ok; for _,v in pairs(settings) do ok=ok or v end if ok then
-
-  _ENV. PluginManager = elreq ('erlib/factorio/PluginManagerLite-1')()
-  _ENV. EventManager  = elreq ('erlib/factorio/EventManagerLite-1' )()
-  elreq ('erlib/lua/Lock')().AutoLock(_ENV, '_ENV', 'GLOBAL')
-
-  PluginManager.enable_savedata_management()
-
-  if settings.enable_bablefish then require('plugins/babelfish/control.lua') end
-  
-  end
-
+require('plugins/!init/!init.lua')('control')
 
 -- -------------------------------------------------------------------------- --
 -- Draft                                                                      --

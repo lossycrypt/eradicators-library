@@ -903,7 +903,7 @@ function Verificate.verify_and(obj,types,...)
 function Verificate.assert(obj,...)
   return Verificate.verify(obj,'true',...)
   end
-
+  
 ----------
 -- Provides function input-checking wrappers.
 -- When a wrapped function is called then first the checker function is called

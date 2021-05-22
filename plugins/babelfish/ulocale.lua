@@ -1,10 +1,29 @@
 ﻿
-local z = '__00-universal-locale__/remote'
-if remote.interfaces[z] then require(z)('babelfish', {
-
-  bablefish = {
+local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
+  local const = require 'plugins/babelfish/const'
   
-    language_name = {
+  
+  
+  require(_)('babelfish', {
+
+  ['[mod-setting-name]'] = {
+    [const.setting.network_rate] = {
+      en = '_UL:PowerUserSetting_ Babelfish Network Usage (KiB/s)',
+      },
+    },
+
+  ['[mod-setting-description]'] = {
+    [const.setting.network_rate] = {
+      en = 'How much network bandwidth Babelfish will use while translating. '
+        .. 'Has no effect in Singleplayer. '
+        .. 'Setting this too high may result in players being dropped from the server. '
+        .. 'No bandwidth is used once translation is done. ',
+      },
+    },
+
+  ['[babelfish]'] = {
+  
+    language_code = {
       ["af"   ] = "af"   ,
       ["ar"   ] = "ar"   ,
       ["be"   ] = "be"   ,

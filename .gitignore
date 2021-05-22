@@ -37,3 +37,4 @@ _*
 
 # But keep special files
 !__init__.lua
+!init.lua

@@ -118,6 +118,7 @@ local Modules = {
   
   Data       = 'erlib/factorio/Data/!init',
   Setting    = 'erlib/factorio/Setting'   ,
+  Locale     = 'erlib/factorio/Locale'    ,
   
   PluginManagerLite = dev_only 'erlib/factorio/PluginManagerLite-1',
   
