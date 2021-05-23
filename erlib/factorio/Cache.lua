@@ -240,7 +240,7 @@ do
 --v4.0
 Cache.AutoCache = function(constructor)
   if type(constructor) ~= 'function' then
-    Stop('Auto Cache','invalid constructor')
+    Stop('Auto Cache',' invalid constructor')
     end
   return setmetatable({},{
     -- This metatable is deleted when *either* __index or __pairs

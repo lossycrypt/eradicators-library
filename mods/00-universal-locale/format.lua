@@ -85,7 +85,7 @@ local pattern_functions = {
       
       -- Put a warning at the beginning of the description.
       add_description_header(entry, db,
-         '_UL:ICON_DEV_[color=orange] '
+         '_UL:ICON_DEV_[color=blue] '
         .. assert(lt.power_user_setting_description_header[entry.language])
         ..'[/color]\\n')
       
@@ -98,7 +98,7 @@ local pattern_functions = {
   function(entry, db)
     if entry.header == '[mod-setting-name]' then
       add_description_header(entry, db, 
-        ("_UL:ICON_TOOLTIP_ [color=blue]%s[/color] [color=acid]%s[/color]\\n")
+        ("_UL:ICON_TOOLTIP_ [color=orange]%s[/color] [color=acid]%s[/color]\\n")
         :format(
           lt.default_value[entry.language],
           -- serpent automatically puts quotes on strings! ;)

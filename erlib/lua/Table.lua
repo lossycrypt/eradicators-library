@@ -318,9 +318,7 @@ function Table.is_empty(tbl)
 -- @tparam table|nil tbl
 -- @treturn table|nil  
 function Table.nil_if_empty(tbl)
-  if tbl and Table.size(tbl) ~= 0 then
-    return _toTable(tbl)
-    end
+  for _ in pairs(tbl) do return _toTable(tbl) end
   end
 
 

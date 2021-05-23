@@ -14,108 +14,33 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
 
   ['[mod-setting-description]'] = {
     [const.setting.network_rate] = {
-      en = 'How much network bandwidth Babelfish will use while translating. '
+      en = 'Approximately how much network bandwidth Babelfish will use while translating. '
         .. 'Has no effect in Singleplayer. '
-        .. 'Setting this too high may result in players being dropped from the server. '
-        .. 'No bandwidth is used once translation is done. ',
+        .. 'No bandwidth is used once translation is done. '
+        .. '\\n\\n'
+        .. 'While Babelfish is working you can hover the small icon in the upper '
+        .. 'right corner to see more detailed status info. '
+        .. '\\n\\n'
+        .. 'If a player has slow internet AND uses a language that is not yet '
+        .. 'translated on the server, then they might be dropped or unable to '
+        .. 'join a server if this setting is too high. In that case '
+        .. 'temporarily lower the setting until translation is done. ',
       },
     },
 
   ['[babelfish]'] = {
   
-    language_code = {
-      ["af"   ] = "af"   ,
-      ["ar"   ] = "ar"   ,
-      ["be"   ] = "be"   ,
-      ["bg"   ] = "bg"   ,
-      ["ca"   ] = "ca"   ,
-      ["cs"   ] = "cs"   ,
-      ["da"   ] = "da"   ,
-      ["de"   ] = "de"   ,
-      ["el"   ] = "el"   ,
-      ["en"   ] = "en"   ,
-      ["eo"   ] = "eo"   ,
-      ["es-ES"] = "es-ES",
-      ["et"   ] = "et"   ,
-      ["fi"   ] = "fi"   ,
-      ["fr"   ] = "fr"   ,
-      ["fy-NL"] = "fy-NL",
-      ["ga-IE"] = "ga-IE",
-      ["he"   ] = "he"   ,
-      ["hr"   ] = "hr"   ,
-      ["hu"   ] = "hu"   ,
-      ["id"   ] = "id"   ,
-      ["it"   ] = "it"   ,
-      ["ja"   ] = "ja"   ,
-      ["ko"   ] = "ko"   ,
-      ["lt"   ] = "lt"   ,
-      ["lv"   ] = "lv"   ,
-      ["nl"   ] = "nl"   ,
-      ["no"   ] = "no"   ,
-      ["pl"   ] = "pl"   ,
-      ["pt-BR"] = "pt-BR",
-      ["pt-PT"] = "pt-PT",
-      ["ro"   ] = "ro"   ,
-      ["ru"   ] = "ru"   ,
-      ["sk"   ] = "sk"   ,
-      ["sl"   ] = "sl"   ,
-      ["sq"   ] = "sq"   ,
-      ["sr"   ] = "sr"   ,
-      ["sv-SE"] = "sv-SE",
-      ["th"   ] = "th"   ,
-      ["tr"   ] = "tr"   ,
-      ["uk"   ] = "uk"   ,
-      ["vi"   ] = "vi"   ,
-      ["zh-CN"] = "zh-CN",
-      ["zh-TW"] = "zh-TW",
+    ['translation-progress'] = {
+      en = 'Translation is currently __1__% done.',
       },
-
-    localised_language_name = {
-      ["af"   ] = "Afrikaans"          ,
-      ["ar"   ] = "العَرَبِيَّة"            ,
-      ["be"   ] = "Беларуская"         ,
-      ["bg"   ] = "български език"     ,
-      ["ca"   ] = "Català"             ,
-      ["cs"   ] = "Čeština"            ,
-      ["da"   ] = "Dansk"              ,
-      ["de"   ] = "Deutsch"            ,
-      ["el"   ] = "Ελληνικά"           ,
-      ["en"   ] = "English"            ,
-      ["eo"   ] = "Esperanto"          ,
-      ["es-ES"] = "Español"            ,
-      ["et"   ] = "Eesti"              ,
-      ["fi"   ] = "Suomi"              ,
-      ["fr"   ] = "Français"           ,
-      ["fy-NL"] = "Frisian"            ,
-      ["ga-IE"] = "Gaeilge"            ,
-      ["he"   ] = "עברית"              ,
-      ["hr"   ] = "Hrvatski"           ,
-      ["hu"   ] = "Magyar"             ,
-      ["id"   ] = "Bahasa Indonesia"   ,
-      ["it"   ] = "Italiano"           ,
-      ["ja"   ] = "日本語"              ,
-      ["ko"   ] = "한국어"                ,
-      ["lt"   ] = "Lietuvių"           ,
-      ["lv"   ] = "Latviešu"           ,
-      ["nl"   ] = "Nederlands"         ,
-      ["no"   ] = "Norsk"              ,
-      ["pl"   ] = "Polski"             ,
-      ["pt-BR"] = "Português, Brasil"  ,
-      ["pt-PT"] = "Português"          ,
-      ["ro"   ] = "Română"             ,
-      ["ru"   ] = "Русский"            ,
-      ["sk"   ] = "Slovenčina"         ,
-      ["sl"   ] = "Slovenščina"        ,
-      ["sq"   ] = "Shqip"              ,
-      ["sr"   ] = "Српски"             ,
-      ["sv-SE"] = "Svenska"            ,
-      ["th"   ] = "ภาษาไทย"             ,
-      ["tr"   ] = "Türkçe"             ,
-      ["uk"   ] = "Українська"         ,
-      ["vi"   ] = "Tiếng Việt Nam"     ,
-      ["zh-CN"] = "简体中文"            ,
-      ["zh-TW"] = "繁體中文"            ,
-      },
+  
+    language_code = (function(r)
+      for code, name in pairs(const.native_language_name) do r[code] = code end
+      return r end){},
+    
+    native_language_name = (function(r)
+      for code, name in pairs(const.native_language_name) do r[code] = name end
+      return r end){},
 
     },
 

@@ -78,10 +78,19 @@ return function(phase) assert(phase)
       require 'plugins/cursor-tracker/data-final-fixes.lua'
       end
     
+    if settings.startup['erlib:enable-babelfish'].value then
+      require 'plugins/babelfish/data-final-fixes'
+      end
+    
   -- ------------------------------------------------------------------------ --
   -- Control                                                                  --
   -- ------------------------------------------------------------------------ --
   elseif phase == 'control' then
+    
+    -- ---------------------------------------------------------------------- --
+    -- Universal Locale (internal condition check)                            --
+    -- ---------------------------------------------------------------------- --
+    require 'plugins/babelfish/ulocale'
     
     -- ---------------------------------------------------------------------- --
     -- Hooks & Nooks                                                          --

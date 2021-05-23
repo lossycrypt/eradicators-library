@@ -3,7 +3,7 @@
 --------------------------------------------------
 -- Description
 --
--- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+-- @{Introduction.DevelopmentStatus|Module Status}: Deprecated, use @{PluginManagerLite}.
 --
 -- @module PluginManager
 -- @usage

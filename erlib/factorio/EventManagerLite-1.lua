@@ -37,7 +37,8 @@
   
   + Because handlers can arbitrarily add or remove other handlers when executed
     the order of handlers has to be copied during each event to ensure
-    a deterministic execution order.
+    a deterministic execution order. (But add_or_remove merged logic
+    allows to replace not-yet-called handlers for the currently running event.)
     
   + Like navtive LuaBootstrap the event order must be determined
     by mod(ule) load order. Runtime add/remove to a naive
@@ -55,7 +56,19 @@
   
   ]]
 
+--[[ Todo:
 
+  + Remove tick log
+  
+  + apply new add_or_remove merged logic to nth_tick handlers
+    by using the same function 
+     add_or_remove(OrderedHandlers[event_name])(module_name, f)
+     add_or_remove(OrderedNthTicks[period])(module_name, f)
+  
+  + valid has to stay anyway due to copy order preservation in handlers
+    when stuff actually is removed
+  
+  ]]
 
 --------------------------------------------------------------------------------
 -- Todo.
@@ -91,6 +104,8 @@ local isLuaObject = Verificate.isType.LuaObject
 local verify      = Verificate.verify
 
 local Crc32       = elreq('erlib/lua/Coding/Crc32')()
+
+local Filter      = elreq('erlib/lua/Filter')()
 
 local table_unpack, math_min
     = table.unpack, math.min
@@ -218,7 +233,7 @@ local OrderedHandlers = {--[[
     [2] = {module_name = , f =},
     }
   ]]}
-
+  
 local is_loader = {
   on_load = true,  on_init = true,
   on_configuration_changed = true,
@@ -228,6 +243,8 @@ local function script_on_event(event_name, f)
   if is_loader[event_name] then return script[event_name](f) end
   return script.on_event(event_name, f) end
 
+--[[
+  
 -- Removes a handler *if* it existed. If not silently does nothing.
 local function remove_handler(module_name, event_name)
   local handlers = OrderedHandlers[event_name]
@@ -238,7 +255,7 @@ local function remove_handler(module_name, event_name)
         handlers[i].valid = false -- invalidate copied references
         table.remove(handlers, i)
         if #handlers == 0 then
-          log:debug('-- ', reverse_defines[event_name], ' (LuaBootstrap)')
+          log:debug('-- ', reverse_defines[event_name], ' (EventHandlerLite)')
           script_on_event(event_name, nil)
           end
         handlers.n = #handlers
@@ -255,7 +272,7 @@ local function add_handler(module_name, event_name, f)
   if (f ~= nil) then
     local handlers = Table.sget(OrderedHandlers, {event_name}, {})
     if #handlers == 0 then
-      log:debug('++ ', reverse_defines[event_name], ' (LuaBootstrap)')
+      log:debug('++ ', reverse_defines[event_name], ' (EventHandlerLite)')
       script_on_event(event_name,
         is_on_tick
         and Private.make_on_tick_handler (event_name)
@@ -269,6 +286,60 @@ local function add_handler(module_name, event_name, f)
     handlers.n = #handlers
     end
   end
+  
+--]]
+  
+local log_handler_change = (not flag.IS_DEV_MODE) and ercfg.SKIP or
+  function(mode, event_name, module_name)
+    log:debug(mode, reverse_defines[event_name], ' ',  module_name)
+    end
+  
+local function add_or_remove_handler(handlers, module_name, event_name, f)
+  local i, handler
+  for k, v in ipairs(handlers) do
+    if v.module_name == module_name then i, handler = k, v break end
+    end
+  --
+  if (f == nil) then
+    if (handler == nil) then
+      log_handler_change('x  ', event_name, module_name) -- didn't exist
+    else
+      log_handler_change('-  ', event_name, module_name) -- remove success
+      handler.valid = false -- todo: deprecate
+      table.remove(handlers, i)
+      -- handlers.n = #handlers
+      if #handlers == 0 then
+        log_handler_change('-- ', event_name, '(EventHandlerLite)')
+        script_on_event(event_name, nil)
+        end
+      end
+  --
+  else
+    if (handler ~= nil) then
+      if handler.f == f then
+        log_handler_change('== ', event_name, module_name) -- already existed
+      else
+        log_handler_change('+= ', event_name, module_name) -- replace f only
+        handler.f = f
+        end
+    else
+      if #handlers == 0 then
+        log_handler_change('++ ', event_name, '(EventHandlerLite)')
+        script_on_event(event_name,
+          (event_name == defines.events.on_tick)
+          and Private.make_on_tick_handler (event_name)
+          or  Private.make_on_event_handler(event_name)
+          )
+        end
+      log_handler_change('+  ', event_name, module_name) -- add new
+      table.insert(handlers, {module_name = module_name, f = f, valid = true})
+      handlers.n = nil -- n can't be sorted
+      table.sort(handlers, is_module_index_smaller) -- deterministic!
+      -- handlers.n = #handlers
+      end
+    end
+  end
+  
 
 function Private.on_event(module_name, event_names, f, filters)
   verify(f, 'func|nil')
@@ -276,7 +347,10 @@ function Private.on_event(module_name, event_names, f, filters)
   --
   for _, event_name in pairs(Table.plural(event_names)) do
     verify(event_name, 'Integer|string') -- defines.events.on_tick is 0!
-    add_handler(module_name, event_name, f)
+    -- add_handler(module_name, event_name, f)
+    local handlers = Table.sget(OrderedHandlers, {event_name}, {})
+    add_or_remove_handler(handlers, module_name, event_name, f)
+    handlers.n = #handlers
     end
   return f end
 
@@ -317,17 +391,20 @@ function Private.make_on_tick_handler(event_name)
 -- -------------------------------------------------------------------------- --
 
 -- @tparam String log_name Human readable event name.
-local function log_event(tick, log_name, module_name)
-  return log:debug(
-    '[tick ', tick, '] ',
-    'Event handled  : ', log_name
-    ,', Module: ', module_name
-    )
-  end
+local log_event = (not flag.IS_DEV_MODE) and ercfg.SKIP or
+  function (log_name, module_name)
+    return log:debug(
+      'Event handled  : ', log_name
+      ,', Module: ', module_name
+      )
+    end
+
+
   
 -- An event becomes invalid if a handler invalidates at
 -- least one LuaObject that was valid before.
 local function make_event_validator(e)
+  if e == nil then return Filter.TRUE end --on_config, etc...
   local objects, n = {}, 0
   for _,v in pairs(e) do 
     if isLuaObject(v) then; n = n + 1
@@ -350,7 +427,7 @@ function Private.make_on_event_handler(event_name)
   --
   local handle = function(handler, e)
     if handler.valid then
-      log_event(e and e.tick or -1, log_name, handler.module_name)
+      log_event(log_name, handler.module_name)
       handler.f(e)
       return true end
     return false end
@@ -473,7 +550,7 @@ function Private.on_nth_tick_handler(e)
     --
     local tick          = e.tick
     local next_nth_tick = math.huge
-    -- log_event(tick, 'on_tick', 'event-manager-nth-tick')
+    -- log_event('on_tick', 'event-manager-nth-tick')
     --
     local handlers = {table_unpack(OrderedNthTicks.handlers)} --deterministic order
     for i=1, OrderedNthTicks.n do
@@ -486,7 +563,7 @@ function Private.on_nth_tick_handler(e)
         --
         assert(handler.next_tick >= tick) --sanity
         if tick == handler.next_tick then
-          -- log_event(tick, 'on_nth_tick ' .. handler.period, handler.module_name)
+          -- log_event('on_nth_tick ' .. handler.period, handler.module_name)
           handler.f {nth_tick = handler.period, tick = tick, offset = handler.offset}
           handler.next_tick = tick + handler.period
           end

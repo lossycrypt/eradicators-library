@@ -12,7 +12,7 @@ local const = require 'plugins/babelfish/const'
 
 Data.Inscribe{
   name          = const.setting.network_rate,
-  type          = 'int-setting'             ,
+  type          = 'double-setting'          ,
   setting_type  = 'runtime-global'          ,
   order         = 'babelfish-1'             ,
   default_value = 8                         ,
@@ -27,29 +27,8 @@ Data.Inscribe{
   order         = 'babelfish-z'             ,
   hidden        = true                      ,
   allow_blank   = true                      ,
-  default_value = ''                        , -- dummy value
+  default_value = 'recipe'                  , -- not used
   
   -- order is important!
-  allowed_values = { '',
-    'recipe-name',
-    'recipe-description',
-    
-    'item-name',
-    'item-description',
-    
-    'fluid-name',
-    'fluid-description',
-    
-    'technology-name',
-    'technology-description',
-    
-    'equipment-name',
-    'equipment-description',
-    
-    'entity-name',
-    'entity-description',
-    
-    'tile-name',
-    'tile-description',
-    }
+  allowed_values = const.allowed_translation_types, -- copied by Inscribe
   }

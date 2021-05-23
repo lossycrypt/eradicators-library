@@ -47,6 +47,8 @@ local join_path   = elreq('erlib/factorio/Data/!init')().Path.join
 
 local require     = _ENV. require -- keep a proper reference
 
+local ntuples     = elreq('erlib/lua/Iter/ntuples')()
+
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
 -- -------------------------------------------------------------------------- --
@@ -80,7 +82,7 @@ function Public.make_asset_getter(plugin_name, mod_name)
   if mod_name == nil then mod_name = Stacktrace.get_mod_name(2) end
   -- local root = '__' .. mod_name .. '__' .. '/assets/' .. plugin_name
   local root = join_path('__'..mod_name..'__', '/assets/', plugin_name)
-  return function(path) return root .. path end
+  return function(path) return join_path(root, path) end
   end
 
   
@@ -109,7 +111,7 @@ function Public.make_relative_require(plugin_name, mod_name)
   local root = join_path(
     (mod_name and ('__'..mod_name..'__/') or nil), 'plugins/', plugin_name
     )
-  return function (path) return require(root .. path) end
+  return function (path) return require(join_path(root, path)) end
   end
 
 
@@ -158,22 +160,26 @@ function Public.enable_savedata_management()
   -- Multiple setters can be associated with the same plugin_name.
   -- This allows using local Savedata references in all files used by a plugin.
   --
-  -- 
-  --
   -- Can only be uesd after @{PluginManagerLite.enable_savedata_management}.
   --
   -- @tparam string plugin_name
   -- @tparam function setter Will be called setter(Savedata) in on\_load and on\_config.
   -- (See @{EventManagerLite.boostrap_event_order} regarding on_init.)
+  -- @tparam[opt] table default The default layout for your Savedata.
+  -- Use if you want certain subtables to always exist. In on_config any
+  -- key that doesn't exist in the Savegame yet will be copied from this.
   --
   -- @usage
-  --   local Savedata; PM.manage_savedata('my-plugin', function(_) Savedata = _ end)
+  --   local Savedata; PM.manage_savedata('plugin_name', function(_) Savedata = _ end, {
+  --     players = {}, forces = {}, surfaces = {}, map = {}
+  --     })
   --
   -- @function PluginManagerLite.manage_savedata
-  function Public.manage_savedata(plugin_name, setter)
+  function Public.manage_savedata(plugin_name, setter, default)
     -- Multiple setters can exist for each plugin_name.
-    local this  = Table.sget(ManagedPlugins, {plugin_name}, {})
-    this.path   = {'plugin_manager', 'plugins', plugin_name}
+    local this   = Table.sget(ManagedPlugins, {plugin_name}, {})
+    this.path    = {'plugin_manager', 'plugins', plugin_name}
+    this.default = Table.dcopy(default or {})
     table.insert(Table.sget(this, {'setters'}, {}), setter)
     end
 
@@ -197,14 +203,15 @@ function Public.enable_savedata_management()
     local this = assert(ManagedPlugins[plugin_name], 'Unknown plugin name.')
     this.mt    = {__index = methods}
     --
-    local auto_subtables = Set.from_values{'players','forces','surfaces','map'}
-    if not getmetatable(methods) then
-      setmetatable(methods, {__index=function(_, key)
-        if auto_subtables[key] and _ENV.game then -- not in on_load!
-          return Table.set(Table.get(_ENV.global, this.path), {key}, {})
-          end
-        end})
-      end
+    -- (2021-05-23: metatable magic replaced by default table)
+    -- local auto_subtables = Set.from_values{'players','forces','surfaces','map'}
+    -- if not getmetatable(methods) then
+    --   setmetatable(methods, {__index=function(_, key)
+    --     if auto_subtables[key] and _ENV.game then -- not in on_load!
+    --       return Table.set(Table.get(_ENV.global, this.path), {key}, {})
+    --       end
+    --     end})
+    --   end
     end
 
   --
@@ -214,12 +221,23 @@ function Public.enable_savedata_management()
     local method     = (not is_on_load) and 'sget' or 'get'
     for plugin_name, this in pairs(ManagedPlugins) do
       -- local default  = (not is_on_load) and    {plugin_name=plugin_name}  or  nil
-      local default  = (not is_on_load) and {} or nil
+      local default  = (not is_on_load) and Table.dcopy(this.default) or nil
       local Savedata = Table[method](_ENV.global, this.path, default)
       -- print(plugin_name, serpent.block(Savedata))
-      if (Savedata ~= nil) then -- can be nil in on_load
+      if (Savedata == nil) then -- can be nil in on_load
+        log:debug('No Savedata found for: ', plugin_name)
+      else
+        for k, v in ntuples(2, this.default) do
+          if not Savedata[k] then
+            log:debug(plugin_name, 'default Savedata: ', k, ' = ', v)
+            Savedata[k] = Table.dcopy(v) -- guaranteed defaults
+          else
+            log:debug(plugin_name, 'default Savedata: ', k, ' (already exists.)')
+            end
+          end
         setmetatable(Savedata, this.mt)
         for i=1, #this.setters do this.setters[i](Savedata) end
+        log:debug('Completed linking Savedata for: ', plugin_name)
         end
       end
     -- print(serpent.block(_ENV.global))

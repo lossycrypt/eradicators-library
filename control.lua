@@ -24,5 +24,15 @@ require 'erlib/ulocale'
 require('plugins/!init/!init.lua')('control')
 
 -- -------------------------------------------------------------------------- --
+-- Reserved Commands                                                          --
+-- -------------------------------------------------------------------------- --
+-- Reserve commands for later use with on_console_command to
+-- prevent "unknown command" error message.
+commands.add_command('er'       , '', ercfg.SKIP)
+commands.add_command('erlib'    , '', ercfg.SKIP)
+commands.add_command('babelfish', '', ercfg.SKIP)
+
+
+-- -------------------------------------------------------------------------- --
 -- Draft                                                                      --
 -- -------------------------------------------------------------------------- --

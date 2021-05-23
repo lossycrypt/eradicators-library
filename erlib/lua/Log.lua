@@ -229,8 +229,8 @@ local function _do_log_raw(stdout,self,level,msg)
   -- debug level is 2 because of tail-calls in do_log_line/block
   local info = debug_getinfo(2,'Sl')
   local msg = string_format(
-    --PREFIX [modname](file:line)[header] msg
-    '%s [%-19s](%-19s:%4s) [%-19s] %s',
+    --PREFIX [modname](file:line)[header][tick] msg
+    '%s [%-19s](%-19s:%4s) [%-19s][tick %s] %s',
     self.prefix[level],      
     -- Name of the mod that *created* the logger.
     -- Possibly different of mod that calls the logger.
@@ -240,6 +240,7 @@ local function _do_log_raw(stdout,self,level,msg)
     (not info) and '' or info.short_src:gsub('__[%a-_]+__/',''):gsub('%.lua$',''):sub(-19),
     (not info) and -1 or info.currentline,
     self.logger_name, -- Header (nessecary?)
+    (rawget(_ENV, 'game') or {}).tick or -1,
     msg
     )
   return self.stdout(msg)

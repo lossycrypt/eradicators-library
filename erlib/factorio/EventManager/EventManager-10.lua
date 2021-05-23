@@ -24,7 +24,7 @@
 --
 --   * Actions use en/dequeue. OnTicks use en/disable.
 --
--- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+-- @{Introduction.DevelopmentStatus|Module Status}: Deprecated, use @{EventManagerLite}.
 --
 -- @module EventManager
 -- @usage
@@ -1315,7 +1315,7 @@ do
         if isUserdataDirty then
           for j=1, m do if not luaobjects[j].valid then
             log:debug(
-              '[tick ', e.tick, '] ',
+              -- '[tick ', e.tick, '] ',
               'Event cycle ended prematurely due to invalidated userdata.')
             return
             end end
@@ -1328,7 +1328,7 @@ do
           local _e = Table_dcopy(e)
           if (not handler_data.filter) or (handler_data.filter(_e,_e.player)) then
             log:debug(
-              '[tick ', e.tick, '] ',
+              -- '[tick ', e.tick, '] ',
               'Event handled  : ', EventUidToName[event_uid]
               ,', Handler: ', handler_data.log_name)
             handler_data.f(_e,_e.player)
@@ -1377,7 +1377,7 @@ function Private.on_every_tick (e)
       
       -- call handler
       LoggersByEventUid[0]:debug(
-        '[tick ', e.tick, '] ',
+        -- '[tick ', e.tick, '] ',
         'Event handled  : on_tick, Handler: ', handler_data.log_name
         )
       -- if handler_data.profiler then -- @future (also read-block of handler_data)
@@ -1428,7 +1428,7 @@ function EventManager.raise_private(event_uid, event_data)
   local tick = (event_uid ~= on_load_uid) and game.tick or -1
   if OrderedHandlers[event_uid] then
     log:debug(
-      '[tick ', tick, '] ',
+      -- '[tick ', tick, '] ',
       'Event raised   : ', EventUidToName[event_uid], ' (private)'
       )
     event_data         = event_data and Table.scopy(event_data) or {}
@@ -1438,7 +1438,7 @@ function EventManager.raise_private(event_uid, event_data)
     Private.on_every_event(event_data)
   else
     log:debug(
-      '[tick ', tick, '] ',
+      -- '[tick ', tick, '] ',
       'No handlers for privately raised event: ',
       EventUidToName[event_uid],' ', event_data
       )
