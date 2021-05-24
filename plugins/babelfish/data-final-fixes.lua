@@ -1,3 +1,5 @@
+-- (c) eradicator a.k.a lossycrypt, 2017-2021, not seperately licensable
+
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
 -- -------------------------------------------------------------------------- --
@@ -34,5 +36,5 @@ data.raw['gui-style']['default']
     clicked_vertical_offset = 0,
     draw_shadow_under_picture = true,
     pie_progress_color = {0.98, 0.66, 0.22, 0.5},
-    left_click_sound = {}
+    left_click_sound = {},
     }

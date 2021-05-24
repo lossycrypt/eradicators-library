@@ -22,6 +22,14 @@ return function(phase) assert(phase)
     ]]
 
   -- ------------------------------------------------------------------------ --
+  -- Debug                                                                    --
+  -- ------------------------------------------------------------------------ --
+    
+    if flag.IS_DEV_MODE then
+      _ENV.Hydra = elreq('erlib/lua/Coding/Hydra')()
+      end
+    
+  -- ------------------------------------------------------------------------ --
   -- Settings                                                                 --
   -- ------------------------------------------------------------------------ --
   if phase == 'settings' then
@@ -32,6 +40,7 @@ return function(phase) assert(phase)
     local function make_enabler(prototype)
       return function()
         data.raw['bool-setting'][prototype.name].forced_value = true
+        log(prototype.name:gsub('.*enable%-','') .. ' was enabled.')
         end
       end
       

@@ -1,0 +1,303 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Startup">Startup </a></li>
+<li><a href="#Remote_Interface">Remote Interface </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Core.html">Core</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/Data.html">Data</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Entity.html">Entity</a></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/EventManagerLite.html">EventManagerLite</a></li>
+  <li><a href="../modules/Force.html">Force</a></li>
+  <li><a href="../modules/Gui.html">Gui</a></li>
+  <li><a href="../modules/Locale.html">Locale</a></li>
+  <li><a href="../modules/Player.html">Player</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
+  <li><a href="../modules/PluginManagerLite.html">PluginManagerLite</a></li>
+  <li><a href="../modules/Remote.html">Remote</a></li>
+  <li><a href="../modules/Setting.html">Setting</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Train.html">Train</a></li>
+  <li><a href="../modules/Array.html">Array</a></li>
+  <li><a href="../modules/Class.html">Class</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Color.html">Color</a></li>
+  <li><a href="../modules/Compare.html">Compare</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Iter.html">Iter</a></li>
+  <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/LocalisedString.html">LocalisedString</a></li>
+  <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
+  <li><a href="../modules/Logic.html">Logic</a></li>
+  <li><a href="../modules/Math.html">Math</a></li>
+  <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Polygon.html">Polygon</a></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
+  <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
+  <li><a href="../modules/Time.html">Time</a></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Vector.html">Vector</a></li>
+  <li><a href="../modules/Verificate.html">Verificate</a></li>
+  <li><a href="../modules/Version.html">Version</a></li>
+  <li><a href="../modules/remotes.html">remotes</a></li>
+  <li><a href="../modules/snippet.html">snippet</a></li>
+  <li><strong>Babelfish</strong></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/Introduction.html">Introduction</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Babelfish</code></h1>
+<p>Localised string search for mods.</p>
+<p> Babelfish is a caching translator for standard prototype localisations.
+ When it detects changes in the locale it starts a background task to
+ translate all prototype names and descriptions. While this task is running
+ a small status indicator in the upper right corner informs each user of
+ the current progress. Each language only needs to be translated once,
+ making the process instantaneous to most users even in multiplayer.</p>
+
+<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">-- settings.lua
+erlib_enable_bablefish()
+-- control.lua
+remote.call(&apos;er:babelfish-remote-interface&apos;,&apos;find&apos;, player_index, word, options)
+</pre>
+    </ul>
+
+
+<h2><a href="#Startup">Startup </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#erlib_enable_bablefish">erlib_enable_bablefish()</a></td>
+	<td class="summary">Activates babelfish for all mods.</td>
+	</tr>
+</table>
+<h2><a href="#Remote_Interface">Remote Interface </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#SearchType">SearchType</a></td>
+	<td class="summary">What to search.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#find_prototype_names">find_prototype_names(pindex, types, word, options)</a></td>
+	<td class="summary">Given a user input finds prototype names.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header has-description"><a name="Startup"></a>Startup </h2>
+
+          <div class="section-description">
+
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "erlib_enable_bablefish"></a>
+    <strong>erlib_enable_bablefish()</strong>
+    </dt>
+    <dd>
+    Activates babelfish for all mods.  Without this babelfish will
+ not be loaded at all. This must be called in <strong>settings.lua</strong>.
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">erlib_enable_bablefish()</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Remote_Interface"></a>Remote Interface </h2>
+
+          <div class="section-description">
+
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "SearchType"></a>
+    <strong>SearchType</strong>
+    </dt>
+    <dd>
+
+<p>What to search.  One of the following strings. This is also the
+ order in which translation occurs.</p>
+
+<pre><code>'recipe_name'    , 'recipe_description'
+'item_name'      , 'item_description'
+'fluid_name'     , 'fluid_description'
+'technology_name', 'technology_description'
+'equipment_name' , 'equipment_description'
+'entity_name'    , 'entity_description'
+'tile_name'      , 'tile_description'
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "find_prototype_names"></a>
+    <strong>find_prototype_names(pindex, types, word, options)</strong>
+    </dt>
+    <dd>
+    Given a user input finds prototype names.
+ Can search the localised name and description of all common prototypes
+ to deliver a native search experience.</p>
+
+<p> Translation is granular per <a href="../modules/Babelfish.html#SearchType">SearchType</a>,
+ so users can start searching for i.e. recipe names even if item names
+ are still being translated.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pindex</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         A <a href="../api/LuaPlayer.html#LuaPlayer.index">LuaPlayer.index</a>.
+        </li>
+        <li><span class="parameter">types</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a> or <a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         One or more <a href="../modules/Babelfish.html#SearchType">SearchTypes</a>.
+        </li>
+        <li><span class="parameter">word</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The user input.
+        </li>
+        <li><span class="parameter">options</span> (<a href="../lua-5.2/doc/manual.html#pdf-table">table</a>)
+        <ul>
+        <li><span class="parameter">limit</span>
+            <span class="types"><a class="type" href="../modules/Types.html#Integer">Integer</a></span>
+         Search will abort after this many
+ hits and return the (partial) result.
+         (<em>default</em> inf)
+        </li>
+        <li><span class="parameter">mode</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         <code>&apos;plain&apos;</code>, <code>&apos;fuzzy&apos;</code> or <code>&apos;lua&apos;</code>.
+ Fuzzy and lua modes both use lua pattern matching, thus if "word" is
+ not a <a href="../lua-5.2/doc/manual.html#pdf-string.find">string.find</a> compatible pattern the search result will be empty.
+         (<em>default</em> plain)
+        </li>
+        </li></ul>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         If Babelfish has not finished translating all of the
+ given types yet this will be false and the result will be nil. Even if some
+ of the given types are already fully translated.</li>
+        <li>
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         A table mapping each requested type to a <a href="../modules/Types.html#set">set</a> of
+ prototype names.</li>
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- First lets make a shortcut.
+</span><span class="keyword">local</span> babelfind = (<span class="keyword">function</span>(c) <span class="keyword">return</span> <span class="keyword">function</span>(...)
+  <span class="keyword">return</span> c(<span class="string">'er:babelfish-remote-interface'</span>,<span class="string">'find_prototype_names'</span>,...)
+  <span class="keyword">end</span> <span class="keyword">end</span>)(remote.call)
+
+<span class="comment">-- Now lets try something. For demonstration purposes I'm using a player
+</span><span class="comment">-- with a German locale.
+</span><span class="keyword">local</span> ok, results
+  = babelfind(game.player.index, {<span class="string">'item_name'</span>,<span class="string">'recipe_name'</span>},<span class="string">'Kupfer'</span>)
+<span class="keyword">if</span> ok <span class="keyword">then</span> <span class="global">print</span>(serpent.block(results)) <span class="keyword">end</span>
+
+&gt; {
+&gt;   item_name = {
+&gt;     [<span class="string">"copper-cable"</span>] = <span class="keyword">true</span>,
+&gt;     [<span class="string">"copper-ore"</span>] = <span class="keyword">true</span>,
+&gt;     [<span class="string">"copper-plate"</span>] = <span class="keyword">true</span>
+&gt;   },
+&gt;   recipe_name = {
+&gt;     [<span class="string">"copper-cable"</span>] = <span class="keyword">true</span>,
+&gt;     [<span class="string">"copper-plate"</span>] = <span class="keyword">true</span>
+&gt;   }
+&gt; }
+</pre>
+    </ul>
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2021-05-24 22:54:48 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

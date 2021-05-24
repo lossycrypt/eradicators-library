@@ -36,6 +36,7 @@ file = {
 
   --includes
   root..'/erlib',
+  root..'/plugins',
   
   
   --includes each sub-dir

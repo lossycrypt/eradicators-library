@@ -11,7 +11,7 @@ local const = require 'plugins/babelfish/const'
 -- -------------------------------------------------------------------------- --
 
 Data.Inscribe{
-  name          = const.setting.network_rate,
+  name          = const.setting_name.network_rate,
   type          = 'double-setting'          ,
   setting_type  = 'runtime-global'          ,
   order         = 'babelfish-1'             ,
@@ -21,7 +21,7 @@ Data.Inscribe{
   }
 
 Data.Inscribe{
-  name          = const.setting.auto_translate_categories,
+  name          = const.setting_name.auto_translate_categories,
   type          = 'string-setting'          ,
   setting_type  = 'runtime-global'          ,
   order         = 'babelfish-z'             ,

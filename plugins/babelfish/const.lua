@@ -1,14 +1,17 @@
 ﻿
+-- This file will also be loaded into OTHER mods environments via
+-- babelfish/remote.
+-- -------------------------------------------------------------------------- --
 
 local const = {}
 
-const.setting = {
+const.setting_name = {
   network_rate = 'er:babelfish-network-rate',
-  auto_translate_categories = 'er:babelfish-auto-translate-categories',
+  auto_translate_categories = 'er:babelfish-translation-types',
   }
   
 const.network = {
-  rerequest_delay = 60,
+  rerequest_delay = 60, -- in ticks
   }
   
 const.style = {
@@ -24,6 +27,14 @@ const.lstring = {
   native_language_name = {'babelfish.native_language_name'},
   }
 
+const.remote = {
+  interface_name = 'er:babelfish-remote-interface',
+  }
+  
+const.gui_name = {
+  status_indicator_button = 'er:babelfish-status-indicator-button',
+  }
+  
 const.allowed_translation_types = {
   -- Order determines translation priority.
   'recipe',
@@ -34,8 +45,7 @@ const.allowed_translation_types = {
   'entity',
   'tile',
   }
-  
-  
+
 const.native_language_name = {
   ["af"   ] = "Afrikaans"          ,
   ["ar"   ] = "العَرَبِيَّة"               ,

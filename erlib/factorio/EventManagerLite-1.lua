@@ -39,6 +39,8 @@
     the order of handlers has to be copied during each event to ensure
     a deterministic execution order. (But add_or_remove merged logic
     allows to replace not-yet-called handlers for the currently running event.)
+    Because this copy keeps temporarily keeps references to potentially
+    already removed handlers all removed handlers have to be marked valid=false.
     
   + Like navtive LuaBootstrap the event order must be determined
     by mod(ule) load order. Runtime add/remove to a naive
@@ -56,18 +58,24 @@
   
   ]]
 
---[[ Todo:
+--[[ Edge cases:
 
-  + Remove tick log
+  + Theoretically if a plugin causes an event to be raised during on_config
+    other plugins might not be ready to properly recieve that event yet.
+    Savedata is created + linked before everything else so this might 
+    be so edgy that it never becomes relevant.
+
+  ]]
+  
+--[[ Todo:
   
   + apply new add_or_remove merged logic to nth_tick handlers
     by using the same function 
      add_or_remove(OrderedHandlers[event_name])(module_name, f)
      add_or_remove(OrderedNthTicks[period])(module_name, f)
-  
-  + valid has to stay anyway due to copy order preservation in handlers
-    when stuff actually is removed
-  
+
+  + do NOT remove valid
+     
   ]]
 
 --------------------------------------------------------------------------------

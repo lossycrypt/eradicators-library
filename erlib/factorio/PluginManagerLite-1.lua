@@ -227,12 +227,14 @@ function Public.enable_savedata_management()
       if (Savedata == nil) then -- can be nil in on_load
         log:debug('No Savedata found for: ', plugin_name)
       else
-        for k, v in ntuples(2, this.default) do
-          if not Savedata[k] then
-            log:debug(plugin_name, 'default Savedata: ', k, ' = ', v)
-            Savedata[k] = Table.dcopy(v) -- guaranteed defaults
-          else
-            log:debug(plugin_name, 'default Savedata: ', k, ' (already exists.)')
+        if not is_on_load then
+          for k, v in ntuples(2, this.default) do
+            if not Savedata[k] then
+              log:debug(plugin_name, 'default Savedata: ', k, ' = ', v)
+              Savedata[k] = Table.dcopy(v) -- guaranteed defaults
+            else
+              log:debug(plugin_name, 'default Savedata: ', k, ' (already exists.)')
+              end
             end
           end
         setmetatable(Savedata, this.mt)
