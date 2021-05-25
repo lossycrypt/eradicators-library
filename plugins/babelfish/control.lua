@@ -10,6 +10,9 @@
 -- the current progress. Each language only needs to be translated once,
 -- making the process instantaneous to most users even in multiplayer.
 --
+-- At the default network speed setting it takes about 10 seconds to fully
+-- translate one language in vanilla factorio.
+--
 -- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
 --
 -- @module Babelfish
@@ -200,6 +203,7 @@ Babelfish.on_player_language_changed = script.on_event({
           table.insert(changed_players, pindex)
           end
       else
+        Savedata.bytes = 0
         local dict = Savedata:sget_dict(pdata.language_code)
         pdata.dict = dict -- link
         if dict:needs_translation() then
@@ -244,20 +248,24 @@ Babelfish.on_recieve_translation = function(e)
 -- on_nth_tick(1)
 Babelfish.request_translations = function(e)
   -- In Singleplayer all translation is done during the loading screen.
-  local allowed_bytes =
-    (game.is_multiplayer() or flag.IS_DEV_MODE)
+  -- Recalculated live to immediately reflect setting changes.
+  local bytes_per_tick =
+    (game.is_multiplayer() or flag.IS_DEV_MODE or true)
     and (1024 / 60) * Setting.get_value('map', const.setting_name.network_rate)
     or math.huge
   --
+  Savedata.bytes = Savedata.bytes + bytes_per_tick
+  --
   for dict, p in ntuples(2, Savedata.incomplete_dictionaries) do
-    allowed_bytes = allowed_bytes - dict:dispatch_requests(p, allowed_bytes)
+    Savedata.bytes = Savedata.bytes - dict:dispatch_requests(p, Savedata.bytes)
     if not dict:needs_translation() then
       Savedata.incomplete_dictionaries[dict] = nil
       end
-    if allowed_bytes <= 0 then break end
     end
+  assert(Savedata.bytes >= 0)
   --
   if 0 == table_size(Savedata.incomplete_dictionaries) then
+    Savedata.bytes = nil
     StatusIndicator.destroy_all()
     Babelfish.on_player_language_changed()
     -- print(serpent.block(Savedata.players[1].dict.lookup))
@@ -323,13 +331,16 @@ remote.add_interface(const.remote.interface_name, Remote)
 -- @table Babelfish.SearchType
 
 -------
--- Given a user input finds prototype names.
+-- Given a user input, finds prototype names.
 -- Can search the localised name and description of all common prototypes
 -- to deliver a native search experience.
 --
 -- Translation is granular per @{Babelfish.SearchType|SearchType},
 -- so users can start searching for i.e. recipe names even if item names
 -- are still being translated.
+--
+-- Prototypes with unlocalised strings (i.e. "unknown-key:*")
+-- are not included in the search.
 --
 -- @tparam NaturalNumber pindex A @{FOBJ LuaPlayer.index}.
 -- @tparam string|DenseArray types One or more @{Babelfish.SearchType|SearchTypes}.

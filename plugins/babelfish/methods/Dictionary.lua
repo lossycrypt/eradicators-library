@@ -43,16 +43,11 @@ local String      = elreq('erlib/lua/String'    )()
 local Class       = elreq('erlib/lua/Class'     )()
 local Filter      = elreq('erlib/lua/Filter'    )()
 
-local Table       = elreq('erlib/lua/Table'     )()
-local Array       = elreq('erlib/lua/Array'     )()
+local sriapi      = elreq('erlib/lua/Iter/sriapi')()
 
-local Replicate   = elreq('erlib/lua/Replicate' )()
-
-local ntuples     = elreq('erlib/lua/Iter/ntuples')()
-
-local pairs, ipairs
-    = pairs, ipairs
-
+local pairs, pcall, string_find
+    = pairs, pcall, string.find
+    
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
 -- -------------------------------------------------------------------------- --
@@ -128,7 +123,7 @@ local function make_new_dictionary (language_code)
     local r = new.lookup[id] or {
       i       = get_request_index(),
       lstring = lstring,
-      bytes   = #id,
+      bytes   = #id * 1.05, -- assume 5% network overhead (wild guess)
       entries = {},
       next_request_tick = 0,
       }
@@ -139,11 +134,6 @@ local function make_new_dictionary (language_code)
     --
     new.requests[r.i] = r
     new.lookup  [id ] = r
-    end
-  -- inverse ipairs()
-  local function sriapi(arr)
-    local i = #arr + 1
-    return function() i = i - 1 return arr[i], i end
     end
   --
   for type in sriapi(const.allowed_translation_types) do
@@ -207,37 +197,38 @@ function Dictionary:push_translation(lstring, translation)
     --
     for _, entry in pairs(request.entries) do
       self.open_requests[entry.type] = self.open_requests[entry.type] - 1
-      local localised = not not translation
       if translation == false then
-        translation = 'unknown string:'..id
+        self[entry.type][entry.name] = {
+          [index.localised] = false,
+          [index.lower    ] = nil, -- reduce Savedata, store no garbage
+          }
       else
-        translation = String.remove_rich_text_tags(translation)
+        self[entry.type][entry.name] = {
+          [index.localised] = true,
+          [index.lower    ] = String.remove_rich_text_tags(translation):lower(),
+          }
         end
-      self[entry.type][entry.name] = {
-        [index.localised] = localised,
-        [index.lower    ] = translation:lower(),
-        }
       end
     end
   end
-  
+
+-- When max_bytes is smaller than the first request
+-- in the queue no reuqests will be sent at all.  
 function Dictionary:dispatch_requests(p, max_bytes)
-  -- At least one request has to be sent even if it goes
-  -- over the max_bytes limit. Otherwise a too low limit
-  -- could cause eternal stalling.
-  local tick = game.tick
-  local i, bytes = self.requests.n + 1, 0
-  repeat i = i - 1
-    local request = self.requests[i]
-    if request and (request.next_request_tick < tick) then
+  local bytes, tick, i = 0, game.tick, self.requests.n
+  for i = self.requests.n, 1, -1 do
+    local request = assert(self.requests[i])
+    if (request.next_request_tick < tick) then
+      if (bytes + request.bytes) > max_bytes then break end
       bytes = bytes + request.bytes
       p.request_translation(request.lstring)
       request.next_request_tick = tick + const.network.rerequest_delay
       end
-    until (bytes >= max_bytes) or (i == 0)
+    i = i - 1
+    end
   return bytes end
-  
-  
+
+
 -- -------------------------------------------------------------------------- --
 -- Find + Search                                                              --
 -- -------------------------------------------------------------------------- --
@@ -254,14 +245,11 @@ function Dictionary:dispatch_requests(p, max_bytes)
     
   ]]
   
-local find, pcall = string.find, pcall
+
 local matchers = {}
 function matchers.plain (t,ws)
-    for i=1,#ws do if not find(t,ws[i],1,true) then return false end end
+    for i=1,#ws do if not string_find(t,ws[i],1,true) then return false end end
     return true end
--- local function And (a,b) return a and b and true end
--- function matchers.fuzzy(t,w) return And(pcall(find,t,w,1,false)) end
--- matchers.lua = matchers.fuzzy
   
 -- @tparams types DenseArray {'item_name', 'recipe_name',...}
 -- @tparams string word The search term.
@@ -277,17 +265,16 @@ function Dictionary:find(types, word, opt)
   verify(opt.limit, 'nil|Integer', 'Babelfish: Invalid limit.' )
   --
   local n = opt.limit and opt.limit or math.huge
-  local include_unknown = (opt.include_unknown == true) -- default false
   local r = {}
   --
   -- fuzzy + lua modes can crash with "weird" user input.
   -- But this needs to fail independantly of self.open_requests.
   local matcher
   if opt.mode == 'lua' then
-    matcher = (pcall(find,'',word)) and find or Filter.False
+    matcher = (pcall(string_find,'',word)) and string_find or Filter.False
   elseif opt.mode == 'fuzzy' then
     word = String.splice(word, '.', '.*'):lower():gsub('%s+','')
-    matcher = (pcall(find,'',word)) and find or Filter.False
+    matcher = (pcall(string_find,'',word)) and string_find or Filter.False
   else
     matcher = matchers.plain
     word = String.split(word:lower(), '%s+')
@@ -299,10 +286,10 @@ function Dictionary:find(types, word, opt)
     if self.open_requests[type] ~= 0 then return false, nil end
     local this = {}; r[type] = this
     for name, translation in pairs(self[type]) do
-      if (n > 0) and (translation[index.localised] or include_unknown) then
-        if matcher(translation[index.lower], word) then
-          this[name], n = true, n - 1
-          end
+      if  (n > 0)
+      and translation[index.localised]
+      and matcher(translation[index.lower], word) then
+        this[name], n = true, n - 1
         end
       end
     end

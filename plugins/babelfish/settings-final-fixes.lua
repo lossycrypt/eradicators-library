@@ -16,19 +16,19 @@ Data.Inscribe{
   setting_type  = 'runtime-global'          ,
   order         = 'babelfish-1'             ,
   default_value = 8                         ,
-  minimum_value = 1                         ,
+  minimum_value = 0.0001                    ,
   maximum_value = 1000                      ,
   }
 
-Data.Inscribe{
-  name          = const.setting_name.auto_translate_categories,
-  type          = 'string-setting'          ,
-  setting_type  = 'runtime-global'          ,
-  order         = 'babelfish-z'             ,
-  hidden        = true                      ,
-  allow_blank   = true                      ,
-  default_value = 'recipe'                  , -- not used
-  
-  -- order is important!
-  allowed_values = const.allowed_translation_types, -- copied by Inscribe
-  }
+-- Data.Inscribe{
+--   name          = const.setting_name.auto_translate_categories,
+--   type          = 'string-setting'          ,
+--   setting_type  = 'runtime-global'          ,
+--   order         = 'babelfish-z'             ,
+--   hidden        = true                      ,
+--   allow_blank   = true                      ,
+--   default_value = 'recipe'                  , -- not used
+--   
+--   -- order is important!
+--   allowed_values = const.allowed_translation_types, -- copied by Inscribe
+--   }

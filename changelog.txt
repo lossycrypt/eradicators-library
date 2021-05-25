@@ -1,18 +1,25 @@
 ---------------------------------------------------------------------------------------------------
-Version: 4.1.6
+Version: 4.1.7
 Date: 2021-x-x
-  Internal:
+  Functions:
     - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.1.6
+Date: 2021-05-25
+  Functions:
+    - Added Iter.sriapi
+  Hooks:
+    - Babelfish: Network rate control is more accurate now.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.5
 Date: 2021-05-24
   Hooks:
-    - Babelfish remote interface added, cleaned up and fully documented.
+    - Babelfish: Remote interface added. All code cleaned up and fully documented.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.4
 Date: 2021-05-23
   Hooks:
-    - Babelfish prototype complete with indicator and search command.
+    - Babelfish: Prototype complete with indicator and search command.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.3
 Date: 2021-05-22
