@@ -69,10 +69,13 @@
   
 --[[ Todo:
   
-  + apply new add_or_remove merged logic to nth_tick handlers
-    by using the same function 
-     add_or_remove(OrderedHandlers[event_name])(module_name, f)
-     add_or_remove(OrderedNthTicks[period])(module_name, f)
+  + How to remove {table_unpack(handlers)}    
+    1) Never remove the handler table for a module once it has been added.
+    2) After adding a new handler table sort + reiterate all handlers and
+       store the next handler as ".next". While at this the active handlers
+       can be counted and the internal_handler de/registered as nessecary.
+    3) Now the order / index can never change during event iteration.
+    4) This also deprecates ".valid" as one can simply check for (f == nil).
 
   + do NOT remove valid
      
@@ -89,6 +92,7 @@
 -- to detect when modules get added / removed from a mod.
 -- Additionally module aware ConfigurationChangedData might be needed.
 -- This would be done as a seperate event module (inside this file?).
+-- Sounds like waaay too complicated stuff for little benefit.
 -- @table todo1
 do end
   
@@ -232,96 +236,56 @@ function Public.get_managed_script(module_name)
 --------------------------------------------------------------------------------
   
 -- -------------------------------------------------------------------------- --
--- OrderedHandlers Registry
+-- Event Registry Functions 
 -- -------------------------------------------------------------------------- --
-local OrderedHandlers = {--[[
-  [defines.events.index] = {
-    -- DenseArray ordered (not indexed) by ModuleIndex.
-    [1] = {module_name = , f =},
-    [2] = {module_name = , f =},
-    }
-  ]]}
-  
+
 local is_loader = {
   on_load = true,  on_init = true,
   on_configuration_changed = true,
   }
   
-local function script_on_event(event_name, f)
-  if is_loader[event_name] then return script[event_name](f) end
-  return script.on_event(event_name, f) end
-
---[[
-  
--- Removes a handler *if* it existed. If not silently does nothing.
-local function remove_handler(module_name, event_name)
-  local handlers = OrderedHandlers[event_name]
-  if handlers then
-    for i=1, #handlers do
-      if handlers[i].module_name == module_name then
-        log:debug('-  ', reverse_defines[event_name], ' ', module_name)
-        handlers[i].valid = false -- invalidate copied references
-        table.remove(handlers, i)
-        if #handlers == 0 then
-          log:debug('-- ', reverse_defines[event_name], ' (EventHandlerLite)')
-          script_on_event(event_name, nil)
-          end
-        handlers.n = #handlers
-        break end
-      end
-    end
-  end
-
--- Adds a new handler at the end. Overwrites existing handler if any.
-local function add_handler(module_name, event_name, f)
-  remove_handler(module_name, event_name)
-  local is_on_tick = (event_name == defines.events.on_tick)
-  --
-  if (f ~= nil) then
-    local handlers = Table.sget(OrderedHandlers, {event_name}, {})
-    if #handlers == 0 then
-      log:debug('++ ', reverse_defines[event_name], ' (EventHandlerLite)')
-      script_on_event(event_name,
-        is_on_tick
-        and Private.make_on_tick_handler (event_name)
-        or  Private.make_on_event_handler(event_name)
-        )
-      end
-    log:debug('+  ', reverse_defines[event_name], ' ', module_name)
-    table.insert(handlers, {module_name = module_name, f = f, valid = true})
-    handlers.n = nil -- n can't be sorted
-    table.sort(handlers, is_module_index_smaller) -- deterministic!
-    handlers.n = #handlers
-    end
-  end
-  
---]]
-  
 local log_handler_change = (not flag.IS_DEV_MODE) and ercfg.SKIP or
   function(mode, event_name, module_name)
     log:debug(mode, reverse_defines[event_name], ' ',  module_name)
     end
+    
+local function default_script_on_event(event_name, f)
+  if is_loader[event_name] then return script[event_name](f) end
+  return script.on_event(event_name, f) end
   
-local function add_or_remove_handler(handlers, module_name, event_name, f)
+local function for_nth_tick_script_on_event(_, f)
+  return Private.on_event('event-manager-nth-tick', defines.events.on_tick, f)
+  end
+  
+local function get_offset(module_name, period)
+  return Crc32.encode(module_name .. period) % period
+  end
+  
+-- Handles everything (normal, on_tick and on_nth_tick handlers)
+local function add_or_remove_handler(
+    handlers, module_name, event_name, f , sort_comparator, script_on_event,
+    period --[[nth_tick only]] )
+  --
   local i, handler
   for k, v in ipairs(handlers) do
-    if v.module_name == module_name then i, handler = k, v break end
+    if  (v.module_name == module_name) 
+    and (v.period      == period     ) -- nil for non-nth-tick
+    then i, handler = k, v break end
     end
-  --
+  -- remove
   if (f == nil) then
     if (handler == nil) then
       log_handler_change('x  ', event_name, module_name) -- didn't exist
     else
       log_handler_change('-  ', event_name, module_name) -- remove success
-      handler.valid = false -- todo: deprecate
-      table.remove(handlers, i)
-      -- handlers.n = #handlers
+      handler.valid = false
+      table.remove(handlers, i) -- keep order
       if #handlers == 0 then
         log_handler_change('-- ', event_name, '(EventHandlerLite)')
         script_on_event(event_name, nil)
         end
       end
-  --
+  -- add
   else
     if (handler ~= nil) then
       if handler.f == f then
@@ -333,31 +297,54 @@ local function add_or_remove_handler(handlers, module_name, event_name, f)
     else
       if #handlers == 0 then
         log_handler_change('++ ', event_name, '(EventHandlerLite)')
-        script_on_event(event_name,
-          (event_name == defines.events.on_tick)
-          and Private.make_on_tick_handler (event_name)
-          or  Private.make_on_event_handler(event_name)
-          )
+        if period ~= nil then
+          script_on_event(nil, Private.on_nth_tick_handler)
+        elseif event_name == defines.events.on_tick then
+          script_on_event(event_name, Private.make_on_tick_handler (event_name))
+        else
+          script_on_event(event_name, Private.make_on_event_handler(event_name))
+          end
         end
       log_handler_change('+  ', event_name, module_name) -- add new
-      table.insert(handlers, {module_name = module_name, f = f, valid = true})
+      table.insert(handlers, {
+        module_name = module_name  ,
+        f           = f            ,
+        valid       = true         ,
+        period      = period or nil,
+        offset      = period and get_offset(module_name, period) or nil,
+        })
       handlers.n = nil -- n can't be sorted
-      table.sort(handlers, is_module_index_smaller) -- deterministic!
-      -- handlers.n = #handlers
+      table.sort(handlers, sort_comparator) -- deterministic!
       end
     end
   end
-  
 
+-- -------------------------------------------------------------------------- --
+-- OrderedHandlers Registry
+-- -------------------------------------------------------------------------- --
+local OrderedHandlers = {--[[
+  [defines.events.index] = {
+    -- DenseArray ordered (not indexed) by ModuleIndex.
+     n  =  2                   , -- array length
+    [1] = {module_name = , f =},
+    [2] = {module_name = , f =},
+    }
+  ]]}
+  
+-- Equivalent to LuaBootstrap.on_event
 function Private.on_event(module_name, event_names, f, filters)
   verify(f, 'func|nil')
   verify(filters, 'nil', 'Filters are not supported by EventManager.')
   --
   for _, event_name in pairs(Table.plural(event_names)) do
     verify(event_name, 'Integer|string') -- defines.events.on_tick is 0!
-    -- add_handler(module_name, event_name, f)
+    --
     local handlers = Table.sget(OrderedHandlers, {event_name}, {})
-    add_or_remove_handler(handlers, module_name, event_name, f)
+    --
+    add_or_remove_handler(
+      handlers, module_name, event_name, f,
+      is_module_index_smaller, default_script_on_event)
+    --
     handlers.n = #handlers
     end
   return f end
@@ -370,7 +357,7 @@ function Private.get_event_handler(module_name, event_name)
       end
     end
   end
-  
+
 -- -------------------------------------------------------------------------- --
 -- OrderedHandlers Event Handler Makers
 -- -------------------------------------------------------------------------- --
@@ -401,13 +388,8 @@ function Private.make_on_tick_handler(event_name)
 -- @tparam String log_name Human readable event name.
 local log_event = (not flag.IS_DEV_MODE) and ercfg.SKIP or
   function (log_name, module_name)
-    return log:debug(
-      'Event handled  : ', log_name
-      ,', Module: ', module_name
-      )
+    return log:debug(log_name, ' → ', module_name)
     end
-
-
   
 -- An event becomes invalid if a handler invalidates at
 -- least one LuaObject that was valid before.
@@ -463,71 +445,40 @@ function Private.make_on_event_handler(event_name)
 -- -------------------------------------------------------------------------- --
 -- Nth Tick Handlers Registry
 -- -------------------------------------------------------------------------- --
-local OrderedNthTicks = { handlers = {}, n = 0, next_nth_tick = 0 }
+local OrderedNthTicks = { 
+  n = 0, next_nth_tick = 0,
+  handlers = {--[[
+    -- DenseArray ordered (not indexed) by ModuleIndex and increasing period.
+    [1] = {module_name = , f =, period = k    },
+    [2] = {module_name = , f =, period = k + j},
+    ]] }, 
+  }
 
-local function get_offset(module_name, period)
-  return Crc32.encode(module_name .. period) % period
-  end
-
-local function remove_on_nth_tick(module_name, period)
-  for i=1, OrderedNthTicks.n do
-    local handler = OrderedNthTicks.handlers[i]
-    if  (handler.module_name == module_name)
-    and (handler.period      == period     )
-    then
-      log:debug('-  on_nth_tick ', period, ' ', module_name)
-      handler.valid = false
-      table.remove(OrderedNthTicks.handlers, i) -- keeps correct order
-      OrderedNthTicks.n = #OrderedNthTicks.handlers
-      if OrderedNthTicks.n == 0 then
-        Private.on_event('event-manager-nth-tick', defines.events.on_tick, nil)
-        end
-      return end -- Each module can only have one handler per period.
+local function cmp_nth_tick_handlers(a,b) -- deterministic order!
+  if (a.module_name == b.module_name) then
+    return a.period < b.period -- must be able to return false!
+  else
+    return is_module_index_smaller(a,b)
     end
   end
   
-local function add_on_nth_tick(module_name, period, f)
-  remove_on_nth_tick(module_name, period)
-  --
-  if (f ~= nil) then
-    if OrderedNthTicks.n == 0 then
-      Private.on_event('event-manager-nth-tick',
-        defines.events.on_tick,
-        Private.on_nth_tick_handler)
-      end
-    log:debug('+  on_nth_tick ', period, ' ', module_name)
-    --
-    table.insert(OrderedNthTicks.handlers, {
-      module_name = module_name,
-      period = period,
-      offset = get_offset(module_name, period),
-      f = f,
-      valid = true,
-      })
-    --
-    table.sort(OrderedNthTicks.handlers, function(a,b) -- deterministic!
-      if (a.module_name == b.module_name) then
-        return a.period < b.period -- must be able to return false!
-      else
-        return is_module_index_smaller(a,b)
-        end
-      end)
-    --
-    -- It can not be known if adding occurs before or
-    -- after on_nth_tick of the same tick. So 
-    -- the next occurance has to be decided within
-    -- the on_nth_tick event handler itself.
-    OrderedNthTicks.n = #OrderedNthTicks.handlers
-    OrderedNthTicks.next_nth_tick = 0 -- activate bootstrap next cycle!
-    end
-  end
-  
+-- Equivalent to LuaBootstrap.on_nth_tick.
 function Private.on_nth_tick(module_name, periods, f)
   verify(f, 'func|nil')
   --
   for _, period in pairs(Table.plural(periods)) do
     verify(period, 'NaturalNumber')
-    add_on_nth_tick(module_name, period, f)
+    add_or_remove_handler(
+      OrderedNthTicks.handlers, module_name, 'on_nth_tick_'..period, f, 
+      cmp_nth_tick_handlers, for_nth_tick_script_on_event, period )
+    --
+    OrderedNthTicks.n = #OrderedNthTicks.handlers
+    --
+    -- It can not be known if adding occurs before or
+    -- after on_nth_tick of the same tick. So
+    -- the next occurance has to be decided within
+    -- the on_nth_tick event handler itself.
+    OrderedNthTicks.next_nth_tick = 0 -- activate bootstrap next cycle!
     end
   return f end
   

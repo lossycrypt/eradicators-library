@@ -13,6 +13,8 @@ Date: 2021-05-25
     - Babelfish: Added can_find, get_player_language_code and get_translation_percentages.
     - Babelfish: Fuzzy find mode no longer depends on lua pattern matching.
     - Babelfish: Fuzzy and plain find modes should now work better with unicode.
+  Internal:
+    - EventManagerLite: Unified add/remove for all handler types.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.5
 Date: 2021-05-24

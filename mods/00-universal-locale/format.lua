@@ -97,12 +97,15 @@ local pattern_functions = {
   -- Inject mod setting default value description.
   function(entry, db)
     if entry.header == '[mod-setting-name]' then
+      local prot = assert(game.mod_setting_prototypes[entry.key],
+        'Can not add default value for non-existant settings prototype: '
+        ..entry.key)
       add_description_header(entry, db, 
         ("_UL:ICON_TOOLTIP_ [color=orange]%s[/color] [color=acid]%s[/color]\\n")
         :format(
           lt.default_value[entry.language],
           -- serpent automatically puts quotes on strings! ;)
-          serpent.line(game.mod_setting_prototypes[entry.key].default_value)
+          serpent.line(prot.default_value)
           )
         )
       end

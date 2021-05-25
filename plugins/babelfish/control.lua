@@ -178,7 +178,7 @@ Babelfish.update_handlers = function()
     script.on_nth_tick(             1, nil)
     end
   end
-  
+
   
 -- -------------------------------------------------------------------------- --
 -- Player Language                                                            --

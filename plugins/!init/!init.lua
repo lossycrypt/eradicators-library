@@ -95,12 +95,7 @@ return function(phase) assert(phase)
   -- Control                                                                  --
   -- ------------------------------------------------------------------------ --
   elseif phase == 'control' then
-    
-    -- ---------------------------------------------------------------------- --
-    -- Universal Locale (internal condition check)                            --
-    -- ---------------------------------------------------------------------- --
-    require 'plugins/babelfish/ulocale'
-    
+       
     -- ---------------------------------------------------------------------- --
     -- Hooks & Nooks                                                          --
     -- ---------------------------------------------------------------------- --
@@ -120,7 +115,12 @@ return function(phase) assert(phase)
 
       PluginManager.enable_savedata_management()
 
-      if settings.enable_bablefish then require('plugins/babelfish/control.lua') end
+      if settings.enable_bablefish then
+        require('plugins/babelfish/control.lua')
+        -- Creating the locale needs access to 
+        -- the settings_prototype.default_value
+        require 'plugins/babelfish/ulocale'
+        end
       
       break end end
       

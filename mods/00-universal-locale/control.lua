@@ -66,6 +66,13 @@ script.on_nth_tick(1,function() script.on_nth_tick(1, nil)
   log:info('...done.')
   end)
 
+-- Pop a nice warning before wasting anyones time.
+script.on_event(defines.events.on_console_command, function(e)
+  if e.command  == 'toggle-heavy-mode' then
+    stop('UniversalLocale is not desync safe!')
+    end
+  end)
+  
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
