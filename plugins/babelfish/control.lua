@@ -383,8 +383,9 @@ function Remote.can_find(pindex, types)
 -- @tparam[opt=inf] Integer options.limit Search will abort after this many
 -- hits and return the (partial) result.
 -- @tparam[opt=plain] string options.mode `'plain'`, `'fuzzy'` or `'lua'`.
--- Fuzzy and lua modes both use lua pattern matching, thus if "word" is
--- not a @{string.find} compatible pattern the search result will be empty.
+-- Plain and fuzzy modes should work fine with unicode input.
+-- Lua mode will return an empty search result if "word" is not
+-- a @{string.find} compatible pattern. 
 -- 
 -- @usage
 -- 

@@ -289,6 +289,25 @@ function Dictionary:dispatch_requests(p, max_bytes)
     
   ]]
   
+  
+-- This abomination splits the input string into a table
+-- of space-free substrings. It does NOT preserve the order
+-- of the substrings.
+local function split_by_space(ustr)
+  local temp = {[ustr] = true}
+  for _, space   in pairs(String.UNICODE_SPACE) do
+  for segment, _ in pairs(temp) do
+  for _, substr  in pairs(String.split(segment, space)) do
+    temp[substr] = true
+    end end end
+  local r = {}
+  for substr in pairs(temp) do
+    if (substr ~= '')
+    and (substr == String.remove_whitespace(substr))
+    then r[#r+1] = substr end
+    end
+  return r end
+
 
 local matchers = {}
 function matchers.plain (t,ws)
@@ -317,11 +336,11 @@ function Dictionary:find(types, word, opt)
   if opt.mode == 'lua' then
     matcher = (pcall(string_find,'',word)) and string_find or Filter.False
   elseif opt.mode == 'fuzzy' then
-    word = String.splice(word, '.', '.*'):lower():gsub('%s+','')
-    matcher = (pcall(string_find,'',word)) and string_find or Filter.False
+    matcher = String.find_fuzzy
+    word = String.to_array(String.remove_whitespace(word:lower()))
   else
     matcher = matchers.plain
-    word = String.split(word:lower(), '%s+')
+    word = split_by_space(word:lower())
     end
   --
   for i=1, #types do

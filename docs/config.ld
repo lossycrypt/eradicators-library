@@ -313,7 +313,7 @@ KeywordPage(
 
 
 -- Keyword: URL
--- Example: @{URL www.wikipedia.com Wiki}
+-- Example: @{URL www.wikipedia.com|Wiki}
 -- Url    : www.wikipedia.com
 -- Name   : Wiki
 KeywordPage(

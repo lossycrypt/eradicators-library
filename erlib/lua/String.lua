@@ -1,4 +1,4 @@
--- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
+﻿-- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
 --------------------------------------------------
 --
@@ -21,9 +21,9 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- -------------------------------------------------------------------------- --
 local type,string = type,string
 
-local string_gsub,string_gmatch,string_find,string_format,
+local string_gsub,string_gmatch,string_find,string_format,string_sub,
       table_concat,math_floor,math_ceil
-    = string.gsub,string.gmatch,string.find,string.format,
+    = string.gsub,string.gmatch,string.find,string.format,string.sub,
       table.concat,math.floor,math.ceil
 
 local Hydra    = elreq ('erlib/lua/Coding/Hydra')()
@@ -51,7 +51,10 @@ String.UPPER_ARGS    = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z'
 String.LOWER_LETTERS = 'abcdefghijklmnopqrstuvwxyz'
 --- 'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
 String.LOWER_ARGS    = 'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
-
+--- A dense array of different unicode spaces. (From @{URL https://emptycharacter.com|here})
+-- @table String.UNICODE_SPACE
+do end
+String.UNICODE_SPACE = {'%s',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','　'}
 
 --------------------------------------------------------------------------------
 -- Analyze strings.
@@ -182,7 +185,34 @@ function String.find_all(str,pattern,multi_capture)
   return matches
   end
 
-
+----------
+-- Factorio style "fuzzy" string search.
+-- For true factorio style matching you must
+-- @{String.remove_whitespace|remove all whitespace}
+-- from your input pattern.
+-- 
+-- @usage
+--   local needle   = 'r p e'
+--   local haystack = 'Iron Plate'
+--   print(String.find_fuzzy(
+--     haystack:lower(), String.to_array(String.remove_whitespace(needle:lower()))
+--     ))
+--   > true
+--
+-- @tparam string str
+-- @tparam DenseArray pattern An array of strings (see @{String.to_array}).
+-- 
+-- @treturn boolean Is true when each character in pattern
+-- occurs in str in the same order.
+-- 
+function String.find_fuzzy(str, pattern)
+  local _, start = nil, 0
+  for i = 1, #pattern do
+    _, start = string_find(str, pattern[i], start + 1, true)
+    if not start then return false end
+    end
+  return true end
+  
 ----------
 -- Splits a string into an array of sub-strings. The pattern
 -- is entirely removed from the result.
@@ -204,20 +234,37 @@ function String.find_all(str,pattern,multi_capture)
 --
 function String.split(str,pattern,raw)
   if pattern == '' then stop('Can not split by empty string.') end
-  local r = {}
+  local r, n = {}, 0
   local s = 1
   while true do
+    n = n + 1
     local i,j = string_find(str,pattern,s,not not raw)
     if not i then break end
-    r[#r+1] = str:sub(s,i-1)
+    r[n] = string_sub(str,s,i-1)
     s = j+1
     end
   if s <= #str then
-    r[#r+1] = str:sub(s) -- rest after the last find
+    r[n] = string_sub(str,s) -- rest after the last find
     end
   return r
   end  
 
+----------
+-- Converts a string into an array of characters.
+-- Has limited unicode awareness.
+--
+-- @tparam string ustr
+-- @treturn DenseArray
+function String.to_array(ustr)
+  local r, i = {}, 0
+  -- From http://lua-users.org/wiki/LuaUnicode
+  -- %z with \0 as it's deprecated according to the official manual.
+  for uchar in string.gmatch(ustr, "(['\0\1-\127\194-\244][\128-\191]*)") do
+    i = i + 1
+    r[i] = uchar
+    end
+  return r end
+  
   
 --------------------------------------------------------------------------------
 -- Manipulate strings.
@@ -237,8 +284,19 @@ function String.ltrim(str) return str:match"^%s*(.-)$"    end
 -- @treturn string
 function String.rtrim(str) return str:match"^(.-)%s*$"    end
 
-
-
+----------
+-- Removes all whitespace from a string.
+-- Does not remove line breaks.
+-- Uses @{String.UNICODE_SPACE}.
+-- @tparam string str
+-- @treturn string
+function String.remove_whitespace(ustr)
+  -- Unicode spaces have to be removed one-by-one to
+  -- not produce garbage output.
+  for i=1, #String.UNICODE_SPACE do 
+    ustr = string_gsub(ustr, String.UNICODE_SPACE[i], '')
+    end
+  return ustr end
   
 ----------
 -- Replaces a raw substring with another raw substring.

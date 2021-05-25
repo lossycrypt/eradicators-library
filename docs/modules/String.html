@@ -134,6 +134,10 @@
 	<td class="name" nowrap><a href="#LOWER_ARGS">LOWER_ARGS</a></td>
 	<td class="summary">'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#UNICODE_SPACE">UNICODE_SPACE</a></td>
+	<td class="summary">A dense array of different unicode spaces.</td>
+	</tr>
 </table>
 <h2><a href="#Analyze_strings">Analyze strings </a></h2>
 <table class="function_list">
@@ -156,8 +160,16 @@
 	<td class="summary">Find all occurances of a pattern in a string.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#find_fuzzy">find_fuzzy(str, pattern)</a></td>
+	<td class="summary">Factorio style "fuzzy" string search.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#split">split(str, pattern, raw)</a></td>
 	<td class="summary">Splits a string into an array of sub-strings.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_array">to_array(ustr)</a></td>
+	<td class="summary">Converts a string into an array of characters.</td>
 	</tr>
 </table>
 <h2><a href="#Manipulate_strings">Manipulate strings </a></h2>
@@ -173,6 +185,10 @@
 	<tr>
 	<td class="name" nowrap><a href="#rtrim">rtrim(str)</a></td>
 	<td class="summary">Trims whitespace from right side of a string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#remove_whitespace">remove_whitespace(str)</a></td>
+	<td class="summary">Removes all whitespace from a string.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#replace">replace(str, pattern, replacement[, n=inf[, raw=true]])</a></td>
@@ -265,6 +281,20 @@
     </dt>
     <dd>
     'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "UNICODE_SPACE"></a>
+    <strong>UNICODE_SPACE</strong>
+    </dt>
+    <dd>
+    A dense array of different unicode spaces.  (From <a href="https://emptycharacter.com">here</a>)
 
 
 
@@ -424,6 +454,53 @@
 
 </dd>
     <dt>
+    <a name = "find_fuzzy"></a>
+    <strong>find_fuzzy(str, pattern)</strong>
+    </dt>
+    <dd>
+    Factorio style "fuzzy" string search.
+ For true factorio style matching you must
+ <a href="../modules/String.html#remove_whitespace">remove all whitespace</a>
+ from your input pattern.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">pattern</span>
+            <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         An array of strings (see <a href="../modules/String.html#to_array">String.to_array</a>).
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         Is true when each character in pattern
+ occurs in str in the same order.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> needle   = <span class="string">'r p e'</span>
+<span class="keyword">local</span> haystack = <span class="string">'Iron Plate'</span>
+<span class="global">print</span>(String.find_fuzzy(
+  haystack:lower(), String.to_array(String.remove_whitespace(needle:lower()))
+  ))
+&gt; <span class="keyword">true</span>
+</pre>
+    </ul>
+
+</dd>
+    <dt>
     <a name = "split"></a>
     <strong>split(str, pattern, raw)</strong>
     </dt>
@@ -474,6 +551,38 @@
 &gt; {<span class="string">"A"</span>, <span class="string">"2C"</span>, <span class="string">"4E"</span>, <span class="string">"6"</span>}
 </pre>
     </ul>
+
+</dd>
+    <dt>
+    <a name = "to_array"></a>
+    <strong>to_array(ustr)</strong>
+    </dt>
+    <dd>
+    Converts a string into an array of characters.
+ Has limited unicode awareness.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ustr</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+
+
+
+    </ol>
+
+
+
 
 </dd>
 </dl>
@@ -548,6 +657,39 @@
     </dt>
     <dd>
     Trims whitespace from right side of a string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "remove_whitespace"></a>
+    <strong>remove_whitespace(str)</strong>
+    </dt>
+    <dd>
+    Removes all whitespace from a string.
+ Does not remove line breaks.
+ Uses <a href="../modules/String.html#UNICODE_SPACE">String.UNICODE_SPACE</a>.
 
 
     <h3>Parameters:</h3>
@@ -935,7 +1077,7 @@ test(<span class="string">'E.R.'</span>,<span class="string">'Adicator'</span>)
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-05-25 15:08:41 </i>
+<i style="float:right;">Last updated 2021-05-25 18:06:37 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
