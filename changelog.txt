@@ -10,6 +10,7 @@ Date: 2021-05-25
     - Added Iter.sriapi
   Hooks:
     - Babelfish: Network rate control is more accurate now.
+    - Babelfish: Added can_find, get_player_language_code and get_translation_percentages.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.5
 Date: 2021-05-24

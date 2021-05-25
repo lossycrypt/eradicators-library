@@ -43,6 +43,8 @@ local String      = elreq('erlib/lua/String'    )()
 local Class       = elreq('erlib/lua/Class'     )()
 local Filter      = elreq('erlib/lua/Filter'    )()
 
+local Table       = elreq('erlib/lua/Table'     )()
+
 local sriapi      = elreq('erlib/lua/Iter/sriapi')()
 
 local pairs, pcall, string_find
@@ -152,17 +154,59 @@ local function make_new_dictionary (language_code)
   --
   return new end
   
+  
+-- A fake "dictionary" to easily make internal names
+-- searchable via the standard find() functions.
+local function make_internal_names_dictionary()
+  local new = {
+    -- This "max" is just a fake value that doesn't cause problems.
+    -- Because it can't be meaningfully calcualted without an actual locale.
+    requests = {n = 0, max = 1},
+    lookup   = {},
+    open_requests = {},
+    language_code        = 'internal',
+    native_language_name = 'Internal', -- User needs to know English anyway.
+    }
+  for type in sriapi(const.allowed_translation_types) do
+    local type_name = type..'_name'        -- 'item_name'
+    local type_desc = type..'_description' -- 'item_description'
+    --
+    new.open_requests[type_name], new[type_name] = 0, {}
+    new.open_requests[type_desc], new[type_desc] = 0, {}
+    --
+    for name in pairs(game[type..'_prototypes']) do
+      new[type_name][name] = {
+        [index.localised] = true,
+        [index.lower    ] = name:lower(),
+        }
+      new[type_desc][name] = {
+        [index.localised] = false,
+        [index.lower    ] = nil,
+        }
+      end
+    end
+  return new end
+  
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 local Dictionary = Class.SimpleClass(make_new_dictionary)
+
+  
+-- -------------------------------------------------------------------------- --
+-- Internal Names Dictionary                                                  --
+-- -------------------------------------------------------------------------- --
+  
+function Dictionary.make_internal_names_dictionary()
+  return Dictionary.reclassify(make_internal_names_dictionary())
+  end
 
 -- -------------------------------------------------------------------------- --
 -- Status                                                                     --
 -- -------------------------------------------------------------------------- --
 
 -- If the dictionary has anything left to request.
-function Dictionary:needs_translation()
+function Dictionary:has_requests()
   return (self.requests.n > 0) end
   
 -- How much is translated yet. For informing the player.

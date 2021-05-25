@@ -47,6 +47,8 @@ const.allowed_translation_types = {
   }
 
 const.native_language_name = {
+  internal  = 'Internal'           ,
+  
   ["af"   ] = "Afrikaans"          ,
   ["ar"   ] = "العَرَبِيَّة"               ,
   ["be"   ] = "Беларуская"         ,

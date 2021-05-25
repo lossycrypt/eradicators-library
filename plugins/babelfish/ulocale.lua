@@ -33,7 +33,7 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
     ['status-indicator-tooltip-header'] = {
       en = 'The Babelfish is currently translating your mods.__1__',
       de = 'Der Babelfisch übersetzt gerade deine Mods.__1__',
-      jp = 'バベルフィッシュさんが只今モッドの翻訳に勤しんでいます。__1__',
+      ja = 'バベルフィッシュさんが只今モッドの翻訳に勤しんでいます。__1__',
       },
 
     language_code = (function(r)

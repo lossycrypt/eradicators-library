@@ -49,12 +49,14 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- -------------------------------------------------------------------------- --
 local log         = elreq('erlib/lua/Log'          )().Logger  'Babelfish'
 local stop        = elreq('erlib/lua/Error'        )().Stopper 'Babelfish'
+local assertify   = elreq('erlib/lua/Error'        )().Asserter(stop)
 
 local Table       = elreq('erlib/lua/Table'        )()
 local Setting     = elreq('erlib/factorio/Setting')()
 
 local Verificate  = elreq('erlib/lua/Verificate'   )()
 local verify      = Verificate.verify
+local isType      = Verificate.isType
 
 local Setting     = elreq('erlib/factorio/Setting' )()
 local Locale      = elreq('erlib/factorio/Locale'  )()
@@ -139,6 +141,7 @@ script.on_config(function(e)
     pdata.language_code = nil
     end
   Babelfish.on_player_language_changed()
+  Savedata.dicts['internal'] = Dictionary.make_internal_names_dictionary()
   end)
   
 script.on_load(function(e)
@@ -206,7 +209,7 @@ Babelfish.on_player_language_changed = script.on_event({
         Savedata.bytes = 0
         local dict = Savedata:sget_dict(pdata.language_code)
         pdata.dict = dict -- link
-        if dict:needs_translation() then
+        if dict:has_requests() then
           incomplete_dictionaries[dict] = p -- need a player to request
           end
         end
@@ -250,7 +253,7 @@ Babelfish.request_translations = function(e)
   -- In Singleplayer all translation is done during the loading screen.
   -- Recalculated live to immediately reflect setting changes.
   local bytes_per_tick =
-    (game.is_multiplayer() or flag.IS_DEV_MODE or true)
+    (game.is_multiplayer() or flag.IS_DEV_MODE)
     and (1024 / 60) * Setting.get_value('map', const.setting_name.network_rate)
     or math.huge
   --
@@ -258,7 +261,7 @@ Babelfish.request_translations = function(e)
   --
   for dict, p in ntuples(2, Savedata.incomplete_dictionaries) do
     Savedata.bytes = Savedata.bytes - dict:dispatch_requests(p, Savedata.bytes)
-    if not dict:needs_translation() then
+    if not dict:has_requests() then
       Savedata.incomplete_dictionaries[dict] = nil
       end
     end
@@ -273,7 +276,7 @@ Babelfish.request_translations = function(e)
     -- print(serpent.block(Savedata.players[1].dict.open_requests))
     end
   end 
-
+  
 -- -------------------------------------------------------------------------- --
 -- Status Indicator                                                           --
 -- -------------------------------------------------------------------------- --
@@ -300,7 +303,7 @@ Babelfish.update_status_indicators = function(e)
 -- @section
 --------------------------------------------------------------------------------
 
--------
+----------
 -- Activates babelfish for all mods. Without this babelfish will
 -- not be loaded at all. This must be called in __settings.lua__.
 --
@@ -309,14 +312,11 @@ Babelfish.update_status_indicators = function(e)
 -- @function erlib_enable_bablefish
   
 --------------------------------------------------------------------------------
--- Remote Interface.  
+-- Remote Interface Types.
 -- @section
 --------------------------------------------------------------------------------
 
-local Remote = {}
-remote.add_interface(const.remote.interface_name, Remote)
-
--------
+----------
 -- What to search. One of the following strings. This is also the
 -- order in which translation occurs.
 --
@@ -330,7 +330,39 @@ remote.add_interface(const.remote.interface_name, Remote)
 --
 -- @table Babelfish.SearchType
 
--------
+----------
+-- Identifies a language between different Babelfish function calls.
+-- Storing this in your global data will likely produce unexpected results.
+-- It's best to always retrieve this shortly before usage.
+--
+-- @table Babelfish.LanguageCode
+  
+--------------------------------------------------------------------------------
+-- Remote Interface.  
+-- @section
+--------------------------------------------------------------------------------
+
+local Remote = {}
+remote.add_interface(const.remote.interface_name, Remote)
+
+----------
+-- Reports if the given types are completely translated yet.
+--
+-- Does the same internal checks as @{Babelfish.find_prototype_names} so
+-- usually you won't need to call this seperately.
+--
+-- @tparam player_index|LanguageCode pindex
+-- A language code should only be used if your mod needs to
+-- allow a player to search in a locale different from their own.
+-- @tparam string|DenseArray types One or more @{Babelfish.SearchType|SearchTypes}.
+--
+-- @treturn boolean If all of the given types are searchable.
+--
+-- @function Babelfish.can_find
+function Remote.can_find(pindex, types)
+  return (Remote.find_prototype_names(pindex, types, '', {limit=0})) end
+
+----------
 -- Given a user input, finds prototype names.
 -- Can search the localised name and description of all common prototypes
 -- to deliver a native search experience.
@@ -342,7 +374,9 @@ remote.add_interface(const.remote.interface_name, Remote)
 -- Prototypes with unlocalised strings (i.e. "unknown-key:*")
 -- are not included in the search.
 --
--- @tparam NaturalNumber pindex A @{FOBJ LuaPlayer.index}.
+-- @tparam player_index|LanguageCode pindex
+-- A language code should only be used if your mod needs to
+-- allow a player to search in a locale different from their own.
 -- @tparam string|DenseArray types One or more @{Babelfish.SearchType|SearchTypes}.
 -- @tparam string word The user input.
 -- @param options (@{table})
@@ -381,24 +415,57 @@ remote.add_interface(const.remote.interface_name, Remote)
 -- given types yet this will be false and the result will be nil. Even if some
 -- of the given types are already fully translated.
 --
--- @treturn table A table mapping each requested type to a @{Types.set|set} of
--- prototype names.
+-- @treturn table|nil A table mapping each requested type to a @{Types.set|set} of
+-- prototype names. 
 --
 -- @function Babelfish.find_prototype_names
 function Remote.find_prototype_names(pindex, types, word, options)
-  -- Other mod might send index of offline player!
-  local pdata = Savedata:sget_pdata(
-    nil, verify(pindex, 'NaturalNumber', 'Babelfish: Invalid player index.'))
-  if not pdata.dict then return false, nil end
-  return pdata.dict:find(Table.plural(types), word, options or {}) end
+  -- The other mod might send the index of an offline player!
+  local dict
+  if isType.NaturalNumber(pindex) then
+    assertify(game.players[pindex], 'No player with given index: ', pindex)
+    dict = Savedata:sget_pdata(nil, pindex).dict
+  else
+    assertify(const.native_language_name[pindex], 'Invalid language code: ', pindex)
+    dict = Savedata.dicts[pindex]
+    end
+  if not dict then return false, nil end
+  return dict:find(Table.plural(types), word, options or {}) end
 
+----------
+-- Retrieves the language code of a player.
+-- Only @{FOBJ LuaPlayer.connected|connected} players have a code, and
+-- there is a delay of one "ping" between connection and code
+-- assignment.
+-- 
+-- @tparam NaturalNumber pindex A @{FOBJ LuaPlayer.index}.
+-- @return The @{Babelfish.LanguageCode|LanguageCode} or @{nil}.
+--
+-- @function Babelfish.get_player_language_code
+function Remote.get_player_language_code(pindex)
+  verify(pindex, 'NaturalNumber', 'Babelfish: Invalid player index')
+  assertify(game.players[pindex], 'No player with given index: ', pindex)
+  return Savedata:sget_pdata(nil, pindex).language_code or nil
+  end
+  
+----------
+-- Retrieves translation percentage of all seen languages.
+-- This is the same data that the built-in status indicator uses.
+-- Includes only languages that have been seen on this map at least once.
+-- 
+-- @treturn table A mapping (@{Babelfish.LanguageCode|LanguageCode} → @{NaturalNumber})
+-- where the number is between 0 and 100 inclusive.
+-- 
+-- @function Babelfish.get_translation_percentages
+function Remote.get_translation_percentages()
+  local r = {}
+  for code, dict in ntuples(2, Savedata.dicts) do
+    r[code] = dict:get_percentage()
+    end
+  return r end
+
+
+  
 -- -------------------------------------------------------------------------- --
 -- Draft                                                                      --
 -- -------------------------------------------------------------------------- --
-
-
-function Remote.get_player_language(pindex)
-  -- For multi-language find()
-  error('Not Implemented')
-  end
-

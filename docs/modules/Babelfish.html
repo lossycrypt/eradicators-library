@@ -33,6 +33,7 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Startup">Startup </a></li>
+<li><a href="#Remote_Interface_Types">Remote Interface Types </a></li>
 <li><a href="#Remote_Interface">Remote Interface </a></li>
 </ul>
 
@@ -106,6 +107,9 @@
  the current progress. Each language only needs to be translated once,
  making the process instantaneous to most users even in multiplayer.</p>
 
+<p> At the default network speed setting it takes about 10 seconds to fully
+ translate one language in vanilla factorio.</p>
+
 <p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.</p>
     <h3>Usage:</h3>
     <ul>
@@ -124,15 +128,34 @@ remote.call(&apos;er:babelfish-remote-interface&apos;,&apos;find&apos;, player_i
 	<td class="summary">Activates babelfish for all mods.</td>
 	</tr>
 </table>
-<h2><a href="#Remote_Interface">Remote Interface </a></h2>
+<h2><a href="#Remote_Interface_Types">Remote Interface Types </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#SearchType">SearchType</a></td>
 	<td class="summary">What to search.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#LanguageCode">LanguageCode</a></td>
+	<td class="summary">Identifies a language between different Babelfish function calls.</td>
+	</tr>
+</table>
+<h2><a href="#Remote_Interface">Remote Interface </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#can_find">can_find(pindex, types)</a></td>
+	<td class="summary">Reports if the given types are completely translated yet.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#find_prototype_names">find_prototype_names(pindex, types, word, options)</a></td>
 	<td class="summary">Given a user input, finds prototype names.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_player_language_code">get_player_language_code(pindex)</a></td>
+	<td class="summary">Retrieves the language code of a player.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_translation_percentages">get_translation_percentages()</a></td>
+	<td class="summary">Retrieves translation percentage of all seen languages.</td>
 	</tr>
 </table>
 
@@ -166,11 +189,8 @@ remote.call(&apos;er:babelfish-remote-interface&apos;,&apos;find&apos;, player_i
 
 </dd>
 </dl>
-    <h2 class="section-header has-description"><a name="Remote_Interface"></a>Remote Interface </h2>
+    <h2 class="section-header "><a name="Remote_Interface_Types"></a>Remote Interface Types </h2>
 
-          <div class="section-description">
-
-          </div>
     <dl class="function">
     <dt>
     <a name = "SearchType"></a>
@@ -201,6 +221,64 @@ remote.call(&apos;er:babelfish-remote-interface&apos;,&apos;find&apos;, player_i
 
 </dd>
     <dt>
+    <a name = "LanguageCode"></a>
+    <strong>LanguageCode</strong>
+    </dt>
+    <dd>
+    Identifies a language between different Babelfish function calls.
+ Storing this in your global data will likely produce unexpected results.
+ It's best to always retrieve this shortly before usage.
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Remote_Interface"></a>Remote Interface </h2>
+
+          <div class="section-description">
+
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "can_find"></a>
+    <strong>can_find(pindex, types)</strong>
+    </dt>
+    <dd>
+    Reports if the given types are completely translated yet. </p>
+
+<p> Does the same internal checks as <a href="../modules/Babelfish.html#find_prototype_names">Babelfish.find_prototype_names</a> so
+ usually you won't need to call this seperately.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pindex</span>
+            <span class="types"><span class="type">player_index</span> or <span class="type">LanguageCode</span></span>
+         A language code should only be used if your mod needs to
+ allow a player to search in a locale different from their own.
+        </li>
+        <li><span class="parameter">types</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a> or <a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         One or more <a href="../modules/Babelfish.html#SearchType">SearchTypes</a>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+        If all of the given types are searchable.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "find_prototype_names"></a>
     <strong>find_prototype_names(pindex, types, word, options)</strong>
     </dt>
@@ -220,8 +298,9 @@ remote.call(&apos;er:babelfish-remote-interface&apos;,&apos;find&apos;, player_i
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">pindex</span>
-            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
-         A <a href="../api/LuaPlayer.html#LuaPlayer.index">LuaPlayer.index</a>.
+            <span class="types"><span class="type">player_index</span> or <span class="type">LanguageCode</span></span>
+         A language code should only be used if your mod needs to
+ allow a player to search in a locale different from their own.
         </li>
         <li><span class="parameter">types</span>
             <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a> or <a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
@@ -257,9 +336,9 @@ remote.call(&apos;er:babelfish-remote-interface&apos;,&apos;find&apos;, player_i
  given types yet this will be false and the result will be nil. Even if some
  of the given types are already fully translated.</li>
         <li>
-           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
          A table mapping each requested type to a <a href="../modules/Types.html#set">set</a> of
- prototype names.</li>
+ prototype names. </li>
     </ol>
 
 
@@ -292,6 +371,58 @@ remote.call(&apos;er:babelfish-remote-interface&apos;,&apos;find&apos;, player_i
     </ul>
 
 </dd>
+    <dt>
+    <a name = "get_player_language_code"></a>
+    <strong>get_player_language_code(pindex)</strong>
+    </dt>
+    <dd>
+    Retrieves the language code of a player.
+ Only <a href="../api/LuaPlayer.html#LuaPlayer.connected">connected</a> players have a code, and
+ there is a delay of one "ping" between connection and code
+ assignment.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pindex</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         A <a href="../api/LuaPlayer.html#LuaPlayer.index">LuaPlayer.index</a>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The <a href="../modules/Babelfish.html#LanguageCode">LanguageCode</a> or <a href="https://www.lua.org/pil/2.1.html">nil</a>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_translation_percentages"></a>
+    <strong>get_translation_percentages()</strong>
+    </dt>
+    <dd>
+    Retrieves translation percentage of all seen languages.
+ This is the same data that the built-in status indicator uses.
+ Includes only languages that have been seen on this map at least once.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         A mapping (<a href="../modules/Babelfish.html#LanguageCode">LanguageCode</a> → <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>)
+ where the number is between 0 and 100 inclusive.
+    </ol>
+
+
+
+
+</dd>
 </dl>
 
 
@@ -299,7 +430,7 @@ remote.call(&apos;er:babelfish-remote-interface&apos;,&apos;find&apos;, player_i
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-05-25 12:37:45 </i>
+<i style="float:right;">Last updated 2021-05-25 15:08:41 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
