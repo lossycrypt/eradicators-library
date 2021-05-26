@@ -174,13 +174,13 @@ local function Test()
     assert((v=='a') and (k==1))
     end
     
-  -- Table.has_value
+  -- Table.find_value
   do
     local t1 = tbl1()
-    assert(true  == Table.has_value(t1,'a'))
-    assert(true  == Table.has_value(t1, 5 ))
-    assert(false == Table.has_value(t1,'z'))
-    assert(false == Table.has_value(t1, 42))
+    assert(true  == not not Table.find(t1,'a'))
+    assert(true  == not not Table.find(t1, 5 ))
+    assert(false == not not Table.find(t1,'z'))
+    assert(false == not not Table.find(t1, 42))
     end
   
   -- Table.next_value, Table.first_value

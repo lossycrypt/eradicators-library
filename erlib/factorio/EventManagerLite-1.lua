@@ -108,6 +108,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- -------------------------------------------------------------------------- --
 local log         = elreq('erlib/lua/Log'       )().Logger  'EventManagerLite'
 local stop        = elreq('erlib/lua/Error'     )().Stopper 'EventManagerLite'
+local assertify   = elreq('erlib/lua/Error'     )().Asserter(stop)
 
 local Table       = elreq('erlib/lua/Table'     )()
 
@@ -119,22 +120,10 @@ local Crc32       = elreq('erlib/lua/Coding/Crc32')()
 
 local Filter      = elreq('erlib/lua/Filter')()
 
+local Remote      = elreq('erlib/factorio/Remote')()
+
 local table_unpack, math_min
     = table.unpack, math.min
-
--- -------------------------------------------------------------------------- --
--- Constants                                                                  --
--- -------------------------------------------------------------------------- --
-local reverse_defines = setmetatable(
-  (function(r) for k,v in pairs(defines.events) do r[v] = k end return r end){},
-  {__index = function(_, name) return name end} -- custom input/event names
-  )
-
--- -------------------------------------------------------------------------- --
--- Module                                                                     --
--- -------------------------------------------------------------------------- --
-local Public  = { factorio_version = '1.1.32' }
-local Private = {}
 
 -- -------------------------------------------------------------------------- --
 -- Disable raw script access.
@@ -143,12 +132,56 @@ local script = assert(_ENV.script) -- LuaObjects can not be copied!
 _ENV.script = setmetatable({},{
   __index = function() stop('LuaBootstrap is disabled by EventManagerLite.') end
   })
+    
+-- -------------------------------------------------------------------------- --
+-- Module                                                                     --
+-- -------------------------------------------------------------------------- --
+local Public  = { factorio_version = '1.1.32' }
+local Private = {}
+   
 
 --------------------------------------------------------------------------------
 -- Public methods.
 -- @section
 --------------------------------------------------------------------------------
-  
+ 
+-- -------------------------------------------------------------------------- --
+-- PIG                                                                        --
+-- -------------------------------------------------------------------------- --
+
+----------
+-- Custom event names.
+-- This table contains all (event\_name → event\_id) mappings
+-- that are contained in the @{Remote.PackedInterfaceGroup} `'erlib:managed-events'`.
+-- Take care to use the correct load order and declare dependencies as needed.
+--
+-- @usage
+--   -- In Mod_A:
+--   EventManagerLite.generate_event_name('on_something_happend')
+--  
+--   -- In Mod_A or any other mod:
+--   script.on_event(EM.events.on_something_happend, function(e)
+--     print('I just shared an event name without effort!')
+--     end)
+--
+-- @table events
+local EventPIG = Remote.PackedInterfaceGroup('erlib:managed-events')
+Public.events = setmetatable({}, {
+  __index = function(self, name)
+    return assertify(EventPIG:get(name), 'Unknown event name: ', name)
+    end})
+    
+-- -------------------------------------------------------------------------- --
+-- Constants                                                                  --
+-- -------------------------------------------------------------------------- --
+local reverse_defines = setmetatable({}, {
+  __index = function(self, id)
+    local k = Table.find(defines.events, id)
+    if not k then k = Table.find(EventPIG:get_all(), id) end
+    self[id] = k or id
+    return self[id]
+    end})
+ 
 -- -------------------------------------------------------------------------- --
 -- LuaBootstrap Wrapper
 -- -------------------------------------------------------------------------- --
@@ -160,6 +193,7 @@ local ModuleScripts  = {} --cache to allow modules to share values across files.
 local ModuleIndexes  = setmetatable({
   ['event-manager'         ] = -math.huge, -- event manager before everything.
   ['event-manager-nth-tick'] =  math.huge, -- on_nth_tick *after* on_tick
+  ['plugin-manager'        ] = -1        , -- prevent accidential wrong usage
   ['plugin-manager-gc'     ] =  math.huge, -- garbage collect after everything.
   },{
   __index = function(self, module_name)
@@ -228,6 +262,12 @@ function Public.get_managed_script(module_name)
   API.get_event_handler = not_implemented
   API.set_event_filter  = not_implemented
   --
+  API.generate_event_name = function(name)
+    if name == nil then return script.generate_event_name() end
+    verify(name, 'string', 'Invalid event name.')
+    return EventPIG:get(name)
+        or EventPIG:set(name, script.generate_event_name())
+    end
   return API end
 
 --------------------------------------------------------------------------------
@@ -281,7 +321,7 @@ local function add_or_remove_handler(
       handler.valid = false
       table.remove(handlers, i) -- keep order
       if #handlers == 0 then
-        log_handler_change('-- ', event_name, '(EventHandlerLite)')
+        log_handler_change('-- ', event_name, '(EventManagerLite)')
         script_on_event(event_name, nil)
         end
       end
@@ -296,7 +336,7 @@ local function add_or_remove_handler(
         end
     else
       if #handlers == 0 then
-        log_handler_change('++ ', event_name, '(EventHandlerLite)')
+        log_handler_change('++ ', event_name, '(EventManagerLite)')
         if period ~= nil then
           script_on_event(nil, Private.on_nth_tick_handler)
         elseif event_name == defines.events.on_tick then
@@ -317,6 +357,8 @@ local function add_or_remove_handler(
       table.sort(handlers, sort_comparator) -- deterministic!
       end
     end
+  log:tell(event_name, handlers)
+  log:tell(ModuleIndexes)
   end
 
 -- -------------------------------------------------------------------------- --
@@ -335,6 +377,7 @@ local OrderedHandlers = {--[[
 function Private.on_event(module_name, event_names, f, filters)
   verify(f, 'func|nil')
   verify(filters, 'nil', 'Filters are not supported by EventManager.')
+  verify(event_names, 'Integer|string|NonEmptyTable', 'Missing event names')
   --
   for _, event_name in pairs(Table.plural(event_names)) do
     verify(event_name, 'Integer|string') -- defines.events.on_tick is 0!
@@ -383,6 +426,21 @@ function Private.make_on_tick_handler(event_name)
     end
   end
 
+function Private.make_on_tick_handler2_draft(event_name)
+  local handlers = OrderedHandlers[event_name]
+  --
+  return function(e)
+    local handler = assert(handlers[1])
+    repeat
+      if handler.f then
+        handler.f {tick = e.tick, name = event_name}
+        end
+      handler = handler.next
+      until not handler
+    end
+  end
+
+  
 -- -------------------------------------------------------------------------- --
 
 -- @tparam String log_name Human readable event name.
@@ -442,6 +500,42 @@ function Private.make_on_event_handler(event_name)
     end
   end
 
+local dontlog = {
+  -- block some of the really spammy ones
+  on_chunk_generated = true,
+  on_player_changed_position = true,
+  on_string_translated = true,
+  on_selected_entity_changed = true,
+  }
+function Private.make_on_event_handler2_draft(event_name)
+  local handlers = OrderedHandlers[event_name]
+  local log_name = reverse_defines[event_name]
+  local dcopy    = Table.dcopy
+  --
+  local log_event =
+   ((not flag.IS_DEV_MODE) or (dontlog[event_name]))
+    and ercfg.SKIP
+    or  function (module_name) return log:debug(log_name, ' → ', module_name) end
+  --
+  return function(e)
+    local handler = assert(handlers[1])
+    local is_event_valid = (handlers.n > 1) and make_event_validator(e)
+    repeat
+      if handler.f then
+        if handler.next then e = dcopy(e) end -- don't copy for last
+        log_event(handler.module_name)
+        handler.f(e)
+        end
+      handler = handler.next
+      until (not handler) or (not is_event_valid())
+    if handler then
+      log:debug('Event prematurely invalidated by previous handler.')
+      end
+    end
+  end
+
+  
+  
 -- -------------------------------------------------------------------------- --
 -- Nth Tick Handlers Registry
 -- -------------------------------------------------------------------------- --
@@ -530,6 +624,39 @@ function Private.on_nth_tick_handler(e)
         next_nth_tick = math_min(handler.next_tick, next_nth_tick)
         end
       end
+    --
+    OrderedNthTicks.next_nth_tick = next_nth_tick
+    end
+  end
+  
+
+function Private.on_nth_tick_handler2_draft(e)
+  -- (tick >= nth) means ((tick == nth) or (0 == nth))
+  if e.tick >= OrderedNthTicks.next_nth_tick then
+    --
+    local tick          = e.tick
+    local next_nth_tick = math.huge
+    -- log_event('on_tick', 'event-manager-nth-tick')
+    --
+    local handlers = OrderedNthTicks.handlers
+    local handler = assert(handlers[1])
+    repeat
+      if handler.f then
+        -- new handler?
+        if (handler.next_tick == nil) then
+          handler.next_tick = get_next_occurance(tick - 1, handler)
+          end
+        assert(handler.next_tick >= tick) --sanity
+        if tick == handler.next_tick then
+          -- log_event('on_nth_tick ' .. handler.period, handler.module_name)
+          handler.f {nth_tick = handler.period, tick = tick, offset = handler.offset}
+          handler.next_tick = tick + handler.period
+          end
+        -- unconditionally collect smallest next tick
+        next_nth_tick = math_min(handler.next_tick, next_nth_tick)
+        end
+      handler = handler.next
+      until not handler
     --
     OrderedNthTicks.next_nth_tick = next_nth_tick
     end
@@ -695,6 +822,23 @@ do end
 ----------
 -- New: Shorthand for on\_configuration\_changed(f).
 -- @function ManagedLuaBootstrap.on_config
+do end
+
+----------
+-- Changed. Now supports naming events.
+-- Any named event ids are automatically published on a
+-- @{Remote.PackedInterfaceGroup} called 'erlib:managed-events'.
+-- And also made easily available to any mod using EventManagerLite
+-- via @{EventManagerLite.events}.
+-- 
+-- See also @{FOBJ LuaBootstrap.generate_event_name}.
+-- 
+-- @tparam[opt] string event_name Your custom name for the event.
+-- 
+-- @treturn NaturalNumber The id for your event. Events with the same
+-- name get the same id.
+-- 
+-- @function ManagedLuaBootstrap.generate_event_name
 do end
 
 ----------

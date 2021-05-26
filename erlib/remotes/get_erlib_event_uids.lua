@@ -18,7 +18,7 @@
 --
 -- Requiring this file simply calls @{Remote.PackedInterfaceGroup:get_all}
 -- on the  @{Remote.PackedInterfaceGroup} named 
--- `'eradicators-library:custom-event-uids'`.
+-- `'erlib:managed-events'`.
 --
 -- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
 --
@@ -38,7 +38,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
-local UID_INTERFACE_NAME = 'eradicators-library:custom-event-uids'
+local UID_INTERFACE_NAME = 'erlib:managed-events'
   
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

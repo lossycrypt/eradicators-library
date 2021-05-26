@@ -515,19 +515,18 @@ function Table.find_largest(tbl,gtr)
 
   
 ----------
--- Checks if a value is in a table. If you need to do this alot consider using
--- a @{Set} instead.
+-- Retrieves the key of a value.
 --
 -- @tparam table tbl
 -- @tparam NotNil value
 --
--- @treturn boolean
+-- @treturn NotNil|nil  The key of the __first occurance__ of the value,
+-- or nil if value wasn't found. 
 --
-function Table.has_value(tbl,value)
-  for _,v in pairs(tbl) do 
-    if v == value then return true end
+function Table.find(tbl, value)
+  for k, v in pairs(tbl) do
+    if v == value then return k end
     end
-  return false
   end
   
 ----------

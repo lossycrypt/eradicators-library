@@ -226,9 +226,9 @@ function PackedInterfaceGroup:update_cache()
 -- @treturn string|number|table|nil Returns nil if there is no such key.
 -- 
 -- @function PackedInterfaceGroup:get
-function PackedInterfaceGroup:get(key,silent)
+function PackedInterfaceGroup:get(key, silent)
   -- @tparam boolean silent Hidden internal setting to skip logging nil.
-  Verify(key,'NotNil')
+  Verify(key,'NotNil', 'Missing PIG key')
   local value = self.cached_data[key]
   -- check remote data if local doesn't know key (yet)
   if value == nil then
@@ -265,6 +265,8 @@ function PackedInterfaceGroup:get_all()
 -- @tparam string|number key
 -- @tparam string|number|table value 
 --
+-- @treturn string|number|table The input value.
+--
 function PackedInterfaceGroup:set(key,value)
   -- Functions in table values are deleted by Hydra.encode().
   -- @future: Should more limits be imposed on value type?
@@ -292,7 +294,7 @@ function PackedInterfaceGroup:set(key,value)
   else -- key == value
     log:debug('PIG <',self.prefix,'>:set("',key,'",',value,') skipped, same value already present.')
     end
-  end
+  return value end
   
 
 --------------------------------------------------------------------------------

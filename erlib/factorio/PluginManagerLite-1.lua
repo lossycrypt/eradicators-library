@@ -59,6 +59,11 @@ local ntuples     = elreq('erlib/lua/Iter/ntuples')()
 local Public  = {}
 local Private = {}
 
+setmetatable(Public, {__index=function(_,method)
+  stop (('Unknown PluginManagerLite method "%s".\n'):format(method)
+  ..'Forgot to call enable_savedata_management()?')
+  end})
+
 --------------------------------------------------------------------------------
 -- Startup methods.
 -- @section
@@ -177,6 +182,7 @@ function Public.enable_savedata_management()
   -- @function PluginManagerLite.manage_savedata
   function Public.manage_savedata(plugin_name, setter, default)
     -- Multiple setters can exist for each plugin_name.
+    log:debug('Recieved savedata setter for ', plugin_name)
     local this   = Table.sget(ManagedPlugins, {plugin_name}, {})
     this.path    = {'plugin_manager', 'plugins', plugin_name}
     this.default = Table.dcopy(default or {})
@@ -230,10 +236,10 @@ function Public.enable_savedata_management()
         if not is_on_load then
           for k, v in ntuples(2, this.default) do
             if not Savedata[k] then
-              log:debug(plugin_name, 'default Savedata: ', k, ' = ', v)
+              log:debug(plugin_name, ' default Savedata: ', k, ' = ', v)
               Savedata[k] = Table.dcopy(v) -- guaranteed defaults
             else
-              log:debug(plugin_name, 'default Savedata: ', k, ' (already exists.)')
+              log:debug(plugin_name, ' default Savedata: ', k, ' (already exists.)')
               end
             end
           end

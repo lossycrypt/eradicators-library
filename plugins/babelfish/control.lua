@@ -129,27 +129,30 @@ PluginManager.classify_savedata('babelfish', {
 --   mod_startup_settings_changed = false }
 script.on_config(function(e)
   if e and
-    ( (table_size(e.mod_changes) > 0)
-      or e.migration_applied
-      or e.mod_startup_settings_changed )
-    then
+  ( (table_size(e.mod_changes) > 0)
+    or e.migration_applied
+    or e.mod_startup_settings_changed )
+  then
     -- If any mod changes at all there is no way to know if and how
     -- the locale has changed. Thus we need to start from scratch.
     Table.overwrite(Savedata, Table.dcopy(DefaultSavedata))
+    Savedata.dicts['internal'] = Dictionary.make_internal_names_dictionary()
     end
   for _, pdata in pairs(Savedata.players) do
     pdata.language_code = nil
     end
+  Babelfish.reclassify() -- probably redundant with on_load
   Babelfish.on_player_language_changed()
-  Savedata.dicts['internal'] = Dictionary.make_internal_names_dictionary()
   end)
-  
+
 script.on_load(function(e)
-  for _, dict in ntuples(2, Savedata.dicts) do
-    Dictionary.reclassify(dict)
-    end
+  Babelfish.reclassify()
   Babelfish.update_handlers()
   end)
+
+Babelfish.reclassify = function()
+  for _, dict in ntuples(2, Savedata.dicts) do Dictionary.reclassify(dict) end
+  end
 
 -- Manages ALL event de/registration
 -- must be ON_LOAD compatible!

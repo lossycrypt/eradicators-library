@@ -261,9 +261,6 @@ local setmetatable, pairs, ipairs, select
 local table_insert, math_random, math_floor, table_unpack, table_remove
     = table.insert, math.random, math.floor, table.unpack, table.remove
     
-local UID_INTERFACE_NAME = 'eradicators-library:custom-event-uids'
-
-
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -443,14 +440,14 @@ function EventManager.suppress_logging(event_uid)
   
 -- Create + Get shared UIDs
 Private.event_uid_pig
-  = Remote.PackedInterfaceGroup('eradicators-library:custom-event-uids')
+  = Remote.PackedInterfaceGroup('erlib:managed-events')
 
 
 ----------
 -- A table like @{FAPI defines defines.events} for custom and modded events.
 -- 
 -- This accesses a @{Remote.PackedInterfaceGroup|PackedInterfaceGroup} named
--- `"eradicators-library:custom-event-uids"`. It contains @{key->value} pairs
+-- `"erlib:managed-events"`. It contains @{key->value} pairs
 -- for all event names that __any__ mod has regiestered with @{EventManager.new_event}.
 -- This is the __recommended__ way of accessing shared EventUIDs of other mods.
 -- 
