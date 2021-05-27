@@ -14,11 +14,13 @@
 --
 -- __Technical Details:__
 --
--- This is equivalent to @{EventManager.event_uid} but doesn't require EventManager .
+-- This is equivalent to @{EventManager.event_uid} and @{EventManagerLite.events}
+-- but doesn't require EventManager/Lite .
 --
 -- Requiring this file simply calls @{Remote.PackedInterfaceGroup:get_all}
 -- on the  @{Remote.PackedInterfaceGroup} named 
--- `'erlib:managed-events'`.
+-- `'erlib:managed-events'`. Thus any event names added after this call won't be
+-- visible.
 --
 -- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
 --

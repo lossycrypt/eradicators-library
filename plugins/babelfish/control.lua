@@ -128,7 +128,7 @@ PluginManager.classify_savedata('babelfish', {
 --   mod_changes = {},
 --   mod_startup_settings_changed = false }
 script.on_config(function(e)
-  if e and
+  if (not e) or
   ( (table_size(e.mod_changes) > 0)
     or e.migration_applied
     or e.mod_startup_settings_changed )
@@ -256,7 +256,7 @@ Babelfish.request_translations = function(e)
   -- In Singleplayer all translation is done during the loading screen.
   -- Recalculated live to immediately reflect setting changes.
   local bytes_per_tick =
-    (game.is_multiplayer() or flag.IS_DEV_MODE)
+    (game.is_multiplayer() or flag.IS_DEV_MODE or true)
     and (1024 / 60) * Setting.get_value('map', const.setting_name.network_rate)
     or math.huge
   --

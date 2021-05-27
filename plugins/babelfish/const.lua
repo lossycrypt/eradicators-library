@@ -1,5 +1,5 @@
 ﻿
--- This file will also be loaded into OTHER mods environments via
+-- This file might also be loaded into OTHER mods environments via
 -- babelfish/remote.
 -- -------------------------------------------------------------------------- --
 

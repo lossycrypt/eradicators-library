@@ -1,8 +1,15 @@
 ---------------------------------------------------------------------------------------------------
-Version: 4.1.8
+Version: 4.1.9
 Date: 2021-x-x
   Functions:
     - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.1.8
+Date: 2021-05-27
+  Internal:
+    - EventManagerLite: Made handler order permanent and linked.
+  Utility Mods:
+    - Added enable-tests trigger mod and udpdated flag.DO_TESTS accordingly.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.7
 Date: 2021-05-26

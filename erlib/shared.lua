@@ -78,7 +78,8 @@ local flag = shared[5]
     flag.IS_DEV_MODE
   
   flag.DO_TESTS = -- run unit tests 
-    flag.IS_DEV_MODE
+    does_file_exist('__00-toggle-to-enable-tests__/empty')
+    or (not flag.IS_FACTORIO)
   
   flag.IS_LIBRARY_MOD = -- am i running inside the original factorio mod?
     (flag.IS_FACTORIO   -- or is this a cross require from another mod?

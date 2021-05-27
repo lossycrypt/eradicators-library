@@ -24,30 +24,23 @@
   + No Savedata.
   + Minimal internal event handlers.
   + Minimal sanity checking.
-  + Native runtime de-/-registering of event handlers.
-  + Dynamic unregistering of inactive internal handlers (including on_tick)
+  + Native runtime un-/-registering of module event handlers.
+  + Dynamic unregistering of inactive *internal* handlers (including on_tick)
   + Offest based load balancing for on_nth_tick handlers (vanilla incompatible).
   + Script errors happen directly when a module calls - no caching.
   
   ]]
   
 --[[ Determinism:
-  
-  + Each module must correctly manage it's own dynamic handlers in on_load.
-  
-  + Because handlers can arbitrarily add or remove other handlers when executed
-    the order of handlers has to be copied during each event to ensure
-    a deterministic execution order. (But add_or_remove merged logic
-    allows to replace not-yet-called handlers for the currently running event.)
-    Because this copy keeps temporarily keeps references to potentially
-    already removed handlers all removed handlers have to be marked valid=false.
-    
-  + Like navtive LuaBootstrap the event order must be determined
-    by mod(ule) load order. Runtime add/remove to a naive
-    array would requires Savedata to know the correct current order in on_load.
 
-  + No other module may ever gain access to Private module functions.
-    
+  + Each module must correctly manage it's own dynamic handlers in on_load.
+
+  + Because handlers can arbitrarily add or remove other handlers when executed
+    the order of handlers is determined by plugin load order and not handler
+    registration order.
+
+  + No other module may ever gain access to "Private" module functions.
+
   ]]
 
 --[[ Annecdotes:
@@ -67,24 +60,14 @@
 
   ]]
   
---[[ Todo:
-  
-  + How to remove {table_unpack(handlers)}    
-    1) Never remove the handler table for a module once it has been added.
-    2) After adding a new handler table sort + reiterate all handlers and
-       store the next handler as ".next". While at this the active handlers
-       can be counted and the internal_handler de/registered as nessecary.
-    3) Now the order / index can never change during event iteration.
-    4) This also deprecates ".valid" as one can simply check for (f == nil).
-
-  + do NOT remove valid
-     
-  ]]
-
 --------------------------------------------------------------------------------
 -- Todo.
 -- @section
 --------------------------------------------------------------------------------
+  
+--[[ Todo:
+  
+  ]]
 
 ----------
 -- Consider if it's worth suppporting on\_init.
@@ -122,8 +105,8 @@ local Filter      = elreq('erlib/lua/Filter')()
 
 local Remote      = elreq('erlib/factorio/Remote')()
 
-local table_unpack, math_min
-    = table.unpack, math.min
+local table_unpack, math_min, math_huge
+    = table.unpack, math.min, math.huge
 
 -- -------------------------------------------------------------------------- --
 -- Disable raw script access.
@@ -191,10 +174,10 @@ local reverse_defines = setmetatable({}, {
 local ModuleScripts  = {} --cache to allow modules to share values across files.
 
 local ModuleIndexes  = setmetatable({
-  ['event-manager'         ] = -math.huge, -- event manager before everything.
+  ['event-manager'         ] = -math.huge, -- event manager before everything
   ['event-manager-nth-tick'] =  math.huge, -- on_nth_tick *after* on_tick
   ['plugin-manager'        ] = -1        , -- prevent accidential wrong usage
-  ['plugin-manager-gc'     ] =  math.huge, -- garbage collect after everything.
+  ['plugin-manager-gc'     ] =  math.huge, -- garbage collect after everything
   },{
   __index = function(self, module_name)
     local index = table_size(self) - 3 -- must be adjusted for built-ins
@@ -204,12 +187,6 @@ local ModuleIndexes  = setmetatable({
     return index end
   })
   
-local function is_module_index_smaller(a,b)
-  return 
-      ModuleIndexes[a.module_name]
-    < ModuleIndexes[b.module_name]
-  end
-
 ----------
 -- Creates a new ManagedLuaBootstrap instance or fetches an existing one of
 -- the same name.
@@ -258,9 +235,8 @@ function Public.get_managed_script(module_name)
   API.module_name  = module_name
   API.module_index = ModuleIndexes[module_name] -- auto-generates new index
   -- nips
-  local not_implemented = function() stop('Not implemented') end
-  API.get_event_handler = not_implemented
-  API.set_event_filter  = not_implemented
+  API.get_event_filter = function() stop('Not implemented') end
+  API.set_event_filter = function() stop('Not implemented') end
   --
   API.generate_event_name = function(name)
     if name == nil then return script.generate_event_name() end
@@ -276,24 +252,47 @@ function Public.get_managed_script(module_name)
 --------------------------------------------------------------------------------
   
 -- -------------------------------------------------------------------------- --
--- Event Registry Functions 
+-- Event Handler Storage
+-- -------------------------------------------------------------------------- --
+local OrderedHandlers = {--[[
+  [defines.events.index] = {
+    -- DenseArray ordered (not indexed) by ModuleIndex.
+    [1] = {module_name = , f =},
+    [2] = {module_name = , f =},
+    }
+  ]]}
+  
+local next_nth_tick   = 0
+
+local OrderedNthTicks = {--[[
+  -- DenseArray ordered (not indexed) by ModuleIndex and increasing period.
+  -- [1] = {module_name = , f =, period = k    },
+  -- [2] = {module_name = , f =, period = k + j},
+  --]] }
+
+-- -------------------------------------------------------------------------- --
+-- Handler Registry (Internal)
 -- -------------------------------------------------------------------------- --
 
+local log_handler_change = (not flag.IS_DEV_MODE) and ercfg.SKIP or
+  function(mode, event_name, module_name)
+    if (module_name == '(EventManagerLite)')
+    and (type(event_name) == 'string') then
+      event_name = event_name:gsub('on_nth_tick_%d+', 'on_nth_tick')
+      end
+    log:debug(mode, reverse_defines[event_name], ' ',  module_name)
+    end
+    
 local is_loader = {
   on_load = true,  on_init = true,
   on_configuration_changed = true,
   }
-  
-local log_handler_change = (not flag.IS_DEV_MODE) and ercfg.SKIP or
-  function(mode, event_name, module_name)
-    log:debug(mode, reverse_defines[event_name], ' ',  module_name)
-    end
     
-local function default_script_on_event(event_name, f)
+local function register_internal_event_handler(event_name, f)
   if is_loader[event_name] then return script[event_name](f) end
   return script.on_event(event_name, f) end
   
-local function for_nth_tick_script_on_event(_, f)
+local function register_internal_nth_tick_handler(_, f)
   return Private.on_event('event-manager-nth-tick', defines.events.on_tick, f)
   end
   
@@ -301,10 +300,30 @@ local function get_offset(module_name, period)
   return Crc32.encode(module_name .. period) % period
   end
   
+local function has_active_handlers(handlers)
+  for i=1, #handlers do if handlers[i].f then return true end end
+  return false end
+  
+local function is_handler_smaller(a, b)
+  -- Can't use (x and y or z) because <false> is a valid return value.
+  if a.module_name ~= b.module_name then
+    return 
+        ModuleIndexes[a.module_name]
+      < ModuleIndexes[b.module_name]
+  else
+    return assert(a.period) < b.period
+    end
+  end
+  
+-- -------------------------------------------------------------------------- --
+  
 -- Handles everything (normal, on_tick and on_nth_tick handlers)
 local function add_or_remove_handler(
-    handlers, module_name, event_name, f , sort_comparator, script_on_event,
-    period --[[nth_tick only]] )
+    handlers, module_name, event_name, f, period --[[nth_tick only]] )
+  --
+  local script_on_event = (period == nil)
+    and register_internal_event_handler
+     or register_internal_nth_tick_handler
   --
   local i, handler
   for k, v in ipairs(handlers) do
@@ -318,9 +337,8 @@ local function add_or_remove_handler(
       log_handler_change('x  ', event_name, module_name) -- didn't exist
     else
       log_handler_change('-  ', event_name, module_name) -- remove success
-      handler.valid = false
-      table.remove(handlers, i) -- keep order
-      if #handlers == 0 then
+      handler.f = nil
+      if not has_active_handlers(handlers) then
         log_handler_change('-- ', event_name, '(EventManagerLite)')
         script_on_event(event_name, nil)
         end
@@ -335,10 +353,10 @@ local function add_or_remove_handler(
         handler.f = f
         end
     else
-      if #handlers == 0 then
+      if not has_active_handlers(handlers) then
         log_handler_change('++ ', event_name, '(EventManagerLite)')
         if period ~= nil then
-          script_on_event(nil, Private.on_nth_tick_handler)
+          script_on_event(nil, Private.make_on_nth_tick_handler())
         elseif event_name == defines.events.on_tick then
           script_on_event(event_name, Private.make_on_tick_handler (event_name))
         else
@@ -346,52 +364,65 @@ local function add_or_remove_handler(
           end
         end
       log_handler_change('+  ', event_name, module_name) -- add new
-      table.insert(handlers, {
+      --
+      local handler = {
         module_name = module_name  ,
         f           = f            ,
-        valid       = true         ,
         period      = period or nil,
         offset      = period and get_offset(module_name, period) or nil,
-        })
-      handlers.n = nil -- n can't be sorted
-      table.sort(handlers, sort_comparator) -- deterministic!
+        }
+      -- permanent fixed + linked order
+      local i = 0; repeat i = i + 1
+        until not (handlers[i] and is_handler_smaller(handlers[i], handler))
+      table.insert(handlers, i, handler)
+      if handlers[i-1] then handlers[i-1].next = handler end
+      handler.next = handlers[i+1]
       end
     end
-  log:tell(event_name, handlers)
-  log:tell(ModuleIndexes)
+  -- log:tell(event_name, handlers)
+  -- log:tell(ModuleIndexes)
   end
 
 -- -------------------------------------------------------------------------- --
--- OrderedHandlers Registry
+-- Handler Registry (LuaBootstrap Emulation)
 -- -------------------------------------------------------------------------- --
-local OrderedHandlers = {--[[
-  [defines.events.index] = {
-    -- DenseArray ordered (not indexed) by ModuleIndex.
-     n  =  2                   , -- array length
-    [1] = {module_name = , f =},
-    [2] = {module_name = , f =},
-    }
-  ]]}
   
 -- Equivalent to LuaBootstrap.on_event
 function Private.on_event(module_name, event_names, f, filters)
   verify(f, 'func|nil')
   verify(filters, 'nil', 'Filters are not supported by EventManager.')
-  verify(event_names, 'Integer|string|NonEmptyTable', 'Missing event names')
+  verify(event_names, 'Integer|string|NonEmptyTable', 'Missing event names.')
   --
   for _, event_name in pairs(Table.plural(event_names)) do
     verify(event_name, 'Integer|string') -- defines.events.on_tick is 0!
     --
-    local handlers = Table.sget(OrderedHandlers, {event_name}, {})
-    --
     add_or_remove_handler(
-      handlers, module_name, event_name, f,
-      is_module_index_smaller, default_script_on_event)
+      Table.sget(OrderedHandlers, {event_name}, {}),
+      module_name, event_name, f)
     --
-    handlers.n = #handlers
     end
   return f end
 
+-- Equivalent to LuaBootstrap.on_nth_tick.
+function Private.on_nth_tick(module_name, periods, f)
+  verify(f, 'func|nil')
+  verify(periods, 'NaturalNumber|table', 'Missing nth period.')
+  --
+  for _, period in pairs(Table.plural(periods)) do
+    verify(period, 'NaturalNumber')
+    --
+    add_or_remove_handler(
+      OrderedNthTicks,
+      module_name, 'on_nth_tick_'..period, f, period)
+    --
+    -- It can not be known if adding occurs before or
+    -- after on_nth_tick of the same tick. So
+    -- the next occurance has to be decided within
+    -- the on_nth_tick event handler itself.
+    next_nth_tick = 0 -- activate bootstrap next cycle!
+    end
+  return f end
+  
 -- For completitions sake this is implemented too.
 function Private.get_event_handler(module_name, event_name)
   for _, handler in pairs(OrderedHandlers[event_name] or {}) do
@@ -402,184 +433,27 @@ function Private.get_event_handler(module_name, event_name)
   end
 
 -- -------------------------------------------------------------------------- --
--- OrderedHandlers Event Handler Makers
+-- Make Internal Handler
 -- -------------------------------------------------------------------------- --
-
--- on_tick(f) and on_nth_tick(1,f) must be handled seperately
--- to keep vanilla behavior.
-function Private.make_on_tick_handler(event_name)
-  local handlers = OrderedHandlers[event_name]
-  --
-  return function(e)
-    if handlers.n == 1 then
-      handlers[1].f {tick = e.tick, name = event_name}
-    else
-      -- if there's more than one handler the current order has
-      -- to be stored to prevent disturbance from add/remove calls.
-      local n, handlers = handlers.n, {table_unpack(handlers)}
-      for i=1, n do
-        if handlers[i].valid then
-          handlers[i].f {tick = e.tick, name = event_name}
-          end
-        end
-      end
-    end
-  end
-
-function Private.make_on_tick_handler2_draft(event_name)
-  local handlers = OrderedHandlers[event_name]
-  --
-  return function(e)
-    local handler = assert(handlers[1])
-    repeat
-      if handler.f then
-        handler.f {tick = e.tick, name = event_name}
-        end
-      handler = handler.next
-      until not handler
-    end
-  end
-
-  
--- -------------------------------------------------------------------------- --
-
--- @tparam String log_name Human readable event name.
-local log_event = (not flag.IS_DEV_MODE) and ercfg.SKIP or
-  function (log_name, module_name)
-    return log:debug(log_name, ' → ', module_name)
-    end
-  
--- An event becomes invalid if a handler invalidates at
--- least one LuaObject that was valid before.
-local function make_event_validator(e)
-  if e == nil then return Filter.TRUE end --on_config, etc...
-  local objects, n = {}, 0
-  for _,v in pairs(e) do 
-    if isLuaObject(v) then; n = n + 1
-      assert(v.valid == true, 'Event contained invalid object!')
-      objects[n] = v
-      end
-    end
-  --
-  return function()
-    for i = 1, n do
-      if (not objects[i].valid) then return false end
-      end
-    return true end
-  end
-
-function Private.make_on_event_handler(event_name)
-  local handlers = OrderedHandlers[event_name]
-  local log_name = reverse_defines[event_name]
-  local dcopy    = Table.dcopy
-  --
-  local handle = function(handler, e)
-    if handler.valid then
-      log_event(log_name, handler.module_name)
-      handler.f(e)
-      return true end
-    return false end
-  --
-  return function(e)
-    assert(handlers.n > 0, 'Recieved event, but had no handlers.' )
-    -- Handlers can mutate OrderedHandlers so a temporary copy is needed.
-    -- next() can not be used because newly added handlers must *not*
-    -- be executed for the current event.
-    local n              = handlers.n
-    local handlers       = (n == 1) and handlers or {table_unpack(handlers)}
-    local is_event_valid = (n >  1) and make_event_validator(e)
-    --
-    for i=1, n-1 do
-      if handle(handlers[i], dcopy(e))
-      and (not is_event_valid()) then
-        log:debug('Event prematurely invalidated by previous handler.')
-        return end
-      end
-    -- final (or only) handler needs neither check nor dcopy
-    handle(handlers[n], e)
-    end
-  end
 
 local dontlog = {
   -- block some of the really spammy ones
-  on_chunk_generated = true,
-  on_player_changed_position = true,
-  on_string_translated = true,
-  on_selected_entity_changed = true,
+  [defines.events.on_chunk_generated        ] = true,
+  [defines.events.on_player_changed_position] = true,
+  [defines.events.on_string_translated      ] = true,
+  [defines.events.on_selected_entity_changed] = true,
   }
-function Private.make_on_event_handler2_draft(event_name)
-  local handlers = OrderedHandlers[event_name]
+
+local function make_event_logger(event_name)
   local log_name = reverse_defines[event_name]
-  local dcopy    = Table.dcopy
-  --
-  local log_event =
+  return 
    ((not flag.IS_DEV_MODE) or (dontlog[event_name]))
     and ercfg.SKIP
-    or  function (module_name) return log:debug(log_name, ' → ', module_name) end
-  --
-  return function(e)
-    local handler = assert(handlers[1])
-    local is_event_valid = (handlers.n > 1) and make_event_validator(e)
-    repeat
-      if handler.f then
-        if handler.next then e = dcopy(e) end -- don't copy for last
-        log_event(handler.module_name)
-        handler.f(e)
-        end
-      handler = handler.next
-      until (not handler) or (not is_event_valid())
-    if handler then
-      log:debug('Event prematurely invalidated by previous handler.')
+    or  function (module_name, period)
+      return log:debug(log_name, period or ' ', ' → ', module_name)
       end
-    end
   end
 
-  
-  
--- -------------------------------------------------------------------------- --
--- Nth Tick Handlers Registry
--- -------------------------------------------------------------------------- --
-local OrderedNthTicks = { 
-  n = 0, next_nth_tick = 0,
-  handlers = {--[[
-    -- DenseArray ordered (not indexed) by ModuleIndex and increasing period.
-    [1] = {module_name = , f =, period = k    },
-    [2] = {module_name = , f =, period = k + j},
-    ]] }, 
-  }
-
-local function cmp_nth_tick_handlers(a,b) -- deterministic order!
-  if (a.module_name == b.module_name) then
-    return a.period < b.period -- must be able to return false!
-  else
-    return is_module_index_smaller(a,b)
-    end
-  end
-  
--- Equivalent to LuaBootstrap.on_nth_tick.
-function Private.on_nth_tick(module_name, periods, f)
-  verify(f, 'func|nil')
-  --
-  for _, period in pairs(Table.plural(periods)) do
-    verify(period, 'NaturalNumber')
-    add_or_remove_handler(
-      OrderedNthTicks.handlers, module_name, 'on_nth_tick_'..period, f, 
-      cmp_nth_tick_handlers, for_nth_tick_script_on_event, period )
-    --
-    OrderedNthTicks.n = #OrderedNthTicks.handlers
-    --
-    -- It can not be known if adding occurs before or
-    -- after on_nth_tick of the same tick. So
-    -- the next occurance has to be decided within
-    -- the on_nth_tick event handler itself.
-    OrderedNthTicks.next_nth_tick = 0 -- activate bootstrap next cycle!
-    end
-  return f end
-  
--- -------------------------------------------------------------------------- --
--- Nth Tick Event Handler
--- -------------------------------------------------------------------------- --
-  
 -- Directly calculates the next tick that an on_nth_tick handler
 -- would've occured on if it had been continually queued during runtime.
 --
@@ -595,73 +469,100 @@ local function get_next_occurance(current_tick, handler)
   local t, p, o = current_tick, handler.period, handler.offset
   return (o > t) and o or (math.floor((t - o) / p) * p + o + p)
   end
-
--- @future: Remove sanity checks once stability is confirmed.  
-function Private.on_nth_tick_handler(e)
-  -- (tick >= nth) means ((tick == nth) or (0 == nth))
-  if e.tick >= OrderedNthTicks.next_nth_tick then
-    --
-    local tick          = e.tick
-    local next_nth_tick = math.huge
-    -- log_event('on_tick', 'event-manager-nth-tick')
-    --
-    local handlers = {table_unpack(OrderedNthTicks.handlers)} --deterministic order
-    for i=1, OrderedNthTicks.n do
-      local handler = handlers[i]
-      if handler.valid then
-        -- new handler?
-        if (handler.next_tick == nil) then
-          handler.next_tick = get_next_occurance(tick - 1, handler)
-          end
-        --
-        assert(handler.next_tick >= tick) --sanity
-        if tick == handler.next_tick then
-          -- log_event('on_nth_tick ' .. handler.period, handler.module_name)
-          handler.f {nth_tick = handler.period, tick = tick, offset = handler.offset}
-          handler.next_tick = tick + handler.period
-          end
-        -- unconditionally collect smallest next tick
-        next_nth_tick = math_min(handler.next_tick, next_nth_tick)
-        end
+  
+-- An event becomes invalid if a handler invalidates at
+-- least one LuaObject that was valid before.
+local function make_event_validator(e)
+  if e == nil then return Filter.TRUE end --on_config, etc...
+  local objects, n = {}, 0
+  for _, v in pairs(e) do 
+    if isLuaObject(v) then; n = n + 1
+      objects[n] = v
+      assert(v.valid == true, 'Event contained invalid object!')
       end
-    --
-    OrderedNthTicks.next_nth_tick = next_nth_tick
     end
+  --
+  return function()
+    for i = 1, n do
+      if (not objects[i].valid) then return false end
+      end
+    return true end
   end
   
+-- -------------------------------------------------------------------------- --
 
-function Private.on_nth_tick_handler2_draft(e)
-  -- (tick >= nth) means ((tick == nth) or (0 == nth))
-  if e.tick >= OrderedNthTicks.next_nth_tick then
-    --
-    local tick          = e.tick
-    local next_nth_tick = math.huge
-    -- log_event('on_tick', 'event-manager-nth-tick')
-    --
-    local handlers = OrderedNthTicks.handlers
+-- on_tick(f) and on_nth_tick(1,f) must be handled seperately
+-- to keep vanilla behavior.
+function Private.make_on_tick_handler(event_name)
+  local handlers = OrderedHandlers[event_name]
+  --
+  return function(e)
     local handler = assert(handlers[1])
     repeat
       if handler.f then
-        -- new handler?
-        if (handler.next_tick == nil) then
-          handler.next_tick = get_next_occurance(tick - 1, handler)
-          end
-        assert(handler.next_tick >= tick) --sanity
-        if tick == handler.next_tick then
-          -- log_event('on_nth_tick ' .. handler.period, handler.module_name)
-          handler.f {nth_tick = handler.period, tick = tick, offset = handler.offset}
-          handler.next_tick = tick + handler.period
-          end
-        -- unconditionally collect smallest next tick
-        next_nth_tick = math_min(handler.next_tick, next_nth_tick)
+        handler.f {tick = e.tick, name = event_name}
         end
       handler = handler.next
       until not handler
-    --
-    OrderedNthTicks.next_nth_tick = next_nth_tick
     end
   end
-  
+
+function Private.make_on_event_handler(event_name)
+  local handlers  = OrderedHandlers[event_name]
+  local dcopy     = Table.dcopy
+  local log_event = make_event_logger(event_name)
+  --
+  return function(e)
+    local handler = assert(handlers[1])
+    local is_event_valid = (handler.next) and make_event_validator(e)
+    repeat
+      local next = handler.next
+      if handler.f then
+        log_event(handler.module_name)
+        handler.f((not next) and e or dcopy(e)) -- don't copy for last
+        end
+      handler = next
+      until (not handler) or (not is_event_valid())
+    if handler then
+      log:debug('Event prematurely invalidated by previous handler.')
+      end
+    end
+  end
+ 
+function Private.make_on_nth_tick_handler()
+  local handlers = OrderedNthTicks
+  local log_event = make_event_logger('on_nth_tick_*')
+  --
+  return function(e)
+    -- (tick >= nth) means ((tick == nth) or (0 == nth))
+    if e.tick >= next_nth_tick then
+      --
+      local tick    = e.tick
+      next_nth_tick = math_huge
+      -- log_event('eml-nth-tick-iterator')
+      --
+      local handler = assert(handlers[1])
+      repeat
+        if handler.f then
+          -- new handler?
+          if (handler.next_tick == nil) then
+            handler.next_tick = get_next_occurance(tick - 1, handler)
+            end
+          assert(handler.next_tick >= tick) --sanity
+          if tick == handler.next_tick then
+            -- log_event(handler.module_name, handler.period)
+            handler.f {nth_tick = handler.period, tick = tick, offset = handler.offset}
+            handler.next_tick = tick + handler.period
+            end
+          -- unconditionally collect smallest next tick
+          next_nth_tick = math_min(handler.next_tick, next_nth_tick)
+          end
+        handler = handler.next
+        until not handler
+      end
+    end
+  end
+    
   
 -- -------------------------------------------------------------------------- --
 -- Debug
@@ -678,7 +579,7 @@ if flag.IS_DEV_MODE then
       (function(a,r) for k,v in pairs(a) do r[reverse_defines[k]] = v end return r end)
       (Table.dcopy(OrderedHandlers),{})
       ,{indentlevel=2}))
-    print('OrderedNthTicks.handlers: ', Hydra.lines(OrderedNthTicks,{indentlevel=2}))
+    print('OrderedNthTicks: ', Hydra.lines(OrderedNthTicks,{indentlevel=2}))
     end
   
   Private.on_event('event-manager',
