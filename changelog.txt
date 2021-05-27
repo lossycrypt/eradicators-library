@@ -10,6 +10,11 @@ Date: 2021-05-27
     - EventManagerLite: Made handler order permanent and linked.
   Utility Mods:
     - Added enable-tests trigger mod and udpdated flag.DO_TESTS accordingly.
+  Hooks:
+    - Babelfish: Fixed language code detection disabled too early.
+    - Babelfish: Made search types configurable. (Breaking change.)
+  Functions:
+    - New function Table.sort
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.7
 Date: 2021-05-26

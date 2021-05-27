@@ -42,8 +42,10 @@ local assertify   = elreq('erlib/lua/Error'     )().Asserter(stop)
 local String      = elreq('erlib/lua/String'    )()
 local Class       = elreq('erlib/lua/Class'     )()
 local Filter      = elreq('erlib/lua/Filter'    )()
+local Cache       = elreq('erlib/factorio/Cache'     )()
 
 local Table       = elreq('erlib/lua/Table'     )()
+local Set         = elreq('erlib/lua/Set'       )()
 
 local sriapi      = elreq('erlib/lua/Iter/sriapi')()
 
@@ -57,10 +59,19 @@ local import = PluginManager.make_relative_require'babelfish'
 local const  = import '/const'
 local ident  = serpent.line
 
-local AllowedTypes = (function(r,t)
-  for i=1, #t do r[t[i]..'_name'] = true r[t[i]..'_description'] = true end
-  return r end)({}, const.allowed_translation_types)
+-- local AllowedTypes = (function(r,t)
+  -- for i=1, #t do r[t[i]..'_name'] = true r[t[i]..'_description'] = true end
+  -- return r end)({}, const.allowed_translation_types)
   
+local SupportedTypes = Set.from_values(const.supported_search_types)
+local TypeOrder      = const.search_type_translation_order
+  
+local RequestedTypes = Cache.AutoCache(function(r)
+  for k, v in pairs(
+  game.mod_setting_prototypes[const.setting_name.search_types].allowed_values)
+  do r[v] = true end
+  end)
+
 local index = {
   localised = 1,
   lower     = 2,
@@ -69,6 +80,17 @@ local index = {
 -- -------------------------------------------------------------------------- --
 -- Blank Dictionary                                                           --
 -- -------------------------------------------------------------------------- --
+
+local function make_new_packed_dictionary(language_code)
+  local new = {
+    packages = {
+      [1] = {
+        
+        }
+      }
+    }
+  
+  end
 
 local function make_new_dictionary (language_code)
   assert(const.native_language_name[language_code] ~= nil, 'Invalid language_code')
@@ -138,18 +160,23 @@ local function make_new_dictionary (language_code)
     new.lookup  [id ] = r
     end
   --
-  for type in sriapi(const.allowed_translation_types) do
+  for type in sriapi(TypeOrder) do
     local type_name = type..'_name'        -- 'item_name'
     local type_desc = type..'_description' -- 'item_description'
     --
     for name, prot in pairs(game[type..'_prototypes']) do
-      request(type_name, prot.name, prot.localised_name)
-      request(type_desc, prot.name, prot.localised_description)
+      if RequestedTypes[type_name] then
+        request(type_name, prot.name, prot.localised_name)
+        end
+      if RequestedTypes[type_desc] then
+        request(type_desc, prot.name, prot.localised_description)
+        end
       end
     --
-    local max = #game[type..'_prototypes']
-    new.open_requests[type_name], new[type_name] = max, {}
-    new.open_requests[type_desc], new[type_desc] = max, {}
+    local max_name = RequestedTypes[type_name] and #game[type..'_prototypes'] or 0
+    local max_desc = RequestedTypes[type_desc] and #game[type..'_prototypes'] or 0
+    new.open_requests[type_name], new[type_name] = max_name, {}
+    new.open_requests[type_desc], new[type_desc] = max_desc, {}
     end
   --
   return new end
@@ -167,7 +194,7 @@ local function make_internal_names_dictionary()
     language_code        = 'internal',
     native_language_name = 'Internal', -- User needs to know English anyway.
     }
-  for type in sriapi(const.allowed_translation_types) do
+  for type in sriapi(TypeOrder) do
     local type_name = type..'_name'        -- 'item_name'
     local type_desc = type..'_description' -- 'item_description'
     --
@@ -290,24 +317,13 @@ function Dictionary:dispatch_requests(p, max_bytes)
   ]]
   
   
--- This abomination splits the input string into a table
--- of space-free substrings. It does NOT preserve the order
--- of the substrings.
-local function split_by_space(ustr)
-  local temp = {[ustr] = true}
-  for _, space   in pairs(String.UNICODE_SPACE) do
-  for segment, _ in pairs(temp) do
-  for _, substr  in pairs(String.split(segment, space)) do
-    temp[substr] = true
-    end end end
-  local r = {}
-  for substr in pairs(temp) do
-    if (substr ~= '')
-    and (substr == String.remove_whitespace(substr))
-    then r[#r+1] = substr end
-    end
-  return r end
 
+-- Replaces all space by ascii space, then splits.
+local function split_by_space(ustr)
+  for _, space in pairs(String.UNICODE_SPACE) do
+    ustr = ustr:gsub(space,' ')
+    end
+  return String.split(ustr, '%s+') end
 
 local matchers = {}
 function matchers.plain (t,ws)
@@ -345,7 +361,8 @@ function Dictionary:find(types, word, opt)
   --
   for i=1, #types do
     local type = types[i]
-    assertify(AllowedTypes[type], 'Babelfish: Invalid translation type: ', type)
+    assertify(SupportedTypes[type], 'Babelfish: Invalid translation type: ', type)
+    assertify(RequestedTypes[type], 'Babelfish: Type must be configured in settings stage: ', type)
     if self.open_requests[type] ~= 0 then return false, nil end
     local this = {}; r[type] = this
     for name, translation in pairs(self[type]) do

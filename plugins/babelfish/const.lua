@@ -7,7 +7,7 @@ local const = {}
 
 const.setting_name = {
   network_rate = 'er:babelfish-network-rate',
-  auto_translate_categories = 'er:babelfish-translation-types',
+  search_types = 'er:babelfish-search-types',
   }
   
 const.network = {
@@ -35,16 +35,41 @@ const.gui_name = {
   status_indicator_button = 'er:babelfish-status-indicator-button',
   }
   
-const.allowed_translation_types = {
-  -- Order determines translation priority.
+const.search_type_translation_order = {
+  -- This is the (hardcoded) order in which prototypes will be translated
+  -- *if* they're activated in settings stage.
   'recipe',
   'item',
   'fluid',
+  'entity',
   'technology',
   'equipment',
-  'entity',
   'tile',
   }
+  
+const.supported_search_types = {
+  "recipe_name",
+  "recipe_description",
+  
+  "item_name",
+  "item_description",
+  
+  "fluid_name",
+  "fluid_description",
+  
+  "entity_name",
+  "entity_description",
+  
+  "technology_name",
+  "technology_description",
+  
+  "equipment_name",
+  "equipment_description",
+  
+  "tile_name",
+  "tile_description"
+  }
+
 
 const.native_language_name = {
   internal  = 'Internal'           ,

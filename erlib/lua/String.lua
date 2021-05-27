@@ -288,7 +288,7 @@ function String.rtrim(str) return str:match"^(.-)%s*$"    end
 -- Removes all whitespace from a string.
 -- Does not remove line breaks.
 -- Uses @{String.UNICODE_SPACE}.
--- @tparam string str
+-- @tparam string ustr
 -- @treturn string
 function String.remove_whitespace(ustr)
   -- Unicode spaces have to be removed one-by-one to

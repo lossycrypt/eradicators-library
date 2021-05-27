@@ -6,6 +6,9 @@ local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__
 local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
   
 -- -------------------------------------------------------------------------- --
+
+
+-- -------------------------------------------------------------------------- --
 return function(phase) assert(phase)
 
   --[[
@@ -15,9 +18,9 @@ return function(phase) assert(phase)
     will take care of everything else.
     
     Available functions:
-      erlib_enable_bablefish()
-      erlib_enable_cursor_tracker() -- to be implemented...
-      erlib_enable_zoom_tracker()   -- to be implemented...
+      erlib_enable_plugin('babelfish')
+      erlib_enable_plugin('cursor-tracker') -- to be implemented...
+      erlib_enable_plugin('zoom_tracker')   -- to be implemented...
       
     ]]
 
@@ -37,13 +40,31 @@ return function(phase) assert(phase)
     local Data  = elreq('erlib/factorio/Data/!init')()
     local Table = elreq('erlib/lua/Table'     )()
     
-    local function make_enabler(prototype)
-      return function()
-        data.raw['bool-setting'][prototype.name].forced_value = true
-        log(prototype.name:gsub('.*enable%-','') .. ' was enabled.')
-        end
+    local enablers = {}
+    local function make_enableable(name, prototype)
+      enablers[name] = prototype
       end
-      
+    
+    _ENV .erlib_enable_plugin = function(plugin_name)
+      local prototype = assert(enablers[plugin_name], 'Unknown plugin')
+      data.raw['bool-setting'][prototype.name].forced_value = true
+      log(prototype.name:gsub('.*enable%-','') .. ' was enabled.')
+      end
+    
+    local configurators = {
+      ['babelfish'] = function(options)
+        assert(type(options) == 'table', 'Babelfish: Invalid options.')
+        assert(type(options.search_types) == 'table', 'Babelfish: Invalid translation types.')
+        for _, v in pairs(options.search_types) do
+          table.insert(enablers['babelfish'].search_types, v)
+          end
+        end
+      }
+    
+    _ENV .erlib_configure_plugin = function(plugin_name, options)
+      assert(configurators[plugin_name], 'Unknown plugin.')(options)
+      end
+    
     local dummy = {
       type          = 'bool-setting' ,
       setting_type  = 'startup'      ,
@@ -53,18 +74,19 @@ return function(phase) assert(phase)
       forced_value  = false          , -- Only loaded if hidden = true
       }
 
-    _ENV .erlib_enable_bablefish = make_enabler(
+    make_enableable('babelfish',
       Data.Inscribe(Table.smerge(dummy, {
         name  = 'erlib:enable-babelfish',
         order = 'ZZ9 Plural Z Alpha'    ,
+        search_types = {}               , -- delete later
       })))
 
-    _ENV .erlib_enable_cursor_tracker = make_enabler(
+    make_enableable('cursor-tracker',
       Data.Inscribe(Table.smerge(dummy,{
         name  = 'erlib:enable-cursor-tracker',
       })))
 
-    _ENV .erlib_enable_zoom_tracker = make_enabler(
+    make_enableable('zoom-tracker',
       Data.Inscribe(Table.smerge(dummy,{
         name  = 'erlib:enable-zoom-tracker',
       })))
@@ -73,9 +95,21 @@ return function(phase) assert(phase)
   -- Settings Final Fixes                                                     --
   -- ------------------------------------------------------------------------ --
   elseif phase == 'settings-final-fixes' then
+
+    local Table = elreq('erlib/lua/Table')()
+    
+    if flag.IS_DEV_MODE then
+      erlib_enable_plugin('babelfish')
+      erlib_configure_plugin('babelfish', {
+        search_types = Table.dcopy
+          (require('plugins/babelfish/const').supported_search_types)
+          })
+      end
   
     if data.raw['bool-setting']['erlib:enable-babelfish'].forced_value then
-      require 'plugins/babelfish/settings-final-fixes'
+      require 'plugins/babelfish/settings-final-fixes' (Table.pop(
+          data.raw['bool-setting']['erlib:enable-babelfish'],'search_types'
+        ))
       end
 
   -- ------------------------------------------------------------------------ --

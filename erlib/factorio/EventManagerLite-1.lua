@@ -338,6 +338,7 @@ local function add_or_remove_handler(
     else
       log_handler_change('-  ', event_name, module_name) -- remove success
       handler.f = nil
+      handler.next_tick = nil
       if not has_active_handlers(handlers) then
         log_handler_change('-- ', event_name, '(EventManagerLite)')
         script_on_event(event_name, nil)
@@ -345,6 +346,16 @@ local function add_or_remove_handler(
       end
   -- add
   else
+    if not has_active_handlers(handlers) then
+      if period ~= nil then
+        script_on_event(nil, Private.make_on_nth_tick_handler())
+      elseif event_name == defines.events.on_tick then
+        script_on_event(event_name, Private.make_on_tick_handler (event_name))
+      else
+        script_on_event(event_name, Private.make_on_event_handler(event_name))
+        end
+      log_handler_change('++ ', event_name, '(EventManagerLite)')
+      end
     if (handler ~= nil) then
       if handler.f == f then
         log_handler_change('== ', event_name, module_name) -- already existed
@@ -353,21 +364,12 @@ local function add_or_remove_handler(
         handler.f = f
         end
     else
-      if not has_active_handlers(handlers) then
-        log_handler_change('++ ', event_name, '(EventManagerLite)')
-        if period ~= nil then
-          script_on_event(nil, Private.make_on_nth_tick_handler())
-        elseif event_name == defines.events.on_tick then
-          script_on_event(event_name, Private.make_on_tick_handler (event_name))
-        else
-          script_on_event(event_name, Private.make_on_event_handler(event_name))
-          end
-        end
       log_handler_change('+  ', event_name, module_name) -- add new
       --
       local handler = {
         module_name = module_name  ,
         f           = f            ,
+        next_tick   = nil          ,
         period      = period or nil,
         offset      = period and get_offset(module_name, period) or nil,
         }

@@ -14,7 +14,7 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
 
   ['[mod-setting-description]'] = {
     [const.setting_name.network_rate] = {
-      en = 'Rough approximately how much network bandwidth Babelfish will use while translating. '
+      en = 'Rough approximation of how much network bandwidth Babelfish will use while translating. '
         .. 'Has no effect in Singleplayer. '
         .. 'No bandwidth is used once translation is done. '
         .. '\\n\\n'
@@ -36,6 +36,22 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       ja = 'バベルフィッシュさんが只今モッドの翻訳に勤しんでいます。__1__',
       },
 
+    ['command-only-in-singleplayer'] = {
+      en = 'This command can only be used in singleplayer.',
+      },
+      
+    ['command-only-by-admin'] = {
+      en = 'This command can only be used by admins.',
+      },
+      
+    ['unknown-command'] = {
+      en = 'Unknown command.',
+      },
+      
+    ['command-confirm'] = {
+      en = 'Ok!',
+      },
+      
     language_code = (function(r)
       for code, name in pairs(const.native_language_name) do r[code] = code end
       return r end){},

@@ -18,7 +18,11 @@
 -- @module Babelfish
 -- @usage
 --  -- settings.lua
---  erlib_enable_bablefish()
+--  erlib_enable_plugin('babelfish')
+--  erlib_configure_plugin('babelfish', {
+--    search_types = {'item_name', 'recipe_name'}
+--    })
+--
 --  -- control.lua
 --  remote.call('er:babelfish-remote-interface','find', player_index, word, options)
 
@@ -138,9 +142,10 @@ script.on_config(function(e)
     Table.overwrite(Savedata, Table.dcopy(DefaultSavedata))
     Savedata.dicts['internal'] = Dictionary.make_internal_names_dictionary()
     end
-  for _, pdata in pairs(Savedata.players) do
-    pdata.language_code = nil
-    end
+  -- for _, pdata in pairs(Savedata.players) do
+    -- pdata.language_code = nil
+    -- end
+  Table.clear(Savedata.players)
   Babelfish.reclassify() -- probably redundant with on_load
   Babelfish.on_player_language_changed()
   end)
@@ -164,13 +169,13 @@ Babelfish.update_handlers = function()
   --
   if update_players then
     log:info('Translation suspended while waiting for language codes.')
-    script.on_event   (string_event  , Babelfish.on_recieve_language_code)
+    script.on_event   (string_event  , Babelfish.on_string_translated)
     script.on_nth_tick(            60, Babelfish.on_player_language_changed)
     script.on_nth_tick(             1, nil)
   elseif update_dicts then
     log:info('Translation started.')
     -- Send out translation requests.
-    script.on_event   (string_event  , Babelfish.on_recieve_translation)
+    script.on_event   (string_event  , Babelfish.on_string_translated)
     script.on_nth_tick(            60, Babelfish.update_status_indicators)
     script.on_nth_tick(             1, Babelfish.request_translations)
   else
@@ -200,13 +205,15 @@ Babelfish.on_player_language_changed = script.on_event({
     if not p.connected then
       -- language must be re-evaluated on re-join
       Savedata:del_pdata(nil, pindex)
+      log:debug('Player removed from game: ', p.name)
     else
       local pdata = Savedata:sget_pdata(nil, pindex)
       if (not pdata.language_code) then
+        table.insert(changed_players, pindex)
         if ((pdata.next_request_tick or 0) <= game.tick) then
-          assert(p.request_translation(const.lstring.language_code))
+          log:debug('Sent language code request to: ', pdata.p.name)
+          assert(pdata.p.request_translation(const.lstring.language_code))
           pdata.next_request_tick = game.tick + const.network.rerequest_delay
-          table.insert(changed_players, pindex)
           end
       else
         Savedata.bytes = 0
@@ -223,32 +230,37 @@ Babelfish.on_player_language_changed = script.on_event({
   Savedata.incomplete_dictionaries = Table.nil_if_empty(incomplete_dictionaries)
   --
   Babelfish.update_handlers()
+  --
+  -- for _, pindex in ipairs(Savedata.changed_players or {}) do
+      -- local pdata = Savedata:sget_pdata(nil, pindex)
+    -- end
   end)
 
--- Wait for the requested language codes.  
-Babelfish.on_recieve_language_code = 
-  (function(f) return function(e) return e.translated and f(e) end end)
-  (function(e)
-    if (#e.localised_string == 1)
-    and (e.localised_string[1] == const.lstring.language_code[1])
-    then
-      local pdata = Savedata:sget_pdata(e)
-      pdata.language_code = e.result
-      pdata.next_request_tick = nil
-      Babelfish.on_player_language_changed()
-      log:debug(("Player %s's language is %s (%s)."):format(
-        pdata.p.name, const.native_language_name[pdata.language_code], pdata.language_code))
-      end
-  end)
+
 
 -- -------------------------------------------------------------------------- --
 -- Request + Recieve                                                          --
 -- -------------------------------------------------------------------------- --
-  
--- Push event to dictionary.
-Babelfish.on_recieve_translation = function(e)
-  Savedata:get_pdata(e).dict
-    :push_translation(e.localised_string, e.translated and e.result)
+
+Babelfish.on_string_translated = function(e)
+  local pdata = Savedata:sget_pdata(e)
+  -- Push event to dictionary.
+  if pdata.language_code then
+    pdata.dict:push_translation(e.localised_string, e.translated and e.result)
+  --
+  elseif (#e.localised_string == 1)
+  and (e.localised_string[1] == const.lstring.language_code[1])
+  then
+    -- Push language code to player.
+    assertify(e.translated, 'Language code untranslated, wtf?')
+    pdata.language_code = e.result
+    pdata.next_request_tick = nil
+    log:debug(("Player %s's language is %s (%s)."):format(
+      pdata.p.name, const.native_language_name[pdata.language_code], pdata.language_code))
+    Babelfish.on_player_language_changed()
+  else
+    log:debug('Ignoring unexpected translation.')
+    end
   end
 
 -- on_nth_tick(1)
@@ -301,18 +313,36 @@ Babelfish.update_status_indicators = function(e)
     end
   end
 
+
+-- -------------------------------------------------------------------------- --
+-- Remote + Documentation                                                     --
+-- -------------------------------------------------------------------------- --
+  
 --------------------------------------------------------------------------------
 -- Startup.  
 -- @section
 --------------------------------------------------------------------------------
 
 ----------
--- Activates babelfish for all mods. Without this babelfish will
--- not be loaded at all. This must be called in __settings.lua__.
+-- Babelfish must be activated and configured before use by calling the
+-- two public global functions explained in the example. Otherwise it
+-- will not load at all. This configuration is global for all mods.
+-- This must be done in __settings.lua__.
+--
+-- You must first activate Babelfish and then add at least one
+-- @{Babelfish.SearchType|SearchType}.
 --
 -- @usage
---   erlib_enable_bablefish()
--- @function erlib_enable_bablefish
+--  
+--  erlib_enable_plugin('babelfish')
+--
+--  --This *ADDS* several types. Types can not be removed once added by any mod.
+--  erlib_configure_plugin('babelfish', {
+--    search_types = {'item_name', 'recipe_name'}
+--    })
+--
+-- @table HowToActivateBabelfish
+do end
   
 --------------------------------------------------------------------------------
 -- Remote Interface Types.
@@ -326,9 +356,9 @@ Babelfish.update_status_indicators = function(e)
 --    'recipe_name'    , 'recipe_description'
 --    'item_name'      , 'item_description'
 --    'fluid_name'     , 'fluid_description'
+--    'entity_name'    , 'entity_description'
 --    'technology_name', 'technology_description'
 --    'equipment_name' , 'equipment_description'
---    'entity_name'    , 'entity_description'
 --    'tile_name'      , 'tile_description'
 --
 -- @table Babelfish.SearchType
@@ -468,6 +498,54 @@ function Remote.get_translation_percentages()
     end
   return r end
 
+----------
+-- Triggers an internal update.
+--
+-- This is meant to be used to circumvent the hard engine limitation of
+-- no events being raised in Singleplayer when the locale changes but
+-- nothing else changed.
+--
+-- This can also be triggered by the commands `'/babelfish update'` (sp only)
+-- and `'/babelfish reset'` (admin only) respectively.
+--
+-- @tparam[opt=false] boolean reset Completely resets all translations
+-- instead of just performing a normal update.
+--
+-- @function Babelfish.force_update
+function Remote.force_update(force)
+  if (force == true) then
+    script.get_event_handler('on_configuration_changed')()
+  else
+    Table.clear(Savedata.players)
+    Babelfish.on_player_language_changed()
+    end
+  end
+  
+script.on_event(defines.events.on_console_command, function(e)
+  if (e.command == 'babelfish') then
+    local pdata, p = Savedata:sget_pdata(e)
+    --
+    if (e.parameters == 'update') then
+      if game.is_multiplayer() then
+        p.print {'babelfish.command-only-in-singleplayer'}
+      else
+        Remote.force_update()
+        p.print {'babelfish.command-confirm'}
+        end
+    --  
+    elseif (e.parameters == 'reset') then
+      if game.is_multiplayer() and not p.admin then
+        p.print {'babelfish.command-only-by-admin'}
+      else
+        Remote.force_update(true)
+        p.print {'babelfish.command-confirm'}
+        end
+    --
+    else
+      p.print{'babelfish.unknown-command'}
+      end
+    end
+  end)
 
   
 -- -------------------------------------------------------------------------- --

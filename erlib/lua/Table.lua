@@ -24,9 +24,9 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- -------------------------------------------------------------------------- --
 
 local table_size, pairs, type, rawget, setmetatable, getmetatable,
-      debug_setmetatable
+      debug_setmetatable, table_sort
     = table_size, pairs, type, rawget, setmetatable, getmetatable,
-      debug.setmetatable
+      debug.setmetatable, table.sort
 
 local NIL
     = ercfg.NIL
@@ -858,6 +858,18 @@ function Table.smerge(tbl,tbl2)
   return _toTable(tbl)
   end
 
+----------
+-- __In-place.__ @{LMAN table.sort} with table return.
+--
+-- @tparam table tbl
+-- @tparam function comp
+--
+-- @treturn table The input table.
+--
+function Table.sort(tbl, comp)
+  table_sort(tbl, comp)
+  return _toTable(tbl)
+  end
   
 ----------
 -- __In-place.__ Inserts value into tbl __only if__ no other key in the table
