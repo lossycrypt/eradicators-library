@@ -100,24 +100,49 @@ local pattern_functions = {
       local prot = assert(game.mod_setting_prototypes[entry.key],
         'Can not add default value for non-existant settings prototype: '
         ..entry.key)
+      local default_value = prot.default_value
+      if type(default_value) == 'string' then
+        -- Drop-Down Items can be localised. But UL does not have
+        -- access to all locales so it can't correctly handle this.
+        if prot.allowed_values then
+          local localised_default 
+          for _, dbentry in pairs(db) do
+            if  (dbentry.header == '[string-mod-setting]')
+            and (dbentry.key    == entry.key..'-'..default_value  )
+            then 
+              default_value = dbentry.value
+              end
+            end
+          end
+        default_value = '"'..default_value..'"'
+     elseif type(default_value) == 'boolean' then
+      default_value = default_value
+        and '☑' -- U+2611 ☑ BALLOT BOX WITH CHECK
+         or '☐' -- U+2610 ☐ BALLOT BOX
+      end
       add_description_header(entry, db, 
-        ("_UL:ICON_TOOLTIP_ [color=orange]%s[/color] [color=acid]%s[/color]\\n")
-        :format(
-          lt.default_value[entry.language],
-          -- serpent automatically puts quotes on strings! ;)
-          serpent.line(prot.default_value)
-          )
+        ("[color=orange]%s[/color] [color=acid]%s[/color]\\n")
+        :format( lt.default_value[entry.language], default_value )
         )
       end
     end,
 
+
+  -- Add Info Icon to all settings with description.
+  function(entry, db)
+    local desc = find_description(entry, db)
+    if desc and not entry.value:find '_UL:ICON_TOOLTIP_' then
+      entry.value = entry.value ..' _UL:ICON_TOOLTIP_'
+      end
+    end,
     
     
-  -- Fix newline escapes
-  -- function(entry, db)
-    -- any slash count to one slash in the final output
-    -- entry.value = entry.value:gsub('\\+n','\\\\n')
-    -- end,
+  -- FINAL FIXES
+  
+  -- Fix missing newline escapes
+  function(entry, db)
+    entry.value = entry.value:gsub('\n','\\n')
+    end,
 
 -- -------------------------------------------------------------------------- --
 -- !FINAL FIXES!

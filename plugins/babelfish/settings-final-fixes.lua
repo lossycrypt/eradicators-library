@@ -23,14 +23,24 @@ local const = require 'plugins/babelfish/const'
     minimum_value = 0.0001                    ,
     maximum_value = 1000                      ,
     }
+
+  Data.Inscribe{
+    name          = const.setting_name.string_match_type,
+    type          = 'string-setting'          ,
+    setting_type  = 'runtime-global'          ,
+    order         = 'babelfish-2'             ,
+    default_value = 'plain'                   ,
+    allowed_values= {'plain', 'fuzzy', 'lua'} ,
+    }
   
 return function(search_types)
   
-  local allowed = Set.from_values(const.supported_search_types)
+  local allowed
+    = Table.map(const.type_data, function(v) return true, v.type end, {})
   
   assert(#search_types > 0, 'Babelfish: At least one search type must be configured.')
   
-  for _, v in pairs(search_types) do
+  for _, v in ipairs(search_types) do
     assert(allowed[v], 'Babelfish: Invalid search type: '..v)
     end
   

@@ -54,7 +54,7 @@ return function(phase) assert(phase)
     local configurators = {
       ['babelfish'] = function(options)
         assert(type(options) == 'table', 'Babelfish: Invalid options.')
-        assert(type(options.search_types) == 'table', 'Babelfish: Invalid translation types.')
+        assert(type(options.search_types) == 'table', 'Babelfish: Translation types must be a table.')
         for _, v in pairs(options.search_types) do
           table.insert(enablers['babelfish'].search_types, v)
           end
@@ -101,9 +101,11 @@ return function(phase) assert(phase)
     if flag.IS_DEV_MODE then
       erlib_enable_plugin('babelfish')
       erlib_configure_plugin('babelfish', {
-        search_types = Table.dcopy
-          (require('plugins/babelfish/const').supported_search_types)
-          })
+        search_types = Table.map(
+          require('plugins/babelfish/const').type_data,
+          function(v) return v.type end,
+          {})
+        })
       end
   
     if data.raw['bool-setting']['erlib:enable-babelfish'].forced_value then

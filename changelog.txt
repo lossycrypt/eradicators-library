@@ -1,8 +1,14 @@
 ---------------------------------------------------------------------------------------------------
-Version: 4.1.9
+Version: 4.1.10
 Date: 2021-x-x
-  Functions:
+  Utility Mods:
     - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.1.9
+Date: 2021-05-31
+  Utility Mods:
+    - Universal Locale: Improved mod setting default value injection for non-numbers.
+    - Universal Locale: Added automatic mod setting description info icon injection.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.8
 Date: 2021-05-27
@@ -15,6 +21,9 @@ Date: 2021-05-27
     - Babelfish: Made search types configurable. (Breaking change.)
   Functions:
     - New function Table.sort
+  Bugfixes:
+    - EventManagerLite: On_event now auto-corrects seperate on_init / on_config
+      registrations.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.7
 Date: 2021-05-26

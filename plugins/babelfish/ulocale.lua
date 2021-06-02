@@ -8,10 +8,40 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
 
   ['[mod-setting-name]'] = {
     [const.setting_name.network_rate] = {
-      en = '_UL:PowerUserSetting_ Babelfish Network Usage (KiB/s)',
+      en = '_UL:PowerUserSetting_ Babelfish: Maximum Network Usage (KiB/s)',
+      },
+    [const.setting_name.string_match_type] = {
+      en = 'Babelfish: Search Mode',
       },
     },
 
+  ['[string-mod-setting]'] = {
+    [const.setting_name.string_match_type..'-'..'plain'] = {
+      en = 'Default',
+      },
+    [const.setting_name.string_match_type..'-'..'fuzzy'] = {
+      en = 'Fuzzy',
+      },
+    [const.setting_name.string_match_type..'-'..'lua'] = {
+      en = '_UL:PowerUserSetting_ Lua pattern',
+      },    
+    },
+
+
+  ['[string-mod-setting-description]'] = {
+    [const.setting_name.string_match_type..'-'..'plain'] = {
+      en = 'Plain text search like in vanilla Factorio.',
+      },
+    [const.setting_name.string_match_type..'-'..'fuzzy'] = {
+      en = 'Searches for each letter seperately. '
+        .. [[Same as Factorio's "Fuzzy search" interface option.]],
+      },
+    [const.setting_name.string_match_type..'-'..'lua'] = {
+      en = 'Raw lua pattern input. Not RegEx.'
+        .. '\nFor hoopy froods who know where their towel is.',
+      },    
+    },
+    
   ['[mod-setting-description]'] = {
     [const.setting_name.network_rate] = {
       en = 'Rough approximation of how much network bandwidth Babelfish will use while translating. '
@@ -25,6 +55,11 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
         .. 'translated on the server, then they might be dropped or unable to '
         .. 'join a server if this setting is too high. In that case '
         .. 'temporarily lower the setting until translation is done. ',
+      },
+    [const.setting_name.string_match_type] = {
+      en = 'Changes how text you enter into the search fields of '
+        .. 'supported mods is treated. All search modes are '
+        .. 'case-insensitive.',
       },
     },
 
@@ -50,6 +85,15 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       
     ['command-confirm'] = {
       en = 'Ok!',
+      },
+      
+    ['test-string'] = {
+      en = 'This is a test. '
+        .. 'Button: __CONTROL__mine__. '
+        .. 'Complex Button: __ALT_CONTROL__1__build__'
+        .. 'Parameters: __2__ __3__. '
+        .. 'Item Name: __ITEM__iron-plate__. '
+        .. 'Plural: __4__ __plural_for_parameter_4_{1=day|rest=days}__'
       },
       
     language_code = (function(r)

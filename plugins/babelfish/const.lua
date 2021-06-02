@@ -6,12 +6,18 @@
 local const = {}
 
 const.setting_name = {
-  network_rate = 'er:babelfish-network-rate',
+  -- user
+  network_rate      = 'er:babelfish-network-rate',
+  string_match_type = 'er:babelfish-string-match-type',
+  
+  -- hidden
   search_types = 'er:babelfish-search-types',
   }
   
 const.network = {
   rerequest_delay = 60, -- in ticks
+  packed_request_header = 'bf2',
+  mtu_bytes = 1452,
   }
   
 const.style = {
@@ -35,40 +41,75 @@ const.gui_name = {
   status_indicator_button = 'er:babelfish-status-indicator-button',
   }
   
-const.search_type_translation_order = {
+-- const.search_type_translation_order = {
   -- This is the (hardcoded) order in which prototypes will be translated
   -- *if* they're activated in settings stage.
-  'recipe',
-  'item',
-  'fluid',
-  'entity',
-  'technology',
-  'equipment',
-  'tile',
+  -- 'item',
+  -- 'fluid',
+  -- 'recipe',
+  -- 'entity',
+  -- 'technology',
+  -- 'equipment',
+  -- 'tile',
+  -- }
+  
+-- Collected Most Extreme Values:
+-- (Outdated: Includes Internal Names, Excludes Unknown Keys)
+--
+-- Type                      | Longest  | Shortest | Average  | Median   | Unk. Key
+-- [item_name             ]  |       76 |        2 |    24.73 |    24.00 |     0.00%
+-- [item_description      ]  |     1277 |        4 |   114.31 |    98.50 |    75.94%
+-- [fluid_name            ]  |       37 |        3 |    16.47 |    17.00 |     0.00%  
+-- [fluid_description     ]  |       98 |       18 |    93.00 |    93.00 |    86.05%
+-- [recipe_name           ]  |       76 |        2 |    23.72 |    23.00 |     0.00%
+-- [recipe_description    ]  |      202 |        4 |   129.89 |   136.00 |    96.72%
+-- [technology_name       ]  |       59 |        3 |    22.38 |    21.00 |     0.00%
+-- [technology_description]  |      408 |       10 |    96.25 |    81.00 |     1.03%
+-- [entity_name           ]  |       63 |        3 |    24.80 |    24.00 |     0.00%
+-- [entity_description    ]  |      429 |        9 |   120.83 |   111.00 |    49.32%
+-- [equipment_name        ]  |       57 |        9 |    33.69 |    33.00 |     0.00%
+-- [equipment_description ]  |      231 |       66 |   154.86 |   137.00 |    63.79%
+-- [tile_name             ]  |       42 |        4 |    18.69 |    20.00 |     0.00%
+-- [tile_description      ]  |       92 |       75 |    92.00 |    92.00 |    98.08%
+  
+-- const.type_bytes_estimate = {
+--   -- These values need to be recalculated.
+--   -- They must exclude internal values, and include "Unknown Key" returns.
+--   ["item_name"             ] =   76,
+--   ["item_description"      ] = 1277,
+--   ["fluid_name"            ] =   37,
+--   ["fluid_description"     ] =   98,
+--   ["recipe_name"           ] =   76,
+--   ["recipe_description"    ] =  202,
+--   ["entity_name"           ] =   59,
+--   ["entity_description"    ] =  408,
+--   ["technology_name"       ] =   63,
+--   ["technology_description"] =  429,
+--   ["equipment_name"        ] =   57,
+--   ["equipment_description" ] =  231,
+--   ["tile_name"             ] =   42,
+--   ["tile_description"      ] =   92,
+--   }
+  
+const.type_data = {
+  -- This is the (hardcoded) order in which prototypes will be translated
+  -- *if* they're activated in settings stage.
+  {type = "item_name"             , longest =   76},
+  {type = "item_description"      , longest = 1277},
+  {type = "fluid_name"            , longest =   37},
+  {type = "fluid_description"     , longest =   98},
+  {type = "recipe_name"           , longest =   76},
+  {type = "recipe_description"    , longest =  202},
+  {type = "entity_name"           , longest =   59},
+  {type = "entity_description"    , longest =  408},
+  {type = "technology_name"       , longest =   63},
+  {type = "technology_description", longest =  429},
+  {type = "equipment_name"        , longest =   57},
+  {type = "equipment_description" , longest =  231},
+  {type = "tile_name"             , longest =   42},
+  {type = "tile_description"      , longest =   92},
   }
   
-const.supported_search_types = {
-  "recipe_name",
-  "recipe_description",
-  
-  "item_name",
-  "item_description",
-  
-  "fluid_name",
-  "fluid_description",
-  
-  "entity_name",
-  "entity_description",
-  
-  "technology_name",
-  "technology_description",
-  
-  "equipment_name",
-  "equipment_description",
-  
-  "tile_name",
-  "tile_description"
-  }
 
 
 const.native_language_name = {

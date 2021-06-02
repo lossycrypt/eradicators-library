@@ -96,4 +96,4 @@ local function Closurize(f,...)
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
 do (STDOUT or log or print)('  Loaded → erlib.Closurize') end
-return function() return Closurize,_Closurize,_uLocale end
+return function() return Closurize,nil,nil end

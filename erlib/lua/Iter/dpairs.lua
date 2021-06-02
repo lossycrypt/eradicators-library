@@ -183,8 +183,8 @@ inside the input table @tbl.
 ]==]
 local function dpairs(tbl, opt)
   -- This function is a slightly modified version of Iter.ntuples
-  verify(n, 'tbl|nil', 'Input was not table.')
-  verify(n, 'nil|tbl', 'Options was not table.')
+  verify(tbl, 'tbl|nil', 'Input was not table.')
+  verify(opt, 'nil|tbl', 'Options was not table.')
   if tbl == nil then return SKIP end
   local include_path       = ((true == (opt or {}).include_path) or nil)
   local include_duplicates =  (true == (opt or {}).include_duplicates)

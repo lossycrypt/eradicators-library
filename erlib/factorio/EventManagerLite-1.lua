@@ -94,6 +94,7 @@ local stop        = elreq('erlib/lua/Error'     )().Stopper 'EventManagerLite'
 local assertify   = elreq('erlib/lua/Error'     )().Asserter(stop)
 
 local Table       = elreq('erlib/lua/Table'     )()
+local Set         = elreq('erlib/lua/Set'       )()
 
 local Verificate  = elreq('erlib/lua/Verificate')()
 local isLuaObject = Verificate.isType.LuaObject
@@ -395,7 +396,16 @@ function Private.on_event(module_name, event_names, f, filters)
   verify(filters, 'nil', 'Filters are not supported by EventManager.')
   verify(event_names, 'Integer|string|NonEmptyTable', 'Missing event names.')
   --
-  for _, event_name in pairs(Table.plural(event_names)) do
+  event_names = Set.from_values(Table.plural(event_names))
+  if event_names['on_config'] then
+    event_names['on_config'] = nil
+    event_names['on_configuration_changed'] = true
+    end
+  if event_names['on_configuration_changed'] then
+    event_names['on_init'] = true
+    end
+  --
+  for _, event_name in pairs(Table.keys(event_names)) do
     verify(event_name, 'Integer|string') -- defines.events.on_tick is 0!
     --
     add_or_remove_handler(

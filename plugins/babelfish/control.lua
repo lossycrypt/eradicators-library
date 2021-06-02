@@ -55,16 +55,20 @@ local log         = elreq('erlib/lua/Log'          )().Logger  'Babelfish'
 local stop        = elreq('erlib/lua/Error'        )().Stopper 'Babelfish'
 local assertify   = elreq('erlib/lua/Error'        )().Asserter(stop)
 
-local Table       = elreq('erlib/lua/Table'        )()
-local Setting     = elreq('erlib/factorio/Setting')()
-
 local Verificate  = elreq('erlib/lua/Verificate'   )()
 local verify      = Verificate.verify
 local isType      = Verificate.isType
 
+local Table       = elreq('erlib/lua/Table'        )()
+local String      = elreq('erlib/lua/String'       )()
+
+local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
+
 local Setting     = elreq('erlib/factorio/Setting' )()
 local Locale      = elreq('erlib/factorio/Locale'  )()
-local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
+
+rawset(_ENV, 'No_Profiler_Commands', true)
+local Profiler = require('__er-profiler-fork__/profiler.lua')
 
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
@@ -78,7 +82,9 @@ local ident  = serpent.line
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 local Babelfish = {}
-local Dictionary = import 'methods/Dictionary'
+-- local Dictionary = import 'methods/Dictionary_Naive'
+-- local Dictionary = import 'methods/Dictionary_NoIdent'
+local Dictionary = import 'methods/Dictionary_NoIdent_PacketPregen'
 
 local StatusIndicator = import 'methods/StatusIndicator'
 
@@ -122,7 +128,7 @@ PluginManager.classify_savedata('babelfish', {
     end,
   
   })
-  
+
 -- -------------------------------------------------------------------------- --
 -- Conditional Events                                                         --
 -- -------------------------------------------------------------------------- --
@@ -151,6 +157,7 @@ script.on_config(function(e)
   end)
 
 script.on_load(function(e)
+  if not Savedata then return end -- on_load before on_config *again*...
   Babelfish.reclassify()
   Babelfish.update_handlers()
   end)
@@ -187,7 +194,7 @@ Babelfish.update_handlers = function()
     end
   end
 
-  
+
 -- -------------------------------------------------------------------------- --
 -- Player Language                                                            --
 -- -------------------------------------------------------------------------- --
@@ -242,11 +249,52 @@ Babelfish.on_player_language_changed = script.on_event({
 -- Request + Recieve                                                          --
 -- -------------------------------------------------------------------------- --
 
+-- local profiler1, profiler2
 Babelfish.on_string_translated = function(e)
   local pdata = Savedata:sget_pdata(e)
   -- Push event to dictionary.
   if pdata.language_code then
-    pdata.dict:push_translation(e.localised_string, e.translated and e.result)
+    -- log:tell('Recieved package', e)
+    -- V: Naive
+    if e.localised_string[2] ~= const.network.packet_header then
+      pdata.dict:push_translation(e.localised_string, e.translated and e.result)
+    -- V: Packaged
+    else
+      -- profiler1 = profiler1 or game.create_profiler()
+      -- profiler2 = profiler2 or game.create_profiler()
+      
+      local string_find = string.find
+      assert(e.translated, 'Untranslated package?!')
+      -- profiler1.restart()
+      -- local profiler = game.create_profiler()
+      local results = String.split(e.result, '\0')
+      -- _ENV.log{'', 'String result split took: ', profiler}; profiler.reset()
+      -- profiler1.stop(); _ENV.log{'', 'String result split took: ', profiler1}
+      
+      -- log:tell('Results:', results)
+      -- assert((#e.localised_string-2)/2 == (#results-2), 'Unexpected result count')
+      -- assert(#e.localised_string == #results, 'Unexpected result count')
+      
+      -- for i = 3, #results do
+      --   local result  = results[i]
+      --   -- local lstring = e.localised_string[3 + (i-3) * 2]
+      --   local lstring = e.localised_string[i][2]
+      --   -- local profiler = game.create_profiler()
+      --   local ok = not string_find(result, 'Unknown key') -- can be anywhere in the string
+      --   -- _ENV.log{'', 'Find unknown took: ', profiler}
+      --   -- if not ok then print('↑ WAS NOT TRANSLATED!') end
+      --   -- pdata.dict:push_translation(lstring, ok and result)
+      --   pdata.dict:push_translation(lstring, ok and result)
+      --   end
+       
+      -- profiler2.restart()
+      for i = 3, #results do
+        pdata.dict:push_translation(e.localised_string[i][2], results[i])
+        end
+        
+      -- _ENV.log{'', 'Translation push took: ', profiler}; profiler.reset()
+      -- profiler2.stop(); _ENV.log{'', 'Translation push took: ', profiler2}
+      end
   --
   elseif (#e.localised_string == 1)
   and (e.localised_string[1] == const.lstring.language_code[1])
@@ -263,22 +311,57 @@ Babelfish.on_string_translated = function(e)
     end
   end
 
+local DO_PACKAGING = false
+-- Packed     translation (full pyanodon): 1185ms
+-- Non-Packed translation (full pyanodon):   90ms (13 times faster!)
+
+  
 -- on_nth_tick(1)
 Babelfish.request_translations = function(e)
+  Dictionary.precompile()
+  --
   -- In Singleplayer all translation is done during the loading screen.
   -- Recalculated live to immediately reflect setting changes.
   local bytes_per_tick =
-    (game.is_multiplayer() or flag.IS_DEV_MODE or true)
+    (game.is_multiplayer() or flag.IS_DEV_MODE and false)
     and (1024 / 60) * Setting.get_value('map', const.setting_name.network_rate)
     or math.huge
   --
-  Savedata.bytes = Savedata.bytes + bytes_per_tick
+  bytes_per_tick = 100000000000
+  -- Profiler.Start(true)
+  Profiler.Start(false)
   --
-  for dict, p in ntuples(2, Savedata.incomplete_dictionaries) do
-    Savedata.bytes = Savedata.bytes - dict:dispatch_requests(p, Savedata.bytes)
-    if not dict:has_requests() then
-      Savedata.incomplete_dictionaries[dict] = nil
+  Savedata.bytes = Savedata.bytes + bytes_per_tick
+  -- V: Packaged (Hacked Garbage Code)
+  if DO_PACKAGING then
+    -- local profiler = game.create_profiler()
+    for dict, p in ntuples(2, Savedata.incomplete_dictionaries) do
+      repeat
+        local bytes_before = Savedata.bytes
+        local n, packet = 3, {'', const.network.packet_header}
+        local function f (request)
+          packet[n] = {'', request, '\0'}
+          n = n + 1
+          end
+        Savedata.bytes = Savedata.bytes - dict:collect_packets(f, Savedata.bytes)
+        if #packet > 2 then p.request_translation(packet) end
+        until bytes_before == Savedata.bytes
+      if not dict:has_requests() then
+        Savedata.incomplete_dictionaries[dict] = nil
+        end
       end
+    -- _ENV.log{'', 'Full packed translation took: ', profiler}
+    end
+  -- V: Naive
+  if not DO_PACKAGING then
+    local profiler = game.create_profiler()
+    for dict, p in ntuples(2, Savedata.incomplete_dictionaries) do
+      Savedata.bytes = Savedata.bytes - dict:dispatch_requests(p, Savedata.bytes)
+      if not dict:has_requests() then
+        Savedata.incomplete_dictionaries[dict] = nil
+        end
+      end    
+    _ENV.log{'', 'Full non-packed translation took: ', profiler}
     end
   assert(Savedata.bytes >= 0)
   --
@@ -289,6 +372,7 @@ Babelfish.request_translations = function(e)
     -- print(serpent.block(Savedata.players[1].dict.lookup))
     -- print(serpent.block(Savedata.players[1].dict.requests))
     -- print(serpent.block(Savedata.players[1].dict.open_requests))
+    Profiler.Stop()
     end
   end 
   
@@ -521,26 +605,36 @@ function Remote.force_update(force)
     end
   end
   
+  
+local subcommands = {
+  update = function(e, pdata, p)
+    if game.is_multiplayer() then
+      p.print {'babelfish.command-only-in-singleplayer'}
+    else
+      Remote.force_update()
+      return true end
+    end,
+  reset = function(e, pdata, p)
+    if game.is_multiplayer() and not p.admin then
+      p.print {'babelfish.command-only-by-admin'}
+    else
+      Remote.force_update(true)
+      return true end
+    end,
+  dump = function(e, pdata, p)
+    for _, dict in pairs(Savedata.dicts) do
+      dict:dump_statistics_to_console()
+      end
+    end,
+  }
 script.on_event(defines.events.on_console_command, function(e)
   if (e.command == 'babelfish') then
     local pdata, p = Savedata:sget_pdata(e)
-    --
-    if (e.parameters == 'update') then
-      if game.is_multiplayer() then
-        p.print {'babelfish.command-only-in-singleplayer'}
-      else
-        Remote.force_update()
+    local f = subcommands[e.parameters]
+    if f then
+      if f(e, pdata, p) then
         p.print {'babelfish.command-confirm'}
         end
-    --  
-    elseif (e.parameters == 'reset') then
-      if game.is_multiplayer() and not p.admin then
-        p.print {'babelfish.command-only-by-admin'}
-      else
-        Remote.force_update(true)
-        p.print {'babelfish.command-confirm'}
-        end
-    --
     else
       p.print{'babelfish.unknown-command'}
       end
