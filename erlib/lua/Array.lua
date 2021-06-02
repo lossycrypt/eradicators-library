@@ -457,24 +457,33 @@ function Array.unsorted_remove_value(arr,value,i)
   
   
 ----------
--- __In-place.__ Moves the value at position #arr to position key.
--- For large arrays this is __much faster__ than @{table.remove}
--- but does not preserve element order.
---
--- @tparam DenseArray arr
--- @tparam AnyValue key
---
--- @treturn DenseArray The input array.
---
-function Array.unsorted_remove_key(arr,key)
-  local n = #arr
-  if key <= n then -- properly ignore after-the-end keys
-    arr[key],arr[n] = arr[n],nil
-    end
-  return _toArray(arr)
+-- __Deprecated__.
+function Array.unsorted_remove_key()
+  -- Deprecated 2021-06-02. Future: Remove after a month or so.
+  stop('Array.unsorted_remove_key is deprecated. Use Array.shuffle_pop instead.')
   end
 
-  
+----------
+-- __In-place.__ Moves the value at index #arr to index i.
+-- For large arrays this is __much faster__ than @{table.remove}
+-- but does not preserve value order.
+--
+-- __Note:__ When i is out-of-bounds then the array remains unchanged.
+-- Unlike @{table.remove} no error is raised. This is to allow easy
+-- key existance checking.
+--
+-- @tparam DenseArray arr
+-- @tparam Integer i The index to remove.
+--
+-- @treturn NotNil|nil The value that _was_ at `arr[i]`
+--
+function Array.shuffle_pop(arr, i)
+  local n, v = #arr, arr[i]
+  if v ~= nil then -- i.e.: local v = assert(shuffle_pop(arr,i), 'Custom error.')
+    arr[n], arr[i] = nil, arr[n] -- order is important to delete i==n
+    end
+  return v end
+
 ----------
 -- __In-place.__ Sets all values to nil. Useful if you need to keep the table
 -- reference intact.

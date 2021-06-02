@@ -13,8 +13,10 @@
   Mods can combine search results as they see fit. Babelfish wont
   do specific combinations like "search recipe and ingredients and products".
   
+  Babelfish only filters names, not prototype properties.
+  Hidden/Void/etc items/recipes must be filtered by the mod.
+  
   ]]
-
 
 --[[ Future Possibilities:
 
@@ -24,7 +26,6 @@
   + Filter out useless entity prototypes. (explosions, projectiles, etc)
   
   ]]
-
   
 --[[ Facts:
 
@@ -63,9 +64,10 @@ local Verificate  = elreq('erlib/lua/Verificate')()
 local verify      = Verificate.verify
 local assertify   = elreq('erlib/lua/Error'     )().Asserter(stop)
                                                 
-local String      = elreq('erlib/lua/String'    )()
 local Class       = elreq('erlib/lua/Class'     )()
 local Filter      = elreq('erlib/lua/Filter'    )()
+local String      = elreq('erlib/lua/String'    )()
+local remove_rich_text_tags = String.remove_rich_text_tags
 
 local Cache       = elreq('erlib/factorio/Cache' )()
 local Locale      = elreq('erlib/factorio/Locale')()
@@ -78,17 +80,21 @@ local sriapi      = elreq('erlib/lua/Iter/sriapi' )()
 local dpairs      = elreq('erlib/lua/Iter/dpairs' )()
 local ntuples     = elreq('erlib/lua/Iter/ntuples')()
 
-local pairs, pcall, string_find, type
-    = pairs, pcall, string.find, type
+local pairs, pcall, string_find, type, string_gmatch, string_lower
+    = pairs, pcall, string.find, type, string.gmatch, string.lower
     
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
 -- -------------------------------------------------------------------------- --
 local import = PluginManager.make_relative_require'babelfish'
 local const  = import '/const'
-local ident  = serpent.line
+local null   = '\0'
 
-local SupportedTypes = const.type_bytes_estimate -- PseudoSet
+local SupportedTypes = 
+  Table.map(const.type_data, function(v) return true, v.type end, {})
+  
+local TypeBytes = 
+  Table.map(const.type_data, function(v) return v.longest, v.type end, {})
   
 local RequestedTypes = Cache.AutoCache(function(r) -- PseudoSet
   for k, v in ipairs(
@@ -113,7 +119,7 @@ local rindex = { -- Request data index
   entries = 2,
   bytes   = 3,
   -- packed request only
-  index   = 4,
+  uid     = 4,
   }
   
 -- -------------------------------------------------------------------------- --
@@ -164,7 +170,7 @@ local mt_lstring_indexed_array = {
   }
 
 -- Specialized serializer.
--- Result is identical to serpent.line(lstring).
+-- Result is identical to serpent.line(lstring, nil).
 -- 4 times faster than serpent.line
 local function lstring_ident(lstring)
   local function f(lstring, arr)
@@ -182,8 +188,34 @@ local function lstring_ident(lstring)
       arr[#arr+1] = '}'
       end
     return arr end
-  return table.concat(f(lstring, {}))
-  end
+  return table.concat(f(lstring, {})) end
+  
+  
+-- Takes a generically joined localised string {'',{'__bla__'},'5'}
+-- and compresses it to fit the engine limit of 20 parameters + 1 key.
+local function lstring_compact(lstring)
+  -- Example:
+  -- 5 == #{'',1,2,3,4} 
+  -- 3 == #{'',{'',1,2},{'',3,4}}
+  -- 2 == #{'',{'',{'',1,2},{'',3,4}}}
+  --
+  assertify(lstring[1] == '', 'Uncompressible lstring: ', lstring)
+  local function f ()
+    local k = 1
+    for i=2, #lstring, 20 do
+      k = k + 1
+      local t = {''}
+      for j=0, 19 do
+        t[j+2] = lstring[i+j]
+        lstring[i+j] = nil
+        end
+      lstring[k] = t
+      end
+    end
+  while #lstring > 21 do f() end
+  return lstring end
+
+  
   
 -- Pre-calculating the full order string makes sorting 12 times faster.
 local get_full_prototype_order; do
@@ -194,7 +226,7 @@ local get_full_prototype_order; do
       break end
     return self[object_name] end})
   function get_full_prototype_order(prot)
-    return table.concat {
+    return table.concat{
       has_group[prot.object_name] and prot.group.order    or '',
       has_group[prot.object_name] and prot.subgroup.order or '',
       prot.order,
@@ -233,12 +265,10 @@ local function get_profiler()
 --
 local get_ordered_requests = function()
   -- Prepare constants
-  local TypeBytes = {}
   local OrderedRequestedTypes = (function(r) -- DenseArray
     for _, tdata in ipairs(const.type_data) do
       if RequestedTypes[tdata.type] then
         r[#r+1] = tdata.type
-        TypeBytes[tdata.type] = tdata.longest
         end
       end
     return r end){}
@@ -322,27 +352,28 @@ local get_request_packets = make_table_getter(function()
   local max_packet_size = const.network.mtu_bytes
     - 8 -- babelfish header size
     - 8 -- outside transport overhead (assumption)
-  local null = '\0'
-  local header = const.network.packed_request_header
+  local master_header = const.network.master_header
+  local packet_header = const.network.packet_header.packed_request
   --
   local packets = {}
   local unique_requests, max_index = get_ordered_requests()
   local profile = get_profiler()
   --
-  local packet, bytes, count
+  local packet, bytes, count, lstrings
   local function finalize_packet()
-    packet[rindex.lstring] = Locale.merge(table.unpack(packet[rindex.lstring]))
     packet[rindex.bytes  ] = bytes
+    packet[rindex.lstring] = 
+      {'', master_header, packet_header, null, packet[rindex.uid], null, lstring_compact(lstrings)}
     -- print(('Packet stat. Entries: %s, Bytes: %s'):format(#packet[rindex.entries], bytes))
     end
   local function new_packet()
     bytes = 0
     count = 0
+    lstrings = {''}
     local index = #packets+1
     packet = {
-      [rindex.lstring] = {header, null, index, null},
       [rindex.entries] = {},
-      [rindex.index  ] = index,
+      [rindex.uid    ] = tostring(index),
       }
     packets[index] = packet
     end
@@ -357,8 +388,8 @@ local get_request_packets = make_table_getter(function()
     bytes = bytes + request[rindex.bytes]
     count = count + 1
     table.insert(packet[rindex.entries], request[rindex.entries])
-    table.insert(packet[rindex.lstring], request[rindex.lstring])
-    table.insert(packet[rindex.lstring], null)
+    table.insert(lstrings, request[rindex.lstring])
+    table.insert(lstrings, null)
     end
   finalize_packet()
   profile('Packing requests together took: ')
@@ -373,9 +404,8 @@ local get_request_packets = make_table_getter(function()
 function Dictionary:update()
   log:debug('Updating dictionary: ', self.language_code)
   --
-  local profile = get_profiler()
   local packets, max_index = get_request_packets()
-  profile('Packets preparation took (total): ')
+  local profile = get_profiler()
   --
   self.packets     = Table.dcopy(packets)
   self.packets.max = #packets -- all-time maxium
@@ -392,20 +422,20 @@ function Dictionary:update()
   for type, max in pairs(max_index) do
     --
     local old_entries = self[type] and (function(r)
-      for i=1, self[type].n do
+      for i=1, self[type].max do
         local entry = self[type][i]
         r[ entry[eindex.name] ] = entry
         end
       return r end){}
     --
-    self[type] = {n = max}
+    self[type] = {max = max}
     -- Most mod updates do not change the locale.
     -- For a smooth transition between mod versions the old
     -- translations are stored for searching while the
     -- retranslation process runs.
     if old_entries then
       for _, packet in ipairs(packets) do
-        for _, _, entry in ntuples(3, packet.entries) do
+        for _, _, entry in ntuples(3, packet[rindex.entries]) do
           local type  = entry[eindex.type ]
           local index = entry[eindex.index]
           local name  = entry[eindex.name ]
@@ -429,7 +459,7 @@ function Dictionary:update()
 function Dictionary.make_internal_names_dictionary()
   local self = Dictionary('internal')
   for _, packet in ipairs(self.packets) do
-    for _, _, entry in ntuples(3, packet.entries) do
+    for _, _, entry in ntuples(3, packet[rindex.entries]) do
       self[ entry[eindex.type] ][ entry[eindex.index] ] = {
         [eindex.lower] = entry[eindex.name]:lower(),
         [eindex.name ] = entry[eindex.name],
@@ -527,9 +557,9 @@ function Dictionary:get_percentage()
     / self.packets.max )
   end
 
-function Dictionary:can_translate(type)
-  assertify(RequestedTypes[type], 'Babelfish: Invalid translation type: ', type)
-  return (table_size(self[type]) - 1) == self[type].n end
+-- function Dictionary:can_translate(type)
+  -- assertify(RequestedTypes[type], 'Babelfish: Invalid translation type: ', type)
+  -- return (table_size(self[type]) - 1) == self[type].max end
   
 -- -------------------------------------------------------------------------- --
 -- Network                                                                    --
@@ -539,121 +569,105 @@ function Dictionary:can_translate(type)
 function Dictionary.precompile()
   Dictionary.precompile = ercfg.SKIP
   --
-  Dictionary('en')
-  error('Precompile test OK')
-  end
-  
-function Dictionary:recieve_packet()
-  
+  get_request_packets()
+  log:debug('Dictionary precompilation complete. (local lua state)')
+  -- error('Precompile test OK')
   end
   
   
-function Dictionary:request_packet(request_translation, max_bytes)
-
-  local packet
-  repeat 
-    packet = self.packets[self.packets.i]
-    
-    -- tomorrow: remove index etc for Array.unsorted_remove()
-    
-    
-
-    until false --???
-  
-  -- self.packets.i
-  end
+-- function Dictionary:get_next_packet()
+  -- local packet = self.packets[self.packets.i]
+  -- self.packets.i = ((self.packets.i - 2) % self.packets.n) + 1
+  -- return packet[rindex.lstring], packet[rindex.bytes]
+  -- end
   
   
--- -------------------------------------------------------------------------- --
--- Network                                                                    --
--- -------------------------------------------------------------------------- --
-  
-  
-  
--- Store the result of an on_string_translated event
--- into the dictionary. When other mods also send requests
--- unwanted garbage must be filtered out.
-function Dictionary:push_translation(lstring, translation)
-  -- naive
-  -- local id = ident(lstring)
-  -- local request = self.lookup[id]
-  -- noident
-  local request
-  local requests = self.requests
-  local i = self.requests.n + 1
-  repeat i = i - 1
-  -- for i = self.requests.n, 1, -1 do
-    if lstring_is_equal(requests[i].lstring, lstring) then
-      -- print('Ident after '..(self.requests.n - i))
-      request = requests[i]
-      break
-      end
-    until i == 1
-  assert(request or i == 1, 'Noident failed')
-  --
-  if request then
-    -- self.lookup[id] = nil
-    --
-    -- Unsorted remove. If package loss is high this might
-    -- disturb the translation type order, but it's significantly
-    -- faster than iterating the whole array all the time.
-    self.requests[request.i] = self.requests[self.requests.n]
-    self.requests[self.requests.n] = nil
-    self.requests.n = self.requests.n - 1
-    --
-    for _, entry in pairs(request.entries) do
-      self.open_requests[entry.type] = self.open_requests[entry.type] - 1
-      if translation == false then
-        self[entry.type][entry.name] = {
-          [index.localised] = false,
-          [index.lower    ] = nil, -- reduce Savedata, store no garbage
-          }
-      else
-        self[entry.type][entry.name] = {
-          [index.localised] = true,
-          [index.lower    ] = String.remove_rich_text_tags(translation):lower(),
-          }
-        end
-      end
-    end
-  end
-
--- When max_bytes is smaller than the first request
--- in the queue no reuqests will be sent at all.  
-function Dictionary:dispatch_requests(p, max_bytes)
-  local bytes, tick, i = 0, game.tick, self.requests.n
-  for i = self.requests.n, 1, -1 do
-    local request = assert(self.requests[i])
-    if (request.next_request_tick < tick) then
-      if (bytes + request.bytes) > max_bytes then break end
-      bytes = bytes + request.bytes
-      p.request_translation(request.lstring)
-      request.next_request_tick = tick + const.network.rerequest_delay
-      end
-    i = i - 1
-    end
-  return bytes end
-
-
-function Dictionary:collect_packets(f, max_bytes)
-  local bytes, tick, i = 0, game.tick, self.requests.n
-  local packet_count = 0
-  for i = self.requests.n, 1, -1 do
-    local request = assert(self.requests[i])
-    if (request.next_request_tick < tick) then
-      if (packet_count > 18)
-      or ((bytes + request.bytes) > max_bytes) then break end
-      packet_count = packet_count + 1
+-- Iterator that quits at 0
+function Dictionary:iter_packets()
+  return function()
+    if (self.packets.i == 0) then
+      self.packets.i = self.packets.n
+      self.packets.block_iter_until = game.tick + const.network.rerequest_delay
+      return nil end
+    if (self.packets.block_iter_until or 0) < game.tick then
+      self.packets.block_iter_until = nil
       --
-      bytes = bytes + request.bytes
-      -- p.request_translation(request.lstring)
-      f(request.lstring)
-      request.next_request_tick = tick + const.network.rerequest_delay
+      local packet = self.packets[self.packets.i]
+      self.packets.i = self.packets.i - 1
+      -- print(('Iter: Entries %s, Bytes %s'):format(
+        -- #packet[rindex.entries], packet[rindex.bytes]
+        -- ))
+      return packet[rindex.lstring], packet[rindex.bytes]
       end
-    i = i - 1
     end
-  return bytes end
+  end
   
+  
+-- Event data must be filtered for correct header + id before
+-- being passed here.
+--
+-- @treturn number The difference between the heuristically estimated
+--                 size of the result and the real size recieved.
+--                 As Babelfish attempts to never underestimate
+--                 this is usually a positive number (overestimated).
+--
+function Dictionary:on_string_translated(lstrings, results)
+  if self.packets.n == 0 then 
+    log:debug('Recieved results but had no open requests: ', results)
+    return end
+  --
+  -- results → {header+id, uid, result1, result2}
+  local next   = string_gmatch(results,'\0([^\0]+)') -- faster than String.split
+  local uid = next()
+  --
+  local i = self.packets.n + 1;
+  repeat i = i - 1; until (i == 0) or (
+    (uid == self.packets[i][rindex.uid])
+    and equ_lstring(self.packets[i][rindex.lstring], lstrings)
+    )    
+  --
+  if not self.packets[i] then
+    print('Self:')
+    print('equ to n?', equ_lstring(self.packets[self.packets.n][rindex.lstring], lstrings))
+    print('uid?', uid, self.packets[self.packets.n][rindex.uid])
+    print('Index:', i)
+    -- print(Hydra.lines(self,{indentlevel=4}))
+    print(Hydra.lines(self.packets[self.packets.n][rindex.lstring]))
+    print(('Packets n=%s, i=%s, max=%s, #=%s'):format(
+      self.packets.n, self.packets.i, self.packets.max, #self.packets
+      ))
+    print('Event data:')
+    print(Hydra.lines(lstrings))
+    print(Hydra.lines(results))
+    end
+  --
+  -- Unsorted remove. If package loss is high this might
+  -- disturb the translation type order, but it's significantly
+  -- faster than iterating the whole array all the time.
+  local packet = assert(Array.shuffle_pop(self.packets, i), 'Packet not found!')
+  self.packets.n = self.packets.n - 1
+  self.packets.i = math.min(self.packets.i, self.packets.n)
+  --
+  local estimated_result_bytes = 0
+  --
+  local j, result, entries = 0, next(), packet[rindex.entries]
+  repeat; j = j + 1
+    estimated_result_bytes = 
+      estimated_result_bytes + TypeBytes[entries[j][1][eindex.type]]
+    for _, entry in ipairs(entries[j]) do
+      self[ entry[eindex.type] ][ entry[eindex.index] ] = {
+        [eindex.lower] = string_lower(remove_rich_text_tags(result)),
+        [eindex.name ] = entry[eindex.name],
+        }
+      -- print(Hydra.line{entry[eindex.type],self[ entry[eindex.type] ][ entry[eindex.index] ]})
+      end
+    result = next()
+    until not result
+  assert(j == #entries, 'Wrong result count.')
+  --
+  return estimated_result_bytes - #results end
+  
+
 -- -------------------------------------------------------------------------- --
 -- Find + Search                                                              --
 -- -------------------------------------------------------------------------- --
@@ -699,41 +713,51 @@ function Dictionary:find(types, word, opt)
   --
   local n = opt.limit and opt.limit or math.huge
   local r = {}
+  local lower_word = word:lower()
+  local status = true
   --
-  -- fuzzy + lua modes can crash with "weird" user input.
-  -- But this needs to fail independantly of self.open_requests.
   local matcher
   if opt.mode == 'lua' then
+    -- Lua mode can fail with "weird" user input.
+    -- But this needs to behave like a search without results.
     matcher = (pcall(string_find,'',word)) and string_find or Filter.False
   elseif opt.mode == 'fuzzy' then
     matcher = String.find_fuzzy
-    word = String.to_array(String.remove_whitespace(word:lower()))
+    word = String.to_array(String.remove_whitespace(lower_word))
   else
     matcher = matchers.plain
-    word = split_by_space(word:lower())
+    word = split_by_space(lower_word)
     end
   --
   for i=1, #types do
     local type = types[i]
     assertify(SupportedTypes[type], 'Babelfish: Invalid translation type: ', type)
     assertify(RequestedTypes[type], 'Babelfish: Type must be configured in settings stage: ', type)
-    if self.open_requests[type] ~= 0 then return false, nil end
+    -- This will only fail on new maps or after an :update()
+    -- added new prototypes.
+    if (table_size(self[type]) - 1) ~= self[type].max then status = false end
+    -- subtables are created regardless of n
     local this = {}; r[type] = this
-    for name, translation in pairs(self[type]) do
-      if  (n > 0)
-      and translation[index.localised]
-      and matcher(translation[index.lower], word) then
-        this[name], n = true, n - 1
+    for i = 1, self[type].max do
+      if n <= 0 then break end
+      local entry = self[type][i]
+      if entry then -- self[type] is sparse after :update()
+        local name = entry[eindex.name]
+        if (lower_word == name) -- verbatim internal name match
+        or matcher(entry[eindex.lower], word) then
+          n = n - 1
+          this[name] = (not flag.IS_DEV_MODE) or entry[eindex.lower]
+          end
         end
       end
     end
   -- Pssst! ;)
-  if ((word[1] or word) == 'dolphin')
+  if (lower_word == 'dolphin')
   and r.item_name
   and game.item_prototypes['raw-fish']
   then r.item_name['raw-fish'] = true end
   --
-  return true, r end
+  return status, r end
 
   
 return Dictionary

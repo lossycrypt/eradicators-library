@@ -19,7 +19,7 @@ local const = require 'plugins/babelfish/const'
     type          = 'double-setting'          ,
     setting_type  = 'runtime-global'          ,
     order         = 'babelfish-1'             ,
-    default_value = 8                         ,
+    default_value = 32                        ,
     minimum_value = 0.0001                    ,
     maximum_value = 1000                      ,
     }

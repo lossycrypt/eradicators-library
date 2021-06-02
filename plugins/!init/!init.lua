@@ -28,9 +28,18 @@ return function(phase) assert(phase)
   -- Debug                                                                    --
   -- ------------------------------------------------------------------------ --
     
-    if flag.IS_DEV_MODE then
-      _ENV.Hydra = elreq('erlib/lua/Coding/Hydra')()
-      end
+  if flag.IS_DEV_MODE then
+    _ENV.Hydra = elreq('erlib/lua/Coding/Hydra')()
+    end
+    
+  -- ------------------------------------------------------------------------ --
+  -- Sanity                                                                   --
+  -- ------------------------------------------------------------------------ --
+  
+  if phase ~= 'control' then
+    -- Detect when another mod accidentially left PM active.
+    assert(_ENV.PluginManager == nil, 'Foreign PluginManager detected in _ENV!')
+    end
     
   -- ------------------------------------------------------------------------ --
   -- Settings                                                                 --
@@ -161,5 +170,6 @@ return function(phase) assert(phase)
       break end end
       
     end
+    
     
   end

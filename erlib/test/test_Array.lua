@@ -283,12 +283,23 @@ local function Test()
   
   -- Array.unsorted_remove_key
   do
-    local dense = make_dense()
-    Array(dense):unsorted_remove_key(4):unsorted_remove_key(7)
+    local dense = Array(make_dense())
+    -- return value
+    assert('d' == dense:shuffle_pop(4))
+    assert('g' == dense:shuffle_pop(7))
     -- correct swapping
     assert(equ({'a','b','c',"m",'e','f',"l",'h','i','j','k'},dense))
-    -- return value + don't remove after the end
-    assert(equ({'a','b','c',"m",'e','f',"l",'h','i','j','k'},Array(dense):unsorted_remove_key(14)))
+    -- correct removal of last key
+    local dense = Array(make_dense())
+    dense:shuffle_pop(#dense)
+    assert(equ({'a','b','c','d','e','f','g','h','i','j','k','l'},dense))
+    for i=#dense, 1, -1  do
+      assert(i   == #dense)
+      assert(dense[i] == dense:shuffle_pop(i))
+      assert(i-1 == #dense)
+      end
+    -- must produce empty table
+    assert(equ({}, dense))
     end
   
   -- Array.scopy

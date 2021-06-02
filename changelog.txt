@@ -9,6 +9,14 @@ Date: 2021-05-31
   Utility Mods:
     - Universal Locale: Improved mod setting default value injection for non-numbers.
     - Universal Locale: Added automatic mod setting description info icon injection.
+  Functions:
+    - Replaced Array.unsorted_remove_key with Array.shuffle_pop
+      and fixed that final key was never removed. (Breaking change.)
+  Hooks:
+    - Babelfish: Improved translation performance by 800%.
+    - Babelfish: Improved network rate control.
+    - Babelfish: Implemented request packaging for better network efficiency.
+    - Babelfish: Implemented request pre-calculation to prevent lag-spikes.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.8
 Date: 2021-05-27

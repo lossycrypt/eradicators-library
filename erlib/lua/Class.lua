@@ -248,11 +248,6 @@ function Class.SwitchCaseClass(analyzer,cases)
         return object
         end
       end
-
-  ----------
-  -- metatable compatiblity @ Belt Router
-  -- @within TODO TOMORROW
-  -- @field Check
     
   ----------
   -- Unconditionally attaches this classes metatable to an object.

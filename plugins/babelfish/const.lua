@@ -16,7 +16,12 @@ const.setting_name = {
   
 const.network = {
   rerequest_delay = 60, -- in ticks
-  packed_request_header = 'bf2',
+  transit_window  = 30, -- in ticks
+  master_header = '金魚',
+  packet_header = {
+    packed_request = '箱',
+    ping           = '音',
+    },
   mtu_bytes = 1452,
   }
   
@@ -34,24 +39,12 @@ const.lstring = {
   }
 
 const.remote = {
-  interface_name = 'er:babelfish-remote-interface',
+  interface_name = 'babelfish',
   }
   
 const.gui_name = {
   status_indicator_button = 'er:babelfish-status-indicator-button',
   }
-  
--- const.search_type_translation_order = {
-  -- This is the (hardcoded) order in which prototypes will be translated
-  -- *if* they're activated in settings stage.
-  -- 'item',
-  -- 'fluid',
-  -- 'recipe',
-  -- 'entity',
-  -- 'technology',
-  -- 'equipment',
-  -- 'tile',
-  -- }
   
 -- Collected Most Extreme Values:
 -- (Outdated: Includes Internal Names, Excludes Unknown Keys)
@@ -72,27 +65,9 @@ const.gui_name = {
 -- [tile_name             ]  |       42 |        4 |    18.69 |    20.00 |     0.00%
 -- [tile_description      ]  |       92 |       75 |    92.00 |    92.00 |    98.08%
   
--- const.type_bytes_estimate = {
---   -- These values need to be recalculated.
---   -- They must exclude internal values, and include "Unknown Key" returns.
---   ["item_name"             ] =   76,
---   ["item_description"      ] = 1277,
---   ["fluid_name"            ] =   37,
---   ["fluid_description"     ] =   98,
---   ["recipe_name"           ] =   76,
---   ["recipe_description"    ] =  202,
---   ["entity_name"           ] =   59,
---   ["entity_description"    ] =  408,
---   ["technology_name"       ] =   63,
---   ["technology_description"] =  429,
---   ["equipment_name"        ] =   57,
---   ["equipment_description" ] =  231,
---   ["tile_name"             ] =   42,
---   ["tile_description"      ] =   92,
---   }
   
 const.type_data = {
-  -- This is the (hardcoded) order in which prototypes will be translated
+  -- This table hardcodes the order in which prototypes will be translated
   -- *if* they're activated in settings stage.
   {type = "item_name"             , longest =   76},
   {type = "item_description"      , longest = 1277},
@@ -100,16 +75,15 @@ const.type_data = {
   {type = "fluid_description"     , longest =   98},
   {type = "recipe_name"           , longest =   76},
   {type = "recipe_description"    , longest =  202},
-  {type = "entity_name"           , longest =   59},
-  {type = "entity_description"    , longest =  408},
   {type = "technology_name"       , longest =   63},
   {type = "technology_description", longest =  429},
   {type = "equipment_name"        , longest =   57},
   {type = "equipment_description" , longest =  231},
-  {type = "tile_name"             , longest =   42},
+  {type = "tile_name"             , longest =   42}, -- max 255
   {type = "tile_description"      , longest =   92},
+  {type = "entity_name"           , longest =   59}, -- lots of garbage
+  {type = "entity_description"    , longest =  408},
   }
-  
 
 
 const.native_language_name = {

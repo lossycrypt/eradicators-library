@@ -45,7 +45,7 @@ local Locale,_Locale,_uLocale = {},{},{}
 --
 -- @usage
 --   local x = {}
---   for i=65, 65*2 do x[i] = string.char(i)) end
+--   for i=65, 65*2 do x[i-64] = string.char(i) end
 --   
 --   game.print(x)
 --   > Error: Too many parameters for localised string: 65 > 20 (limit).

@@ -10,6 +10,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 local Data  = elreq('erlib/factorio/Data/!init')()
 local const = require 'plugins/babelfish/const'
 
+local PluginManager = elreq('erlib/factorio/PluginManagerLite-1')()
 local asset = PluginManager.make_asset_getter('babelfish')
 
 -- -------------------------------------------------------------------------- --

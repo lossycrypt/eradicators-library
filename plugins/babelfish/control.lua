@@ -24,7 +24,7 @@
 --    })
 --
 --  -- control.lua
---  remote.call('er:babelfish-remote-interface','find', player_index, word, options)
+--  remote.call('babelfish','find', player_index, word, options)
 
 --[[ Annecdotes:
 
@@ -35,9 +35,16 @@
 
 --[[ Future:
 
-  +Detect non-multiplayer language changes. Needs some fancy
-  desync-unsafe voodoo magic (which is fine because SP doesn't desync...).
-  I don't want to do regular polling just for this...
+  + Detect non-multiplayer language changes. Needs some fancy
+    desync-unsafe voodoo magic (which is fine because SP doesn't desync...).
+    I don't want to do regular polling just for this...
+  
+  ]]
+
+--[[ Facts:
+  
+  + In Singleplayer on_string_translated is raised for all 
+    requests from exactly one tick before.
   
   ]]
   
@@ -110,8 +117,9 @@ PluginManager.classify_savedata('babelfish', {
   init_pdata = function(self, pindex)
     return Table.set(self.players, {pindex}, {
       p = game.players[pindex],
-      language_code = nil,
       dict = nil,
+      -- last_recieve_tick = nil, -- on_string_translated
+      next_request_tick = nil, -- on_player_language_changed
       })
     end,
   
@@ -123,7 +131,7 @@ PluginManager.classify_savedata('babelfish', {
     return assert(self.dicts[lcode]) end,
   
   sget_dict = function(self, lcode)
-    return (self.dicts or Table.set(self,{'dicts'},{}))[lcode]
+    return self.dicts[lcode]
         or Table.set(self.dicts, {lcode}, Dictionary(lcode))
     end,
   
@@ -138,6 +146,8 @@ PluginManager.classify_savedata('babelfish', {
 --   mod_changes = {},
 --   mod_startup_settings_changed = false }
 script.on_config(function(e)
+  Dictionary.precompile()
+  --
   if (not e) or
   ( (table_size(e.mod_changes) > 0)
     or e.migration_applied
@@ -145,14 +155,15 @@ script.on_config(function(e)
   then
     -- If any mod changes at all there is no way to know if and how
     -- the locale has changed. Thus we need to start from scratch.
-    Table.overwrite(Savedata, Table.dcopy(DefaultSavedata))
-    Savedata.dicts['internal'] = Dictionary.make_internal_names_dictionary()
+    
+    -- Table.overwrite(Savedata, Table.dcopy(DefaultSavedata))
+    for _, dict in pairs(Savedata.dicts) do dict:update() end
+    
+    -- Savedata.dicts['internal'] = Dictionary.make_internal_names_dictionary()
     end
-  -- for _, pdata in pairs(Savedata.players) do
-    -- pdata.language_code = nil
-    -- end
   Table.clear(Savedata.players)
   Babelfish.reclassify() -- probably redundant with on_load
+  Babelfish.update_settings_cache()
   Babelfish.on_player_language_changed()
   end)
 
@@ -173,6 +184,10 @@ Babelfish.update_handlers = function()
   --
   local update_players = (not not Savedata.changed_players) or nil
   local update_dicts   = (not not Savedata.incomplete_dictionaries) or nil
+  --
+  -- Profiler.Start(false)
+  -- Profiler.Start(true)
+  -- Profiler.Stop()
   --
   if update_players then
     log:info('Translation suspended while waiting for language codes.')
@@ -215,7 +230,7 @@ Babelfish.on_player_language_changed = script.on_event({
       log:debug('Player removed from game: ', p.name)
     else
       local pdata = Savedata:sget_pdata(nil, pindex)
-      if (not pdata.language_code) then
+      if (not pdata.dict) then
         table.insert(changed_players, pindex)
         if ((pdata.next_request_tick or 0) <= game.tick) then
           log:debug('Sent language code request to: ', pdata.p.name)
@@ -223,11 +238,9 @@ Babelfish.on_player_language_changed = script.on_event({
           pdata.next_request_tick = game.tick + const.network.rerequest_delay
           end
       else
-        Savedata.bytes = 0
-        local dict = Savedata:sget_dict(pdata.language_code)
-        pdata.dict = dict -- link
-        if dict:has_requests() then
-          incomplete_dictionaries[dict] = p -- need a player to request
+        if pdata.dict:has_requests() then
+          pdata.next_request_tick = game.tick
+          incomplete_dictionaries[pdata.dict] = pdata -- need a player to request
           end
         end
       end
@@ -235,6 +248,14 @@ Babelfish.on_player_language_changed = script.on_event({
   --
   Savedata.changed_players         = Table.nil_if_empty(changed_players)
   Savedata.incomplete_dictionaries = Table.nil_if_empty(incomplete_dictionaries)
+  --
+  if Savedata.incomplete_dictionaries then
+    Savedata.bytes = 0
+    Savedata.bytes_in_transit = 0
+  else
+    Savedata.bytes = nil
+    Savedata.bytes_in_transit = nil
+    end
   --
   Babelfish.update_handlers()
   --
@@ -249,83 +270,112 @@ Babelfish.on_player_language_changed = script.on_event({
 -- Request + Recieve                                                          --
 -- -------------------------------------------------------------------------- --
 
--- local profiler1, profiler2
-Babelfish.on_string_translated = function(e)
-  local pdata = Savedata:sget_pdata(e)
-  -- Push event to dictionary.
-  if pdata.language_code then
-    -- log:tell('Recieved package', e)
-    -- V: Naive
-    if e.localised_string[2] ~= const.network.packet_header then
-      pdata.dict:push_translation(e.localised_string, e.translated and e.result)
-    -- V: Packaged
-    else
-      -- profiler1 = profiler1 or game.create_profiler()
-      -- profiler2 = profiler2 or game.create_profiler()
-      
-      local string_find = string.find
-      assert(e.translated, 'Untranslated package?!')
-      -- profiler1.restart()
-      -- local profiler = game.create_profiler()
-      local results = String.split(e.result, '\0')
-      -- _ENV.log{'', 'String result split took: ', profiler}; profiler.reset()
-      -- profiler1.stop(); _ENV.log{'', 'String result split took: ', profiler1}
-      
-      -- log:tell('Results:', results)
-      -- assert((#e.localised_string-2)/2 == (#results-2), 'Unexpected result count')
-      -- assert(#e.localised_string == #results, 'Unexpected result count')
-      
-      -- for i = 3, #results do
-      --   local result  = results[i]
-      --   -- local lstring = e.localised_string[3 + (i-3) * 2]
-      --   local lstring = e.localised_string[i][2]
-      --   -- local profiler = game.create_profiler()
-      --   local ok = not string_find(result, 'Unknown key') -- can be anywhere in the string
-      --   -- _ENV.log{'', 'Find unknown took: ', profiler}
-      --   -- if not ok then print('↑ WAS NOT TRANSLATED!') end
-      --   -- pdata.dict:push_translation(lstring, ok and result)
-      --   pdata.dict:push_translation(lstring, ok and result)
-      --   end
-       
-      -- profiler2.restart()
-      for i = 3, #results do
-        pdata.dict:push_translation(e.localised_string[i][2], results[i])
-        end
-        
-      -- _ENV.log{'', 'Translation push took: ', profiler}; profiler.reset()
-      -- profiler2.stop(); _ENV.log{'', 'Translation push took: ', profiler2}
-      end
-  --
-  elseif (#e.localised_string == 1)
-  and (e.localised_string[1] == const.lstring.language_code[1])
-  then
-    -- Push language code to player.
-    assertify(e.translated, 'Language code untranslated, wtf?')
-    pdata.language_code = e.result
-    pdata.next_request_tick = nil
-    log:debug(("Player %s's language is %s (%s)."):format(
-      pdata.p.name, const.native_language_name[pdata.language_code], pdata.language_code))
-    Babelfish.on_player_language_changed()
-  else
-    log:debug('Ignoring unexpected translation.')
-    end
-  end
-
 local DO_PACKAGING = false
 -- Packed     translation (full pyanodon): 1185ms
 -- Non-Packed translation (full pyanodon):   90ms (13 times faster!)
 
+local function get_profiler()
+  return (not flag.IS_DEV_MODE) and ercfg.SKIP or (function(profiler)
+    return function(msg) _ENV.log{'', msg, profiler}; profiler.restart() end
+    end)(game.create_profiler())
+  end
+
+
+Babelfish.on_string_translated = function(e)
+  --
+  local lstring = e.localised_string
+  local pdata = Savedata:sget_pdata(e)
+  pdata.next_request_tick = e.tick
+  --
+  -- player language code
+  if (#lstring == 1) and (lstring[1] == const.lstring.language_code[1]) then
+    assertify(e.translated, 'Language code untranslated, wtf?')
+    pdata.dict = Savedata:sget_dict(e.result)
+    log:debug(("Player %s's language is %s (%s)."):format(
+      pdata.p.name, pdata.dict.native_language_name, pdata.dict.language_code))
+    Babelfish.on_player_language_changed()
+  --
+  -- babelfish packet
+  elseif (lstring[2] == const.network.master_header) then
+    assertify(e.translated, 'Untranslated babelfish packet!? ', e)
+    -- packed request
+    if lstring[3] == const.network.packet_header.packed_request then
+      if pdata.dict then
+        Savedata.bytes = Savedata.bytes +
+          pdata.dict:on_string_translated(lstring, e.result)
+        -- log:debug('Packet ok!')
+      else
+        log:debug('Packet recieved but player had not dictionary.', e)
+        end
+    else
+      stop('Babelfish packet had unknown id.', e)
+      end
+  -- garbage (other mods)
+  else
+    log:debug('Ignoring unexpected translation event.')
+    end
+  --
+  end
+
+
+Babelfish.update_settings_cache = script.on_event(
+  defines.events.on_runtime_mod_setting_changed,
+  function()
+    Savedata.max_bytes_per_tick =
+      (game.is_multiplayer() or flag.IS_DEV_MODE)
+      and (1024 / 60) * Setting.get_value('map', const.setting_name.network_rate)
+      or math.huge
+    Savedata.max_bytes_in_transit
+      = Savedata.max_bytes_per_tick * const.network.transit_window * 60
+    log:debug('Updated settings max_bytes_per_tick: ', Savedata.max_bytes_per_tick)
+    log:debug('Updated settings max_bytes_in_transit: ', Savedata.max_bytes_in_transit)
+    end)
+
   
 -- on_nth_tick(1)
 Babelfish.request_translations = function(e)
+  -- To prevent lag-spikes during play always precompile
+  -- as early as possible to make the load screen hide
+  -- the spike.
   Dictionary.precompile()
+  --
+  -- Check if there's still work
+  if 0 == table_size(Savedata.incomplete_dictionaries) then
+    StatusIndicator.destroy_all()
+    Babelfish.on_player_language_changed()
+    return end
+  --
+  for dict, pdata in ntuples(2, Savedata.incomplete_dictionaries) do
+    if not dict:has_requests() then
+      Savedata.incomplete_dictionaries[dict] = nil
+    else
+      -- If a player hasn't answered in a while don't sent them more.
+      -- if pdata.next_request_tick < (e.tick - const.network.rerequest_delay) then
+        -- pdata.next_request_tick = e.tick + const.network.rerequest_delay
+      -- elseif pdata.next_request_tick < e.tick then
+        Savedata.bytes = Savedata.bytes + Savedata.max_bytes_per_tick
+        -- print(e.tick, Savedata.bytes)
+        -- Savedata.bytes can become negative after a large packet.
+        if Savedata.bytes > 0 then
+          for packet, bytes in dict:iter_packets() do
+            pdata.p.request_translation(packet) -- todo: rate-limit
+            Savedata.bytes = Savedata.bytes - bytes
+            if Savedata.bytes <= 0 then return end
+            end
+          end
+        -- end
+      end
+    end
+  
+  
+  
+  
+  if true then return end -- LEGACY BELOW THIS
+  
   --
   -- In Singleplayer all translation is done during the loading screen.
   -- Recalculated live to immediately reflect setting changes.
-  local bytes_per_tick =
-    (game.is_multiplayer() or flag.IS_DEV_MODE and false)
-    and (1024 / 60) * Setting.get_value('map', const.setting_name.network_rate)
-    or math.huge
+
   --
   bytes_per_tick = 100000000000
   -- Profiler.Start(true)
@@ -365,15 +415,7 @@ Babelfish.request_translations = function(e)
     end
   assert(Savedata.bytes >= 0)
   --
-  if 0 == table_size(Savedata.incomplete_dictionaries) then
-    Savedata.bytes = nil
-    StatusIndicator.destroy_all()
-    Babelfish.on_player_language_changed()
-    -- print(serpent.block(Savedata.players[1].dict.lookup))
-    -- print(serpent.block(Savedata.players[1].dict.requests))
-    -- print(serpent.block(Savedata.players[1].dict.open_requests))
-    Profiler.Stop()
-    end
+
   end 
   
 -- -------------------------------------------------------------------------- --
@@ -437,13 +479,13 @@ do end
 -- What to search. One of the following strings. This is also the
 -- order in which translation occurs.
 --
---    'recipe_name'    , 'recipe_description'
 --    'item_name'      , 'item_description'
 --    'fluid_name'     , 'fluid_description'
---    'entity_name'    , 'entity_description'
+--    'recipe_name'    , 'recipe_description'
 --    'technology_name', 'technology_description'
 --    'equipment_name' , 'equipment_description'
 --    'tile_name'      , 'tile_description'
+--    'entity_name'    , 'entity_description'
 --
 -- @table Babelfish.SearchType
 
@@ -508,7 +550,7 @@ function Remote.can_find(pindex, types)
 -- 
 --   -- First lets make a shortcut.
 --   local babelfind = (function(c) return function(...)
---     return c('er:babelfish-remote-interface','find_prototype_names',...)
+--     return c('babelfish','find_prototype_names',...)
 --     end end)(remote.call)
 --   
 --   -- Now lets try something. For demonstration purposes I'm using a player
@@ -529,12 +571,20 @@ function Remote.can_find(pindex, types)
 --   >   }
 --   > }
 -- 
--- @treturn boolean If Babelfish has not finished translating all of the
--- given types yet this will be false and the result will be nil. Even if some
--- of the given types are already fully translated.
+-- @treturn boolean|nil  
 --
--- @treturn table|nil A table mapping each requested type to a @{Types.set|set} of
--- prototype names. 
+--   @{nil} means: The requested language is not available. Either you used
+--   an outdated LanguageCode or the player has only just connected and isn't
+--   identified yet. No search result is returned.  
+--
+--   @{false} means: Babelfish is still translating some or all of the requested
+--   SearchTypes. A best effort search result is included but likely to be
+--   incomplete. It is recommended to try again after translation is complete.  
+--
+--   @{true} means: No problems occured.  
+--  
+-- @treturn table|nil The search result. A table mapping each requested
+-- SearchType to a @{Types.set|set} of prototype names. 
 --
 -- @function Babelfish.find_prototype_names
 function Remote.find_prototype_names(pindex, types, word, options)
@@ -547,7 +597,7 @@ function Remote.find_prototype_names(pindex, types, word, options)
     assertify(const.native_language_name[pindex], 'Invalid language code: ', pindex)
     dict = Savedata.dicts[pindex]
     end
-  if not dict then return false, nil end
+  if not dict then return nil, nil end -- while waiting for language_code
   return dict:find(Table.plural(types), word, options or {}) end
 
 ----------
@@ -570,6 +620,9 @@ function Remote.get_player_language_code(pindex)
 -- Retrieves translation percentage of all seen languages.
 -- This is the same data that the built-in status indicator uses.
 -- Includes only languages that have been seen on this map at least once.
+-- 
+-- __Note:__ This is the total percentage. Prioritized SearchType are
+-- usually available much earlier than 100%. Use @{Babelfish.can_find}.
 -- 
 -- @treturn table A mapping (@{Babelfish.LanguageCode|LanguageCode} → @{NaturalNumber})
 -- where the number is between 0 and 100 inclusive.
