@@ -752,6 +752,23 @@ script.on_event(defines.events.on_console_command, function(e)
     demo = function(e, pdata, p)
       Demo(p):toggle_gui()
       end,
+      
+      
+    test = function(e, pdata, p)
+      --
+      for k, v in pairs(pdata.dict) do
+        if type(v) == 'table' then
+          local holes = 0
+          for i=1, v.max do 
+            if v[i] == nil then holes = holes + 1 end
+            end
+          print(('%s had %s holes'):format(k, holes))
+          end
+        end
+      --
+      end,
+      
+      
     }
   end
   

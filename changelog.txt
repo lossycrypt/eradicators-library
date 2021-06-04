@@ -8,6 +8,7 @@ Version: 4.1.10
 Date: 2021-06-??
   Hooks:
     - Babelfish: Fixed soft-update of old dictionary after mod changes.
+    - Babelfish: Unlocalised descriptions are now treated as empty strings.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.9
 Date: 2021-06-04

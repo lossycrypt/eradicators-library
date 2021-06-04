@@ -46,7 +46,7 @@ data:extend{{
   name = const.name.tip_1,
   category = require ('__eradicators-library__/plugins/tips-group/const')
              .tips.category_name,
-  starting_status = "optional",
+  starting_status = "unlocked",
   indent = 1,
   tag = ('[img=%s] '):format(const.sprite.default_icon),
   order = 'babelfish',

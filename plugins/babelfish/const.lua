@@ -1,6 +1,4 @@
-﻿
--- This file might also be loaded into OTHER mods environments via
--- babelfish/remote.
+﻿-- This is NOT a config file. Do not change things you don't understand 120%.
 -- -------------------------------------------------------------------------- --
 
 local const = {}
@@ -49,46 +47,43 @@ const.gui_name = {
 const.name = {
   tip_1 = 'er:babelfish-tip-1',
   }
-  
+ 
 -- Collected Most Extreme Values:
--- (Outdated: Includes Internal Names, Excludes Unknown Keys)
---
--- Type                      | Longest  | Shortest | Average  | Median   | Unk. Key
--- [item_name             ]  |       76 |        2 |    24.73 |    24.00 |     0.00%
--- [item_description      ]  |     1277 |        4 |   114.31 |    98.50 |    75.94%
--- [fluid_name            ]  |       37 |        3 |    16.47 |    17.00 |     0.00%  
--- [fluid_description     ]  |       98 |       18 |    93.00 |    93.00 |    86.05%
--- [recipe_name           ]  |       76 |        2 |    23.72 |    23.00 |     0.00%
--- [recipe_description    ]  |      202 |        4 |   129.89 |   136.00 |    96.72%
--- [technology_name       ]  |       59 |        3 |    22.38 |    21.00 |     0.00%
--- [technology_description]  |      408 |       10 |    96.25 |    81.00 |     1.03%
--- [entity_name           ]  |       63 |        3 |    24.80 |    24.00 |     0.00%
--- [entity_description    ]  |      429 |        9 |   120.83 |   111.00 |    49.32%
--- [equipment_name        ]  |       57 |        9 |    33.69 |    33.00 |     0.00%
--- [equipment_description ]  |      231 |       66 |   154.86 |   137.00 |    63.79%
--- [tile_name             ]  |       42 |        4 |    18.69 |    20.00 |     0.00%
--- [tile_description      ]  |       92 |       75 |    92.00 |    92.00 |    98.08%
-  
-  
+-- (Mods used for collection: Space Exploration, Krastorio 2, Full Pyanodon)
+-- (Don't forget to include unknown description lenghts!)
+-- [item_name             ]  |       76 |        3 |    24.85 |    24.00 |     0.43%
+-- [item_description      ]  |     1277 |        4 |    69.33 |    56.00 |    76.15%
+-- [fluid_name            ]  |       44 |        3 |    16.55 |    17.00 |     0.00%
+-- [fluid_description     ]  |       98 |       18 |    50.05 |    46.00 |    86.05%
+-- [recipe_name           ]  |       80 |        3 |    21.62 |    21.00 |     0.00%
+-- [recipe_description    ]  |      202 |        4 |    60.19 |    58.00 |    96.70%
+-- [technology_name       ]  |       59 |        3 |    22.40 |    21.00 |     0.00%
+-- [technology_description]  |      408 |       10 |    92.32 |    78.00 |     0.52%
+-- [equipment_name        ]  |       57 |       10 |    33.69 |    33.00 |     0.00%
+-- [equipment_description ]  |      231 |       53 |    97.90 |    75.50 |    63.79%
+-- [tile_name             ]  |       46 |        4 |    18.69 |    14.00 |     0.00%
+-- [tile_description      ]  |       92 |       37 |    50.99 |    52.00 |    98.08%
+-- [entity_name           ]  |       81 |        3 |    27.66 |    27.00 |     7.73%
+-- [entity_description    ]  |      429 |        9 |    63.85 |    54.00 |    49.76%
+
 const.type_data = {
   -- This table hardcodes the order in which prototypes will be translated
   -- *if* they're activated in settings stage.
   {type = "item_name"             , longest =   76},
   {type = "item_description"      , longest = 1277},
-  {type = "fluid_name"            , longest =   37},
+  {type = "fluid_name"            , longest =   44},
   {type = "fluid_description"     , longest =   98},
-  {type = "recipe_name"           , longest =   76},
+  {type = "recipe_name"           , longest =   80},
   {type = "recipe_description"    , longest =  202},
-  {type = "technology_name"       , longest =   63},
-  {type = "technology_description", longest =  429},
+  {type = "technology_name"       , longest =   59},
+  {type = "technology_description", longest =  408},
   {type = "equipment_name"        , longest =   57},
   {type = "equipment_description" , longest =  231},
-  {type = "tile_name"             , longest =   42}, -- max 255
+  {type = "tile_name"             , longest =   46}, -- max 255
   {type = "tile_description"      , longest =   92},
-  {type = "entity_name"           , longest =   59}, -- lots of garbage
-  {type = "entity_description"    , longest =  408},
+  {type = "entity_name"           , longest =   81}, -- lots of garbage
+  {type = "entity_description"    , longest =  429},
   }
-
 
 const.native_language_name = {
   internal  = 'Internal'           ,

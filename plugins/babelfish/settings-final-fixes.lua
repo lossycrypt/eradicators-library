@@ -20,8 +20,8 @@ local const = require 'plugins/babelfish/const'
     setting_type  = 'runtime-global'          ,
     order         = 'babelfish-1'             ,
     default_value = 32                        ,
-    minimum_value = 0.0001                    ,
-    maximum_value = 1000                      ,
+    minimum_value = 0.000001                  ,
+    maximum_value = 10000000                  , -- 10GiB/s
     }
 
   Data.Inscribe{

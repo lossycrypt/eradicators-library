@@ -33,6 +33,9 @@ local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
 local Remote      = elreq('erlib/factorio/Remote'  )()
 local Gui         = elreq('erlib/factorio/Gui'     )()
 
+rawset(_ENV, 'No_Profiler_Commands', true)
+local Profiler = require('__er-profiler-fork__/profiler.lua')
+
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
 -- -------------------------------------------------------------------------- --
@@ -96,6 +99,10 @@ function Demo:toggle_gui()
         ..'is returned for each search result instead of <true>.[/color]',
       }
     end
+  Gui.move(anchor.add {
+    type = 'label',
+    name = Name.gui.profiler_label,
+    }, W-32, 24 )
   --
   Gui.move(anchor.add {
     type = 'text-box',
@@ -126,14 +133,19 @@ script.on_event(defines.events.on_gui_text_changed, function(e)
       game.mod_setting_prototypes[babelconst.setting_name.search_types]
       .allowed_values
   
+    -- Profiler.Start()
+    local prfS = game.create_profiler()
     local status, result = Babelfish.find_prototype_names(
       e.player_index,
       types         , -- {'item_name', ...}
       e.text          -- player input
       )
+    prfS.stop()
+    -- Profiler.Stop()
+    local prfG = game.create_profiler()
   
     local anchor = e.element.parent
-  
+      
     -- Show the literal result.
     anchor[Name.gui.output_serpent].text = 
       ('Status: %s \nResult: %s'):format
@@ -142,7 +154,7 @@ script.on_event(defines.events.on_gui_text_changed, function(e)
     -- Show a nice result gui.
     local pane = anchor[Name.gui.output_table_pane]
     pane.clear()
-    
+
     local last_type, type, tbl, args, add
     for full_type, name in ntuples(3, status and result or nil) do
       if last_type ~= full_type then
@@ -163,6 +175,10 @@ script.on_event(defines.events.on_gui_text_changed, function(e)
       args[type] = name
       add(args).locked = true
       end
+      
+    anchor[Name.gui.profiler_label].caption = 
+      {'', 'Search took: ', prfS, ', ', 'Gui update took: ', prfG}
+      
     end
   end)
   

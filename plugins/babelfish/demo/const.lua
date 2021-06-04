@@ -9,6 +9,7 @@ const.name = {
     input1            = 'er:babelfish-demo-input1'    ,
     output_serpent    = 'er:babelfish-demo-output2'   ,
     output_table_pane = 'er:babelfish-demo-output1-scroll-pane',
+    profiler_label    = 'er:babelfish-demo-profiler-label',
     }
   }
   

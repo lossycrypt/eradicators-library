@@ -48,13 +48,19 @@ require(_)('interact-button', {
 require(_)('profiler-override', {
   ['[lua-profiler]'] = {
     [';1'] = { -- supports multiple comments with numbers
-      en = 'Remove the "Elapsed:" and "Duration:" prefix when printing a LuaProfiler.'
+      en = 'Remove the "Elapsed:" and "Duration:" prefix when printing a LuaProfiler.',
+      de = 'Remove the "Elapsed:" and "Duration:" prefix when printing a LuaProfiler.',
+      ja = 'Remove the "Elapsed:" and "Duration:" prefix when printing a LuaProfiler.',
       },
     ['elapsed'] = { 
       en = "__1__ms",
+      de = "__1__ms",
+      ja = "__1__ms",
       },
     ['duration'] = { 
       en = "__1__ms",
+      de = "__1__ms",
+      ja = "__1__ms",
       },
     },
   })

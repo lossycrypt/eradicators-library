@@ -59,6 +59,6 @@ data:extend{{
   name = 'er:tips-header',
   category = const.tips.category_name,
   is_title = true,
-  starting_status = "optional",
+  starting_status = "not-to-be-suggested",
   order = '0',
   }}

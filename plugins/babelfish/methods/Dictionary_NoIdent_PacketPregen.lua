@@ -22,6 +22,12 @@
 
   + Cache find resulsts instead of "lower" strings
     to reduce global data at cost of local data?
+    1000 copies of vanilla search result for "i" take about 100MB (~2500 entries).
+    retrieving cache is about ~30 times faster IF the result
+    does not need to be deep-copied. Dcopy() makes it SLOWER than without cache.
+    Cache must be very careful about desyncs so it's only allow
+    on fully translated dictionaries. Cache must be keyed to:
+    language, match mode, word. If any options are present ignore cache.
   
   + Filter out useless entity prototypes. (explosions, projectiles, etc)
   
@@ -51,6 +57,32 @@
     placeholders intact (i.e. "Foo __1__ bar."). If at least one
     parameter is given all parameters are messed up. This makes
     a lua-side reimplementation theoretically possible.
+    
+  ]]
+  
+--[[ Related Forum Theads:
+
+  + Bug Report ("Won't Fix")
+    https://forums.factorio.com/viewtopic.php?f=58&t=98676
+    Localised string literal {""} without parameters is converted to
+    "" the empty string in on_string_translated.
+    => If this ever becomes a problem adjust equ_lstring
+    
+  + Interface Request ("Unlikely")
+    https://forums.factorio.com/viewtopic.php?f=28&t=98680
+    Read access to interface setting "Fuzzy search"
+
+  + Interface Request (Unanswered)
+    https://forums.factorio.com/viewtopic.php?f=28&t=98695
+    A method to detect changes in player language in Singleplayer.
+    
+  + Interface Request (Unanswered)
+    https://forums.factorio.com/viewtopic.php?f=28&t=98628
+    LuaGameScript.is_headless_server [boolean]	
+    
+  + Interface Request (Unanswered)
+    https://forums.factorio.com/viewtopic.php?f=28&t=98698
+    LuaPlayer.unlock_tips_and_tricks_item(name)
     
   ]]
   
@@ -87,8 +119,8 @@ local Cache       = elreq('erlib/factorio/Cache'  )()
 local Locale      = elreq('erlib/factorio/Locale' )()
 local Setting     = elreq('erlib/factorio/Setting')()
 
-local pairs, pcall, string_find, type, string_gmatch, string_lower
-    = pairs, pcall, string.find, type, string.gmatch, string.lower
+local pairs, pcall, string_find, type, string_gmatch, string_lower, string_gsub
+    = pairs, pcall, string.find, type, string.gmatch, string.lower, string.gsub
     
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
@@ -97,18 +129,23 @@ local import = PluginManager.make_relative_require'babelfish'
 local const  = import '/const'
 local null   = '\0'
 
-local function get_allowed_search_types()
-  return game.mod_setting_prototypes[const.setting_name.search_types].allowed_values
-  end
-
 local SupportedTypes = 
   Table.map(const.type_data, function(v) return true, v.type end, {})
   
 local TypeBytes = 
   Table.map(const.type_data, function(v) return v.longest, v.type end, {})
   
+local function get_requested_search_types()
+  return game.mod_setting_prototypes[const.setting_name.search_types].allowed_values
+  end
+  
+local function get_not_requested_search_types()
+  return Set.from_keys(SupportedTypes)
+    :complement(Set.from_values(get_requested_search_types()))
+  end
+  
 local RequestedTypes = Cache.AutoCache(function(r) -- PseudoSet
-  for k, v in ipairs(get_allowed_search_types()) do r[v] = true end
+  for k, v in ipairs(get_requested_search_types()) do r[v] = true end
   end)
 
 -- -------------------------------------------------------------------------- --
@@ -412,7 +449,7 @@ local get_request_packets = make_table_getter(function()
 function Dictionary:update()
   log:debug('Updating dictionary: ', self.language_code)
   --
-  Table.clear(self, get_allowed_search_types())
+  Table.clear(self, get_not_requested_search_types(), false)
   --
   local packets, max_index = get_request_packets()
   local profile = get_profiler()
@@ -446,7 +483,9 @@ function Dictionary:update()
       old_entries[type] = self[type] and self[type].max and (function(r)
         for i=1, self[type].max do
           local entry = self[type][i]
-          r[ entry[eindex.name] ] = entry
+          if entry then -- :update() during partial translation!
+            r[ entry[eindex.name] ] = entry
+            end
           end
         return r end){}
       --
@@ -676,6 +715,17 @@ function Dictionary:on_string_translated(lstrings, results)
     estimated_result_bytes = 
       estimated_result_bytes + TypeBytes[entries[j][1][eindex.type]]
     for _, entry in ipairs(entries[j]) do
+      --
+      -- The engine translates unknown descriptions as "unknown key"
+      -- but unlike unknown item names vanilla shows them as empty.
+      -- Not storing them saves space and fixes search results.
+      if string_find(entry[eindex.type], '_description') then 
+        local t = string_gsub(entry[eindex.type],'_','-')
+        if result == 'Unknown key: "'..t..'.'..entry[eindex.name]..'"' then
+          result = ''
+          end
+        end
+      --
       self[ entry[eindex.type] ][ entry[eindex.index] ] = {
         [eindex.lower] = string_lower(remove_rich_text_tags(result)),
         [eindex.name ] = entry[eindex.name],
@@ -705,8 +755,6 @@ function Dictionary:on_string_translated(lstrings, results)
     
   ]]
   
-  
-
 -- Replaces all space by ascii space, then splits.
 local function split_by_space(ustr)
   for _, space in pairs(String.UNICODE_SPACE) do
@@ -736,14 +784,12 @@ function Dictionary:find(types, word, opt)
   local r = {}
   local exact_word = word
   local status = true
-  -- local eindex_lower = (self.language_code ~= 'internal')
-                      -- and eindex.lower or eindex.name
   --
   local matcher
   if opt.mode == 'lua' then
     -- Lua mode can fail with "weird" user input.
     -- But this needs to behave like a search without results.
-    matcher = (pcall(string_find,'',word)) and string_find or Filter.False
+    matcher = (pcall(string_find,'%',word)) and string_find or Filter.FALSE
   elseif opt.mode == 'fuzzy' then
     matcher = String.find_fuzzy
     word = String.to_array(String.remove_whitespace(word:lower()))
