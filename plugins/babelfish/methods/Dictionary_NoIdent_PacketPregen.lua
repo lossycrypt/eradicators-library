@@ -25,6 +25,12 @@
   
   + Filter out useless entity prototypes. (explosions, projectiles, etc)
   
+  + Exclude "Unknown Key:" /descriptions/ from find()
+    because those are not shown in-game. (Unlike unknown item names.)
+    But only if it matches *exactly* the expected
+    <Unknown Key: "type-description.prototype-name"> including correct
+    capitalization! (Probably best not to store it at all)
+    
   ]]
   
 --[[ Facts:
@@ -69,9 +75,6 @@ local Filter      = elreq('erlib/lua/Filter'    )()
 local String      = elreq('erlib/lua/String'    )()
 local remove_rich_text_tags = String.remove_rich_text_tags
 
-local Cache       = elreq('erlib/factorio/Cache' )()
-local Locale      = elreq('erlib/factorio/Locale')()
-
 local Table       = elreq('erlib/lua/Table'     )()
 local Array       = elreq('erlib/lua/Array'     )()
 local Set         = elreq('erlib/lua/Set'       )()
@@ -79,6 +82,10 @@ local Set         = elreq('erlib/lua/Set'       )()
 local sriapi      = elreq('erlib/lua/Iter/sriapi' )()
 local dpairs      = elreq('erlib/lua/Iter/dpairs' )()
 local ntuples     = elreq('erlib/lua/Iter/ntuples')()
+
+local Cache       = elreq('erlib/factorio/Cache'  )()
+local Locale      = elreq('erlib/factorio/Locale' )()
+local Setting     = elreq('erlib/factorio/Setting')()
 
 local pairs, pcall, string_find, type, string_gmatch, string_lower
     = pairs, pcall, string.find, type, string.gmatch, string.lower
@@ -129,10 +136,9 @@ local Dictionary = Class.SimpleClass(
   -- initializer
   function(language_code)
     local self = {
-      language_code
-        = language_code,
-      native_language_name
-        = assert(const.native_language_name[language_code], 'Invalid language_code'),
+      language_code        = language_code,
+      native_language_name = assert(
+        const.native_language_name[language_code], 'Invalid language_code'),
       }  
     return self end,
   -- finalizer
@@ -419,31 +425,51 @@ function Dictionary:update()
       end
     end
   --
-  for type, max in pairs(max_index) do
-    --
-    local old_entries = self[type] and (function(r)
-      for i=1, self[type].max do
-        local entry = self[type][i]
-        r[ entry[eindex.name] ] = entry
+  if self.language_code == 'internal' then
+    for type, max in pairs(max_index) do
+      self[type] = {max = max}
+      end
+    self.packets.n = 0
+    self.packets.i = 0
+    for i = self.packets.max, 1, -1 do
+      local packet = self.packets[i]
+      self.packets[i] = nil
+      for _, _, entry in ntuples(3, packet[rindex.entries]) do
+        self[ entry[eindex.type] ][ entry[eindex.index] ] = {
+          [eindex.lower] = entry[eindex.name]:lower(),
+          [eindex.name ] = entry[eindex.name],
+          }
         end
-      return r end){}
-    --
-    self[type] = {max = max}
-    -- Most mod updates do not change the locale.
-    -- For a smooth transition between mod versions the old
-    -- translations are stored for searching while the
-    -- retranslation process runs.
-    if old_entries then
-      for _, packet in ipairs(packets) do
-        for _, _, entry in ntuples(3, packet[rindex.entries]) do
-          local type  = entry[eindex.type ]
-          local index = entry[eindex.index]
-          local name  = entry[eindex.name ]
-          if old_entries[name] then
-            self[type][index] = {
-              [eindex.lower] = old_entries[name][eindex.lower],
-              [eindex.name ] = name,
-              }
+      end
+  --
+  else
+    for type, max in pairs(max_index) do
+      --
+      local old_entries = self[type] and self[type].max and (function(r)
+        for i=1, self[type].max do
+          local entry = self[type][i]
+          r[ entry[eindex.name] ] = entry
+          end
+        return r end){}
+      --
+      self[type] = {max = max}
+      --
+      -- Most mod updates do not change the locale.
+      -- For a smooth transition between mod versions the old
+      -- translations are kept for searching while the
+      -- retranslation process runs.
+      if old_entries then
+        for _, packet in ipairs(packets) do
+          for _, _, entry in ntuples(3, packet[rindex.entries]) do
+            local type  = entry[eindex.type ]
+            local index = entry[eindex.index]
+            local name  = entry[eindex.name ]
+            if old_entries[name] then
+              self[type][index] = {
+                [eindex.lower] = old_entries[name][eindex.lower],
+                [eindex.name ] = name,
+                }
+              end
             end
           end
         end
@@ -456,20 +482,22 @@ function Dictionary:update()
 -- Internal Names Dictionary                                                  --
 -- -------------------------------------------------------------------------- --
 
-function Dictionary.make_internal_names_dictionary()
-  local self = Dictionary('internal')
-  for _, packet in ipairs(self.packets) do
-    for _, _, entry in ntuples(3, packet[rindex.entries]) do
-      self[ entry[eindex.type] ][ entry[eindex.index] ] = {
-        [eindex.lower] = entry[eindex.name]:lower(),
-        [eindex.name ] = entry[eindex.name],
-        }
-      end
-    end
-  for i = 1, self.packets.max do 
-    self.packets[i] = nil
-    end
-  return end
+
+
+-- function Dictionary.make_internal_names_dictionary()
+  -- local self = Dictionary('internal')
+  -- for _, packet in ipairs(self.packets) do
+    -- for _, _, entry in ntuples(3, packet[rindex.entries]) do
+      -- self[ entry[eindex.type] ][ entry[eindex.index] ] = {
+        -- [eindex.lower] = entry[eindex.name]:lower(),
+        -- [eindex.name ] = entry[eindex.name],
+        -- }
+      -- end
+    -- end
+  -- for i = 1, self.packets.max do 
+    -- self.packets[i] = nil
+    -- end
+  -- return end
 
   
   
@@ -485,7 +513,7 @@ function Dictionary.make_internal_names_dictionary()
 -- Debug                                                                      --
 -- -------------------------------------------------------------------------- --
 function Dictionary:dump_statistics_to_console()
-  if flag.IS_DEV_MODE and (self.requests.n == 0) then
+  if flag.IS_DEV_MODE and (self.packets.n == 0) then
     print( ('-'):rep(80) )
     print( 'Dictionary Statistics:' )
     print( ('Language: %s'):format(self.language_code) )
@@ -525,10 +553,10 @@ function Dictionary:dump_statistics_to_console()
       if RequestedTypes[type] then
         local lengths = {}
         local untranslated = 0
-        for name, data in pairs(self[type]) do
-          local lower = data[eindex.lower]
+        for _, entry in ipairs(self[type]) do
+          local lower = entry[eindex.lower]
           table.insert(lengths, #lower)
-          if lower:find('Unknown Key') then
+          if lower:find('unknown key') then
             untranslated = untranslated + 1
             end
           end
@@ -565,7 +593,9 @@ function Dictionary:get_percentage()
 -- Network                                                                    --
 -- -------------------------------------------------------------------------- --
   
-  
+-- Does the CPU intensive setup of the internal lua state right now
+-- to prevent lag spikes when a player joins later.
+-- MUST NEVER CHANGE THE GAME STATE!
 function Dictionary.precompile()
   Dictionary.precompile = ercfg.SKIP
   --
@@ -574,22 +604,14 @@ function Dictionary.precompile()
   -- error('Precompile test OK')
   end
   
-  
--- function Dictionary:get_next_packet()
-  -- local packet = self.packets[self.packets.i]
-  -- self.packets.i = ((self.packets.i - 2) % self.packets.n) + 1
-  -- return packet[rindex.lstring], packet[rindex.bytes]
-  -- end
-  
-  
--- Iterator that quits at 0
-function Dictionary:iter_packets()
+-- Iterator that waits a while after wrapping around.
+function Dictionary:iter_packets(tick)
   return function()
     if (self.packets.i == 0) then
       self.packets.i = self.packets.n
-      self.packets.block_iter_until = game.tick + const.network.rerequest_delay
+      self.packets.block_iter_until = tick + const.network.rerequest_delay
       return nil end
-    if (self.packets.block_iter_until or 0) < game.tick then
+    if (self.packets.block_iter_until or 0) < tick then
       self.packets.block_iter_until = nil
       --
       local packet = self.packets[self.packets.i]
@@ -648,6 +670,9 @@ function Dictionary:on_string_translated(lstrings, results)
   self.packets.n = self.packets.n - 1
   self.packets.i = math.min(self.packets.i, self.packets.n)
   --
+  -- Re-Lookup the estimated portion of the packet size
+  -- to allow for more precise bitrate control by comparison
+  -- with the real result size.
   local estimated_result_bytes = 0
   --
   local j, result, entries = 0, next(), packet[rindex.entries]
@@ -665,7 +690,7 @@ function Dictionary:on_string_translated(lstrings, results)
     until not result
   assert(j == #entries, 'Wrong result count.')
   --
-  return estimated_result_bytes - #results end
+  return estimated_result_bytes, packet[rindex.bytes] end
   
 
 -- -------------------------------------------------------------------------- --
@@ -713,8 +738,10 @@ function Dictionary:find(types, word, opt)
   --
   local n = opt.limit and opt.limit or math.huge
   local r = {}
-  local lower_word = word:lower()
+  local exact_word = word
   local status = true
+  -- local eindex_lower = (self.language_code ~= 'internal')
+                      -- and eindex.lower or eindex.name
   --
   local matcher
   if opt.mode == 'lua' then
@@ -723,10 +750,10 @@ function Dictionary:find(types, word, opt)
     matcher = (pcall(string_find,'',word)) and string_find or Filter.False
   elseif opt.mode == 'fuzzy' then
     matcher = String.find_fuzzy
-    word = String.to_array(String.remove_whitespace(lower_word))
+    word = String.to_array(String.remove_whitespace(word:lower()))
   else
     matcher = matchers.plain
-    word = split_by_space(lower_word)
+    word = split_by_space(word:lower())
     end
   --
   for i=1, #types do
@@ -743,7 +770,7 @@ function Dictionary:find(types, word, opt)
       local entry = self[type][i]
       if entry then -- self[type] is sparse after :update()
         local name = entry[eindex.name]
-        if (lower_word == name) -- verbatim internal name match
+        if (exact_word == name) -- verbatim internal name match
         or matcher(entry[eindex.lower], word) then
           n = n - 1
           this[name] = (not flag.IS_DEV_MODE) or entry[eindex.lower]
@@ -752,7 +779,7 @@ function Dictionary:find(types, word, opt)
       end
     end
   -- Pssst! ;)
-  if (lower_word == 'dolphin')
+  if (exact_word:lower() == 'dolphin')
   and r.item_name
   and game.item_prototypes['raw-fish']
   then r.item_name['raw-fish'] = true end

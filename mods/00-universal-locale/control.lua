@@ -62,7 +62,7 @@ script.on_nth_tick(1,function() script.on_nth_tick(1, nil)
   This.format_locales(db)
   This.write_locales_to_disk(db)
   --
-  game.print(('[ER uLocale] %s locales have been written to disk.'):format(#db))
+  game.print(('[ER uLocale] %s entries have been written to disk.'):format(#db))
   log:info('...done.')
   end)
 

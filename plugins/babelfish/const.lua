@@ -20,7 +20,7 @@ const.network = {
   master_header = '金魚',
   packet_header = {
     packed_request = '箱',
-    ping           = '音',
+    ping           = '音', -- not used yet
     },
   mtu_bytes = 1452,
   }
@@ -44,6 +44,10 @@ const.remote = {
   
 const.gui_name = {
   status_indicator_button = 'er:babelfish-status-indicator-button',
+  }
+  
+const.name = {
+  tip_1 = 'er:babelfish-tip-1',
   }
   
 -- Collected Most Extreme Values:

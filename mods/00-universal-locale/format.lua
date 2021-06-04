@@ -130,8 +130,12 @@ local pattern_functions = {
 
   -- Add Info Icon to all settings with description.
   function(entry, db)
+    local no_header_icon = {
+      ['[tips-and-tricks-item-description]'] = true,
+      }
     local desc = find_description(entry, db)
     if desc and not entry.value:find '_UL:ICON_TOOLTIP_' then
+      if no_header_icon[desc.header] then return end
       entry.value = entry.value ..' _UL:ICON_TOOLTIP_'
       end
     end,
@@ -139,9 +143,14 @@ local pattern_functions = {
     
   -- FINAL FIXES
   
-  -- Fix missing newline escapes
+  
+  -- Fix missing newline escapes.
+  -- Remove space at the start of text blocks. (Allows using real [[]] blocks.)
   function(entry, db)
-    entry.value = entry.value:gsub('\n','\\n')
+    -- Future: Auto-detect width of space at beginning of [[block]].
+    entry.value = entry.value
+      :gsub('^%s*' ,''   ) -- left-trim
+      :gsub('\n%s*','\\n') -- escape newlines
     end,
 
 -- -------------------------------------------------------------------------- --
@@ -161,6 +170,10 @@ local pattern_strings = {
   {'_UL:ICON_DEV_'    , '[img=developer]'},
   {'_UL:ICON_TOOLTIP_', '[img=info]'     },
 
+  --hackfix
+  {'_UL:1SPACE_', ' '},
+  {'_UL:2SPACE_', '  '},
+  
   --internal use
   {'_UL:ENDOFHEADER_','\\n'},
   

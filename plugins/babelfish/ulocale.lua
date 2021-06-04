@@ -105,5 +105,29 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       return r end){},
 
     },
+    
+    
+  ['[tips-and-tricks-item-name]'] = {
+    [const.name.tip_1] = { 
+      en = "Babelfish",
+      de = "",
+      ja = "",
+      }
+    },
+    
+  ['[tips-and-tricks-item-description]'] = {
+    [const.name.tip_1] = { 
+      en = [[Babelfish helps mods to interact with you in your
+             own language. You will see a small indicator in the upper
+             right corner of the screen when it is working.
+             \n
+             Mods known to use Babelfish:
+             _UL:2SPACE_ Eradicator's Belt Builder (by eradicator)
+             _UL:2SPACE_ Factory Planner (by Therenas) (soon™)
+           ]],
+      de = "",
+      ja = "",
+      }
+    },
 
   }) end

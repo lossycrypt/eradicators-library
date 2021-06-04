@@ -661,6 +661,40 @@ function Table.sget(tbl,path,default)
   return _toTableIfTable(r[k])
   end
 
+
+----------
+-- Adds a number to an existing value or creates a new value.
+--
+-- __Alias:__ `Table\['+='\]\(t,p,n\)`
+--
+-- @tparam table tbl
+-- @tparam table path
+-- @tparam number number
+--
+-- @function Table.add
+Table['+='], Table.add = Twice(function(tbl, path, number)
+  Table.set(tbl, path, number + (Table.get(tbl, path) or 0))
+  end)
+
+  
+----------
+-- Removes and returns a value from a table.
+--
+-- Does _not_ remove empty sub-tables left behind after removing all keys.
+--
+-- __Note:__ Not to be confused with @{LMAN table.remove} which only works on arrays.
+--
+-- @tparam table tbl
+-- @tparam TablePath path
+--
+-- @treturn AnyValue
+--
+function Table.remove(tbl, path)
+  local value = Table.get(tbl, path)
+  Table.set(tbl, path, nil);
+  return value
+  end
+  
   
 ----------
 -- __Concept.__
@@ -732,25 +766,6 @@ function Table.patch(tbl,patches)
   return _toTable(tbl)
   end
 
-  
-----------
--- Removes and returns a value from a table.
---
--- Does _not_ remove empty sub-tables left behind after removing all keys.
---
--- __Note:__ Not to be confused with @{LMAN table.remove} which only works on arrays.
---
--- @tparam table tbl
--- @tparam TablePath path
---
--- @treturn AnyValue
---
-function Table.remove(tbl, path)
-  local value = Table.get(tbl, path)
-  Table.set(tbl, path, nil);
-  return value
-  end
-  
   
   
 --------------------------------------------------------------------------------

@@ -27,7 +27,7 @@ local const = require 'plugins/babelfish/const'
   Data.Inscribe{
     name          = const.setting_name.string_match_type,
     type          = 'string-setting'          ,
-    setting_type  = 'runtime-global'          ,
+    setting_type  = 'runtime-per-user'        ,
     order         = 'babelfish-2'             ,
     default_value = 'plain'                   ,
     allowed_values= {'plain', 'fuzzy', 'lua'} ,

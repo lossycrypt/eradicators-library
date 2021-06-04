@@ -1,0 +1,20 @@
+﻿-- (c) eradicator a.k.a lossycrypt, 2017-2021, not seperately licensable
+-- -------------------------------------------------------------------------- --
+
+local const = {}
+
+const.name = {
+  gui = {
+    anchor            = 'er:babelfish-demo-gui-anchor',
+    input1            = 'er:babelfish-demo-input1'    ,
+    output_serpent    = 'er:babelfish-demo-output2'   ,
+    output_table_pane = 'er:babelfish-demo-output1-scroll-pane',
+    }
+  }
+  
+const.gui = {
+  width  = 1600,
+  height =  800,
+  }
+
+return const

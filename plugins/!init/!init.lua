@@ -128,6 +128,10 @@ return function(phase) assert(phase)
   -- ------------------------------------------------------------------------ --
   elseif phase == 'data-final-fixes' then
 
+    if true then -- Does this need a condition?
+      require 'plugins/tips-group/data-final-fixes'
+      end
+      
     if settings.startup['erlib:enable-cursor-tracker'].value then
       require 'plugins/cursor-tracker/data-final-fixes.lua'
       end
@@ -140,7 +144,12 @@ return function(phase) assert(phase)
   -- Control                                                                  --
   -- ------------------------------------------------------------------------ --
   elseif phase == 'control' then
-       
+
+    -- ---------------------------------------------------------------------- --
+    -- Generic Ulocale                                                        --
+    -- ---------------------------------------------------------------------- --
+    require 'plugins/tips-group/ulocale'
+  
     -- ---------------------------------------------------------------------- --
     -- Hooks & Nooks                                                          --
     -- ---------------------------------------------------------------------- --
@@ -161,7 +170,7 @@ return function(phase) assert(phase)
       PluginManager.enable_savedata_management()
 
       if settings.enable_bablefish then
-        require('plugins/babelfish/control.lua')
+        require 'plugins/babelfish/control.lua'
         -- Creating the locale needs access to 
         -- the settings_prototype.default_value
         require 'plugins/babelfish/ulocale'
