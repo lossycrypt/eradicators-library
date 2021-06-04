@@ -97,6 +97,10 @@ local import = PluginManager.make_relative_require'babelfish'
 local const  = import '/const'
 local null   = '\0'
 
+local function get_allowed_search_types()
+  return game.mod_setting_prototypes[const.setting_name.search_types].allowed_values
+  end
+
 local SupportedTypes = 
   Table.map(const.type_data, function(v) return true, v.type end, {})
   
@@ -104,9 +108,7 @@ local TypeBytes =
   Table.map(const.type_data, function(v) return v.longest, v.type end, {})
   
 local RequestedTypes = Cache.AutoCache(function(r) -- PseudoSet
-  for k, v in ipairs(
-  game.mod_setting_prototypes[const.setting_name.search_types].allowed_values)
-  do r[v] = true end
+  for k, v in ipairs(get_allowed_search_types()) do r[v] = true end
   end)
 
 -- -------------------------------------------------------------------------- --
@@ -410,6 +412,8 @@ local get_request_packets = make_table_getter(function()
 function Dictionary:update()
   log:debug('Updating dictionary: ', self.language_code)
   --
+  Table.clear(self, get_allowed_search_types())
+  --
   local packets, max_index = get_request_packets()
   local profile = get_profiler()
   --
@@ -418,12 +422,6 @@ function Dictionary:update()
   self.packets.n   = #packets -- current maximum
   self.packets.i   = #packets -- next package to be requested
   profile('Packets dcopy took: ')
-  --
-  for _, tdata in pairs(const.type_data) do
-    if not RequestedTypes[tdata.type] then
-      self[tdata.type] = nil
-      end
-    end
   --
   if self.language_code == 'internal' then
     for type, max in pairs(max_index) do
@@ -443,34 +441,32 @@ function Dictionary:update()
       end
   --
   else
+    local old_entries = {}
     for type, max in pairs(max_index) do
-      --
-      local old_entries = self[type] and self[type].max and (function(r)
+      old_entries[type] = self[type] and self[type].max and (function(r)
         for i=1, self[type].max do
           local entry = self[type][i]
           r[ entry[eindex.name] ] = entry
           end
         return r end){}
       --
-      self[type] = {max = max}
-      --
-      -- Most mod updates do not change the locale.
-      -- For a smooth transition between mod versions the old
-      -- translations are kept for searching while the
-      -- retranslation process runs.
-      if old_entries then
-        for _, packet in ipairs(packets) do
-          for _, _, entry in ntuples(3, packet[rindex.entries]) do
-            local type  = entry[eindex.type ]
-            local index = entry[eindex.index]
-            local name  = entry[eindex.name ]
-            if old_entries[name] then
-              self[type][index] = {
-                [eindex.lower] = old_entries[name][eindex.lower],
-                [eindex.name ] = name,
-                }
-              end
-            end
+      self[type] = {max = max} -- must exist before multi-type requests
+      end
+    --
+    -- Most mod updates do not change the locale.
+    -- For a smooth transition between mod versions the old
+    -- translations are kept for searching while the
+    -- retranslation process runs.
+    for _, packet in ipairs(self.packets) do
+      for _, _, entry in ntuples(3, packet[rindex.entries]) do
+        local type  = entry[eindex.type ]
+        local index = entry[eindex.index]
+        local name  = entry[eindex.name ]
+        if old_entries[type] and old_entries[type][name] then
+          self[type][index] = {
+            [eindex.lower] = old_entries[type][name][eindex.lower],
+            [eindex.name ] = name,
+            }
           end
         end
       end

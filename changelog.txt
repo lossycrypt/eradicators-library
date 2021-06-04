@@ -1,18 +1,23 @@
 ---------------------------------------------------------------------------------------------------
-Version: 4.1.10
+Version: 4.1.11
 Date: 2021-x-x
   Utility Mods:
     - ?
 ---------------------------------------------------------------------------------------------------
+Version: 4.1.10
+Date: 2021-06-??
+  Hooks:
+    - Babelfish: Fixed soft-update of old dictionary after mod changes.
+---------------------------------------------------------------------------------------------------
 Version: 4.1.9
-Date: 2021-05-31
+Date: 2021-06-04
   Utility Mods:
     - Universal Locale: Improved mod setting default value injection for non-numbers.
     - Universal Locale: Added automatic mod setting description info icon injection.
     - Universal Locale: Added automatic left trimming for [[string blocks]].
   Functions:
     - Replaced Array.unsorted_remove_key with Array.shuffle_pop
-      and fixed that final key was never removed. (Breaking change.)
+      and fixed that the final key was never removed. (Breaking change.)
     - Added Gui.move
   Hooks:
     - Babelfish: Improved translation CPU performance by 400%+.
