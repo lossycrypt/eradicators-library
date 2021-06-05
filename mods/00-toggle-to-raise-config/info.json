@@ -1,5 +1,5 @@
 {
-  "title"            : "!Toggle to raise on_config_changed!",
+  "title"            : "! Toggle to raise on_config_changed",
   "name"             : "00-toggle-to-raise-config",
   "author"           : "eradicator",
   "version"          : "0.0.3",

@@ -4,6 +4,9 @@
 -- Useful cache constructors. For when you don't want to spam
 -- global savedata with lots of outdated junk.
 --
+-- __Warning:__ Incorrect usage of Cache functions will cause desyncs.
+-- Read the instructions very carefully.
+--
 -- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
 --
 -- @module Cache
@@ -33,9 +36,119 @@ local Table = elreq('erlib/lua/Table')()
 local table_size = Table.size -- factorio C-side if available
 local table_insert, table_remove = table.insert, table.remove
 
--- -----------------------------------------------------------------------------
--- TickedCache
--- -----------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- AutoCache.
+-- @section
+--------------------------------------------------------------------------------
+
+----------
+-- Creates a new AutoCache.
+-- 
+-- A __read-only__ table that fills itself on first access. This is intended to 
+-- store pre-processed prototype data at runtime without cluttering global
+-- savedata with tons of garbage. Less garbage means faster save/load. It also
+-- removes the need to migrate old data.
+-- 
+-- The engine limits access to prototype data to inside events for no good
+-- reason. AutoCache provides a comfortable way to transparently fetch the data
+-- in the first event you need it.
+-- 
+-- __Warning:__ Because the constructor is called in a non-deterministic
+-- way it will cause desyncs if you try to do anything else except reading
+-- startup settings or game.*_prototypes.
+-- 
+-- @tparam function constructor This is called exactly once with an empty table
+-- as the only argument. Is must then fill that table with the desired values.
+-- @treturn table the AutoCache'ed table.
+--
+-- @function Cache.AutoCache
+--
+-- @usage
+--    -- First you need a data collector.
+--    local function get_entity_types (data)
+--      for k,v in pairs(game.prototypes) do
+--        data[v.name] = v.type -- You must store your data in the given table.
+--        end
+--      return nil -- The return value is not used.
+--      end
+--
+--    -- Then you tell AutoCache to handle the collection for you.
+--    local MyData = AutoCache(get_entity_types)
+--    
+--    -- The collected data can only be used in events.
+--    script.on_event(defines.events.on_stuff_happend,function(event)
+--      if MyData[event.entity.name] == 'assembling-machine' then
+--        DoStuff()
+--        end
+--      end)
+do
+  local Stop = Error.Stopper('AutoCache')
+
+  local function read_only_error()
+    Stop('Auto Cache','all auto-caches are read-only')
+    end
+    
+  local function fill(self,constructor)
+    if not game then Stop('Auto Cache',' not available outside events.\nThis is a bug in YOUR code.') end
+    setmetatable(self,nil)
+    -- The data has to be stored directly into self by the constructor
+    -- to not invalidate external references to the cache table.
+    constructor(self)
+    -- allowing to read nil can make the cache significantly smaller
+    -- respect metatable set by the constructor
+    local mt = (debug.getmetatable(self) or {})
+    debug.setmetatable(self,mt)
+    if not mt.__newindex then mt.__newindex = read_only_error end
+    end
+
+--v4.0
+Cache.AutoCache = function(constructor)
+  if type(constructor) ~= 'function' then
+    Stop('Auto Cache',' invalid constructor')
+    end
+  return setmetatable({},{
+    -- This metatable is deleted when *either* __index or __pairs
+    -- are called for the first time. Thus *if* either is called
+    -- it is guaranteed that the cache is still empty.
+
+    __index = function(self,key)
+      fill(self,constructor)
+      return self[key]
+      end,
+
+    -- Must block all writes before the cache is filled.
+    __newindex = read_only_error,
+    
+    __pairs = function(self)
+      fill(self,constructor)
+      return pairs(self)
+      end,
+
+    __ipairs = function(self)
+      fill(self,constructor)
+      return ipairs(self)
+      end,
+      
+      --@future: allow clearing the cache to be refilled
+      -- on next write. Usecase: rebuilding the cache after data
+      -- changes such as on_research_finished for caching a
+      -- forces allowed recipes.
+      --> requires not deleting the metatable on fill
+      --> requires somehow circumventing __pairs.
+    -- clear = function(self)
+      -- for k in pairs(self) do self[k] = nil end
+      -- end,
+      
+    })
+  end
+  end
+
+
+--------------------------------------------------------------------------------
+-- TickedCache.
+-- @section
+--------------------------------------------------------------------------------
 
 --[[------
   A tick-volatile cache. Only contains values that were written during
@@ -56,9 +169,7 @@ local table_insert, table_remove = table.insert, table.remove
   @treturn TickedCache an empty ticked cache.
   ]]
 
-----------
--- When you call `TickedCache()` you get a new TickCache object.
--- @type TickedCache
+
 
 ----------
 -- @{The Length Operator|The Length Operator #} works as it always does.
@@ -178,134 +289,12 @@ Cache.TickedCache = function()
 
 
 -- -----------------------------------------------------------------------------
--- AutoCache
--- -----------------------------------------------------------------------------
-
-----------
--- Creates a new AutoCache.
--- 
--- A read-only table that fills itself on first access. This is intended to 
--- store pre-processed prototype data at runtime without cluttering global
--- savedata with tons of garbage. Less garbage means faster save/load. It also
--- removes the need to migrate old data.
--- 
--- The engine limits access to prototype data to inside events for no good
--- reason. AutoCache provides a comfortable way to transparently fetch the data
--- in the first event you need it.
--- 
--- @tparam function constructor This is called exactly once with an empty table
--- as the only argument. Is must then fill that table with the desired values.
--- @treturn table the AutoCache'ed table.
---
--- @function Cache.AutoCache
---
--- @usage
---    -- First you need a data collector.
---    local function get_entity_types (data)
---      for k,v in pairs(game.prototypes) do
---        data[v.name] = v.type -- You must store your data in the given table.
---        end
---      return nil -- The return value is not used.
---      end
---
---    -- Then you tell AutoCache to handle the collection for you.
---    local MyData = AutoCache(get_entity_types)
---    
---    -- The collected data can only be used in events.
---    script.on_event(defines.events.on_stuff_happend,function(event)
---      if MyData[event.entity.name] == 'assembling-machine' then
---        DoStuff()
---        end
---      end)
-do
-  local Stop = Error.Stopper('AutoCache')
-
-  local function read_only_error()
-    Stop('Auto Cache','all auto-caches are read-only')
-    end
-    
-  local function fill(self,constructor)
-    if not game then Stop('Auto Cache','not available outside events') end
-    setmetatable(self,nil)
-    -- The data has to be stored directly into self by the constructor
-    -- to not invalidate external references to the cache table.
-    constructor(self)
-    -- allowing to read nil can make the cache significantly smaller
-    -- respect metatable set by the constructor
-    local mt = (debug.getmetatable(self) or {})
-    debug.setmetatable(self,mt)
-    if not mt.__newindex then mt.__newindex = read_only_error end
-    end
-
---v4.0
-Cache.AutoCache = function(constructor)
-  if type(constructor) ~= 'function' then
-    Stop('Auto Cache',' invalid constructor')
-    end
-  return setmetatable({},{
-    -- This metatable is deleted when *either* __index or __pairs
-    -- are called for the first time. Thus *if* either is called
-    -- it is guaranteed that the cache is still empty.
-
-    __index = function(self,key)
-      fill(self,constructor)
-      return self[key]
-      end,
-
-    -- Must block all writes before the cache is filled.
-    __newindex = read_only_error,
-    
-    __pairs = function(self)
-      fill(self,constructor)
-      return pairs(self)
-      end,
-
-    __ipairs = function(self)
-      fill(self,constructor)
-      return ipairs(self)
-      end,
-      
-      --@future: allow clearing the cache to be refilled
-      -- on next write. Usecase: rebuilding the cache after data
-      -- changes such as on_research_finished for caching a
-      -- forces allowed recipes.
-      --> requires not deleting the metatable on fill
-      --> requires somehow circumventing __pairs.
-    -- clear = function(self)
-      -- for k in pairs(self) do self[k] = nil end
-      -- end,
-      
-    })
-  end
-  end
-
-
-
-
--- -----------------------------------------------------------------------------
--- OnLoadCache.
--- -----------------------------------------------------------------------------
-
-----------
--- __Not implemented__. Similar to an AutoCache but self-constructs when a
--- savegame is loaded. Using `on_debug_once_per_session`.
---
--- __Note:__ EventManager must be running *before* you can use this.
--- @function Cache.OnLoadCache
-
-
--- -----------------------------------------------------------------------------
 -- ???.
 -- -----------------------------------------------------------------------------
 
 
 ----------
--- Use Table.map instead of custom local implementation.
--- @within Todo
--- @field todo1
-
-----------
--- Implement OnLoadCache once the EventManager is ready.
+-- Use Table.map instead of custom local implementation for TickedCache.
 -- @within Todo
 -- @field todo1
 

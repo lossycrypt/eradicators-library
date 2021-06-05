@@ -33,8 +33,8 @@ local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
 local Remote      = elreq('erlib/factorio/Remote'  )()
 local Gui         = elreq('erlib/factorio/Gui'     )()
 
-rawset(_ENV, 'No_Profiler_Commands', true)
-local Profiler = require('__er-profiler-fork__/profiler.lua')
+-- rawset(_ENV, 'No_Profiler_Commands', true)
+-- local Profiler = require('__00-profiler-fork__/profiler.lua')
 
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
@@ -133,7 +133,6 @@ script.on_event(defines.events.on_gui_text_changed, function(e)
       game.mod_setting_prototypes[babelconst.setting_name.search_types]
       .allowed_values
   
-    -- Profiler.Start()
     local prfS = game.create_profiler()
     local status, result = Babelfish.find_prototype_names(
       e.player_index,
@@ -141,7 +140,6 @@ script.on_event(defines.events.on_gui_text_changed, function(e)
       e.text          -- player input
       )
     prfS.stop()
-    -- Profiler.Stop()
     local prfG = game.create_profiler()
   
     local anchor = e.element.parent

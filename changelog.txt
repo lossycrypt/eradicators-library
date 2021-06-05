@@ -1,11 +1,23 @@
 ---------------------------------------------------------------------------------------------------
-Version: 4.1.11
+Version: 4.1.12
 Date: 2021-x-x
   Utility Mods:
     - ?
 ---------------------------------------------------------------------------------------------------
+Version: 4.1.11
+Date: 2021-06-06
+  Functions:
+    - Fixed Vector() imported bounding boxes had wrong offset.
+    - Fully implemented Color module.
+    - Added Setting.make()
+  Utility Mods:
+    - Added profiler-fork. My fork of Boodals's and justarandomgeek's profiler.
+      Thank you both very much.
+    - Profiler: Updated info.json to Factorio version 1.1.
+    - Profiler: Fixed that assert() intercept did not return the input value.
+---------------------------------------------------------------------------------------------------
 Version: 4.1.10
-Date: 2021-06-??
+Date: 2021-06-04
   Hooks:
     - Babelfish: Fixed soft-update of old dictionary after mod changes.
     - Babelfish: Unlocalised descriptions are now treated as empty strings.
@@ -33,7 +45,7 @@ Date: 2021-05-27
   Internal:
     - EventManagerLite: Made handler order permanent and linked.
   Utility Mods:
-    - Added enable-tests trigger mod and udpdated flag.DO_TESTS accordingly.
+    - Added enable-tests trigger mod and updated flag.DO_TESTS accordingly.
   Hooks:
     - Babelfish: Fixed language code detection disabled too early.
     - Babelfish: Made search types configurable. (Breaking change.)

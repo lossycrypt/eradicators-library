@@ -32,8 +32,8 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Functions">Functions</a></li>
-<li><a href="#Class_TickedCache">Class TickedCache </a></li>
+<li><a href="#AutoCache">AutoCache </a></li>
+<li><a href="#TickedCache">TickedCache </a></li>
 <li><a href="#Todo">Todo</a></li>
 </ul>
 
@@ -103,6 +103,9 @@
 <p> For when you don't want to spam
  global savedata with lots of outdated junk.</p>
 
+<p> <strong>Warning:</strong> Incorrect usage of Cache functions will cause desyncs.
+ Read the instructions very carefully.</p>
+
 <p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Experimental 2020-10-31.</p>
     <h3>Usage:</h3>
     <ul>
@@ -111,23 +114,19 @@
     </ul>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#AutoCache">AutoCache </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#AutoCache">AutoCache(constructor)</a></td>
+	<td class="summary">Creates a new AutoCache.</td>
+	</tr>
+</table>
+<h2><a href="#TickedCache">TickedCache </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#TickedCache">TickedCache()</a></td>
 	<td class="summary">A tick-volatile cache.</td>
 	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#AutoCache">AutoCache(constructor)</a></td>
-	<td class="summary">Creates a new AutoCache.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#OnLoadCache">OnLoadCache()</a></td>
-	<td class="summary"><strong>Not implemented</strong>.</td>
-	</tr>
-</table>
-<h2><a href="#Class_TickedCache">Class TickedCache </a></h2>
-<table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#TickedCache.__len">TickedCache.__len()</a></td>
 	<td class="summary"><a href="../lua-5.2/doc/manual.html#3.4.6 ">The Length Operator #</a> works as it always does.</td>
@@ -157,11 +156,7 @@
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#todo1">todo1</a></td>
-	<td class="summary">Use Table.map instead of custom local implementation.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#todo1">todo1</a></td>
-	<td class="summary">Implement OnLoadCache once the EventManager is ready.</td>
+	<td class="summary">Use Table.map instead of custom local implementation for TickedCache.</td>
 	</tr>
 </table>
 
@@ -169,46 +164,9 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="AutoCache"></a>AutoCache </h2>
 
     <dl class="function">
-    <dt>
-    <a name = "TickedCache"></a>
-    <strong>TickedCache()</strong>
-    </dt>
-    <dd>
-
-<p>A tick-volatile cache.  Only contains values that were written during
-  the same tick. The main use-case for this is to correlate
-  data between events that happen sequentially in the same tick. This is
-  <strong>desync safe</strong> because it has no influence across tick boundaries.</p>
-
-<p>  A TickedCache table emulates normal Lua <a href="../lua-5.2/doc/manual.html#pdf-table">table</a> behavior as best as it can
-  but there are a few <strong>important differences</strong>.</p>
-
-<ol>
-    <li><p>Lua <a href="../lua-5.2/doc/manual.html#pdf-table">table</a>, ErLib <a href="../modules/Table.html#">Table</a> or <a href="../api/Libraries.html#table_size">table_size</a> methods are not
-     supported. You must use the equivalent methods mentioned on this page.</p></li>
-    <li><p>Lua <a href="../lua-5.2/doc/manual.html#pdf-next">next</a> is not supported, use standard for-loop <a href="../lua-5.2/doc/manual.html#pdf-pairs">pairs</a> or <a href="../lua-5.2/doc/manual.html#pdf-ipairs">ipairs</a>
-     instead.</p></li>
-</ol>
-
-
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">TickedCache</span></span>
-        an empty ticked cache.
-    </ol>
-
-
-
-
-</dd>
     <dt>
     <a name = "AutoCache"></a>
     <strong>AutoCache(constructor)</strong>
@@ -216,14 +174,18 @@
     <dd>
     Creates a new AutoCache. </p>
 
-<p> A read-only table that fills itself on first access. This is intended to
+<p> A <strong>read-only</strong> table that fills itself on first access. This is intended to
  store pre-processed prototype data at runtime without cluttering global
  savedata with tons of garbage. Less garbage means faster save/load. It also
  removes the need to migrate old data.</p>
 
 <p> The engine limits access to prototype data to inside events for no good
  reason. AutoCache provides a comfortable way to transparently fetch the data
- in the first event you need it.
+ in the first event you need it.</p>
+
+<p> <strong>Warning:</strong> Because the constructor is called in a non-deterministic
+ way it will cause desyncs if you try to do anything else except reading
+ startup settings or game.*_prototypes.
 
 
     <h3>Parameters:</h3>
@@ -267,30 +229,47 @@
     </ul>
 
 </dd>
+</dl>
+    <h2 class="section-header "><a name="TickedCache"></a>TickedCache </h2>
+
+    <dl class="function">
     <dt>
-    <a name = "OnLoadCache"></a>
-    <strong>OnLoadCache()</strong>
+    <a name = "TickedCache"></a>
+    <strong>TickedCache()</strong>
     </dt>
     <dd>
-    <strong>Not implemented</strong>.  Similar to an AutoCache but self-constructs when a
- savegame is loaded. Using <code>on_debug_once_per_session</code>.</p>
 
-<p> <strong>Note:</strong> EventManager must be running <em>before</em> you can use this.
+<p>A tick-volatile cache.  Only contains values that were written during
+  the same tick. The main use-case for this is to correlate
+  data between events that happen sequentially in the same tick. This is
+  <strong>desync safe</strong> because it has no influence across tick boundaries.</p>
+
+<p>  A TickedCache table emulates normal Lua <a href="../lua-5.2/doc/manual.html#pdf-table">table</a> behavior as best as it can
+  but there are a few <strong>important differences</strong>.</p>
+
+<ol>
+    <li><p>Lua <a href="../lua-5.2/doc/manual.html#pdf-table">table</a>, ErLib <a href="../modules/Table.html#">Table</a> or <a href="../api/Libraries.html#table_size">table_size</a> methods are not
+     supported. You must use the equivalent methods mentioned on this page.</p></li>
+    <li><p>Lua <a href="../lua-5.2/doc/manual.html#pdf-next">next</a> is not supported, use standard for-loop <a href="../lua-5.2/doc/manual.html#pdf-pairs">pairs</a> or <a href="../lua-5.2/doc/manual.html#pdf-ipairs">ipairs</a>
+     instead.</p></li>
+</ol>
 
 
 
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">TickedCache</span></span>
+        an empty ticked cache.
+    </ol>
 
 
 
 
 </dd>
-</dl>
-    <h2 class="section-header has-description"><a name="Class_TickedCache"></a>Class TickedCache </h2>
-
-          <div class="section-description">
-          When you call <code>TickedCache()</code> you get a new TickCache object.
-          </div>
-    <dl class="function">
     <dt>
     <a name = "TickedCache.__len"></a>
     <strong>TickedCache.__len()</strong>
@@ -444,28 +423,7 @@
     <strong>todo1</strong>
     </dt>
     <dd>
-    Use Table.map instead of custom local implementation.
-
-
-    <ul>
-        <li><span class="parameter">todo1</span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "todo1"></a>
-    <strong>todo1</strong>
-    </dt>
-    <dd>
-    Implement OnLoadCache once the EventManager is ready.
+    Use Table.map instead of custom local implementation for TickedCache.
 
 
     <ul>
@@ -488,7 +446,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-06-04 21:19:15 </i>
+<i style="float:right;">Last updated 2021-06-06 01:17:26 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

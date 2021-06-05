@@ -271,7 +271,10 @@ Vector = Class.SwitchCaseClass(
       a.left_top.y                   ,
       } end,
     ['bounding_box'] = function(b) return {
-      b[2][1],b[2][2],  b[1][1],b[1][2],
+      b[2][1] - b[1][1],
+      b[2][2] - b[1][2],
+      b[1][1]          ,
+      b[1][2]          ,
       } end,
     ['simple_vector'] = function(v)
       return {v[1],v[2],0,0} end ,
