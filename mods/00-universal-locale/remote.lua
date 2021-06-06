@@ -10,12 +10,13 @@
 -- their locales with universal-locale. As it is executed
 -- inside the *remote* mod it needs to be careful.
 return function (file_name, ulocale)
-  local mod_name = debug.getinfo(2,'S').short_src:match('^__(.+)__/?')
+  local mod_name = debug.getinfo(2,'S').source:match('^@__(.+)__/?')
   -- checking is done on this side to get an error with a meaningful stacktrace
   assert(mod_name ,'[ER Universal Locale] Modname detection failed.' )
   assert(file_name,'[ER Universal Locale] Missing file name.'        )
   assert(ulocale  ,'[ER Universal Locale] Missing locale table.'     )
   assert(file_name ~= 'file_name', '[ER Universal Locale] Please change the default file name ;).')
+  assert(file_name ~= 'template' , '[ER Universal Locale] Please change the default file name ;).')
   
   local interface_name
   local i=0; repeat i = i + 1 --find the next free name

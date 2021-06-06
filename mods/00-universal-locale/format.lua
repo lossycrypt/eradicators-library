@@ -34,8 +34,9 @@ local function find_description(entry, db)
   local desc_header = get_description_header(entry)
   --
   for _, dbentry in pairs(db) do
-    if  (dbentry.header == desc_header)
-    and (dbentry.key    == entry.key  )
+    if  (dbentry.header   == desc_header   )
+    and (dbentry.key      == entry.key     )
+    and (dbentry.language == entry.language)
     then return dbentry end end
   end
   
@@ -107,8 +108,9 @@ local pattern_functions = {
         if prot.allowed_values then
           local localised_default 
           for _, dbentry in pairs(db) do
-            if  (dbentry.header == '[string-mod-setting]')
-            and (dbentry.key    == entry.key..'-'..default_value  )
+            if  (dbentry.header   == '[string-mod-setting]')
+            and (dbentry.language == entry.language        )
+            and (dbentry.key      == entry.key..'-'..default_value  )
             then 
               default_value = dbentry.value
               end
