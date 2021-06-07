@@ -34,6 +34,7 @@
 
 # Keep tools
 !/tools/**/*.cmd
+!/tools/**/*.py
 
 # Block underscore prefixed files
 _*
