@@ -60,9 +60,9 @@ local Color = elreq('erlib/lua/Color')()
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Data,_Data,_uLocale = {},{},{}
+local Data,_Data = {},{}
 
-
+Data.Sprite = elreq('erlib/factorio/Data/Sprite')()
 
 -- -------
 -- Nothing.
@@ -403,4 +403,4 @@ function Data.Inscribe (prototype)
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
 do (STDOUT or log or print)('  Loaded → erlib.Data') end
-return function() return Data,_Data,_uLocale end
+return function() return Data,_Data,nil end

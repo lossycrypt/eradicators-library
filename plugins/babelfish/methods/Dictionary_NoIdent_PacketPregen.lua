@@ -31,12 +31,12 @@
   
   + Filter out useless entity prototypes. (explosions, projectiles, etc)
   
-  + Exclude "Unknown Key:" /descriptions/ from find()
-    because those are not shown in-game. (Unlike unknown item names.)
-    But only if it matches *exactly* the expected
-    <Unknown Key: "type-description.prototype-name"> including correct
-    capitalization! (Probably best not to store it at all)
-    
+  + Custom utf8:lower() string functions.
+    Nichtmal ('Ä'):lower() funktioniert! Also müssen quasi alle
+    nicht-englischen sprachen auf Unicode umgestellt werden.
+    => Für Performance kann man Englisch als einziges lua-nativ lassen?
+       Aber nur bei der Suche. Beim Speichern kann mans alles richtig machen.
+  
   ]]
   
 --[[ Facts:

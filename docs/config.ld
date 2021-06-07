@@ -311,6 +311,15 @@ KeywordPage(
   '../api/%s.html', '.*'
   )
 
+-- Keyword: FWIKI
+-- Example: @{FWIKI Types IconData} -> https://wiki.factorio.com/Types/IconData
+-- Example: @{FWIKI Prototype Entity.minable} -> https://wiki.factorio.com/Prototype/Entity#minable
+-- Url    : https://wiki.factorio.com/
+KeywordPage(
+  '^FWIKI (.*)$',
+  'https://wiki.factorio.com/%s/%s#%s', '([^%s]+) ([^%s%.]+)%.?([^%s]*)',
+  '%s/%s', '(.*) (.*)$'  
+  )
 
 -- Keyword: URL
 -- Example: @{URL www.wikipedia.com|Wiki}
@@ -321,6 +330,7 @@ KeywordPage(
   ,'%s', '^([^%|]+).-$'
   ,'%s', '^[^%|]+(.-)$'
   )
+
   
 -- -------------------------------------------------------------------------- --
 -- Translators                                                                --
