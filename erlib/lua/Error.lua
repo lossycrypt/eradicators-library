@@ -32,7 +32,7 @@ local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__
 local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
 
 -- -------------------------------------------------------------------------- --
--- Locals / Init                                                              --
+-- Eradicators Library                                                        --
 -- -------------------------------------------------------------------------- --
 
 local Stacktrace = require(elroot.. 'erlib/factorio/Stacktrace')()
@@ -48,7 +48,7 @@ local table,type,pairs,tostring
 local Error,_Error,_uLocale = {},{},{}
 
 -- -------------------------------------------------------------------------- --
--- Locals / Init                                                              --
+-- Eradicators Library                                                        --
 -- -------------------------------------------------------------------------- --
 -- The Error module is a cornerstone of the framework and thus
 -- it can not rely on Array or Table. So it uses some small customized

@@ -86,7 +86,7 @@ local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__
 local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
 
 -- -------------------------------------------------------------------------- --
--- Locals / Init                                                              --
+-- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 local log         = elreq('erlib/lua/Log'       )().Logger  'EventManagerLite'
@@ -204,6 +204,7 @@ local ModuleIndexes  = setmetatable({
 function Public.get_managed_script(module_name)
   verify(module_name, 'NonEmptyString', 'Invalid module name.')
   assert(not (module_name:find'event%-manager'), 'That module name is reserved.')
+  assert(module_name ~= 'template', 'Please change the default module name!')
   --
   if ModuleScripts[module_name] then return ModuleScripts[module_name] end
   local API = setmetatable({},{__index = script}) -- dcopy can't copy LuaObject!

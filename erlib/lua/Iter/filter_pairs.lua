@@ -16,7 +16,7 @@
 local type,pairs,next = type,pairs,next
 
 -- -------------------------------------------------------------------------- --
--- Locals / Init                                                              --
+-- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 -- local stop   = elreq('erlib/lua/Error')().Stopper('filter_pairs')

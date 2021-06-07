@@ -34,7 +34,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 local Stacktrace = {}
 
 -- -------------------------------------------------------------------------- --
--- Locals / Init                                                              --
+-- Eradicators Library                                                        --
 -- -------------------------------------------------------------------------- --
 
 local debug_getinfo = _ENV .debug .getinfo

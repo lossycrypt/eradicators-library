@@ -16,10 +16,9 @@ local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__
 local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
 
 -- -------------------------------------------------------------------------- --
--- Locals / Init                                                              --
+-- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
-
 local Hydra = elreq('erlib/lua/Coding/Hydra')()
 
 local log  = elreq('erlib/lua/Log'  )().Logger  'Remote'
@@ -42,10 +41,15 @@ local Lambda    = elreq('erlib/lua/Lambda'   )()
 local Filter    = elreq('erlib/lua/Filter'   )()
 
 -- -------------------------------------------------------------------------- --
+-- Locals                                                                     --
+-- -------------------------------------------------------------------------- --
+local remote_call = assert(remote.call)
+
+-- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Remote,_Remote,_uLocale = {},{},{}
+local Remote = {}
 
 
 
@@ -350,7 +354,6 @@ function PackedInterfaceGroup:set(key,value)
   
 ]]
 function Remote.get_interface(interface_name)
-  local remote_call = assert(remote.call)
   return setmetatable({},{
     __index = function(self, key)
       local f = function(...) return remote_call(interface_name, key, ...) end
@@ -368,6 +371,26 @@ function Remote.get_interface(interface_name)
 
 
 
+--------------------------------------------------------------------------------
+-- Misc.   
+-- @section
+--------------------------------------------------------------------------------
+
+--[[------
+Calls a remote interface method if it exists.
+  
+@tparam string interface_name
+@tparam string method_name
+@tparam AnyValue ... Parameters for the remote function.
+
+@treturn boolean If the method exists or not.
+@treturn AnyValue The return value(s) of the remote call.
+]]
+function Remote.try_call(interface_name, method_name, ...)
+  if Table.get(remote.interfaces, {interface_name, method_name}) then
+    return true, remote_call(interface_name, method_name, ...)
+    end
+  return false, nil end
   
 
 -- -------------------------------------------------------------------------- --
@@ -380,4 +403,4 @@ Remote.PackedInterfaceGroup = PackedInterfaceGroup
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
 do (STDOUT or log or print)('  Loaded → erlib.Remote') end
-return function() return Remote,_Remote,_uLocale end
+return function() return Remote,nil,nil end

@@ -5,11 +5,13 @@ Date: 2021-x-x
     - ?
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.11
-Date: 2021-06-06
+Date: 2021-06-07
   Functions:
     - Fixed Vector() imported bounding boxes had wrong offset.
     - Fully implemented Color module.
-    - Added Setting.make()
+    - Added Setting.make
+    - Added Remote.try_call
+    - Added Player.toggle_shortcut
   Utility Mods:
     - Added profiler-fork. My fork of Boodals's and justarandomgeek's profiler.
       Thank you both very much.

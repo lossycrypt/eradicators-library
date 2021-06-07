@@ -116,7 +116,7 @@ local pattern_functions = {
               end
             end
           end
-        default_value = '"'..default_value..'"'
+        -- default_value = '"'..default_value..'"' -- Quotes are not for end-users.
      elseif type(default_value) == 'boolean' then
       default_value = default_value
         and '☑' -- U+2611 ☑ BALLOT BOX WITH CHECK

@@ -29,7 +29,7 @@ local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__
 local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
 
 -- -------------------------------------------------------------------------- --
--- Locals / Init                                                              --
+-- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 local log         = elreq('erlib/lua/Log'       )().Logger  'PluginManagerLite'
@@ -83,6 +83,7 @@ setmetatable(Public, {__index=function(_,method)
 -- @treturn function f(path)
 --
 function Public.make_asset_getter(plugin_name, mod_name)
+  assert(plugin_name ~= 'template', 'Please change the default name!')
   -- if mod_name == 'local' then mod_name = erlib.Const.mod_name end
   if mod_name == nil then mod_name = Stacktrace.get_mod_name(2) end
   -- local root = '__' .. mod_name .. '__' .. '/assets/' .. plugin_name
@@ -111,6 +112,7 @@ function Public.make_asset_getter(plugin_name, mod_name)
 --   `require("__my-mod-name__/plugins/my-plugin-name/"..path)`.
 --
 function Public.make_relative_require(plugin_name, mod_name)
+  assert(plugin_name ~= 'template', 'Please change the default name!')
   -- local root =
     -- (mod_name and ('__'..mod_name..'__/') or '') ..'plugins/' ..plugin_name
   local root = join_path(
@@ -181,6 +183,7 @@ function Public.enable_savedata_management()
   --
   -- @function PluginManagerLite.manage_savedata
   function Public.manage_savedata(plugin_name, setter, default)
+    assert(plugin_name ~= 'template', 'Please change the default name!')
     -- Multiple setters can exist for each plugin_name.
     log:debug('Recieved savedata setter for ', plugin_name)
     local this   = Table.sget(ManagedPlugins, {plugin_name}, {})

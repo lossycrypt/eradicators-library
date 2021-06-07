@@ -54,7 +54,7 @@ local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__
 local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
 
 -- -------------------------------------------------------------------------- --
--- Locals / Init                                                              --
+-- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 local log         = elreq('erlib/lua/Log'          )().Logger  'Babelfish'
@@ -524,7 +524,8 @@ remote.add_interface(const.remote.interface_name, Remote)
 -- to deliver a native search experience.
 -- Translation is granular per @{Babelfish.SearchType|SearchType}.
 --
--- All searches are conducted in __lower-case__. In the SearchType order given,
+-- All searches are conducted in __lower-case__ (as far as @{string.lower}
+-- works in that language). In the SearchType order given,
 -- and in prototype `order` specific order.
 --
 -- The search result is identical to vanilla search even for unlocalised

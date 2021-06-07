@@ -68,6 +68,13 @@
     "" the empty string in on_string_translated.
     => If this ever becomes a problem adjust equ_lstring
     
+  + Bug Report ("Won't Fix")
+    https://forums.factorio.com/viewtopic.php?f=58&t=98704
+    Unicode search is case-sensitive in Russian
+    => Consider finding a unicode-capable lua library.
+    => As the main usecase is string.lower() it would be sufficent
+       to grab a bunch of mapping tables and implement it myself.
+    
   + Interface Request ("Unlikely")
     https://forums.factorio.com/viewtopic.php?f=28&t=98680
     Read access to interface setting "Fuzzy search"
@@ -92,7 +99,7 @@
 local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
 local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
 -- -------------------------------------------------------------------------- --
--- Locals / Init                                                              --
+-- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 local log         = elreq('erlib/lua/Log'       )().Logger  'BabelfishDictionary'

@@ -18,7 +18,7 @@ local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__
 local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
 
 -- -------------------------------------------------------------------------- --
--- Locals / Init                                                              --
+-- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 
@@ -101,6 +101,21 @@ function Player.get_player(spec)
     end
   return assert(game.players[spec]) end
 
+  
+----------
+-- Sets a shortcut to the opposite state it is in now.
+--
+-- @tparam LuaPlayer p
+-- @tparam string name @{FOBJ LuaShortcutPrototype.name}
+--
+-- @treturn boolean The new state.
+--
+function Player.toggle_shortcut (p, name)
+  local state = not p.is_shortcut_toggled(name)
+  p.set_shortcut_toggled(name,state)
+  return state end
+
+  
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --

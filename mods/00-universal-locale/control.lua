@@ -15,7 +15,7 @@ local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__
 local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
 
 -- -------------------------------------------------------------------------- --
--- Locals / Init                                                              --
+-- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 
@@ -107,6 +107,8 @@ function This.convert_locales(ulocales)
   for mod_name, file_name, header, key, language, value in ntuples(6, ulocales) do
     --
     assertify('' == header:gsub('%[.*%]',''), 'Header missing brackets?\n',
+      '\nheader: "', header, '"\n\nmod_name: ', mod_name, '\nfile_name: ', file_name)
+    assertify(header:find('^[a-z%-:%[%]]+$'), 'Header has invalid characters: ',
       '\nheader: "', header, '"\n\nmod_name: ', mod_name, '\nfile_name: ', file_name)
     assertify(language_codes[language], 'Invalid language code: ', language,
       '\nheader: "', header, '"\n\nmod_name: ', mod_name, '\nfile_name: ', file_name)

@@ -34,7 +34,7 @@ if flag.IS_DEV_MODE then
 
   end
 -- -------------------------------------------------------------------------- --
--- Locals / Init                                                              --
+-- Eradicators Library                                                        --
 -- -------------------------------------------------------------------------- --
 
 -- Removes stale references so they can be garbage collected.
