@@ -32,6 +32,9 @@
 !/docs/**/*.css
 !/docs/**/*.ld
 
+# Keep tools
+!/tools/**/*.cmd
+
 # Block underscore prefixed files
 _*
 
