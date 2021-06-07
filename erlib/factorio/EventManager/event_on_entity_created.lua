@@ -150,11 +150,12 @@ return function (EventManager, Private)
   local function remapping_event_raiser (mappings)
     local remapper = Table.remapper(mappings)
     return function(e)
+      e = remapper(e)
       -- Pre-fetching name and type should make up for the slowdown
       -- caused by the wrapper itself by making the filters faster.
       e.created_entity_name = e.created_entity.name
       e.created_entity_type = e.created_entity.type
-      return raise_event(event_uid, remapper(e))
+      return raise_event(event_uid, e)
       end
     end
 

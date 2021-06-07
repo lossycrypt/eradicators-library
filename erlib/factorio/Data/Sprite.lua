@@ -65,7 +65,7 @@ local Sprite,_Sprite = {},{}
 function Sprite.format_icon(file_path, options)
   options = options or {}
   return {
-    icon = file_path,
+    icon = file_path:gsub('%.png$','')..'.png', -- supplement missing extension
     icon_size
       = assert(tonumber(file_path:match '.*[^mip]%f[%d](%d+)'), 'Missing icon size'),
     icon_mipmaps
