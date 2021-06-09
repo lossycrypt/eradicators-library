@@ -37,6 +37,8 @@
 <li><a href="#icon">icon </a></li>
 <li><a href="#item">item </a></li>
 <li><a href="#all_prototypes">all prototypes </a></li>
+<li><a href="#Prototype">Prototype </a></li>
+<li><a href="#Recipe">Recipe </a></li>
 <li><a href="#Sprite">Sprite </a></li>
 </ul>
 
@@ -149,6 +151,29 @@
 	<tr>
 	<td class="name" nowrap><a href="#Inscribe">Inscribe(prototype)</a></td>
 	<td class="summary">Advanced prototype creation and forking.</td>
+	</tr>
+</table>
+<h2><a href="#Prototype">Prototype </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Prototype.get">Prototype.get(type, name)</a></td>
+	<td class="summary">Retrieves a prototype table reference from data.raw
+ Raises an error if that prototype doesn't exist.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Prototype.get_enabled">Prototype.get_enabled(prototype)</a></td>
+	<td class="summary">Retrieves enabled status of a recipe, technology or custom-input.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Prototype.set_enabled">Prototype.set_enabled(prototype, normal_enabled, expensive_enabled)</a></td>
+	<td class="summary">Sets the enabled status on a recipe, technology or custom-input.</td>
+	</tr>
+</table>
+<h2><a href="#Recipe">Recipe </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Recipe.copy_unlock_condition">Recipe.copy_unlock_condition(source_name, target_names)</a></td>
+	<td class="summary">Copies the unlock conditions of one recipe to another.</td>
 	</tr>
 </table>
 <h2><a href="#Sprite">Sprite </a></h2>
@@ -486,6 +511,160 @@ EventManager.new_handler {
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="Prototype"></a>Prototype </h2>
+
+            <h3>Usage:</h3>
+            <pre class="example"><span class="keyword">local</span> Prototype = <span class="global">require</span>(<span class="string">'__eradicators-library__/erlib/factorio/Data/Prototype'</span>)()</pre>
+    <dl class="function">
+    <dt>
+    <a name = "Prototype.get"></a>
+    <strong>Prototype.get(type, name)</strong>
+    </dt>
+    <dd>
+    Retrieves a prototype table reference from data.raw
+ Raises an error if that prototype doesn't exist.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">type</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        prototype
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Prototype.get_enabled"></a>
+    <strong>Prototype.get_enabled(prototype)</strong>
+    </dt>
+    <dd>
+    Retrieves enabled status of a recipe, technology or custom-input.
+ If neither normal nor expensive difficulty is explicitly defined
+ then inline data is treated as normal difficulty data.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">prototype</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+        If normal difficulty is enabled.</li>
+        <li>
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         If expensive difficulty is enabled. If the
+ prototype does not define expensive difficulty this will be the same
+ as normal difficulty.</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Prototype.set_enabled"></a>
+    <strong>Prototype.set_enabled(prototype, normal_enabled, expensive_enabled)</strong>
+    </dt>
+    <dd>
+    Sets the enabled status on a recipe, technology or custom-input.
+ If neither normal nor expensive difficulty is explicitly defined
+ then inline data is treated as normal difficulty data.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">prototype</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">normal_enabled</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">expensive_enabled</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         <em>(default: normal_enabled</em>)
+ If the prototype does not have explicit difficulty sub-tables
+ this value is ignored.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Recipe"></a>Recipe </h2>
+
+            <h3>Usage:</h3>
+            <pre class="example"><span class="keyword">local</span> Recipe = <span class="global">require</span>(<span class="string">'__eradicators-library__/erlib/factorio/Data/Recipe'</span>)()</pre>
+    <dl class="function">
+    <dt>
+    <a name = "Recipe.copy_unlock_condition"></a>
+    <strong>Recipe.copy_unlock_condition(source_name, target_names)</strong>
+    </dt>
+    <dd>
+    Copies the unlock conditions of one recipe to another.
+ This includes the recipe.enabled parameter for all defined difficulties
+ as well as the technology unlocks if there are any.</p>
+
+<p> <strong>Note:</strong> All recipe prototypes invloved must exist before calling this.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">source_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">target_names</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a> or <a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Sprite"></a>Sprite </h2>
 
             <h3>Usage:</h3>
@@ -561,7 +740,7 @@ EventManager.new_handler {
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-06-07 21:21:55 </i>
+<i style="float:right;">Last updated 2021-06-09 03:38:42 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

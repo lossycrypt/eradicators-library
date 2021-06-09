@@ -5,7 +5,7 @@
 --
 -- @submodule Iter
 -- @usage
---  local filter_pairs = require('__eradicators-library__/erlib/lua/Iter/filter_pairs')()
+--  local fpairs = require('__eradicators-library__/erlib/lua/Iter/fpairs')()
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -19,7 +19,7 @@ local type,pairs,next = type,pairs,next
 -- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
--- local stop   = elreq('erlib/lua/Error')().Stopper('filter_pairs')
+-- local stop   = elreq('erlib/lua/Error')().Stopper('fpairs')
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -31,6 +31,8 @@ local type,pairs,next = type,pairs,next
 -- 
 -- @tparam table tbl The table to be iterated.
 -- @tparam function f The filter function f(value,key,table).
+-- 
+-- @treturn A __stateless__ iterator function.
 -- 
 -- @usage
 --   -- For example if you've got stored LuaEntity references
@@ -47,7 +49,7 @@ local type,pairs,next = type,pairs,next
 --      global.MyEntityData[unit_number] = nil
 --      end
 -- 
-local function filter_pairs(tbl,f)
+local function fpairs(tbl,f)
   local next,_,start = pairs(tbl) --respect custom iterator
   local function _iter(tbl,k)
     local v
@@ -64,5 +66,5 @@ local function filter_pairs(tbl,f)
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-do (STDOUT or log or print)('  Loaded → erlib.Iter.filter_pairs') end
-return function() return filter_pairs end
+do (STDOUT or log or print)('  Loaded → erlib.Iter.fpairs') end
+return function() return fpairs end

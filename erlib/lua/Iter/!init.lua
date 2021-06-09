@@ -45,8 +45,8 @@ Iter.ntuples      = elreq('erlib/lua/Iter/ntuples')()
 Iter.dpairs       = elreq('erlib/lua/Iter/dpairs')()
 Iter.sriapi       = elreq('erlib/lua/Iter/sriapi')()
 
-Iter.filter_pairs = elreq('erlib/lua/Iter/filter_pairs' )()
--- Iter.map_tuples  = elreq('erlib/lua/Iter/map_tuples' )()
+Iter.fpairs  = elreq('erlib/lua/Iter/fpairs'  )()
+Iter.fpairs2 = elreq('erlib/lua/Iter/fpairs2' )()
 
 -- Iter.map_tuples is trivial to emulate with sync_tuples so
 -- no extra module is required.

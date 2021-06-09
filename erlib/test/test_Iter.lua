@@ -312,7 +312,7 @@ local function Test()
 
   say('  TESTR  @  erlib.Iter.array_pairs → No test implemented.')
   say('  TESTR  @  erlib.Iter.dpairs → No test implemented.')
-  say('  TESTR  @  erlib.Iter.filter_pairs → No test implemented.')
+  say('  TESTR  @  erlib.Iter.fpairs → No test implemented.')
   end
 
 

@@ -230,10 +230,10 @@ local function revectorize(v) return setmetatable(v, Vector.object_mt) end
 -- Vector(SimpleVector) :: a factorio two component vector {x,y}
 -- Vector(Number,Number or nil,Number or nil,Number or nil) 
 --   :: Numbers are dx, dy, ox, oy
---   :: origin defaults to (0,0)
+--   :: oy defaults to ox
+--   :: ox defaults to 0
 --   :: dy defaults to dx
 --   :: dx is mandatory
---
 -- @function Vector
 -- @param ...
 --
@@ -263,7 +263,7 @@ Vector = Class.SwitchCaseClass(
   -- nil, --no fallback, default is hard failure
   { ['vector'] = function(v) return v:copy() end,
     ['values'] = function(dx,dy,ox,oy) return
-      {dx or 0,dy or dx or 0,ox or 0,oy or 0} end, --@future: "oy or ox or 0"?
+      {assert(dx, 'dx can not be nil'),dy or dx or 0,ox or 0,oy or ox or 0} end,
     ['area']   = function(a) return {
       a.right_bottom.x - a.left_top.x,
       a.right_bottom.y - a.left_top.y,
@@ -452,8 +452,11 @@ function Vector.scale_both_ways(v,n)
     v[3] - ( (0.5*n-0.5) * v[1] )   ,
     v[4] - ( (0.5*n-0.5) * v[2] )   
   return v end
----moves the origin of @v so that the center of the line @v_offset -> @v_target
----is positioned on the target of @w
+---moves the origin of @v so that the center of the line @v_origin -> @v_target
+---is positioned on the target of @w.
+---@usage
+---  print(Hydra.line(Vector(3):set_center_to_target(0):to_box()))
+---  > {{-1.5, -1.5}, {1.5, 1.5}}
 function Vector.set_center_to_target(v,...)
   local wx,wy = Vector(...):get_target()
   v[3],v[4] = wx - v[1]/2, wy - v[2]/2

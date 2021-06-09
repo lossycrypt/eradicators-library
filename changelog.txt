@@ -1,8 +1,20 @@
 ---------------------------------------------------------------------------------------------------
-Version: 4.1.12
+Version: 4.1.13
 Date: 2021-x-x
-  Utility Mods:
+  Functions:
     - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.1.12
+Date: 2021-06-08
+  Functions:
+    - Renamed Iter.filter_pairs to Iter.fpairs
+    - Added Iter.fpairs2
+    - Added Data.Recipe.copy_unlock_condition
+    - Added Data.Prototype.get
+    - Added Data.Prototype.get_enabled
+    - Added Data.Prototype.set_enabled
+  Utility Mods:
+    - Universal Locale: Removed info icon from map-gen-preset-description.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.11
 Date: 2021-06-07

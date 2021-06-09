@@ -134,6 +134,7 @@ local pattern_functions = {
   function(entry, db)
     local no_header_icon = {
       ['[tips-and-tricks-item-description]'] = true,
+      ['[map-gen-preset-description]'      ] = true,
       }
     local desc = find_description(entry, db)
     if desc and not entry.value:find '_UL:ICON_TOOLTIP_' then

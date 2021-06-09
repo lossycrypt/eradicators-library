@@ -126,7 +126,7 @@ return function (EventManager)
       local researched_uids_array = Array(get_fuids(force))
       for i,uid in pairs(researched_uids_array) do
         if _map[uid] == nil then
-          researched_uids_array:unsorted_remove_key(i)
+          researched_uids_array:shuffle_pop(i)
           end
         end
       -- iter all technologies and compare with known state

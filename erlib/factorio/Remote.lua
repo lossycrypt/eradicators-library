@@ -28,7 +28,7 @@ local Verificate = elreq('erlib/lua/Verificate')()
 local Verify           , Verify_Or
     = Verificate.verify, Verificate.verify_or
 
-local filter_pairs = elreq('erlib/lua/Iter/filter_pairs')()
+local filter_pairs = elreq('erlib/lua/Iter/fpairs')()
 
 local Set   = elreq('erlib/lua/Set'  )()
 local Table = elreq('erlib/lua/Table')()

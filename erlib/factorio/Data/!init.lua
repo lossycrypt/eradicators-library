@@ -62,7 +62,10 @@ local Color = elreq('erlib/lua/Color')()
 
 local Data,_Data = {},{}
 
-Data.Sprite = elreq('erlib/factorio/Data/Sprite')()
+Data.Sprite     = elreq('erlib/factorio/Data/Sprite'    )()
+Data.Recipe     = elreq('erlib/factorio/Data/Recipe'    )()
+Data.Prototype  = elreq('erlib/factorio/Data/Prototype' )()
+-- Data.Technology = elreq('erlib/factorio/Data/Technology')()
 
 -- -------
 -- Nothing.
