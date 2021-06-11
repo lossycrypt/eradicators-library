@@ -64,6 +64,9 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 local function sriapi(arr)
   -- No point in making this stateless. Direct array access
   -- is faster when manual index management is required.
+  --
+  -- Statefulness is VERY USEFUL when elements are to 
+  -- be deleted during the iteration!
   local i = #arr + 1
   -- For loops break when the *first* return value becomes nil,
   -- thus it's easier to return the value first and the index second.

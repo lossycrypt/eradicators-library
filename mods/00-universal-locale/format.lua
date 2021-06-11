@@ -43,8 +43,12 @@ local function find_description(entry, db)
 -- Takes a string and puts it into the description of the corresponding
 -- entry. Generates a new description if there was none.
 local function add_description_header(entry, db, msg)
+  --
+  local x; entry.value, x = entry.value:gsub('_UL:NOAUTODESCRIPTION_','')
+  if x > 0 then return end
+  --
   local desc = find_description(entry, db)
-  
+  --
   if desc then
   
     local desc_value = String.split(desc.value, '_UL:ENDOFHEADER_')
@@ -133,8 +137,12 @@ local pattern_functions = {
   -- Add Info Icon to all settings with description.
   function(entry, db)
     local no_header_icon = {
+      -- Reason: Can't hover.
       ['[tips-and-tricks-item-description]'] = true,
       ['[map-gen-preset-description]'      ] = true,
+      ['[technology-description]'          ] = true,
+      -- Reason: Automatically added by engine! Wtf!
+      ['[controls-description]'] = true,
       }
     local desc = find_description(entry, db)
     if desc and not entry.value:find '_UL:ICON_TOOLTIP_' then

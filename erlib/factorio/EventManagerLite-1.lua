@@ -69,13 +69,14 @@
   
   ]]
 
-----------
+-- -------
 -- Consider if it's worth suppporting on\_init.
 -- This would require storing loaded module names in Savedata
 -- to detect when modules get added / removed from a mod.
 -- Additionally module aware ConfigurationChangedData might be needed.
 -- This would be done as a seperate event module (inside this file?).
 -- Sounds like waaay too complicated stuff for little benefit.
+-- KISS. This is supposed to be EventManager LITE!
 -- @table todo1
 do end
   

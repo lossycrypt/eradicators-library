@@ -39,10 +39,10 @@ local function gtr(verA,verB)
 
 local ops = {}
   ops['>' ] = gtr                                                     
-  ops['>='] = function(A,B) return      gtr(A,B) or (not gtr(B,A)) end
+  ops['>='] = function(A,B) return not  gtr(B,A)                   end
   ops['=='] = function(A,B) return not (gtr(A,B) or      gtr(B,A)) end
   ops['~='] = function(A,B) return     (gtr(A,B) or      gtr(B,A)) end
-  ops['<='] = function(A,B) return      gtr(B,A) or (not gtr(A,B)) end
+  ops['<='] = function(A,B) return not  gtr(A,B)                   end
   ops['<' ] = function(A,B) return      gtr(B,A)                   end
   ops['!='] = ops['~=']
 
@@ -93,6 +93,30 @@ function Version.compare(verA,operator,verB)
 function Version.parse(versionA)
   return parse_version(versionA)
   end
+  
+  
+-- -------------------------------------------------------------------------- --
+-- Experiment                                                                 --
+-- -------------------------------------------------------------------------- --
+
+-- Can this be inlined with metatables?
+-- Would've been nice to be able to do: Version('1.1') == '1.1.0'
+--
+-- Conclusion: NOPE!
+--   Lua does NEVER call the __eq method unless both 
+--   operands are already of the same type! __le does
+--   work, but it's really bad trap if == always returns false.
+--
+-- local mt = {
+--   __eq = function(A,B)
+--     A, B = A[1] or A, B[1] or B -- Lua string indexing returns nil. Weird!
+--     return ops['=='](A,B) end,
+--   __lt = function(A,B)
+--     -- Lua is smart and deduces <, <=, >, >= from a single "less than" function.
+--     A, B = A[1] or A, B[1] or B
+--     return ops['<'](A,B) end
+--     }
+-- setmetatable(Version, {__call=function(_,str) return setmetatable({str},mt) end})
   
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

@@ -71,6 +71,7 @@ local stop = Error .Stopper 'Core' -- local to each plugin in the future
 local startup_only = function(path) if not Const.load_stage.control then return path end end
 local control_only = function(path) if     Const.load_stage.control then return path end end
 local dev_only     = function(path) if flag.IS_DEV_MODE then return path end end
+local fdata_only   = function(path) if flag.IS_FACTORIO and Const.load_stage.data then return path end end
 
 local Modules = {
   --determines load order
@@ -119,6 +120,8 @@ local Modules = {
   Data       = 'erlib/factorio/Data/!init',
   Setting    = 'erlib/factorio/Setting'   ,
   Locale     = 'erlib/factorio/Locale'    ,
+  
+  Wube       = fdata_only 'erlib/factorio/Wube',
   
   PluginManagerLite = dev_only 'erlib/factorio/PluginManagerLite-1',
   

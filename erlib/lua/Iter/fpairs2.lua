@@ -13,7 +13,8 @@
 local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
 local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
 
-local type,pairs,next = type,pairs,next
+local type,pairs,next,table_unpack
+    = type,pairs,next,table.unpack
 
 -- -------------------------------------------------------------------------- --
 -- Eradicators Library                                                        --
@@ -38,18 +39,19 @@ local Table   = elreq('erlib/lua/Table')()
 -- The iterator terminates after f has been called on all elemetnts of tbl.
 --
 local function fpairs2(tbl, f)
-  local next, tbl, start = pairs(tbl) --respect custom iterator
-  local k
   assert(tbl)
   assert(f)
+  local next, tbl, start = pairs(tbl) --respect custom iterator
+  local k, n
   local function _iter()
     local v
     repeat 
       k, v = next(tbl, k)
       if k == nil then return nil end
       v = {f(v, k, tbl)}
-      until (Table.size(v) > 0)
-    return table.unpack(v) end
+      n = Table.array_size(v) --v can be sparse!
+      until (n > 0)
+    return table_unpack(v,1,n) end
   return _iter end
 
 

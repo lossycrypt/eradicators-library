@@ -1,0 +1,365 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Erlib Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Circuit">Circuit </a></li>
+<li><a href="#Pixel">Pixel </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/Core.html">Core</a></li>
+  <li><a href="../modules/Types.html">Types</a></li>
+  <li><a href="../modules/Concepts.html">Concepts</a></li>
+  <li><a href="../modules/Cache.html">Cache</a></li>
+  <li><a href="../modules/Data.html">Data</a></li>
+  <li><a href="../modules/Template.html">Template</a></li>
+  <li><a href="../modules/Entity.html">Entity</a></li>
+  <li><a href="../modules/EventManager.html">EventManager</a></li>
+  <li><a href="../modules/EventManagerLite.html">EventManagerLite</a></li>
+  <li><a href="../modules/Force.html">Force</a></li>
+  <li><a href="../modules/Gui.html">Gui</a></li>
+  <li><a href="../modules/Locale.html">Locale</a></li>
+  <li><a href="../modules/Player.html">Player</a></li>
+  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
+  <li><a href="../modules/PluginManagerLite.html">PluginManagerLite</a></li>
+  <li><a href="../modules/Remote.html">Remote</a></li>
+  <li><a href="../modules/Setting.html">Setting</a></li>
+  <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
+  <li><a href="../modules/Train.html">Train</a></li>
+  <li><strong>Wube</strong></li>
+  <li><a href="../modules/Array.html">Array</a></li>
+  <li><a href="../modules/Class.html">Class</a></li>
+  <li><a href="../modules/Coding.html">Coding</a></li>
+  <li><a href="../modules/Color.html">Color</a></li>
+  <li><a href="../modules/Compare.html">Compare</a></li>
+  <li><a href="../modules/Debug.html">Debug</a></li>
+  <li><a href="../modules/Error.html">Error</a></li>
+  <li><a href="../modules/Filter.html">Filter</a></li>
+  <li><a href="../modules/Iter.html">Iter</a></li>
+  <li><a href="../modules/Lambda.html">Lambda</a></li>
+  <li><a href="../modules/LocalisedString.html">LocalisedString</a></li>
+  <li><a href="../modules/Lock.html">Lock</a></li>
+  <li><a href="../modules/Log.html">Log</a></li>
+  <li><a href="../modules/Logic.html">Logic</a></li>
+  <li><a href="../modules/Math.html">Math</a></li>
+  <li><a href="../modules/Meta.html">Meta</a></li>
+  <li><a href="../modules/Polygon.html">Polygon</a></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
+  <li><a href="../modules/Set.html">Set</a></li>
+  <li><a href="../modules/String.html">String</a></li>
+  <li><a href="../modules/Table.html">Table</a></li>
+  <li><a href="../modules/Time.html">Time</a></li>
+  <li><a href="../modules/Tool.html">Tool</a></li>
+  <li><a href="../modules/Vector.html">Vector</a></li>
+  <li><a href="../modules/Verificate.html">Verificate</a></li>
+  <li><a href="../modules/Version.html">Version</a></li>
+  <li><a href="../modules/remotes.html">remotes</a></li>
+  <li><a href="../modules/snippet.html">snippet</a></li>
+  <li><a href="../modules/Babelfish.html">Babelfish</a></li>
+</ul>
+<h2>Source</h2>
+<ul class="nowrap">
+  <li><a href="../source/Introduction.html">Introduction</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Wube</code></h1>
+<p>Documents some of factorios built-in data-stage functions.</p>
+<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.</p>
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">local Wube = require(&apos;__eradicators-library__/erlib/factorio/Wube&apos;)()
+</pre>
+    </ul>
+
+
+<h2><a href="#Circuit">Circuit </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#default_circuit_wire_max_distance">default_circuit_wire_max_distance</a></td>
+	<td class="summary">(<a href="https://www.lua.org/pil/2.3.html">number</a>).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#universal_connector_template">universal_connector_template</a></td>
+	<td class="summary">(<a href="../lua-5.2/doc/manual.html#pdf-table">table</a>).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#circuit_connector_definitions">circuit_connector_definitions</a></td>
+	<td class="summary">(<a href="../lua-5.2/doc/manual.html#pdf-table">table</a>).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#circuit_connector_definitions.create">circuit_connector_definitions.create(connector_template, definitions)</a></td>
+	<td class="summary">(<a href="https://www.lua.org/pil/2.6.html">function</a>).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#make_universal_circuit_connectors">make_universal_circuit_connectors(definitions)</a></td>
+	<td class="summary">(<a href="https://www.lua.org/pil/2.6.html">function</a>).</td>
+	</tr>
+</table>
+<h2><a href="#Pixel">Pixel </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Util.by_pixel">Util.by_pixel(x, y)</a></td>
+	<td class="summary">Converts pixels to tiles (32 pixels per tile).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Util.by_pixel_hr">Util.by_pixel_hr(x, y)</a></td>
+	<td class="summary">Converts pixels to tiles (64 pixels per tile).</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Circuit"></a>Circuit </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "default_circuit_wire_max_distance"></a>
+    <strong>default_circuit_wire_max_distance</strong>
+    </dt>
+    <dd>
+    (<a href="https://www.lua.org/pil/2.3.html">number</a>).
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "universal_connector_template"></a>
+    <strong>universal_connector_template</strong>
+    </dt>
+    <dd>
+    (<a href="../lua-5.2/doc/manual.html#pdf-table">table</a>). <br/>
+ The template graphics are in: <br/>
+ <code>base/graphics/entity/circuit-connector/hr-ccm-universal-04a-base-sequence.png</code>
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "circuit_connector_definitions"></a>
+    <strong>circuit_connector_definitions</strong>
+    </dt>
+    <dd>
+    (<a href="../lua-5.2/doc/manual.html#pdf-table">table</a>).
+ Contains the sprites and points generated by base factorio in: <br/>
+ <code>core/lualib/circuit-connector-generated-definitions.lua</code>
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "circuit_connector_definitions.create"></a>
+    <strong>circuit_connector_definitions.create(connector_template, definitions)</strong>
+    </dt>
+    <dd>
+    (<a href="https://www.lua.org/pil/2.6.html">function</a>).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">connector_template</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         For examples <a href="../modules/Wube.html#universal_connector_template">Wube.universal_connector_template</a>.
+        </li>
+        <li><span class="parameter">definitions</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         A table with two subtables: <br/>
+   <code>sprites</code> (<a href="../lua-5.2/doc/manual.html#pdf-table">table</a>) <a href="https://wiki.factorio.com/Prototype/Entity#circuit_connector_sprites">Prototype/Entity.circuit_connector_sprites</a> <br/>
+   <code>points</code> (<a href="../lua-5.2/doc/manual.html#pdf-table">table</a>) <a href="https://wiki.factorio.com/Prototype/Entity#circuit_wire_connection_point">Prototype/Entity.circuit_wire_connection_point</a> 
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "make_universal_circuit_connectors"></a>
+    <strong>make_universal_circuit_connectors(definitions)</strong>
+    </dt>
+    <dd>
+    (<a href="https://www.lua.org/pil/2.6.html">function</a>).  Erlib Syntactic Sugar. <br/>
+ Calls <a href="./Wube.html#circuit_connector_definitions.create">circuit_connector_definitions.create</a>
+ using the <a href="../modules/Wube.html#universal_connector_template">Wube.universal_connector_template</a>, and unpacks the results.</p>
+
+<p> Variation number is based on the sequence in the template graphics file.
+ Starting at 1 in the upper left corner and incrementing left-to-right, top-to-bottom.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">definitions</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        <a href="https://wiki.factorio.com/Prototype/Entity#circuit_connector_sprites">Prototype/Entity.circuit_connector_sprites</a></li>
+        <li>
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        <a href="https://wiki.factorio.com/Prototype/Entity#circuit_wire_connection_point">Prototype/Entity.circuit_wire_connection_point</a></li>
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> sprites, points = Wube.make_universal_circuit_connectors{{
+  variation     = <span class="number">26</span>,
+  main_offset   = Wube.Util.by_pixel(<span class="number">7</span>, <span class="number">15.5</span>),
+  shadow_offset = Wube.Util.by_pixel(<span class="number">7</span>, <span class="number">15.5</span>),
+  show_shadow   = <span class="keyword">false</span>,
+  }}
+
+<span class="keyword">local</span> my_prototype = {}
+my_prototype.circuit_connector_sprites     = sprites
+my_prototype.circuit_wire_connection_point = points
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Pixel"></a>Pixel </h2>
+
+          <div class="section-description">
+
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "Util.by_pixel"></a>
+    <strong>Util.by_pixel(x, y)</strong>
+    </dt>
+    <dd>
+    Converts pixels to tiles (32 pixels per tile).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">x</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.3.html">number</a></span>
+         in pixels
+        </li>
+        <li><span class="parameter">y</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.3.html">number</a></span>
+         in pixels
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        <code>{x,y}</code> in tiles
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Util.by_pixel_hr"></a>
+    <strong>Util.by_pixel_hr(x, y)</strong>
+    </dt>
+    <dd>
+    Converts pixels to tiles (64 pixels per tile).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">x</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.3.html">number</a></span>
+         in pixels
+        </li>
+        <li><span class="parameter">y</span>
+            <span class="types"><a class="type" href="https://www.lua.org/pil/2.3.html">number</a></span>
+         in pixels
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        <code>{x,y}</code> in tiles
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2021-06-11 04:17:59 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

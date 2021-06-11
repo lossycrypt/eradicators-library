@@ -50,10 +50,8 @@ local Recipe,_Recipe = {},{}
 
 ----------
 -- Copies the unlock conditions of one recipe to another.
--- This includes the recipe.enabled parameter for all defined difficulties
+-- This includes @{FWIKI Prototype Recipe.enabled} for all defined difficulties
 -- as well as the technology unlocks if there are any.
--- 
--- __Note:__ All recipe prototypes invloved must exist before calling this.
 -- 
 -- @tparam string source_name
 -- @tparam string|DenseArray target_names
@@ -67,7 +65,7 @@ function Recipe.copy_unlock_condition(source_name, target_names)
   local normal, expensive
       = Prototype.get_enabled(Prototype.get('recipe', source_name))
   for _, name in ipairs(target_names) do
-    Prototype.set_enabled( Prototype.get('recipe', name), normal, expensive)
+    Prototype.set_enabled(Prototype.get('recipe', name), normal, expensive)
     end
   --
   local function find_unlock(tech)
@@ -82,6 +80,8 @@ function Recipe.copy_unlock_condition(source_name, target_names)
     if isType.table(tbl[key]) then
       local i, effect = find_unlock(tbl[key])
       if i then
+        -- Put the new ones right after the source instead
+        -- of at the end of the array. Looks nicer.
         for j, name in ipairs(target_names) do
           table.insert(effect, i + (j-1), {
             type   = 'unlock-recipe',
@@ -91,7 +91,7 @@ function Recipe.copy_unlock_condition(source_name, target_names)
         end
       end
     end
-  -- Why do technologies have difficulty garbage?!
+  -- Why must technologies have difficulty garbage?! *sigh*
   for name, tech in pairs(data.raw.technology) do
     add_unlocks(data.raw.technology, name)
     add_unlocks(tech, 'normal')

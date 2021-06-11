@@ -148,8 +148,7 @@ function Table.array_size(tbl)
       last = i
       end
     end
-  return last
-  end
+  return last end
   
   
 ----------

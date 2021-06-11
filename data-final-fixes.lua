@@ -17,7 +17,7 @@ if flag.DO_TESTS then
 -- Create Shared Hotkeys                                                      --
 -- -------------------------------------------------------------------------- --
 local Data = elreq('erlib/factorio/Data/!init')()
-Data.SimpleCustomInput('er:','interact-button','mouse-button-3')
+Data.SimpleCustomInput('er:','interact','mouse-button-3')
 
 -- -------------------------------------------------------------------------- --
 -- Plugins                                                                      --

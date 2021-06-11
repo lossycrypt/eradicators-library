@@ -254,6 +254,15 @@ function Public.enable_savedata_management()
     -- print(serpent.block(_ENV.global))
     end
 
+  local function delete_unused_savedatas()
+    local Savedatas = Table.get(_ENV.global,{'plugin_manager', 'plugins'})
+    for plugin_name, _ in pairs(Savedatas) do
+      if not ManagedPlugins[plugin_name] then
+        log:debug('delete unknown Savedata: ', plugin_name)
+        Savedatas[plugin_name] = nil
+        end
+      end
+    end
     
   script.on_load(function()
     -- print('PM on_load')
@@ -264,6 +273,7 @@ function Public.enable_savedata_management()
     -- print('PM on_init')
     -- print('PM on_config')
     relink_savedatas()
+    delete_unused_savedatas()
     end)
 
     

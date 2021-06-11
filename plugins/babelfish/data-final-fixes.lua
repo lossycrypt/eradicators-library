@@ -46,14 +46,14 @@ data:extend{{
   name = const.name.tip_1,
   category = require ('__eradicators-library__/plugins/tips-group/const')
              .tips.category_name,
-  starting_status = "unlocked",
+  starting_status = "not-to-be-suggested",
   indent = 1,
   tag = ('[img=%s] '):format(const.sprite.default_icon),
   order = 'babelfish',
-  trigger = {
+  -- trigger = {
     -- There is no lua-script based trigger. (base 1.1.34)
-    type = "time-elapsed",
+    -- type = "time-elapsed",
     -- ticks = 60 * 60 * 5, -- 5 minutes
-    ticks = 1,
-    },
+    -- ticks = 1,
+    -- },
   }}

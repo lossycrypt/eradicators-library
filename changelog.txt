@@ -13,6 +13,10 @@ Date: 2021-06-08
     - Added Data.Prototype.get
     - Added Data.Prototype.get_enabled
     - Added Data.Prototype.set_enabled
+    - New module Wube for documenting vanilla data-stage functions.
+    - Added Wube.make_universal_circuit_connectors
+    - Added TickedAction to EventManagerLite
+    - Added removal of uninstalled plugin's savedata to PluginManagerLite.
   Utility Mods:
     - Universal Locale: Removed info icon from map-gen-preset-description.
 ---------------------------------------------------------------------------------------------------

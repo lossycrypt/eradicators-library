@@ -26,14 +26,14 @@ require(_)('dontpanic', {
 -- -------------------------------------------------------------------------- --
 require(_)('interact-button', { 
   ['[controls]'] = {
-    ['er:interact-button'] = { 
+    ['er:interact'] = { 
       en = "Interact with object",
       de = "Mit Object interagieren",
       ja = "操作する",
       }
     },
   ['[controls-description]'] = {
-    ['er:interact-button'] = { 
+    ['er:interact'] = { 
       en = "A generic tertiary interact button for mods to use alongside "
         .. "mine and build.",
       de = 'Ein unspetifischer dritter Interactionsknopf für Mods.',

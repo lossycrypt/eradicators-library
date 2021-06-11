@@ -24,6 +24,17 @@ return function(phase) assert(phase)
       
     ]]
 
+  local const = require('__eradicators-library__/plugins/!init/const')
+
+  local function get_enabled_plugins(setting)
+    -- allowed_values can not be read in data stage
+    local Set    = elreq('erlib/lua/Set'   )()
+    local String = elreq('erlib/lua/String')()
+    return Set.from_values(
+      String.split(assert(setting.value or setting.default_value),'|')
+      )
+    end
+    
   -- ------------------------------------------------------------------------ --
   -- Debug                                                                    --
   -- ------------------------------------------------------------------------ --
@@ -46,26 +57,32 @@ return function(phase) assert(phase)
   -- ------------------------------------------------------------------------ --
   if phase == 'settings' then
 
-    local Data  = elreq('erlib/factorio/Data/!init')()
-    local Table = elreq('erlib/lua/Table'     )()
-    
-    local enablers = {}
-    local function make_enableable(name, prototype)
-      enablers[name] = prototype
-      end
+    local Setting = elreq('erlib/factorio/Setting')()
+    local Table   = elreq('erlib/lua/Table'       )()
+      
+    local db = Setting.make {
+      const.name.setting.enabled_plugins,
+      'startup', 'string', 'none',
+      'zz',
+      allow_blank    = false,
+      allowed_values = {'none'},
+      hidden         = (not flag.IS_DEV_MODE),
+      }
     
     _ENV .erlib_enable_plugin = function(plugin_name)
-      local prototype = assert(enablers[plugin_name], 'Unknown plugin')
-      data.raw['bool-setting'][prototype.name].forced_value = true
-      log(prototype.name:gsub('.*enable%-','') .. ' was enabled.')
+      local value = db.default_value..'|'..plugin_name
+      db.default_value  = value
+      db.allowed_values = {value}
+      log('Recieved request to enable plugin: "'..plugin_name..'".')
       end
     
     local configurators = {
       ['babelfish'] = function(options)
         assert(type(options) == 'table', 'Babelfish: Invalid options.')
         assert(type(options.search_types) == 'table', 'Babelfish: Translation types must be a table.')
+        local search_types = Table.sget(db, {'babelfish_search_types'}, {})
         for _, v in pairs(options.search_types) do
-          table.insert(enablers['babelfish'].search_types, v)
+          table.insert(search_types, v)
           end
         end
       }
@@ -73,32 +90,6 @@ return function(phase) assert(phase)
     _ENV .erlib_configure_plugin = function(plugin_name, options)
       assert(configurators[plugin_name], 'Unknown plugin.')(options)
       end
-    
-    local dummy = {
-      type          = 'bool-setting' ,
-      setting_type  = 'startup'      ,
-      order         = 'zz'           ,
-      hidden        = true           ,
-      default_value = false          ,
-      forced_value  = false          , -- Only loaded if hidden = true
-      }
-
-    make_enableable('babelfish',
-      Data.Inscribe(Table.smerge(dummy, {
-        name  = 'erlib:enable-babelfish',
-        order = 'ZZ9 Plural Z Alpha'    ,
-        search_types = {}               , -- delete later
-      })))
-
-    make_enableable('cursor-tracker',
-      Data.Inscribe(Table.smerge(dummy,{
-        name  = 'erlib:enable-cursor-tracker',
-      })))
-
-    make_enableable('zoom-tracker',
-      Data.Inscribe(Table.smerge(dummy,{
-        name  = 'erlib:enable-zoom-tracker',
-      })))
       
   -- ------------------------------------------------------------------------ --
   -- Settings Final Fixes                                                     --
@@ -106,6 +97,10 @@ return function(phase) assert(phase)
   elseif phase == 'settings-final-fixes' then
 
     local Table = elreq('erlib/lua/Table')()
+    local Set   = elreq('erlib/lua/Set'  )()
+    
+    local db = data.raw['string-setting'][const.name.setting.enabled_plugins]
+    local enabled_plugins = get_enabled_plugins(db)
     
     if flag.IS_DEV_MODE then
       erlib_enable_plugin('babelfish')
@@ -117,10 +112,10 @@ return function(phase) assert(phase)
         })
       end
   
-    if data.raw['bool-setting']['erlib:enable-babelfish'].forced_value then
-      require 'plugins/babelfish/settings-final-fixes' (Table.pop(
-          data.raw['bool-setting']['erlib:enable-babelfish'],'search_types'
-        ))
+    if enabled_plugins['babelfish'] then
+      require 'plugins/babelfish/settings-final-fixes' (
+        Table.pop(db, 'babelfish_search_types')
+        )
       end
 
   -- ------------------------------------------------------------------------ --
@@ -128,18 +123,22 @@ return function(phase) assert(phase)
   -- ------------------------------------------------------------------------ --
   elseif phase == 'data-final-fixes' then
 
+    local db = settings.startup[const.name.setting.enabled_plugins]
+    local enabled_plugins = get_enabled_plugins(db)
+  
     if true then -- Does this need a condition?
       require 'plugins/tips-group/data-final-fixes'
       end
       
-    if settings.startup['erlib:enable-cursor-tracker'].value then
+    if enabled_plugins['cursor-tracker'] then
       require 'plugins/cursor-tracker/data-final-fixes.lua'
       end
     
-    if settings.startup['erlib:enable-babelfish'].value then
+    if enabled_plugins['babelfish'] then
       require 'plugins/babelfish/data-final-fixes'
       end
-    
+
+      
   -- ------------------------------------------------------------------------ --
   -- Control                                                                  --
   -- ------------------------------------------------------------------------ --
@@ -149,19 +148,22 @@ return function(phase) assert(phase)
     -- Generic Ulocale                                                        --
     -- ---------------------------------------------------------------------- --
     require 'plugins/tips-group/ulocale'
+    require 'plugins/!init/ulocale'
   
     -- ---------------------------------------------------------------------- --
     -- Hooks & Nooks                                                          --
     -- ---------------------------------------------------------------------- --
-    local function f(n) return _ENV.settings.startup[n].value end
-    local settings = {
-      enable_bablefish      = f 'erlib:enable-babelfish'     ,
-      enable_cursor_tracker = f 'erlib:enable-cursor-tracker',
-      enable_zoom_tracker   = f 'erlib:enable-zoom-tracker'  ,
-      }
+      
+    local Set   = elreq('erlib/lua/Set'  )()
+    
+    local db = _ENV.settings.startup[const.name.setting.enabled_plugins]
+    local enabled_plugins = get_enabled_plugins(db)
+    -- ignore dummies
+    enabled_plugins[''    ] = nil
+    enabled_plugins['none'] = nil
       
     -- When *at least one* plugin has been requested.
-    for _, v in pairs(settings) do if v then
+    for v, _ in pairs(enabled_plugins) do if v then
 
       _ENV. PluginManager = require ('erlib/factorio/PluginManagerLite-1')()
       _ENV. EventManager  = require ('erlib/factorio/EventManagerLite-1' )()
@@ -169,16 +171,19 @@ return function(phase) assert(phase)
 
       PluginManager.enable_savedata_management()
 
-      if settings.enable_bablefish then
+      if enabled_plugins['babelfish'] then
         require 'plugins/babelfish/control.lua'
         -- Creating the locale needs access to 
         -- the settings_prototype.default_value
         require 'plugins/babelfish/ulocale'
         end
       
+      if enabled_plugins['on_ticked_action'] then
+        require 'plugins/on_ticked_action/control.lua'
+        end
+      
       break end end
       
     end
-    
     
   end

@@ -48,7 +48,7 @@ return function(search_types)
     name          = const.setting_name.search_types,
     type          = 'string-setting'          ,
     setting_type  = 'runtime-global'          ,
-    order         = 'babelfish-z'             ,
+    order         = 'ZZ9 Plural Z Alpha'      ,
     hidden        = true                      ,
     allow_blank   = true                      ,
     default_value = search_types[1]           , -- not used

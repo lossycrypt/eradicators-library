@@ -32,11 +32,11 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Todo">Todo </a></li>
 <li><a href="#Factorio_Behavior">Factorio Behavior </a></li>
 <li><a href="#Examples">Examples </a></li>
 <li><a href="#Public_methods">Public methods </a></li>
 <li><a href="#ManagedLuaBootstrap">ManagedLuaBootstrap </a></li>
+<li><a href="#TickedAction">TickedAction </a></li>
 </ul>
 
 
@@ -61,6 +61,7 @@
   <li><a href="../modules/Setting.html">Setting</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
   <li><a href="../modules/Train.html">Train</a></li>
+  <li><a href="../modules/Wube.html">Wube</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
   <li><a href="../modules/Class.html">Class</a></li>
   <li><a href="../modules/Coding.html">Coding</a></li>
@@ -116,13 +117,6 @@
     </ul>
 
 
-<h2><a href="#Todo">Todo </a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#todo1">todo1</a></td>
-	<td class="summary">Consider if it's worth suppporting on_init.</td>
-	</tr>
-</table>
 <h2><a href="#Factorio_Behavior">Factorio Behavior </a></h2>
 <table class="function_list">
 	<tr>
@@ -210,34 +204,26 @@
 	<td class="summary">Removed.</td>
 	</tr>
 </table>
+<h2><a href="#TickedAction">TickedAction </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#on_ticked_action">on_ticked_action</a></td>
+	<td class="summary">Called when an action should happen.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TickedAction.enqueue">TickedAction.enqueue(module_name, method_name, offsets[, parameter])</a></td>
+	<td class="summary">Plans a future action.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TickedAction.dequeue">TickedAction.dequeue(module_name, method_name[, ticks])</a></td>
+	<td class="summary">Cancels a future action before it happens.</td>
+	</tr>
+</table>
 
 <br/>
 <br/>
 
 
-    <h2 class="section-header "><a name="Todo"></a>Todo </h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "todo1"></a>
-    <strong>todo1</strong>
-    </dt>
-    <dd>
-    Consider if it's worth suppporting on_init.
- This would require storing loaded module names in Savedata
- to detect when modules get added / removed from a mod.
- Additionally module aware ConfigurationChangedData might be needed.
- This would be done as a seperate event module (inside this file?).
- Sounds like waaay too complicated stuff for little benefit.
-
-
-
-
-
-
-
-</dd>
-</dl>
     <h2 class="section-header has-description"><a name="Factorio_Behavior"></a>Factorio Behavior </h2>
 
           <div class="section-description">
@@ -736,13 +722,148 @@ script.on_config(<span class="keyword">function</span>(e)
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="TickedAction"></a>TickedAction </h2>
+
+            <h3>Usage:</h3>
+            <pre class="example"><span class="comment">-- settings.lua
+</span>erlib_enable_plugin(<span class="string">'on_ticked_action'</span>)
+
+<span class="comment">-- control.lua
+</span><span class="keyword">local</span> Action = Remote.get_interface(<span class="string">'erlib:on_ticked_action'</span>)
+
+<span class="keyword">local</span> my_actions = {
+  doit = <span class="keyword">function</span>(name)
+    <span class="global">print</span>(name .. <span class="string">' did it !'</span>)
+    <span class="keyword">end</span>
+  }
+
+script.on_event(EventManagerLite.events.on_ticked_action, <span class="keyword">function</span>(e)
+  <span class="keyword">if</span> e.module_name == <span class="string">'my-module'</span> <span class="keyword">then</span>
+    <span class="keyword">if</span> e.method_name == <span class="string">'doit'</span> <span class="keyword">then</span>
+      my_actions.doit(e.parameter.name)
+      <span class="keyword">end</span>
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>)
+
+script.on_event(defines.events.on_something_happend, <span class="keyword">function</span>(e)
+  Action.enqueue(<span class="string">'my-module'</span>, <span class="string">'doit'</span>, <span class="number">60</span>*<span class="number">5</span>, {name = <span class="string">'The gardener'</span>})
+  <span class="keyword">end</span>)
+
+<span class="comment">-- 5 seconds later
+</span>&gt; The gardener did it!
+</pre>
+    <dl class="function">
+    <dt>
+    <a name = "on_ticked_action"></a>
+    <strong>on_ticked_action</strong>
+    </dt>
+    <dd>
+    Called when an action should happen.  Events with the same tick are
+ raised in the order they were enqueued in.</p>
+
+<p> See also <a href="../modules/EventManagerLite.html#events">EventManagerLite.events</a>
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">module_name</span>
+         <a href="../lua-5.2/doc/manual.html#pdf-string">string</a> The name you chose.
+        </li>
+        <li><span class="parameter">method_name</span>
+         <a href="../lua-5.2/doc/manual.html#pdf-string">string</a> The name you chose.
+        </li>
+        <li><span class="parameter">parameter</span>
+         <a href="../modules/Types.html#AnyValue">AnyValue</a> The data you gave.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TickedAction.enqueue"></a>
+    <strong>TickedAction.enqueue(module_name, method_name, offsets[, parameter])</strong>
+    </dt>
+    <dd>
+    Plans a future action.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">module_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         A name to identify your event later.
+        </li>
+        <li><span class="parameter">method_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         A name to identify your event later.
+        </li>
+        <li><span class="parameter">offsets</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a> or <a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         How many ticks from now
+ you want the action to happen. You can plan several ticks at once.
+        </li>
+        <li><span class="parameter">parameter</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a>, <a class="type" href="../api/Builtin-Types.html#boolean">boolean</a>, <a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a> or <a class="type" href="https://www.lua.org/pil/2.3.html">number</a></span>
+         You can
+ store data here to retrieve it in the event later. The data
+ must survive a remote call, global Savedata save/load cycles
+ and script.raise_event, so it's best to keep it simple.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TickedAction.dequeue"></a>
+    <strong>TickedAction.dequeue(module_name, method_name[, ticks])</strong>
+    </dt>
+    <dd>
+    Cancels a future action before it happens.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">module_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">method_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">ticks</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a> or <a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         You can either unplan
+ all actions with matching names, or only actions that were planned
+ for the given ticks.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-06-09 03:38:42 </i>
+<i style="float:right;">Last updated 2021-06-11 04:17:59 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
