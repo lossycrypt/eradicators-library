@@ -9,6 +9,6 @@
   "license"          : "The Unlicense (Public Domain)",
   "description"      : "Boodal's lua profiler for identifying performance intensive parts of mods, wrapped in a mod for convenient cross-mod requires. This is a developer tool, not meant for actual gameplay. It is intentionally desync unsafe. Do not use it in multiplayer.",
   "dependencies"     : [
-    "base"
+    "00-toggle-to-enable-dev-mode"
   ]
 }

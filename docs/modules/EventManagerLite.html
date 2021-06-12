@@ -36,6 +36,7 @@
 <li><a href="#Examples">Examples </a></li>
 <li><a href="#Public_methods">Public methods </a></li>
 <li><a href="#ManagedLuaBootstrap">ManagedLuaBootstrap </a></li>
+<li><a href="#ExtraEvents">ExtraEvents</a></li>
 <li><a href="#TickedAction">TickedAction </a></li>
 </ul>
 
@@ -55,7 +56,6 @@
   <li><a href="../modules/Gui.html">Gui</a></li>
   <li><a href="../modules/Locale.html">Locale</a></li>
   <li><a href="../modules/Player.html">Player</a></li>
-  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><a href="../modules/PluginManagerLite.html">PluginManagerLite</a></li>
   <li><a href="../modules/Remote.html">Remote</a></li>
   <li><a href="../modules/Setting.html">Setting</a></li>
@@ -202,6 +202,26 @@
 	<tr>
 	<td class="name" nowrap><a href="#ManagedLuaBootstrap.get_event_filter">ManagedLuaBootstrap.get_event_filter()</a></td>
 	<td class="summary">Removed.</td>
+	</tr>
+</table>
+<h2><a href="#ExtraEvents">ExtraEvents</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#HowToActivateExtraEvents">HowToActivateExtraEvents</a></td>
+	<td class="summary">Extra events must be activated in settings stage prior to usage.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#on_entity_created">on_entity_created</a></td>
+	<td class="summary">All-in-one entity building event.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#on_player_changed_chunk">on_player_changed_chunk</a></td>
+	<td class="summary">Raised when the player moves or is teleported across a chunk border on
+ the same surface, or has moved to another surface.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#on_user_panic">on_user_panic</a></td>
+	<td class="summary">Raised when a player calls <code>&quot;DON&apos;T PANIC!&quot;</code> in the chat.</td>
 	</tr>
 </table>
 <h2><a href="#TickedAction">TickedAction </a></h2>
@@ -722,6 +742,190 @@ script.on_config(<span class="keyword">function</span>(e)
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="ExtraEvents"></a>ExtraEvents</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "HowToActivateExtraEvents"></a>
+    <strong>HowToActivateExtraEvents</strong>
+    </dt>
+    <dd>
+    Extra events must be activated in settings stage prior to usage.
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- settings-updates.lua
+</span>erlib_enable_plugin(<span class="string">'on_player_changed_chunk'</span>)
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "on_entity_created"></a>
+    <strong>on_entity_created</strong>
+    </dt>
+    <dd>
+    All-in-one entity building event. </p>
+
+<p> Combines the following events: <br/>
+ <a href="../api/Events.html#on_built_entity">on_built_entity</a> <br/>
+ <a href="../api/Events.html#on_robot_built_entity">on_robot_built_entity</a> <br/>
+ <a href="../api/Events.html#script_raised_built">script_raised_built</a> <br/>
+ <a href="../api/Events.html#script_raised_revive">script_raised_revive</a> <br/>
+ <a href="../api/Events.html#on_entity_cloned">on_entity_cloned</a> <br/>
+ <a href="../api/Events.html#on_trigger_created_entity">on_trigger_created_entity</a>
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">created_entity</span>
+            <span class="types"><a class="type" href="../api/LuaEntity.html">LuaEntity</a></span>
+         The entity built.
+        </li>
+        <li><span class="parameter">player_index</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+
+
+
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">robot</span>
+            <span class="types"><a class="type" href="../api/LuaEntity.html">LuaEntity</a></span>
+         The robot that did the building.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">stack</span>
+            <span class="types"><a class="type" href="../api/LuaItemStack.html">LuaItemStack</a></span>
+         The item used to do the building.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">item</span>
+            <span class="types"><a class="type" href="../api/LuaItemPrototype.html">LuaItemPrototype</a></span>
+         The item prototype used to build the entity. Note this won't exist in some situations (built from blueprint, undo, etc).
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">tags</span>
+            <span class="types"><a class="type" href="../api/Concepts.html#Tags">Tags</a></span>
+         The tags associated with this entity.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">clone_source</span>
+            <span class="types"><a class="type" href="../api/LuaEntity.html">LuaEntity</a></span>
+         The entity that this entity was cloned from.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">trigger_source</span>
+            <span class="types"><a class="type" href="../api/LuaEntity.html">LuaEntity</a></span>
+         The entity with a trigger prototype (such as capsules) that created this entity.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "on_player_changed_chunk"></a>
+    <strong>on_player_changed_chunk</strong>
+    </dt>
+    <dd>
+    Raised when the player moves or is teleported across a chunk border on
+ the same surface, or has moved to another surface.  After a surface
+ was deleted this is called for all players.</p>
+
+<p> Abstracts: <br/>
+ <a href="../api/Events.html#on_player_changed_position">on_player_changed_position</a> <br/>
+ <a href="../api/Events.html#on_player_changed_surface">on_player_changed_surface</a>
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">player_index</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#uint">uint</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">surface_index</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#uint">uint</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+         <em>If</em> the player changed surfaces then this is
+ the old surfaces index.
+        </li>
+        <li><span class="parameter">old_chunk</span>
+            <span class="types"><a class="type" href="../api/Concepts.html#ChunkPositionAndArea">ChunkPositionAndArea</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">new_chunk</span>
+            <span class="types"><a class="type" href="../api/Concepts.html#ChunkPositionAndArea">ChunkPositionAndArea</a></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "on_user_panic"></a>
+    <strong>on_user_panic</strong>
+    </dt>
+    <dd>
+    Raised when a player calls <code>&quot;DON&apos;T PANIC!&quot;</code> in the chat.
+ You should trigger some generic sanity checking and garbage
+ collection of your mods internal state now.</p>
+
+<p> Abstract:
+ <a href="../api/Events.html#on_console_chat">on_console_chat</a>
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">player_index</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#uint">uint</a></span>
+
+
+
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">message</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">calming_words</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The key for the localised string you
+ should print when you're done.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">script.on_event(EventManager.events.on_user_panic, <span class="keyword">function</span>(e)
+  dostuff()
+  Player.get_event_player(e).<span class="global">print</span>{e.calming_words, <span class="string">'name-of-your-content'</span>}
+  <span class="keyword">end</span>)
+</pre>
+    </ul>
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="TickedAction"></a>TickedAction </h2>
 
             <h3>Usage:</h3>
@@ -863,7 +1067,7 @@ script.on_event(defines.events.on_something_happend, <span class="keyword">funct
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-06-11 04:17:59 </i>
+<i style="float:right;">Last updated 2021-06-12 01:04:16 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

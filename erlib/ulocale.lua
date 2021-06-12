@@ -11,17 +11,6 @@
 --     },
 --   })
 
-
--- -------------------------------------------------------------------------- --
-require(_)('dontpanic', { 
-  ['[er:dont-panic]'] = {
-    ['calming-words'] = { 
-      en = "[color=default]eradicator: Calm down please! "
-        .. "It's ok now. I fixed the [color=blue]__1__[/color].[/color]",
-      }
-    },
-  })
-  
   
 -- -------------------------------------------------------------------------- --
 require(_)('interact-button', { 

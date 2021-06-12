@@ -32,7 +32,7 @@ local Verificate = elreq('erlib/lua/Verificate')()
 
 -- local Tool       = elreq('erlib/lua/Tool'      )()
     
--- local Table      = elreq('erlib/lua/Table'     )()
+local Table      = elreq('erlib/lua/Table'     )()
 -- local Array      = elreq('erlib/lua/Array'     )()
 -- local Set        = elreq('erlib/lua/Set'       )()
 
@@ -86,21 +86,44 @@ function Player.notify(p, text, position)
   end
 
 
-----------
--- Gets a LuaPlayer object.
---
--- @tparam PlayerSpecification spec It is an error if that player doesn't exist.
--- @treturn LuaPlayer
---
-function Player.get_player(spec)
-  if Verificate.isType.LuaObject(spec)
-  and spec.object_name == 'LuaPlayer'
-  then
-    if not spec.valid then stop('Given LuaPlayer object was invalid.') end
-    return spec
-    end
-  return assert(game.players[spec]) end
+do
+  local players = {}
+  
+  local function from_key(key)
+    local p = players[key]
+    if (p and p.valid) then return p end
+    return Table.set(players, {key}, game.get_player(key)) end
+  
+  ----------
+  -- Gets a LuaPlayer object.
+  --
+  -- Functionally equivalent to @{FOBJ LuaGameScript.get_player},
+  -- but faster because the player object is cached on the lua side.
+  --
+  -- @tparam NaturalNumber|string player A @{FOBJ LuaPlayer.index} or @{FOBJ LuaPlayer.name}
+  -- @treturn LuaPlayer
+  -- @function Player.get_player
+  Player.get_player = from_key
 
+  ----------
+  -- Gets a LuaPlayer object.
+  --
+  -- Shortcut for  `Player.get_player(e.player_index)`.
+  --
+  -- @usage
+  --   -- Maximum speed access to lua player objects.
+  --   local getp = Player.get_event_player
+  --   script.on_event(defines.events.on_something_happend, function(e)
+  --     local p = getp(e)
+  --     game.print(p.name .. ' did something!')
+  --     end)
+  --
+  -- @tparam table e Any event table that contains `player_index`.
+  -- @treturn LuaPlayer
+  -- @function Player.get_event_player
+  function Player.get_event_player(e) return from_key(e.player_index) end
+    
+  end
   
 ----------
 -- Sets a shortcut to the opposite state it is in now.

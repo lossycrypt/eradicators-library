@@ -42,6 +42,8 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- local sriapi      = elreq('erlib/lua/Iter/sriapi'  )()
 
 -- local Setting     = elreq('erlib/factorio/Setting'   )()
+-- local Player      = elreq('erlib/factorio/Player'    )()
+-- local getp        = Player.get_event_player
 
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
@@ -90,5 +92,5 @@ local script = EventManager .get_managed_script    'template'
 --   })
   
 -- -------------------------------------------------------------------------- --
--- Control                                                                    --
+-- Events                                                                     --
 -- -------------------------------------------------------------------------- --

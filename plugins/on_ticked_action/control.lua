@@ -52,7 +52,7 @@ local TickedAction = {}
 local Private = {}
 
 remote.add_interface(const.name.remote.interface, TickedAction)
-script.generate_event_name('on_ticked_action')
+local on_ticked_action = script.generate_event_name('on_ticked_action')
 
 -- -------------------------------------------------------------------------- --
 -- Savedata                                                                   --
@@ -250,7 +250,7 @@ function Private.on_tick(e)
       local action = Savedata.queue[i]
       if action.tick == e.tick then
         log:debug('raise action → ', action)
-        script.raise_event( EventManager.events.on_ticked_action, action )
+        script.raise_event(on_ticked_action, action)
         end
       end
     --

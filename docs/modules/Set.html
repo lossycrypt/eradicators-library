@@ -32,10 +32,10 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Creation">Creation </a></li>
 <li><a href="#Module">Module </a></li>
 <li><a href="#Conversion">Conversion </a></li>
 <li><a href="#Metamethods">Metamethods </a></li>
+<li><a href="#Creation">Creation </a></li>
 <li><a href="#Comparison">Comparison </a></li>
 </ul>
 
@@ -55,7 +55,6 @@
   <li><a href="../modules/Gui.html">Gui</a></li>
   <li><a href="../modules/Locale.html">Locale</a></li>
   <li><a href="../modules/Player.html">Player</a></li>
-  <li><a href="../modules/PluginManager.html">PluginManager</a></li>
   <li><a href="../modules/PluginManagerLite.html">PluginManagerLite</a></li>
   <li><a href="../modules/Remote.html">Remote</a></li>
   <li><a href="../modules/Setting.html">Setting</a></li>
@@ -121,25 +120,6 @@
     </ul>
 
 
-<h2><a href="#Creation">Creation </a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#union">union(A, B)</a></td>
-	<td class="summary">→∀x (Ax ∨ Bx)</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#intersection">intersection(A, B)</a></td>
-	<td class="summary">→∀x (Ax ∧ Bx)</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#complement">complement(A, B)</a></td>
-	<td class="summary">→∀x (Ax ∧ ¬Bx)</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#difference">difference(A, B)</a></td>
-	<td class="summary">→∀x (¬(Ax ∧ Bx))</td>
-	</tr>
-</table>
 <h2><a href="#Module">Module </a></h2>
 <table class="function_list">
 	<tr>
@@ -167,6 +147,25 @@
 	<tr>
 	<td class="name" nowrap><a href="#__sub">__sub()</a></td>
 	<td class="summary">Substraction with - is Set.complement().</td>
+	</tr>
+</table>
+<h2><a href="#Creation">Creation </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#union">union(A, B)</a></td>
+	<td class="summary">→∀x (Ax ∨ Bx)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#intersection">intersection(A, B)</a></td>
+	<td class="summary">→∀x (Ax ∧ Bx)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#complement">complement(A, B)</a></td>
+	<td class="summary">→∀x (Ax ∧ ¬Bx)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#difference">difference(A, B)</a></td>
+	<td class="summary">→∀x (¬(Ax ∧ Bx))</td>
 	</tr>
 </table>
 <h2><a href="#Comparison">Comparison </a></h2>
@@ -197,6 +196,139 @@
 <br/>
 
 
+    <h2 class="section-header "><a name="Module"></a>Module </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Set"></a>
+    <strong>Set(tbl)</strong>
+    </dt>
+    <dd>
+    Attaches the Set modules metatable to the tbl.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#PseudoSet">PseudoSet</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Conversion"></a>Conversion </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "from_values"></a>
+    <strong>from_values(tbl)</strong>
+    </dt>
+    <dd>
+    Creates a <a href="../modules/Set.html#">Set</a> that maps all values from the input table to <a href="../modules/Types.html#true">true</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#set">set</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_keys"></a>
+    <strong>from_keys(tbl)</strong>
+    </dt>
+    <dd>
+    Creates a <a href="../modules/Set.html#">Set</a> that maps all keys from the input table to <a href="../modules/Types.html#true">true</a>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/Types.html#set">set</a></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Metamethods"></a>Metamethods </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "__add"></a>
+    <strong>__add()</strong>
+    </dt>
+    <dd>
+    Addition with + is Set.union().
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__sub"></a>
+    <strong>__sub()</strong>
+    </dt>
+    <dd>
+    Substraction with - is Set.complement().
+
+
+
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Creation"></a>Creation </h2>
 
     <dl class="function">
@@ -335,139 +467,6 @@
 
 
     </ol>
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="Module"></a>Module </h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "Set"></a>
-    <strong>Set(tbl)</strong>
-    </dt>
-    <dd>
-    Attaches the Set modules metatable to the tbl.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">tbl</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
-
-
-
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../modules/Types.html#PseudoSet">PseudoSet</a></span>
-
-
-
-    </ol>
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="Conversion"></a>Conversion </h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "from_values"></a>
-    <strong>from_values(tbl)</strong>
-    </dt>
-    <dd>
-    Creates a <a href="../modules/Set.html#">Set</a> that maps all values from the input table to <a href="../modules/Types.html#true">true</a>.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">tbl</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
-
-
-
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../modules/Types.html#set">set</a></span>
-
-
-
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "from_keys"></a>
-    <strong>from_keys(tbl)</strong>
-    </dt>
-    <dd>
-    Creates a <a href="../modules/Set.html#">Set</a> that maps all keys from the input table to <a href="../modules/Types.html#true">true</a>
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">tbl</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
-
-
-
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../modules/Types.html#set">set</a></span>
-
-
-
-    </ol>
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="Metamethods"></a>Metamethods </h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "__add"></a>
-    <strong>__add()</strong>
-    </dt>
-    <dd>
-    Addition with + is Set.union().
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "__sub"></a>
-    <strong>__sub()</strong>
-    </dt>
-    <dd>
-    Substraction with - is Set.complement().
-
-
-
 
 
 
@@ -660,7 +659,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-06-11 04:17:59 </i>
+<i style="float:right;">Last updated 2021-06-12 01:04:16 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

@@ -632,7 +632,8 @@ function Table.set(tbl,path,value)
     end
   if value == NIL then value = nil end
   r[path[n]] = value
-  return _toTableIfTable(value)
+  -- return _toTableIfTable(value) --@2021-06-11 Let's see if removing it breaks anything.
+  return value
   end
 
   
@@ -656,8 +657,8 @@ function Table.sget(tbl,path,default)
     end
   local k = path[n]
   if r[k] == nil then r[k] = default end -- NIL makes no sense here
-  -- return r[k]
-  return _toTableIfTable(r[k])
+  -- return _toTableIfTable(r[k])
+  return r[k] --@2021-06-11 Let's see if removing it breaks anything.
   end
 
 

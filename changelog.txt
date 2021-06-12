@@ -17,6 +17,12 @@ Date: 2021-06-08
     - Added Wube.make_universal_circuit_connectors
     - Added TickedAction to EventManagerLite
     - Added removal of uninstalled plugin's savedata to PluginManagerLite.
+    - Table.get and Table.sget no longer attach the Table metatable to the return value.
+    - Player.get_player no longer accepts LuaPlayer objects as input (breaking change).
+    - Player.get_player now uses lua-side caching to be very fast.
+    - Added Player.get_event_player
+    - Added Tool.try_require
+    - The deprecated old EventManager and PluginManager have been removed.
   Utility Mods:
     - Universal Locale: Removed info icon from map-gen-preset-description.
 ---------------------------------------------------------------------------------------------------

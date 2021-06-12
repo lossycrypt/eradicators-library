@@ -191,6 +191,28 @@ function Tool.Select_second(_,_) return _ end
 -- @function Tool.Select_third
 function Tool.Select_third(_,_,_) return _ end
 
+ 
+----------
+-- Converts a factorio tick to hours, minutes and seconds.
+-- 
+-- @tparam NaturalNumber tick
+-- 
+-- @treturn table A table `{h=,m=,s=}` of @{NaturalNumber}s.
+-- 
+function Tool.tick_to_time(tick)
+  local seconds = tick / 60
+  return {
+    h = math.floor(seconds / (60^2)     ),
+    m = math.floor(seconds % (60^2) / 60),
+    s = math.floor(seconds %  60        ),
+    }
+  -- Test:
+  -- for h = 1,3 do for m = 1,3 do for s = 1,3 do
+  --   local tick = h*60*60*60+m*60*60+s*60+17
+  --   printt(Tool.tick_to_time(tick), tick)
+  --   end end end
+  end
+  
 
 ----------
 -- Require()'s lua files relative to the calling file.
@@ -238,35 +260,45 @@ function Tool.Import(relative_path)
   return chunk
   end
  
-
-----------
--- Converts a factorio tick to hours, minutes and seconds.
--- 
--- @tparam NaturalNumber tick
--- 
--- @treturn table A table `{h=,m=,s=}` of @{NaturalNumber}s.
--- 
-function Tool.tick_to_time(tick)
-  local seconds = tick / 60
-  return {
-    h = math.floor(seconds / (60^2)     ),
-    m = math.floor(seconds % (60^2) / 60),
-    s = math.floor(seconds %  60        ),
-    }
-  -- Test:
-  -- for h = 1,3 do for m = 1,3 do for s = 1,3 do
-  --   local tick = h*60*60*60+m*60*60+s*60+17
-  --   printt(Tool.tick_to_time(tick), tick)
-  --   end end end
-  end
-  
- 
- 
  
 --------------------------------------------------------------------------------
 -- Draft.
 -- @section
 --------------------------------------------------------------------------------
+
+
+----------
+-- Does not raise an error if the file doesn't exist.
+--
+-- @tparam string path
+--
+-- @treturn boolean If the require succeeded.
+-- @treturn AnyValue The return value of the required file.
+function Tool.try_require(path)
+  local ok, chunk = pcall(require,path)
+  if ok == true then
+    return true, chunk
+  else
+    -- Compare to exactly the file-not-found message that is expected
+    -- to prevent accidentially ignoring important file-not-found errors.
+    local template = 'module %s not found;  no such file %s'
+    -- ".lua" is automatically appended to the second part
+    -- of the message but not to the first.
+    if chunk:gsub('%.lua$','') ~= template:format(path,path):gsub('%.lua$','') then
+      -- Catches syntax errors, AutoLock errors, etc.
+      -- The error message is already formated. Possibly by a custom Stopper.
+      error(
+        '\n[color=blue]An error occured during\ntry_require("'..path..'")[/color]\n'
+        ..chunk
+        )
+    else
+      -- log:debug('No such file (expected): ',path)
+      -- log:debug('No such file : ',path)
+      return false, nil
+      end
+    end
+  end
+ 
 
 
 -- Python-style "try-except-finally"?

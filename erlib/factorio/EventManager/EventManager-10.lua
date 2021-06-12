@@ -1,7 +1,9 @@
 -- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
 
+error('EventManager was replaced by EventManagerLite.')
+
 --------------------------------------------------
--- Multiple handlers per event and easy future actions.
+-- __Deprecated.__ Multiple handlers per event and easy future actions.
 --
 -- __Note:__ EventManager is incompatible with mods that directly access
 -- @{FOBJ LuaBootstrap}. To ensure smooth operations it replaces `script`

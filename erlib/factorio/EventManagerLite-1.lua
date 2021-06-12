@@ -848,6 +848,21 @@ do end
 
 
 -- -------------------------------------------------------------------------- --
+-- ExtraEvents.
+-- -------------------------------------------------------------------------- --
+
+----------
+-- Extra events must be activated in settings stage prior to usage.
+-- 
+-- @usage
+--   -- settings-updates.lua
+--   erlib_enable_plugin('on_player_changed_chunk')
+--
+-- @within ExtraEvents
+-- @table HowToActivateExtraEvents
+do end
+
+-- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
 -- Determinism: Never allow access to internal functions.

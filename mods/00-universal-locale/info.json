@@ -10,5 +10,6 @@
   "description"     :  
     "Advanced multi-language locale preperation.",
   "dependencies"    : [
+    "00-toggle-to-enable-dev-mode"
     ]
 }

@@ -137,7 +137,6 @@ return function(phase) assert(phase)
     if enabled_plugins['babelfish'] then
       require 'plugins/babelfish/data-final-fixes'
       end
-
       
   -- ------------------------------------------------------------------------ --
   -- Control                                                                  --
@@ -182,6 +181,19 @@ return function(phase) assert(phase)
         require 'plugins/on_ticked_action/control.lua'
         end
       
+      if enabled_plugins['on_player_changed_chunk'] then
+        require 'plugins/on_player_changed_chunk/control.lua'
+        end
+        
+      if enabled_plugins['on_user_panic'] then
+        require 'plugins/on_user_panic/control'
+        require 'plugins/on_user_panic/ulocale'
+        end
+
+      if enabled_plugins['on_entity_created'] then
+        require 'plugins/on_entity_created/control'
+        end
+        
       break end end
       
     end
