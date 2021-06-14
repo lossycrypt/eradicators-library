@@ -72,16 +72,20 @@ function Player.try_reach_entity(p, entity, text)
 
   
 ----------
--- Creates a localized flying text for a player.
+-- Creates a plain localized flying text for a player.
+--
+-- Syntactic Sugar for @{FOBJ LuaPlayer create_local_flying_text}
 --
 -- @tparam LuaPlayer p
 -- @tparam LocalisedString text
--- @tparam Position position
+-- @tparam[opt=at the cursor position] Position position
 --
 function Player.notify(p, text, position)
+  -- DOC: "if create_at_cursor is true all values except 'text' are ignored."
   return p.create_local_flying_text {
-    text     = text    ,
-    position = position, --@future: default to selected or player itself?
+    text             = text        ,
+    create_at_cursor = not position,
+    position         = position    ,
     }
   end
 

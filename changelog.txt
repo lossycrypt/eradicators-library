@@ -1,8 +1,13 @@
 ---------------------------------------------------------------------------------------------------
-Version: 4.1.13
+Version: 4.1.14
 Date: 2021-x-x
   Functions:
     - ?
+---------------------------------------------------------------------------------------------------
+Version: 4.1.13
+Date: 2021-06-14
+  Functions:
+    - Player.notify position not defaults to cursor position.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.12
 Date: 2021-06-08
@@ -25,6 +30,8 @@ Date: 2021-06-08
     - The deprecated old EventManager and PluginManager have been removed.
   Utility Mods:
     - Universal Locale: Removed info icon from map-gen-preset-description.
+  Plugins:
+    - Added on_entity_created, on_player_changed_chunk and on_user_panic.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.11
 Date: 2021-06-07
@@ -46,7 +53,7 @@ Date: 2021-06-07
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.10
 Date: 2021-06-04
-  Hooks:
+  Plugins:
     - Babelfish: Fixed soft-update of old dictionary after mod changes.
     - Babelfish: Unlocalised descriptions are now treated as empty strings.
   Functions:
@@ -62,7 +69,7 @@ Date: 2021-06-04
     - Replaced Array.unsorted_remove_key with Array.shuffle_pop
       and fixed that the final key was never removed. (Breaking change.)
     - Added Gui.move
-  Hooks:
+  Plugins:
     - Babelfish: Improved translation CPU performance by 400%+.
     - Babelfish: Improved network rate control.
     - Babelfish: Implemented request packaging for better network efficiency.
@@ -74,7 +81,7 @@ Date: 2021-05-27
     - EventManagerLite: Made handler order permanent and linked.
   Utility Mods:
     - Added enable-tests trigger mod and updated flag.DO_TESTS accordingly.
-  Hooks:
+  Plugins:
     - Babelfish: Fixed language code detection disabled too early.
     - Babelfish: Made search types configurable. (Breaking change.)
   Functions:
@@ -95,7 +102,7 @@ Version: 4.1.6
 Date: 2021-05-25
   Functions:
     - Added Iter.sriapi
-  Hooks:
+  Plugins:
     - Babelfish: Network rate control is more accurate now.
     - Babelfish: Added can_find, get_player_language_code and get_translation_percentages.
     - Babelfish: Fuzzy find mode no longer depends on lua pattern matching.
@@ -105,12 +112,12 @@ Date: 2021-05-25
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.5
 Date: 2021-05-24
-  Hooks:
+  Plugins:
     - Babelfish: Remote interface added. All code cleaned up and fully documented.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.4
 Date: 2021-05-23
-  Hooks:
+  Plugins:
     - Babelfish: Prototype complete with indicator and search command.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.3
