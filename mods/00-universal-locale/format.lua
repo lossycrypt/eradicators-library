@@ -141,6 +141,7 @@ local pattern_functions = {
       ['[tips-and-tricks-item-description]'] = true,
       ['[map-gen-preset-description]'      ] = true,
       ['[technology-description]'          ] = true,
+      ['[mod-description]'                 ] = true,
       -- Reason: Automatically added by engine! Wtf!
       ['[controls-description]'] = true,
       }

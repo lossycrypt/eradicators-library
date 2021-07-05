@@ -373,13 +373,28 @@ function Data.Inscribe (prototype)
   
   -- fork?
   local new
-  if magic.parent_name or magic.parent_type then
+  if not (magic.parent_name or magic.parent_type) then
+    new = prototype
+    
+  else
     local parent_name = magic.parent_name or prototype.name
     local parent_type = magic.parent_type or prototype.type
     local parent      = Table.dcopy(data.raw[parent_type][parent_name])
     new = Table.smerge(parent, prototype)
-  else
-    new = prototype
+    
+    -- auto-fix minable result
+    if new.minable then
+      if (new.minable.result == parent_name) then
+        new.minable.result = new.name
+      elseif new.minable.results then
+        for _, result in ipairs(new.minable.results) do
+          local k = (results.name) and 'name' or 1
+          if (results[k] == parent_name) then results[k] = new.name end
+          end
+        end
+      end
+   
+    --
     end
   
   --

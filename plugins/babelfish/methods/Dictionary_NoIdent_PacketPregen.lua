@@ -272,7 +272,8 @@ local function lstring_compact(lstring)
 -- Pre-calculating the full order string makes sorting 12 times faster.
 local get_full_prototype_order; do
   local has_group = setmetatable({},{__index=function(self, object_name)
-    local category = object_name:match('Lua(.+)Prototype'):lower()
+    local category = object_name:match('Lua(.+)Prototype')
+      :gsub('%u','_%1'):sub(2):lower() -- "VirutalSignal" -> "virtual_signal"
     for _, prot in pairs(game[category..'_prototypes']) do
       self[object_name] = (pcall(function() return prot.group end))
       break end
@@ -331,15 +332,15 @@ local get_ordered_requests = function()
   for _, type in ipairs(OrderedRequestedTypes) do
     if not sorted_prots[type] then
       local prots = {}
-      for name, prot in pairs(game[type:gsub('_.*$','_prototypes')]) do
+      for name, prot in pairs(game[type:gsub('_[^_]+$','_prototypes')]) do
         prots[#prots+1] = setmetatable({
           real_order = get_full_prototype_order(prot), --12 times faster sorting
           name = prot.name,
           },{__index = prot})
         end
       table.sort(prots, function(a,b) return a.real_order < b.real_order end)
-      sorted_prots[type:gsub('_.*$','_name'       )] = prots
-      sorted_prots[type:gsub('_.*$','_description')] = prots
+      sorted_prots[type:gsub('_[^_]+$','_name'       )] = prots
+      sorted_prots[type:gsub('_[^_]+$','_description')] = prots
       end
     end
   profile('Prototype sorting took: ')

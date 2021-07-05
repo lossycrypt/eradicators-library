@@ -67,7 +67,7 @@ local Player,_Player,_uLocale = {},{},{}
 -- @treturn boolean 
 function Player.try_reach_entity(p, entity, text)
   return p.can_reach_entity(entity)
-      or (Player.notify(p, {'cant-reach'}, entity.position) and false)
+      or (Player.notify(p, text or {'cant-reach'}, entity.position) and false)
   end
 
   

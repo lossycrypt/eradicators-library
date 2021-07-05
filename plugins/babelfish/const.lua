@@ -83,6 +83,8 @@ const.type_data = {
   {type = "tile_description"      , longest =   92},
   {type = "entity_name"           , longest =   81}, -- lots of garbage
   {type = "entity_description"    , longest =  429},
+  -- unmeasured longest!
+  {type = "virtual_signal_name"   , longest =   50},
   }
 
 const.native_language_name = {

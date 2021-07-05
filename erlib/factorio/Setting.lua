@@ -85,7 +85,7 @@ if Stacktrace.get_load_stage().data then
   function Setting.get_value(setting_type, name)
     -- only startup exists in data stage
     assert(setting_type == 'startup', 'Invalid setting type.')
-    return settings.startup[name].value
+    return assert(settings.startup[name], 'Invalid name: '..name ).value
     end
     
   ---------

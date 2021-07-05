@@ -159,18 +159,27 @@ script.on_event(defines.events.on_gui_text_changed, function(e)
         last_type = full_type
         pane.add {type = 'label', caption = full_type }
         tbl = pane.add {type = 'table', column_count = math.floor((W-64)/40)}
-       tbl.style.horizontal_spacing = 0
-       tbl.style.vertical_spacing = 0
-       --
-       type = full_type:gsub('_.*','')
-       add  = tbl.add
-       args = {
-        type      = 'choose-elem-button',
-        style     = 'slot_button',
-        elem_type = type,
-        }
-       end
-      args[type] = name
+        tbl.style.horizontal_spacing = 0
+        tbl.style.vertical_spacing = 0
+        --
+        type = full_type:gsub('_[^_]+$','')
+        add  = tbl.add
+        args = {
+          type      = 'choose-elem-button',
+          style     = 'slot_button',
+          elem_type = type,
+          }
+        if type == 'virtual_signal' then
+          args.elem_type = 'signal'
+          args.signal = {type = 'virtual'}
+          end
+        end
+      if type == 'virtual_signal' then
+        -- VirtualSignal uses "SignalID" table instead of name string.
+        args.signal.name = name
+      else
+        args[type] = name
+        end
       add(args).locked = true
       end
       
