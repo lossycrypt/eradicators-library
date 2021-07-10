@@ -34,8 +34,10 @@ local Table       = elreq('erlib/lua/Table'        )()
 -- -------------------------------------------------------------------------- --
 local script = EventManager .get_managed_script    'on_player_changed_chunk'
 
-local on_player_changed_chunk =
-  script.generate_event_name 'on_player_changed_chunk'
+local const = {
+  on_player_changed_chunk =
+    script.generate_event_name 'on_player_changed_chunk'
+  }
 
 -- -------------------------------------------------------------------------- --
 -- Local Library                                                              --
@@ -53,22 +55,21 @@ local function position_to_chunk_position(position)
 -- Adds area to ChunkPosition
 -- @tparam ChunkPosition cpos
 -- @treturn ChunkPositionAndArea
-local function chunk_position_plus_area(cpos)
+local function add_chunk_area(cpos)
   local lt = {x = cpos.x*32   , y = cpos.y*32   }
   local rb = {x = cpos.x*32+32, y = cpos.y*32+32}
   cpos.area = {
     left_top     = lt, lt = lt,
     right_bottom = rb, rb = rb}
-  return cpos
-  end
-
--- Compares two (chunk-) positions.
-local function is_position_equal(posA, posB)
-  return (posA.x == posB.x) and (posA.y == posB.y)
-  end
-
-local POSITION_ZERO = {x = 0, y = 0}
+  return cpos end
   
+local function get_player_chunk_position_and_area(p)
+  return add_chunk_area(position_to_chunk_position(p.position)) end
+
+-- Compares two (chunk-)positions.
+local function is_position_equal(posA, posB)
+  return (posA.x == posB.x) and (posA.y == posB.y) end
+
 -- -------------------------------------------------------------------------- --
 -- Savedata                                                                   --
 -- -------------------------------------------------------------------------- --
@@ -79,8 +80,10 @@ PluginManager.manage_garbage   ('on_player_changed_chunk')
 PluginManager.classify_savedata('on_player_changed_chunk', {
 
   init_pdata = function(self, pindex)
-    return Table.set(self.players, {assert(pindex)}, {
-      p = game.players[pindex],
+    local p = game.players[assert(pindex)]
+    return Table.set(self.players, {pindex}, {
+      p = p,
+      old_chunk = get_player_chunk_position_and_area(p)
       })
     end,
 
@@ -95,17 +98,20 @@ PluginManager.classify_savedata('on_player_changed_chunk', {
 -- Events                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local on_player_changed_surface = script.on_event(
+local function on_player_changed_chunk(pdata, p, e)
+  -- e.surface_index remains unchanged!
+  e.old_chunk = pdata.old_chunk
+  e.new_chunk = get_player_chunk_position_and_area(p)
+  pdata.old_chunk = e.new_chunk
+  return script.raise_event(const.on_player_changed_chunk, e) end
+
+script.on_event(
   -- FAPI: "In the instance a player is moved off a surface due to
   -- it being deleted this is not called."
   defines.events.on_player_changed_surface,
   function(e)
     local pdata, p = Savedata:sget_pdata(e)
-    -- e.surface_index remains unchanged
-    e.old_chunk = pdata.old_chunk or POSITION_ZERO
-    e.new_chunk = position_to_chunk_position(p.position)
-    pdata.old_chunk = e.new_chunk
-    return script.raise_event(on_player_changed_chunk, e) end)
+    return on_player_changed_chunk(pdata, p, e) end)
 
 script.on_event(
   defines.events.on_surface_deleted,
@@ -115,7 +121,8 @@ script.on_event(
     -- event 1% more exact.
     for pindex in pairs(game.players) do
       e.player_index = pindex
-      on_player_changed_surface(Table.scopy(e))
+      local pdata, p = Savedata:sget_pdata(e)
+      on_player_changed_chunk(pdata, p, Table.scopy(e))
       end
     end)
   
@@ -123,13 +130,13 @@ script.on_event(
   defines.events.on_player_changed_position,
   function (e)
     local pdata, p = Savedata:sget_pdata(e)
-    local old_chunk = pdata.old_chunk or POSITION_ZERO
-    local new_chunk = position_to_chunk_position(p.position)
-    if not is_position_equal(old_chunk, new_chunk) then
-      pdata.old_chunk = new_chunk
-      e.old_chunk = chunk_position_plus_area(old_chunk)
-      e.new_chunk = chunk_position_plus_area(new_chunk)
-      return script.raise_event(on_player_changed_chunk, e) end
+    if not is_position_equal(
+      pdata.old_chunk,
+      position_to_chunk_position(p.position)
+      )
+    then
+      return on_player_changed_chunk(pdata, p, e)
+      end
     end)
 
     
@@ -140,7 +147,8 @@ script.on_event(
 ----------
 -- Raised when the player moves or is teleported across a chunk border on
 -- the same surface, or has moved to another surface. After a surface
--- was deleted this is called for all players.
+-- was deleted this is called for all players regardless of if they were
+-- actually on that surface.
 -- 
 -- Abstracts:  
 -- @{FAPI Events on_player_changed_position}  

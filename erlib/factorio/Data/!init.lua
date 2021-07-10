@@ -347,6 +347,7 @@ function Data.Item.find_item_prototype(name)
 -- Processing order:  
 --   - Deep-copy the input table.  
 --   - Shallow merge with parent deep-copy.  
+--   - Adjust minable result (if applicable).  
 --   - Apply `magic.post_patches`.  
 --   - Apply @{Table.remove_nil}.  
 --
