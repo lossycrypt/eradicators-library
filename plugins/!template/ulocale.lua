@@ -2,6 +2,7 @@
 
 -- local import = PluginManager.make_relative_require 'template'
 -- local const  = import '/const'
+-- local hotkey = Locale.format_hotkey_tooltip
 
 -- -------------------------------------------------------------------------- --
 require(_)('template', {

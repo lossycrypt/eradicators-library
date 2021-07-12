@@ -82,7 +82,27 @@ function Locale.merge(...)
   return args
   end
 
-
+----------
+-- Applies rich text tags to mimic vanilla hotkey tooltips.
+-- Intended to format tooltips for custom guis that can't 
+-- use `"__CONTROL-foobar__`" localization because
+-- LuaGuiElement buttons are hardcoded.
+--
+-- @usage
+--   game.print{'', Locale.format_hotkey_tooltip('Left mouse button', 'to do something awesome!')}
+--
+-- @tparam string key The hotkey
+-- @tparam string description The description
+-- @treturn string A richt-text-tag decorated plain string.
+function Locale.format_hotkey_tooltip(key, description)
+  return table.concat {
+    '[font=default-semibold]',
+    '[color=#7dcff3]', key        , '[/color] ',
+    '[color=#ffe5bd]', description, '[/color]',
+    '[/font]'
+    }
+  end
+  
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --

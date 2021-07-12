@@ -317,6 +317,7 @@ Babelfish.on_string_translated = function(e)
   -- garbage (other mods)
   else
     log:debug('Ignoring unexpected translation event.')
+    -- log:debug(('Ignoring unexpected translation event. (Lenght: %s, Start: %s'):format(#e.result, e.result:sub(1,10)))
     end
   --
   end

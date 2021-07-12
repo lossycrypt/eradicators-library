@@ -7,9 +7,15 @@ Date: 2021-x-x
 Version: 4.1.15
 Date: 2021-07-10
   Functions:
-    - Added
+    - Added Gui.set_slider_auto_tooltip
+    - Added Gui.find_child
+    - Added Gui.get_ancestors
+    - Added Entity.get_item_contents
+    - Added Locale.format_hotkey_tooltip
   Bugfixes:
     - Fixed missing area in on_player_changed_chunk when changing surfaces.
+  Plugins:
+    - Added gui-auto-styler
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.14
 Date: 2021-07-05

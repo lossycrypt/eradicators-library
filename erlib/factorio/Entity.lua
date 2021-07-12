@@ -109,6 +109,45 @@ function Entity.get_vehicle_driver_player(vehicle)
   end
   end
 
+--------------------------------------------------------------------------------
+-- Inventory.
+-- @section
+--------------------------------------------------------------------------------
+
+----------
+-- Scans all inventories.
+-- Like @{FOBJ LuaEntity.get_fluid_contents} but for items.
+--
+-- @tparam LuaEntity entity
+-- @return dictionary[string → number]
+do
+  -- It does not matter what the inventory index means
+  -- because all inventories are scanned.
+  local max_inventory_index = (function(r)
+    for _, i in pairs(defines.inventory) do r = math.max(r, i) end
+    return r end)(0)
+  --
+  function Entity.get_item_contents(entity)
+    local r  = {}
+    -- Special
+    if entity.type == 'inserter' then
+      local stack = entity.held_stack
+      if stack.valid_for_read then
+        return {[stack.name] = stack.count}
+        end
+    -- Generic
+    else
+      for i=1, max_inventory_index do
+        local inv = entity.get_inventory(i)
+        if inv then
+          for name, count in pairs(inv.get_contents()) do
+            r[name] = (r[name] and r[name] + count) or count
+            end
+          end
+        end
+      end
+    return r end
+  end
   
   
 -- -------------------------------------------------------------------------- --

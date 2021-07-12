@@ -74,6 +74,7 @@ return function(phase) assert(phase)
       db.default_value  = value
       db.allowed_values = {value}
       log('Recieved request to enable plugin: "'..plugin_name..'".')
+      -- print(debug.traceback())
       end
     
     local configurators = {
@@ -114,7 +115,7 @@ return function(phase) assert(phase)
   
     if enabled_plugins['babelfish'] then
       require 'plugins/babelfish/settings-final-fixes' (
-        Table.pop(db, 'babelfish_search_types')
+        assert(Table.pop(db, 'babelfish_search_types'))
         )
       end
 
@@ -192,6 +193,10 @@ return function(phase) assert(phase)
 
       if enabled_plugins['on_entity_created'] then
         require 'plugins/on_entity_created/control'
+        end
+        
+      if enabled_plugins['gui-auto-styler'] then
+        require 'plugins/gui-auto-styler/control'
         end
         
       break end end
