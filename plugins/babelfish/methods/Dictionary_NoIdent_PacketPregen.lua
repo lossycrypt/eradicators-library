@@ -125,6 +125,7 @@ local ntuples     = elreq('erlib/lua/Iter/ntuples')()
 local Cache       = elreq('erlib/factorio/Cache'  )()
 local Locale      = elreq('erlib/factorio/Locale' )()
 local Setting     = elreq('erlib/factorio/Setting')()
+local Prototype   = elreq('erlib/factorio/Prototype')()
 
 local pairs, pcall, string_find, type, string_gmatch, string_lower, string_gsub
     = pairs, pcall, string.find, type, string.gmatch, string.lower, string.gsub
@@ -276,23 +277,33 @@ local function lstring_compact(lstring)
   
   
 -- Pre-calculating the full order string makes sorting 12 times faster.
-local get_full_prototype_order; do
-  local has_group = setmetatable({},{__index=function(self, object_name)
-    local category = object_name:match('Lua(.+)Prototype')
-      :gsub('%u','_%1'):sub(2):lower() -- "VirutalSignal" -> "virtual_signal"
-    for _, prot in pairs(game[category..'_prototypes']) do
-      self[object_name] = (pcall(function() return prot.group end))
-      break end
-    return self[object_name] end})
-  function get_full_prototype_order(prot)
-    return table.concat{
-      has_group[prot.object_name] and prot.group.order    or '',
-      has_group[prot.object_name] and prot.subgroup.order or '',
-      prot.order,
-      prot.name
-      }
-    end
-  end
+
+-- V1
+--
+-- local get_full_prototype_order; do
+--   local has_group = setmetatable({},{__index=function(self, object_name)
+--     local category = object_name:match('Lua(.+)Prototype')
+--       :gsub('%u','_%1'):sub(2):lower() -- "VirutalSignal" -> "virtual_signal"
+--     for _, prot in pairs(game[category..'_prototypes']) do
+--       self[object_name] = (pcall(function() return prot.group end))
+--       break end
+--     return self[object_name] end})
+--   function get_full_prototype_order(prot)
+--     return table.concat{
+--       has_group[prot.object_name] and prot.group.order    or '',
+--       has_group[prot.object_name] and prot.subgroup.order or '',
+--       prot.order,
+--       prot.name
+--       }
+--     end
+--   end
+  
+-- V2
+-- local get_full_prototype_order = function(prot)
+--   return Prototype.get_absolute_order(prot.object_name, prot.name)
+--   end
+  
+  
   
 -- Creates a function that automatically calls a constructor
 -- function f once. And returns the result of f() on all 
@@ -340,8 +351,14 @@ local get_ordered_requests = function()
       local prots = {}
       for name, prot in pairs(game[type:gsub('_[^_]+$','_prototypes')]) do
         prots[#prots+1] = setmetatable({
-          real_order = get_full_prototype_order(prot), --12 times faster sorting
-          name = prot.name,
+          -- V1
+          -- name = prot.name,
+          -- real_order = get_full_prototype_order(prot), --12 times faster sorting
+          -- V2
+          name = name,
+          real_order = Prototype.get_absolute_order(
+            prot.object_name, name
+            )
           },{__index = prot})
         end
       table.sort(prots, function(a,b) return a.real_order < b.real_order end)

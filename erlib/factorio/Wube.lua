@@ -72,7 +72,7 @@ do end
 
 ----------
 -- (@{function}). Erlib Syntactic Sugar.  
--- Calls @{URL ./Wube.html#circuit_connector_definitions.create|circuit_connector_definitions.create}
+-- Calls [circuit\_connector\_definitions.create](./Wube.html#circuit_connector_definitions.create)
 -- using the @{Wube.universal_connector_template}, and unpacks the results.
 --
 -- Variation number is based on the sequence in the template graphics file.

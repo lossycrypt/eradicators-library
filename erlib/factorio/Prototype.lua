@@ -74,7 +74,6 @@ do
   local order = setmetatable({}, {__index = function(self, object_name)
     self[object_name] = setmetatable({}, {__index = function(self, name)
       self[name] = _get_order(object_name, name)
-      print('fresh')
       return self[name]
       end})
     return self[object_name]

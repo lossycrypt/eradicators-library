@@ -321,15 +321,18 @@ KeywordPage(
   '%s/%s', '(.*) (.*)$'  
   )
 
+-- This LITERALLY fails at random and generates garbage URLS
+-- in 1/4 builds. Replaced by markdown: [Name](url).
+--
 -- Keyword: URL
 -- Example: @{URL www.wikipedia.com|Wiki}
 -- Url    : www.wikipedia.com
 -- Name   : Wiki
-KeywordPage(
-  '^URL (.*)$'
-  ,'%s', '^([^%|]+).-$'
-  ,'%s', '^[^%|]+(.-)$'
-  )
+-- KeywordPage(
+  -- '^URL (.*)$'
+  -- ,'%s', '^([^%|]+).-$'
+  -- ,'%s', '^[^%|]+(.-)$'
+  -- )
 
   
 -- -------------------------------------------------------------------------- --

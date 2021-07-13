@@ -2,7 +2,7 @@
 
 --------------------------------------------------
 -- Methods for
--- @{URL https://wiki.factorio.com/Tutorial:Mod_settings|Mod Settings}.
+-- [Mod Settings](https://wiki.factorio.com/Tutorial:Mod_settings).
 --
 -- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
 --

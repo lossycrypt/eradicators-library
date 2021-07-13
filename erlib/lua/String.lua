@@ -51,7 +51,7 @@ String.UPPER_ARGS    = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z'
 String.LOWER_LETTERS = 'abcdefghijklmnopqrstuvwxyz'
 --- 'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
 String.LOWER_ARGS    = 'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'
---- A dense array of different unicode spaces. (From @{URL https://emptycharacter.com|here})
+--- A dense array of different unicode spaces. (From [here](https://emptycharacter.com))
 -- @table String.UNICODE_SPACE
 do end
 String.UNICODE_SPACE = {'%s',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','　'}
@@ -445,12 +445,17 @@ function String.to_camel_case(str)
   end
   
 ----------
--- Converts CamelCase to snake_case.
+-- Converts CamelCase or dash-case to snake_case.
 --
 -- @tparam string str
 -- @treturn string
 function String.to_snake_case(str)
-  return string_lower(string_gsub(str, '(%a)(%u)', '%1_%2'))
+  return 
+    string_lower( -- outside to not leak gsub second return value.
+      string_gsub(
+        string_gsub(str, '(%a)(%u)', '%1_%2')
+        ,'-','_')
+      )
   end
   
   

@@ -109,6 +109,53 @@ function Gui.move(elm, w, h, x, y)
   return elm end
 
   
+----------
+-- Creates a draggable title-bar with close button.
+-- Mimics vanilla style in accordance with
+-- [Raiguards Style Guide](https://github.com/raiguard/Factorio-SmallMods/wiki/GUI-Style-Guide)
+--
+function Gui.create_title_bar(opts)
+  -- A standardtized frame title bar
+  -- [1] https://github.com/raiguard/Factorio-SmallMods/wiki/GUI-Style-Guide
+
+  -- (Originally from skin-swapper)
+  
+  local anchor = opts.anchor
+  
+  assert(#anchor.children == 0, 'Anchor already has children.')
+  
+  --title flow
+  local title = anchor.add{
+    type      = 'flow',
+    direction = 'horizontal',
+    }
+  title.drag_target = opts.drag_target -- gui.screen only 
+  local label = title.add{
+    type    = 'label',
+    caption = assert(opts.caption),
+    style   = 'frame_title',
+    }
+  label.ignored_by_interaction = true -- required for dragging...wth
+  local drag = title.add{
+    type  = 'empty-widget',
+    style = 'draggable_space_header',
+    }
+  drag.style.height = 24
+  drag.style.horizontally_stretchable = true
+  drag.style.right_margin = 4
+  drag.ignored_by_interaction = true -- required for dragging...wth
+  
+  local closebutton = title.add{
+    name                = assert(opts.close_button_name),
+    type                = 'sprite-button'       ,
+    style               = 'frame_action_button' ,
+    sprite              = 'utility/close_white' ,
+    hovered_sprite      = 'utility/close_black' ,
+    clicked_sprite      = 'utility/close_black' ,
+    mouse_button_filter = {'left'}              ,
+    }
+  end
+  
 --------------------------------------------------------------------------------
 -- AutoStyler.
 -- @section
