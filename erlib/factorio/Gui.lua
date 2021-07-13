@@ -114,39 +114,53 @@ function Gui.move(elm, w, h, x, y)
 -- Mimics vanilla style in accordance with
 -- [Raiguards Style Guide](https://github.com/raiguard/Factorio-SmallMods/wiki/GUI-Style-Guide)
 --
+-- @tparam table opts
+-- @tparam LuaGuiElement opts.anchor The LuaGuiElement that the title bar will be created in.
+-- @tparam LocalisedString|string opts.caption
+-- @tparam[opt] LuaGuiElement opts.drag_target
+-- @tparam[opt] string opts.close_button_name 
+-- @tparam[opt] string opts.minimize_button_name
+-- @treturn table A table containing the created LuaGuiElements.
+-- `{title_flow=, title_label=, drag_widget=, minimize_button=, close_button=}`
 function Gui.create_title_bar(opts)
-  -- A standardtized frame title bar
-  -- [1] https://github.com/raiguard/Factorio-SmallMods/wiki/GUI-Style-Guide
-
   -- (Originally from skin-swapper)
-  
-  local anchor = opts.anchor
-  
-  assert(#anchor.children == 0, 'Anchor already has children.')
-  
+  local r = {}
   --title flow
-  local title = anchor.add{
+  r.title_flow = assert(assert(opts).anchor).add{
     type      = 'flow',
     direction = 'horizontal',
     }
-  title.drag_target = opts.drag_target -- gui.screen only 
-  local label = title.add{
+  r.title_flow.drag_target = opts.drag_target -- gui.screen only 
+  r.title_label = r.title_flow.add{
     type    = 'label',
     caption = assert(opts.caption),
     style   = 'frame_title',
     }
-  label.ignored_by_interaction = true -- required for dragging...wth
-  local drag = title.add{
+  r.title_label.ignored_by_interaction = true -- required for dragging...wth
+  r.drag_widget = r.title_flow.add{
     type  = 'empty-widget',
     style = 'draggable_space_header',
     }
-  drag.style.height = 24
-  drag.style.horizontally_stretchable = true
-  drag.style.right_margin = 4
-  drag.ignored_by_interaction = true -- required for dragging...wth
+  r.drag_widget.style.height = 24
+  r.drag_widget.style.horizontally_stretchable = true
+  r.drag_widget.style.right_margin = 4
+  r.drag_widget.ignored_by_interaction = true -- required for dragging...wth
   
-  local closebutton = title.add{
-    name                = assert(opts.close_button_name),
+  if opts.minimize_button_name then
+    r.minimize_button = r.title_flow.add{
+      name                = opts.minimize_button_name,
+      type                = 'sprite-button'        ,
+      style               = 'frame_action_button'  ,
+      -- sprite              = 'utility/collapse'     ,
+      -- hovered_sprite      = 'utility/collapse'     ,
+      -- clicked_sprite      = 'utility/collapse_dark',
+      mouse_button_filter = {'left'}               ,
+      }
+    Gui.set_minimize_button_sprite(r.minimize_button, true)
+    end
+  
+  r.close_button = r.title_flow.add{
+    name                = opts.close_button_name,
     type                = 'sprite-button'       ,
     style               = 'frame_action_button' ,
     sprite              = 'utility/close_white' ,
@@ -154,10 +168,28 @@ function Gui.create_title_bar(opts)
     clicked_sprite      = 'utility/close_black' ,
     mouse_button_filter = {'left'}              ,
     }
+  return r end
+  
+----------
+-- Updates the sprite on a min-max button.
+-- @tparam LuaGuiElement elm This must be a `sprite-button`!
+-- @tparam boolean state True is a downwards arrow, false is a rightwards arrow.
+function Gui.set_minimize_button_sprite(elm, state)
+  if state then
+    elm.sprite              = 'utility/collapse'     
+    elm.hovered_sprite      = 'utility/collapse'     
+    elm.clicked_sprite      = 'utility/collapse_dark'
+  else
+    elm.sprite              = 'utility/expand'     
+    elm.hovered_sprite      = 'utility/expand'     
+    elm.clicked_sprite      = 'utility/expand_dark'
+    end
   end
+  
   
 --------------------------------------------------------------------------------
 -- AutoStyler.
+-- These functions will silently do nothing unless activated.
 -- @section
 -- @usage
 --   -- settings.lua
