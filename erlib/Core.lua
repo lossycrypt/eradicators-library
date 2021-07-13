@@ -116,6 +116,7 @@ local Modules = {
   Player     = control_only 'erlib/factorio/Player',
   Force      = control_only 'erlib/factorio/Force' ,
   Train      = control_only 'erlib/factorio/Train' ,
+  Prototype  = control_only 'erlib/factorio/Prototype' ,
   
   Data       = 'erlib/factorio/Data/!init',
   Setting    = 'erlib/factorio/Setting'   ,

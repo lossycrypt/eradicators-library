@@ -32,7 +32,7 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Functions">Functions</a></li>
+<li><a href="#Section">Section </a></li>
 </ul>
 
 
@@ -52,7 +52,7 @@
   <li><a href="../modules/Locale.html">Locale</a></li>
   <li><a href="../modules/Player.html">Player</a></li>
   <li><a href="../modules/PluginManagerLite.html">PluginManagerLite</a></li>
-  <li><a href="../modules/Prototype.html">Prototype</a></li>
+  <li><strong>Prototype</strong></li>
   <li><a href="../modules/Remote.html">Remote</a></li>
   <li><a href="../modules/Setting.html">Setting</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
@@ -75,7 +75,7 @@
   <li><a href="../modules/Math.html">Math</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
   <li><a href="../modules/Polygon.html">Polygon</a></li>
-  <li><strong>Replicate</strong></li>
+  <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
   <li><a href="../modules/Table.html">Table</a></li>
@@ -97,33 +97,27 @@
 
 <div id="content">
 
-<h1>Module <code>Replicate</code></h1>
-<p>Inline replication of object references.</p>
-<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Polishing.</p>
+<h1>Module <code>Prototype</code></h1>
+<p>Description</p>
+
+<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.</p>
+<p>
+
+
+
+</p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Replicate = require(&apos;__eradicators-library__/erlib/lua/Replicate&apos;)()
+        <pre class="example">local Prototype = require(&apos;__eradicators-library__/erlib/factorio/Prototype&apos;)()
 </pre>
     </ul>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#Section">Section </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Twice">Twice(v)</a></td>
-	<td class="summary">Returns two references to the given object.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#Thrice">Thrice(v)</a></td>
-	<td class="summary">Returns three references to the given object.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#FourtyTwo">FourtyTwo(v)</a></td>
-	<td class="summary">Returns 42 references to the given object.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#Replicate">Replicate(n, v)</a></td>
-	<td class="summary">Returns n references to the given object.</td>
+	<td class="name" nowrap><a href="#get_absolute_order">get_absolute_order(object_name, name)</a></td>
+	<td class="summary">Merges type, group, subgroup, order and name.</td>
 	</tr>
 </table>
 
@@ -131,123 +125,48 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="Section"></a>Section </h2>
 
     <dl class="function">
     <dt>
-    <a name = "Twice"></a>
-    <strong>Twice(v)</strong>
+    <a name = "get_absolute_order"></a>
+    <strong>get_absolute_order(object_name, name)</strong>
     </dt>
     <dd>
-    Returns two references to the given object.
+    Merges type, group, subgroup, order and name.
+ Allows sorting arrays or arbitary prototype combinations.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">v</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+        <li><span class="parameter">object_name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The runtime-type of the desired prototype.
+ Valid inputs formats are:
+ <code>&quot;LuaVirtualSignalPrototype&quot;</code>,
+ <code>&quot;LuaVirtualSignal&quot;</code>,
+ <code>&quot;VirtualSignal&quot;</code> or
+ <code>&quot;virtual_signal&quot;</code>
+        </li>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
 
 
 
         </li>
     </ul>
 
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
 
 
 
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> A,B = Twice(f)</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "Thrice"></a>
-    <strong>Thrice(v)</strong>
-    </dt>
-    <dd>
-    Returns three references to the given object.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">v</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
+    </ol>
 
 
 
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> A,B,C = Thrice({})</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "FourtyTwo"></a>
-    <strong>FourtyTwo(v)</strong>
-    </dt>
-    <dd>
-    Returns 42 references to the given object.
- That should be enough for everyone.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">v</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> A,B,C,D,E,F,G = FourtyTwo(LuaEntity) <span class="comment">--You don't have to catch 'em all.</span></pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "Replicate"></a>
-    <strong>Replicate(n, v)</strong>
-    </dt>
-    <dd>
-    Returns n references to the given object.
- For when you need precision.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">n</span>
-            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
-
-
-
-        </li>
-        <li><span class="parameter">v</span>
-            <span class="types"><a class="type" href="../modules/Types.html#AnyValue">AnyValue</a></span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> A,B,C,E,F,G = Replicate(<span class="number">6</span>,LuaEntity)</pre>
-    </ul>
 
 </dd>
 </dl>

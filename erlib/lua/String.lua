@@ -22,9 +22,9 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 local type,string = type,string
 
 local string_gsub,string_gmatch,string_find,string_format,string_sub,
-      table_concat,math_floor,math_ceil
+      table_concat,math_floor,math_ceil,string_lower
     = string.gsub,string.gmatch,string.find,string.format,string.sub,
-      table.concat,math.floor,math.ceil
+      table.concat,math.floor,math.ceil,string.lower
 
 local Hydra    = elreq ('erlib/lua/Coding/Hydra')()
 local Meta     = elreq ('erlib/lua/Meta/!init')()
@@ -367,8 +367,6 @@ function String.splice(str,pattern,seperator,i,j)
   return table_concat(r,seperator)
   end
 
-
-
 ----------
 -- Either pads or chops a string to an exact length.
 -- Too long strings will be chopped up in the middle, too short strings
@@ -444,6 +442,15 @@ function String.to_camel_case(str)
     :gsub('[^%a]*$' ,''      ) -- remove trailing non-letters
   return prefix .. infix .. postfix
   end
+  end
+  
+----------
+-- Converts CamelCase to snake_case.
+--
+-- @tparam string str
+-- @treturn string
+function String.to_snake_case(str)
+  return string_lower(string_gsub(str, '(%a)(%u)', '%1_%2'))
   end
   
   
