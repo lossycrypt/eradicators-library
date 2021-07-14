@@ -56,6 +56,7 @@ local const = {
     },
     
   method_level = {
+    raw   = 0            ,
     err   = 0            ,
     warn  = 1            ,
     info  = 2            ,
@@ -369,7 +370,7 @@ local _head, _foot = ('―'):rep(100)..'\n', ('.'):rep(200)..'\n'
 function Log:header(...) return self:do_log_seperator(_head, ...) end
 function Log:footer(...) return self:do_log_seperator(_foot, ...) end
 
-
+function Log:raw   (...) return log(...) end -- Factorio native logger
 
 --------------------------------------------------------------------------------
 -- Methods.

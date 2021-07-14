@@ -36,7 +36,7 @@ local Color
 -- because it alters _ENV.
 
 -- lossycrypt 2021-06-05: edited to always include alpha
-function wube_util_color(hex)  -- supports 'rrggbb', 'rgb', 'rrggbbaa', 'rgba', 'ww', 'w'
+local function wube_util_color(hex)  -- supports 'rrggbb', 'rgb', 'rrggbbaa', 'rgba', 'ww', 'w'
   hex = hex:gsub("#","")
   local function h(i,j)
     return j and tonumber("0x"..hex:sub(i,j)) / 255 or tonumber("0x"..hex:sub(i,i)) / 15

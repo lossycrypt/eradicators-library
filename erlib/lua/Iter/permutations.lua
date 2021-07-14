@@ -175,4 +175,4 @@ local function permutations(arr,i,j)
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
 do (STDOUT or log or print)('  Loaded → erlib.permutations') end
-return function() return permutations,_permutations,_uLocale end
+return function() return permutations, nil, nil end

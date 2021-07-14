@@ -29,6 +29,10 @@ require 'erlib/ulocale'
 -- Plugins                                                                    --
 -- -------------------------------------------------------------------------- --
 require('plugins/!init/!init.lua')('control')
+-- require('plugins/!init/!init.lua')('control-updates')
+-- require('plugins/!init/!init.lua')('control-final-fixes')
+require('plugins/!init/!init.lua')('ulocale')
+
 
 -- -------------------------------------------------------------------------- --
 -- Reserved Commands                                                          --

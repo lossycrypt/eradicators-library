@@ -64,7 +64,7 @@ local Lock,_Lock,_uLocale = {},{},{}
 -- @usage
 --   -- Apply the lock to any table.
 --   -- For this example we'll apply it to the global environment.
---   AutoLockTable(_ENV,'Global Environment','MyPassword')
+--   Lock.auto_lock(_ENV,'Global Environment','MyPassword')
 --   
 --   -- Accidential writing of ney keys will fail.
 --   _ENV.A_New_Key = 'A new value!'
@@ -94,10 +94,10 @@ local Lock,_Lock,_uLocale = {},{},{}
 --   > ok this time!
 --   
 --   -- It'll have the default value of boolean false.
---   if (Another_New_Key == false) then print('i got it') end
---   > i got it
+--   if (Another_New_Key == false) then print('I got it.') end
+--   > I got it.
 --   
-function Lock.AutoLock (tbl,name,passphrase,err_write,err_read)
+function Lock.auto_lock(tbl, name, passphrase, err_write, err_read)
 
   --already locked?
   if debug.getmetatable(tbl) then
@@ -120,7 +120,7 @@ function Lock.AutoLock (tbl,name,passphrase,err_write,err_read)
   mt .__newindex  = err_write
   
   local idx = {
-    __has_key        = function(key) return (rawget(tbl,key) ~= nil)        end,
+    __has_key = function(key) return (rawget(tbl, key) ~= nil)        end,
     }
   if passphrase then
     -- "false" value is used when the key should only be declared "allowed"
@@ -134,22 +134,42 @@ function Lock.AutoLock (tbl,name,passphrase,err_write,err_read)
   return tbl
   end
   
+----------
+-- Detects if a table was locked by this module.
+-- @tparam table tbl
+-- @treturn boolean
+function Lock.is_locked(tbl)
+  local mt = debug.getmetatable(tbl)
+  return (mt ~= nil) and (mt.is_erlib_locked == true) end
   
 ----------
 -- Removes any locks created by this module. Will error if you try to remove
 -- any other kind of lock or metatable.
 -- @tparam table tbl
-function Lock.RemoveLock(tbl)
-  local mt = debug.getmetatable(tbl)
-  if mt ~= nil then
-    if mt.is_erlib_locked then
-      debug.setmetatable(tbl,nil)
+function Lock.remove_lock(tbl)
+  if Lock.is_locked(tbl) then
+    return debug.setmetatable(tbl, nil)
+  else
+    if debug.getmetatable(tbl) then
+      stop('Can not remove metatable of unknown origin.')
     else
-      Stop('Can not remove metatable of unknown origin.')
+      stop('Table was not locked.')
       end
     end
   end
 
+
+-- -------------------------------------------------------------------------- --
+-- Deprecated                                                                 --
+-- -------------------------------------------------------------------------- --
+  
+function Lock.AutoLock(_, name, pass) -- Deprecated since 2021-07-14
+  stop('"AutoLock" was renamed to "auto_lock": ', name,' ', pass)
+  end
+function Lock.RemoveLock() -- Deprecated since 2021-07-14
+  stop('"RemoveLock" was renamed to "remove_lock".')
+  end
+  
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --

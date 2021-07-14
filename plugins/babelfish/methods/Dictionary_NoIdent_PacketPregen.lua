@@ -144,12 +144,6 @@ local TypeBytes =
   Table.map(const.type_data, function(v) return v.longest, v.type end, {})
   
 local function get_requested_search_types()
-  -- assert(game, 'Call outside of event.')
-  -- assert(game.mod_setting_prototypes)
-  -- assert(const.setting_name.search_types)
-  -- print(serpent.block(const))
-  assert(game.mod_setting_prototypes[const.setting_name.search_types],  
-    'Babelfish setting does not exist?! wtf?!')
   return game.mod_setting_prototypes[const.setting_name.search_types].allowed_values
   end
   

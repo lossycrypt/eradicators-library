@@ -249,7 +249,7 @@ local function EradicatorsLibraryMain(options)
     --lock (NP++ has custom metatable)
     local setter = function(t,k,v) t[k] = v end
     if flag.IS_FACTORIO and (opt.auto_lock ~= false) then
-      erlib.Lock.AutoLock(ENV,'Erlib Core-Installed Environment','GLOBAL')
+      erlib.Lock.auto_lock(ENV,'Erlib Core-Installed Environment','GLOBAL')
       setter = function(t,k,v) t.GLOBAL(k,v) end
       end
     --install to env

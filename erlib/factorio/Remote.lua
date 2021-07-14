@@ -241,7 +241,7 @@ function PackedInterfaceGroup:get(key, silent)
     end
   -- if it's *still* nil at least log it...
   if value == nil and silent ~= true then
-    log:debug('PIG <',self.prefix,'>:get("',key,'") returned nil.')
+    log:debug('PIG <', self.prefix, '>:get("', key, '") returned nil.')
   else
     return Table.dcopy(value) -- don't need to copy nil
     end
@@ -284,7 +284,7 @@ function PackedInterfaceGroup:set(key,value)
   -- error on different value
   -- table value identity is conveniently destroyed by Hydra during update_cache()
   if self.cached_data[key] == nil then
-    log:debug('PIG <',self.prefix,'>:set("',key,'",',value,')')
+    log:debug('PIG <',self.prefix,'>:set("',key,'", ',value,')')
     self.cached_data[key               ] = value
     self.interface  [_encode(key,value)] = ercfg.SKIP
   elseif self.cached_data[key] ~= value then
@@ -296,7 +296,7 @@ function PackedInterfaceGroup:set(key,value)
       ,'\n  new_val = ', value
       )
   else -- key == value
-    log:debug('PIG <',self.prefix,'>:set("',key,'",',value,') skipped, same value already present.')
+    log:debug('PIG <',self.prefix,'>:set("',key,'", ',value,') skipped, same value already present.')
     end
   return value end
   

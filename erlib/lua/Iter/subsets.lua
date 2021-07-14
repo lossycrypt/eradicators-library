@@ -136,4 +136,4 @@ local function subsets(size,arr)
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
 do (STDOUT or log or print)('  Loaded → erlib.subsets') end
-return function() return subsets,_subsets,_uLocale end
+return function() return subsets, nil, nil end

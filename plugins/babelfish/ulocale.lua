@@ -13,6 +13,9 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
     [const.setting_name.string_match_type] = {
       en = 'Babelfish: Search Mode',
       },
+    [const.setting_name.search_types] = {
+      en = '[Hidden] Babelfish: Search Types _UL:NOAUTODESCRIPTION_',
+      },
     },
 
   ['[string-mod-setting]'] = {
@@ -26,7 +29,6 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       en = '_UL:PowerUserSetting_ Lua pattern',
       },    
     },
-
 
   ['[string-mod-setting-description]'] = {
     [const.setting_name.string_match_type..'-'..'plain'] = {

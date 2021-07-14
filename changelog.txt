@@ -1,8 +1,14 @@
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.18
-Date: 2021-x-x
+Date: 2021-7-14
   Functions:
-    - Added
+    - Added Lock.is_locked
+    - Renamed Lock.RemoveLock to Lock.remove_lock
+    - Renamed Lock.AutoLock to Lock.auto_lock
+  Bugfixes:
+    - Fixed Babelfish failed to create setting in dev mode.
+  Internal:
+    - Standardized and cleaned up plugin init logic.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.17
 Date: 2021-7-13
