@@ -190,13 +190,15 @@ script.on_event(defines.events.on_gui_text_changed, function(e)
       {'', 'Search took: ', prfS, ', ', 'Gui update took: ', prfG}
       
     
-    -- Compare total translated size to de-duplicated translated size.
-    local arr = {}
-    for full_type, name, word in ntuples(3, status and result or nil) do
-      arr[#arr+1] = word
+    if flag.IS_DEV_MODE and false then
+      -- Compare total translated size to de-duplicated translated size.
+      local arr = {}
+      for full_type, name, word in ntuples(3, status and result or nil) do
+        arr[#arr+1] = word
+        end
+      print('Full  length: ', #table.concat(arr))
+      print('Dedup length: ', #table.concat(Table.keys(Set.from_values(arr))))
       end
-    print('Full  length: ', #table.concat(arr))
-    print('Dedup length: ', #table.concat(Table.keys(Set.from_values(arr))))
       
     end
   end)

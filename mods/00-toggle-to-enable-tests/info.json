@@ -1,5 +1,5 @@
 {
-  "title"           : "! Toggle to enable tests!",
+  "title"           : "! Toggle flag.DO_TESTS",
   "name"            : "00-toggle-to-enable-tests",
   "version"         : "0.1.1",
   "author"          : "eradicator",
