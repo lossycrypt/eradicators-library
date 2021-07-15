@@ -112,11 +112,12 @@ local assertify   = elreq('erlib/lua/Error'     )().Asserter(stop)
 local Class       = elreq('erlib/lua/Class'     )()
 local Filter      = elreq('erlib/lua/Filter'    )()
 local String      = elreq('erlib/lua/String'    )()
-local remove_rich_text_tags = String.remove_rich_text_tags
+-- local remove_rich_text_tags = String.remove_rich_text_tags
 
 local Table       = elreq('erlib/lua/Table'     )()
 local Array       = elreq('erlib/lua/Array'     )()
 local Set         = elreq('erlib/lua/Set'       )()
+local Memoize     = elreq('erlib/lua/Meta/Memoize')()
 
 local sriapi      = elreq('erlib/lua/Iter/sriapi' )()
 local dpairs      = elreq('erlib/lua/Iter/dpairs' )()
@@ -129,7 +130,23 @@ local Prototype   = elreq('erlib/factorio/Prototype')()
 
 local pairs, pcall, string_find, type, string_gmatch, string_lower, string_gsub
     = pairs, pcall, string.find, type, string.gmatch, string.lower, string.gsub
-    
+
+-- -------------------------------------------------------------------------- --
+-- UTF8 (Dummy Implementation)                                                --
+-- -------------------------------------------------------------------------- --
+-- for future compatibility
+
+local Utf8 = {
+  lower = string.lower,
+  find  = string.find ,
+  to_array              = String.to_array,
+  find_fuzzy            = String.find_fuzzy,
+  remove_whitespace     = String.remove_whitespace,
+  remove_rich_text_tags = String.remove_rich_text_tags,
+  }
+        
+local utf8_find = Utf8.find
+        
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
 -- -------------------------------------------------------------------------- --
@@ -162,7 +179,8 @@ local RequestedTypes = Cache.AutoCache(function(r) -- PseudoSet
 local eindex = { -- Entry data index
   name  = 2,
   -- translated entries only
-  lower = 1,
+  -- lower = 1,
+  word  = 1,
   -- requested entries only
   index = 3,
   type  = 4,
@@ -213,14 +231,14 @@ local equ_lstring; do
   end
 
 -- Inverse-order search for requests.
-local mt_lstring_indexed_array = {
-  __index = function(self, lstring)
-    for i=#self, 1, -1  do
-      local v = self[i] -- might require rawget or setmetatable(self, nil)
-      if equ_lstring(v[1], lstring) then return v end
-      end
-    end,
-  }
+-- local mt_lstring_indexed_array = {
+--   __index = function(self, lstring)
+--     for i=#self, 1, -1  do
+--       local v = self[i] -- might require rawget or setmetatable(self, nil)
+--       if equ_lstring(v[1], lstring) then return v end
+--       end
+--     end,
+--   }
 
 -- Specialized serializer.
 -- Result is identical to serpent.line(lstring, nil).
@@ -313,6 +331,14 @@ local function get_profiler()
   return (not flag.IS_DEV_MODE) and ercfg.SKIP or (function(profiler)
     return function(msg) _ENV.log{'', msg, profiler}; profiler.restart() end
     end)(game.create_profiler())
+  end
+  
+  
+-- Pre-processes translated strings and user input
+-- into an easy-to-compare form.
+local normalize_word = function(word)
+  return Utf8.lower(Utf8.remove_rich_text_tags(word))
+  -- return utf8(word):remove_rich_text_tags():lower():tostring()
   end
   
 -- -------------------------------------------------------------------------- --
@@ -496,8 +522,9 @@ function Dictionary:update()
       self.packets[i] = nil
       for _, _, entry in ntuples(3, packet[rindex.entries]) do
         self[ entry[eindex.type] ][ entry[eindex.index] ] = {
-          [eindex.lower] = entry[eindex.name]:lower(),
-          [eindex.name ] = entry[eindex.name],
+          -- [eindex.word] = entry[eindex.name]:lower(),
+          [eindex.word] = entry[eindex.name],
+          [eindex.name] = entry[eindex.name],
           }
         end
       end
@@ -528,8 +555,8 @@ function Dictionary:update()
         local name  = entry[eindex.name ]
         if old_entries[type] and old_entries[type][name] then
           self[type][index] = {
-            [eindex.lower] = old_entries[type][name][eindex.lower],
-            [eindex.name ] = name,
+            [eindex.word] = old_entries[type][name][eindex.word],
+            [eindex.name] = name,
             }
           end
         end
@@ -549,8 +576,8 @@ function Dictionary:update()
   -- for _, packet in ipairs(self.packets) do
     -- for _, _, entry in ntuples(3, packet[rindex.entries]) do
       -- self[ entry[eindex.type] ][ entry[eindex.index] ] = {
-        -- [eindex.lower] = entry[eindex.name]:lower(),
-        -- [eindex.name ] = entry[eindex.name],
+        -- [eindex.word] = entry[eindex.name]:lower(),
+        -- [eindex.name] = entry[eindex.name],
         -- }
       -- end
     -- end
@@ -614,9 +641,10 @@ function Dictionary:dump_statistics_to_console()
         local lengths = {}
         local untranslated = 0
         for _, entry in ipairs(self[type]) do
-          local lower = entry[eindex.lower]
+          local lower = Utf8.lower(entry[eindex.word])
           table.insert(lengths, #lower)
-          if lower:find('unknown key') then
+          -- if lower:find('unknown key') then
+          if Utf8.find(lower, 'unknown key') then
             untranslated = untranslated + 1
             end
           end
@@ -752,8 +780,9 @@ function Dictionary:on_string_translated(lstrings, results)
         end
       --
       self[ entry[eindex.type] ][ entry[eindex.index] ] = {
-        [eindex.lower] = string_lower(remove_rich_text_tags(result)),
-        [eindex.name ] = entry[eindex.name],
+        -- [eindex.word] = string_lower(remove_rich_text_tags(result)),
+        [eindex.word] = result,
+        [eindex.name] = entry[eindex.name],
         }
       -- print(Hydra.line{entry[eindex.type],self[ entry[eindex.type] ][ entry[eindex.index] ]})
       end
@@ -779,6 +808,10 @@ function Dictionary:on_string_translated(lstrings, results)
     garbage when used with anything else.
     
   ]]
+
+-- User-input should not be cached to prevent
+-- high memory usage or exploits.
+local normalized_word_cache = Memoize(normalize_word) -- language agnostic!
   
 -- Replaces all space by ascii space, then splits.
 local function split_by_space(ustr)
@@ -789,8 +822,9 @@ local function split_by_space(ustr)
 
 local matchers = {}
 function matchers.plain (t,ws)
-    for i=1,#ws do if not string_find(t,ws[i],1,true) then return false end end
+    for i=1,#ws do if not utf8_find(t,ws[i],1,true) then return false end end
     return true end
+  
   
 -- @tparams types DenseArray {'item_name', 'recipe_name',...}
 -- @tparams string word The search term.
@@ -813,14 +847,16 @@ function Dictionary:find(types, word, opt)
   local matcher
   if opt.mode == 'lua' then
     -- Lua mode can fail with "weird" user input.
-    -- But this needs to behave like a search without results.
+    -- But that case needs to behave like a search without results.
     matcher = (pcall(string_find,'%',word)) and string_find or Filter.FALSE
   elseif opt.mode == 'fuzzy' then
-    matcher = String.find_fuzzy
-    word = String.to_array(String.remove_whitespace(word:lower()))
+    matcher = Utf8.find_fuzzy
+    -- word = String.to_array(String.remove_whitespace(word:lower()))
+    word = Utf8.to_array(Utf8.remove_whitespace(Utf8.lower(word)))
   else
     matcher = matchers.plain
-    word = split_by_space(word:lower())
+    -- word = split_by_space(word:lower())
+    word = split_by_space(Utf8.lower(word))
     end
   --
   for i=1, #types do
@@ -838,20 +874,40 @@ function Dictionary:find(types, word, opt)
       if entry then -- self[type] is sparse after :update()
         local name = entry[eindex.name]
         if (exact_word == name) -- verbatim internal name match
-        or matcher(entry[eindex.lower], word) then
+        -- or matcher(entry[eindex.word], word) then
+        or matcher(normalized_word_cache[entry[eindex.word]], word) then
           n = n - 1
-          this[name] = (not flag.IS_DEV_MODE) or entry[eindex.lower]
+          this[name] = (not flag.IS_DEV_MODE) or entry[eindex.word]
           end
         end
       end
     end
   -- Pssst! ;)
-  if (exact_word:lower() == 'dolphin')
+  -- if (exact_word:lower() == 'dolphin')
+  if (Utf8.lower(exact_word) == 'dolphin')
   and r.item_name
   and game.item_prototypes['raw-fish']
   then r.item_name['raw-fish'] = true end
   --
+  log:debug('Cache size: ', #normalized_word_cache)
+  --
   return status, r end
 
+  
+-- There is no distinction between "that name isn't translated"
+-- and "that is not a prototype name". Even erroring on invalid
+-- names would incur a heavy performance penalty on every call.
+function Dictionary:translate_name(type, name)
+  assertify(SupportedTypes[type], 'Babelfish: Invalid translation type: ', type)
+  assertify(RequestedTypes[type], 'Babelfish: Type must be configured in settings stage: ', type)
+  verify(name, 'str', 'Babelfish: Invalid name: ', name)
+  local this = self[type]
+  for i = 1, self[type].max do
+    if this[i][eindex.name] == name then
+      return this[i][eindex.word]
+      end
+    end
+  end
+  
   
 return Dictionary

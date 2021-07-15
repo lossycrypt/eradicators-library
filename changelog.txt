@@ -1,3 +1,13 @@
+Version: 4.1.19
+Date: 2021-7-15
+  Plugins:
+    - Babelfish: Added translate_prototype_name
+    - Babelfish: Added on_user_panic compatibility.
+    - Babelfish: Cleaned up the documentation a bit.
+    - Babelfish: Added mod-usable localised message for translation failure.
+  Internal:
+    - Babelfish: Store full translation instead of pre-processed result.
+    - Babelfish: Prepared for potential future Utf8 improvements.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.18
 Date: 2021-7-14

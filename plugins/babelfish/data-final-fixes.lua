@@ -44,6 +44,7 @@ data.raw['gui-style']['default']
 data:extend{{
   type = 'tips-and-tricks-item',
   name = const.name.tip_1,
+  localised_name = {'babelfish.babelfish'},
   category = require ('__eradicators-library__/plugins/tips-group/const')
              .tips.category_name,
   starting_status = "not-to-be-suggested",

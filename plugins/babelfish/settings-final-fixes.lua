@@ -21,7 +21,7 @@ Data.Inscribe{
   type          = 'double-setting'          ,
   setting_type  = 'runtime-global'          ,
   order         = 'babelfish-1'             ,
-  default_value = 32                        ,
+  default_value = 64                        ,
   minimum_value = 0.000001                  ,
   maximum_value = 10000000                  , -- 10GiB/s
   }

@@ -32,8 +32,7 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Startup">Startup </a></li>
-<li><a href="#Remote_Interface_Types">Remote Interface Types </a></li>
+<li><a href="#Concepts">Concepts</a></li>
 <li><a href="#Remote_Interface">Remote Interface </a></li>
 <li><a href="#Commands">Commands </a></li>
 </ul>
@@ -106,59 +105,49 @@
  When it detects changes in the locale it starts a background task to
  translate all prototype names and descriptions. In Singleplayer this
  process happens during the loading screen and is invisible to the player.
- In Multiplayer translation is done gradually in in on_tick to prevent
- network congestion. While this task is running
- a small status indicator in the upper right corner informs each user of
- the current progress. Each language only needs to be translated once,
+ In Multiplayer translation is done gradually in on_tick to prevent
+ network congestion. Each language only needs to be translated once,
  so even in Multiplayer the process is instant for most users.</p>
 
-<p> At the default network speed setting on a vanilla factorio installation:
- It takes ~20 ticks to fully translate all item and fluid names of one language.
- And it takes ~6 seconds to fully translate all names and descriptions of one language.</p>
+<p> While translation is running a small status indicator in
+ the upper right corner informs each user of the <em>approximate</em> progress.
+ However there is no such progress information on the API as the real
+ progress is much more complex and prioritized SearchTypes like
+ <code>&quot;item_name</code>" may already be completely translated despite the indicator
+ showing i.e. "10%".</p>
 
 <p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Polishing.</p>
 
 
-<h2><a href="#Startup">Startup </a></h2>
+<h2><a href="#Concepts">Concepts</a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#HowToActivateBabelfish">HowToActivateBabelfish</a></td>
 	<td class="summary">Babelfish must be activated and configured before use by calling <em>both</em>
  public global functions explained in the example.</td>
 	</tr>
-</table>
-<h2><a href="#Remote_Interface_Types">Remote Interface Types </a></h2>
-<table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#SearchType">SearchType</a></td>
 	<td class="summary">What to search.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#LanguageCode">LanguageCode</a></td>
-	<td class="summary">Identifies a language between different Babelfish function calls.</td>
 	</tr>
 </table>
 <h2><a href="#Remote_Interface">Remote Interface </a></h2>
 <table class="function_list">
 	<tr>
+	<td class="name" nowrap><a href="#RemoteInterfaceName">RemoteInterfaceName</a></td>
+	<td class="summary">The remote interface is named <code>&quot;babelfish</code>".</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#can_find_prototype_names">can_find_prototype_names(pindex, types, options)</a></td>
+	<td class="summary">Reports if all of the given types are completely translated yet.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#find_prototype_names">find_prototype_names(pindex, types, word, options)</a></td>
 	<td class="summary">Given a user input, finds prototype names.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#can_find">can_find(pindex, types, options)</a></td>
-	<td class="summary">Reports if all of the given types are completely translated yet.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#get_player_language_code">get_player_language_code(pindex)</a></td>
-	<td class="summary">Retrieves the LanguageCode of a player.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#get_translation_percentages">get_translation_percentages()</a></td>
-	<td class="summary">Retrieves all translation percentages.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#force_update">force_update([reset=false])</a></td>
-	<td class="summary">Triggers an internal update.</td>
+	<td class="name" nowrap><a href="#translate_prototype_name">translate_prototype_name(pindex, type, name)</a></td>
+	<td class="summary">Retrieves the localised name or description of a single prototype.</td>
 	</tr>
 </table>
 <h2><a href="#Commands">Commands </a></h2>
@@ -185,11 +174,8 @@
 <br/>
 
 
-    <h2 class="section-header has-description"><a name="Startup"></a>Startup </h2>
+    <h2 class="section-header "><a name="Concepts"></a>Concepts</h2>
 
-          <div class="section-description">
-
-          </div>
     <dl class="function">
     <dt>
     <a name = "HowToActivateBabelfish"></a>
@@ -221,55 +207,29 @@
     </ul>
 
 </dd>
-</dl>
-    <h2 class="section-header "><a name="Remote_Interface_Types"></a>Remote Interface Types </h2>
-
-    <dl class="function">
     <dt>
     <a name = "SearchType"></a>
     <strong>SearchType</strong>
     </dt>
     <dd>
 
-<p>What to search.  One of the following strings. This is also the
- order in which translation occurs. Once translation for a type
+<p>What to search.  One of the following strings. <strong>This is also the
+ order in which translation occurs.</strong> Once translation for a type
  is complete it can be fully searched, regardless of the translation
  status of the other types.</p>
 
-<pre><code>'item_name'      , 'item_description'
-'fluid_name'     , 'fluid_description'
-'recipe_name'    , 'recipe_description'
-'technology_name', 'technology_description'
-'equipment_name' , 'equipment_description'
-'tile_name'      , 'tile_description'
-'entity_name'    , 'entity_description'
+<pre><code>"item_name"          , "item_description"      ,
+"fluid_name"         , "fluid_description"     ,
+"recipe_name"        , "recipe_description"    ,
+"technology_name"    , "technology_description",
+"equipment_name"     , "equipment_description" ,
+"tile_name"          , "tile_description"      ,
+"entity_name"        , "entity_description"    ,
+"virtual_signal_name",
 </code></pre>
 
 
 
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "LanguageCode"></a>
-    <strong>LanguageCode</strong>
-    </dt>
-    <dd>
-    Identifies a language between different Babelfish function calls.
- Storing this in your global data will likely produce unexpected results.
- It's best to always retrieve this shortly before usage.</p>
-
-<p> Only <a href="../api/LuaPlayer.html#LuaPlayer.connected">connected</a> players have a code, and
- there is a delay of one "ping" between connection and code
- assignment.</p>
-
-<p> The special string <code>&apos;internal&apos;</code> can be used to ignore the locale and
- search prototype names directly.
 
 
 
@@ -286,116 +246,22 @@
           </div>
     <dl class="function">
     <dt>
-    <a name = "find_prototype_names"></a>
-    <strong>find_prototype_names(pindex, types, word, options)</strong>
+    <a name = "RemoteInterfaceName"></a>
+    <strong>RemoteInterfaceName</strong>
     </dt>
     <dd>
-    Given a user input, finds prototype names.
- Can search the localised name and description of all common prototypes
- to deliver a native search experience.
- Translation is granular per <a href="../modules/Babelfish.html#SearchType">SearchType</a>.</p>
-
-<p> All searches are conducted in <strong>lower-case</strong> (as far as <a href="../lua-5.2/doc/manual.html#pdf-string.lower">string.lower</a>
- works in that language). In the SearchType order given,
- and in prototype <code>order</code> specific order.</p>
-
-<p> The search result is identical to vanilla search even for unlocalised
- names and descriptions (i.e. "Unknown Key:").</p>
-
-<p> With some intentional exceptions: <br/>
- 1) If <code>word</code> is an exact prototype name (i.e. "iron-plate")
- that prototype will <em>additionally</em> be included in the search result. <br/>
- 2) Babelfish does not filter prototypes. The serch result includes names
- of all matching prototypes including hidden items, void recipes, etc. <br/>
- 3) Babelfish understands unicode language spaces (vanilla does <em>not</em>).
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">pindex</span>
-            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
-         A <a href="../api/LuaPlayer.html#LuaPlayer.index">LuaPlayer.index</a>.
-        </li>
-        <li><span class="parameter">types</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a> or <a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
-         One or more <a href="../modules/Babelfish.html#SearchType">SearchTypes</a>.
-        </li>
-        <li><span class="parameter">word</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-         The user input. Interpreted according to the users chosen
- search mode: plaintext, fuzzy or lua pattern. (Currently
- implemented as a per-player mod setting).
-        </li>
-        <li><span class="parameter">options</span> (<a href="../lua-5.2/doc/manual.html#pdf-table">table</a>)
-        <ul>
-        <li><span class="parameter">limit</span>
-            <span class="types"><a class="type" href="../modules/Types.html#Integer">Integer</a></span>
-         Search will abort after this many
- hits and return the (partial) result.
-         (<em>default</em> inf)
-        </li>
-        <li><span class="parameter">language_code</span>
-            <span class="types"><span class="type">LanguageCode</span></span>
-         Defaults to the players current language.
- Can be used to let a player search in the language of another player.
-         (<em>optional</em>)
-        </li>
-        </li></ul>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-        <li>
-           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
-         The status code.  </p>
-
-<p>   <a href="https://www.lua.org/pil/2.1.html">nil</a> means: The requested language is not available. Either you used
-   <code>options.language_code</code> with an outdated code, or the player does not
-   yet have a <a href="../modules/Babelfish.html#LanguageCode">LanguageCode</a>.</p>
-
-<p>   <a href="../modules/Types.html#false">false</a> means: Babelfish is still translating some or all of the requested
-   SearchTypes. A best-effort search result is included but likely to be
-   incomplete. It is recommended to try again after translation is complete.  </p>
-
-<p>   <a href="../modules/Types.html#true">true</a> means: No problems occured.  </li>
-        <li>
-           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
-         The search result. A table mapping each requested
- SearchType to a <a href="../modules/Types.html#set">set</a> of prototype names. </li>
-    </ol>
+    The remote interface is named <code>&quot;babelfish</code>".
 
 
 
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="comment">-- First lets make a shortcut.
-</span><span class="keyword">local</span> babelfind = (<span class="keyword">function</span>(c) <span class="keyword">return</span> <span class="keyword">function</span>(...)
-  <span class="keyword">return</span> c(<span class="string">'babelfish'</span>, <span class="string">'find_prototype_names'</span>, ...)
-  <span class="keyword">end</span> <span class="keyword">end</span>)(remote.call)
 
-<span class="comment">-- For demonstration purposes let's use a player with a German locale.
-</span><span class="keyword">local</span> ok, results
-  = babelfind(game.player.index, {<span class="string">'item_name'</span>, <span class="string">'recipe_name'</span>}, <span class="string">'Kupfer'</span>)
-<span class="keyword">if</span> ok <span class="keyword">then</span> <span class="global">print</span>(serpent.block(results)) <span class="keyword">end</span>
 
-&gt; {
-&gt;   item_name = {
-&gt;     [<span class="string">"copper-cable"</span>] = <span class="keyword">true</span>,
-&gt;     [<span class="string">"copper-ore"</span>  ] = <span class="keyword">true</span>,
-&gt;     [<span class="string">"copper-plate"</span>] = <span class="keyword">true</span>
-&gt;   },
-&gt;   recipe_name = {
-&gt;     [<span class="string">"copper-cable"</span>] = <span class="keyword">true</span>,
-&gt;     [<span class="string">"copper-plate"</span>] = <span class="keyword">true</span>
-&gt;   }
-&gt; }
-</pre>
-    </ul>
+
 
 </dd>
     <dt>
-    <a name = "can_find"></a>
-    <strong>can_find(pindex, types, options)</strong>
+    <a name = "can_find_prototype_names"></a>
+    <strong>can_find_prototype_names(pindex, types, options)</strong>
     </dt>
     <dd>
     Reports if all of the given types are completely translated yet. </p>
@@ -438,11 +304,31 @@
 
 </dd>
     <dt>
-    <a name = "get_player_language_code"></a>
-    <strong>get_player_language_code(pindex)</strong>
+    <a name = "find_prototype_names"></a>
+    <strong>find_prototype_names(pindex, types, word, options)</strong>
     </dt>
     <dd>
-    Retrieves the LanguageCode of a player.
+    Given a user input, finds prototype names.
+ Can search the localised name and description of all common prototypes
+ to deliver a native search experience.
+ Translation is granular per <a href="../modules/Babelfish.html#SearchType">SearchType</a>.</p>
+
+<p> All searches are conducted in <strong>lower-case</strong> (as far as <a href="../lua-5.2/doc/manual.html#pdf-string.lower">string.lower</a>
+ works in that language). In the SearchType order given,
+ and in prototype <code>order</code> specific order.</p>
+
+<p> The search result is identical to vanilla search even for unlocalised
+ names and descriptions (i.e. "Unknown Key:").</p>
+
+<p> With some intentional exceptions: <br/>
+ 1) If <code>word</code> is an exact prototype name (i.e. "iron-plate")
+ that prototype will <em>additionally</em> be included in the search result. <br/>
+ 2) Babelfish does not filter prototypes. The serch result includes names
+ of all matching prototypes including hidden items, void recipes, etc. <br/>
+ 3) Babelfish understands unicode language spaces (vanilla does <em>not</em>).</p>
+
+<p> <strong>Note:</strong> To avoid bad performance it is recommended to not search for
+ very short or empty strings.
 
 
     <h3>Parameters:</h3>
@@ -451,69 +337,111 @@
             <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
          A <a href="../api/LuaPlayer.html#LuaPlayer.index">LuaPlayer.index</a>.
         </li>
+        <li><span class="parameter">types</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a> or <a class="type" href="../modules/Types.html#DenseArray">DenseArray</a></span>
+         One or more <a href="../modules/Babelfish.html#SearchType">SearchTypes</a>.
+        </li>
+        <li><span class="parameter">word</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         The user input. Interpreted according to the users chosen
+ search mode: plaintext, fuzzy or lua pattern (per-player mod setting).
+ For best performance it is
+ recommended to not search for strings shorter than length 2.
+        </li>
+        <li><span class="parameter">options</span> (<a href="../lua-5.2/doc/manual.html#pdf-table">table</a>)
+        <ul>
+        <li><span class="parameter">limit</span>
+            <span class="types"><a class="type" href="../modules/Types.html#Integer">Integer</a></span>
+         Search will abort after this many
+ hits and return the (partial) result.
+         (<em>default</em> inf)
+        </li>
+        </li></ul>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
+        <li>
+           <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+         The status code.  </p>
 
-        (<a href="../modules/Babelfish.html#LanguageCode">LanguageCode</a> or <a href="https://www.lua.org/pil/2.1.html">nil</a>).
+<p>   <a href="https://www.lua.org/pil/2.1.html">nil</a> means: The language for that player has not been detected yet.
+   This will hardly ever happen in reality. Just try again a second later.</p>
+
+<p>   <a href="../modules/Types.html#false">false</a> means: Babelfish is still translating some or all of the requested
+   SearchTypes. A best-effort search result is included but likely to be
+   incomplete. It is recommended to try again after translation is complete. <br/>
+   You can show <code>{&apos;babelfish.translation-in-progress&apos;}</code> to the player.</p>
+
+<p>   <a href="../modules/Types.html#true">true</a> means: No problems occured.  </li>
+        <li>
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+         The search result. A table mapping each requested
+ SearchType to a <a href="../modules/Types.html#set">set</a> of prototype names. </li>
     </ol>
 
 
 
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- First lets make a shortcut.
+</span><span class="keyword">local</span> babelfind = (<span class="keyword">function</span>(c) <span class="keyword">return</span> <span class="keyword">function</span>(...)
+  <span class="keyword">return</span> c(<span class="string">'babelfish'</span>, <span class="string">'find_prototype_names'</span>, ...)
+  <span class="keyword">end</span> <span class="keyword">end</span>)(remote.call)
+
+<span class="comment">-- For demonstration purposes let's use a player with a German locale.
+</span><span class="keyword">local</span> ok, results
+  = babelfind(game.player.index, {<span class="string">'item_name'</span>, <span class="string">'recipe_name'</span>}, <span class="string">'Kupfer'</span>)
+<span class="keyword">if</span> ok <span class="keyword">then</span> <span class="global">print</span>(serpent.block(results)) <span class="keyword">end</span>
+
+&gt; {
+&gt;   item_name = {
+&gt;     [<span class="string">"copper-cable"</span>] = <span class="keyword">true</span>,
+&gt;     [<span class="string">"copper-ore"</span>  ] = <span class="keyword">true</span>,
+&gt;     [<span class="string">"copper-plate"</span>] = <span class="keyword">true</span>
+&gt;   },
+&gt;   recipe_name = {
+&gt;     [<span class="string">"copper-cable"</span>] = <span class="keyword">true</span>,
+&gt;     [<span class="string">"copper-plate"</span>] = <span class="keyword">true</span>
+&gt;   }
+&gt; }
+</pre>
+    </ul>
 
 </dd>
     <dt>
-    <a name = "get_translation_percentages"></a>
-    <strong>get_translation_percentages()</strong>
+    <a name = "translate_prototype_name"></a>
+    <strong>translate_prototype_name(pindex, type, name)</strong>
     </dt>
     <dd>
-    Retrieves all translation percentages.
- This is the same data that the built-in status indicator uses.
- Includes only languages that have been seen on this map at least once.</p>
-
-<p> This is the total percentage intended for GUI visualization only.
- Use <a href="../modules/Babelfish.html#can_find">Babelfish.can_find</a> to get the proper per-SearchType status.
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
-         A mapping (<a href="../modules/Babelfish.html#LanguageCode">LanguageCode</a> → <a href="../modules/Types.html#NaturalNumber">NaturalNumber</a>)
- where the number is between 0 and 100 inclusive.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "force_update"></a>
-    <strong>force_update([reset=false])</strong>
-    </dt>
-    <dd>
-    Triggers an internal update. </p>
-
-<p> This is meant to be used to circumvent the hard engine limitation of
- no events being raised in Singleplayer when the locale changes but
- nothing else changed.</p>
-
-<p> This can also be triggered by the commands <code>&apos;/babelfish update&apos;</code>
- (singleplayer only) and <code>&apos;/babelfish reset&apos;</code> (admin only) respectively.
+    Retrieves the localised name or description of a single prototype.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">reset</span>
-            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
-         Completely resets all translations
- instead of just performing a normal update.
-         (<em>default</em> false)
+        <li><span class="parameter">pindex</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         A <a href="../api/LuaPlayer.html#LuaPlayer.index">LuaPlayer.index</a>.
+        </li>
+        <li><span class="parameter">type</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         A <a href="../modules/Babelfish.html#SearchType">SearchTypes</a>.
+        </li>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
+         A prototype name.
         </li>
     </ul>
 
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+         The translation, or nil if that entry is
+ not translated yet, or the name is unknown. Empty descriptions
+ will return an empty string. Empty names return the usual "Unknown key:".
+ The result should be used immediately or it may become outdated.
+    </ol>
 
 
 
@@ -592,7 +520,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-07-14 20:53:27 </i>
+<i style="float:right;">Last updated 2021-07-15 19:26:17 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

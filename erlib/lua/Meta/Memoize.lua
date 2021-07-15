@@ -32,19 +32,14 @@ local _Memo1, _MemoN
 
 
 -- Simple argument splitter 1<>N
-local function Memoize(constructor,n,max_cache_size)
-  -- if (type(n) == 'function') and (constructor==nil)then 
-    -- n,constructor = 1,n
-    -- end
-  if type(constructor) ~= 'function' then
-    err('Constructor must be a function')
-    end
+local function Memoize(constructor, n, max_cache_size)
+  assert(type(constructor) == 'function', 'Constructor must be a function.')
   if (n or 1) == 1 then
     -- does not check max_cache_size because it would be too expensive to
     -- check on every call.
     return _Memo1(constructor)
   else
-    return _MemoN(n,constructor,max_cache_size)
+    return _MemoN(n, constructor, max_cache_size)
     end
   end
 
@@ -75,28 +70,21 @@ local function Memoize(constructor,n,max_cache_size)
 --   -- of the time it would to call the un-memoized function.
 --   local four = memodoubleup[2]
 
-  
--- Simple one-argument Memoizer
+-- Simple one-argument Memoizer (V2)
 function _Memo1(constructor)
-  local mt = {}
-  function mt.__index(self,key)
-    local value = constructor(key)
-    self[key] = value
-    return value
-    end
-  function mt.__call(self,key)
-    return self[key] --implicitly calls index -> constructor
-                     --@todo: copy value? performance? can't copy table access anyway.
-    end
-  function mt.__pairs(self)
-    err('Memoized function is not iterable.')
-    end
-  function mt.__ipairs(self)
-    err('Memoized function is not iterable.')
-    end
-  return setmetatable({},mt)
+  return setmetatable({}, {
+    __index = function(self, key)
+      local value = constructor(key) -- Can be nil.
+      rawset(self, key, value)
+      return value end,
+    __call = function(self, key)
+      return self[key] end,
+    --
+    __pairs    = function() err('Memoized function is not iterable.') end,
+    __ipairs   = function() err('Memoized function is not iterable.') end,
+    __newindex = function() err('Memoized function is not writable.') end,
+    })
   end
-
 
   
 ----------

@@ -27,6 +27,9 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- local log         = elreq('erlib/lua/Log'          )().Logger  'BabelfishDemo'
 -- local stop        = elreq('erlib/lua/Error'        )().Stopper 'BabelfishDemo'
 
+local Table       = elreq('erlib/lua/Table'        )()
+local Set         = elreq('erlib/lua/Set'          )()
+
 local Class       = elreq('erlib/lua/Class'        )()
 local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
 
@@ -185,6 +188,15 @@ script.on_event(defines.events.on_gui_text_changed, function(e)
       
     anchor[Name.gui.profiler_label].caption = 
       {'', 'Search took: ', prfS, ', ', 'Gui update took: ', prfG}
+      
+    
+    -- Compare total translated size to de-duplicated translated size.
+    local arr = {}
+    for full_type, name, word in ntuples(3, status and result or nil) do
+      arr[#arr+1] = word
+      end
+    print('Full  length: ', #table.concat(arr))
+    print('Dedup length: ', #table.concat(Table.keys(Set.from_values(arr))))
       
     end
   end)

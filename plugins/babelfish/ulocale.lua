@@ -66,11 +66,18 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
     },
 
   ['[babelfish]'] = {
+    
+    ['babelfish'] = {
+      en = 'Babelfish',
+      de = 'Babelfisch',
+      ja = 'バベルフィッシュさん',
+      },
 
-    ['status-indicator-tooltip-header'] = {
-      en = 'The Babelfish is currently translating your mods.__1__',
-      de = 'Der Babelfisch übersetzt gerade deine Mods.__1__',
-      ja = 'バベルフィッシュさんが只今モッドの翻訳に勤しんでいます。__1__',
+    -- ['status-indicator-tooltip-header'] = {
+    ['translation-in-progress'] = {
+      en = 'The Babelfish is currently translating your mods.',
+      de = 'Der Babelfisch übersetzt gerade deine Mods.',
+      ja = 'バベルフィッシュさんが只今モッドの翻訳に勤しんでいます。',
       },
 
     ['command-only-in-singleplayer'] = {
@@ -108,20 +115,21 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
 
     },
     
-    
-  ['[tips-and-tricks-item-name]'] = {
-    [const.name.tip_1] = { 
-      en = "Babelfish",
-      de = "",
-      ja = "",
-      }
-    },
+  -- Replaced by {'babelfish.babelfish'} in prototype.
+  --
+  -- ['[tips-and-tricks-item-name]'] = {
+    -- [const.name.tip_1] = { 
+      -- en = "Babelfish",
+      -- de = "",
+      -- ja = "",
+      -- }
+    -- },
     
   ['[tips-and-tricks-item-description]'] = {
     [const.name.tip_1] = { 
       en = [[Babelfish helps mods to interact with you in your
              own language. You will see a small indicator in the upper
-             right corner of the screen when it is working.
+             right corner of the screen while it is working.
              \n
              Mods known to use Babelfish:
              _UL:2SPACE_ Eradicator's Belt Builder (by eradicator)

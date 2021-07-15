@@ -7,15 +7,16 @@
 -- When it detects changes in the locale it starts a background task to 
 -- translate all prototype names and descriptions. In Singleplayer this
 -- process happens during the loading screen and is invisible to the player.
--- In Multiplayer translation is done gradually in in on_tick to prevent
--- network congestion. While this task is running
--- a small status indicator in the upper right corner informs each user of 
--- the current progress. Each language only needs to be translated once,
+-- In Multiplayer translation is done gradually in on_tick to prevent
+-- network congestion. Each language only needs to be translated once,
 -- so even in Multiplayer the process is instant for most users.
 --
--- At the default network speed setting on a vanilla factorio installation:
--- It takes ~20 ticks to fully translate all item and fluid names of one language.
--- And it takes ~6 seconds to fully translate all names and descriptions of one language.
+-- While translation is running a small status indicator in
+-- the upper right corner informs each user of the _approximate_ progress. 
+-- However there is no such progress information on the API as the real
+-- progress is much more complex and prioritized SearchTypes like
+-- `"item_name`" may already be completely translated despite the indicator
+-- showing i.e. "10%".
 --
 -- @{Introduction.DevelopmentStatus|Module Status}: Polishing.
 --
@@ -94,6 +95,11 @@ local Dictionary = import 'methods/Dictionary_NoIdent_PacketPregen'
 local StatusIndicator = import 'methods/StatusIndicator'
 
 local Demo = import 'demo/control'
+
+local Remote = {}
+remote.add_interface(const.remote.interface_name, Remote)
+
+local Deprecated = {} -- disabled Remote methods
 
 -- -------------------------------------------------------------------------- --
 -- Savedata                                                                   --
@@ -429,15 +435,14 @@ Babelfish.request_translations = function(e)
 -- -------------------------------------------------------------------------- --
 Babelfish.update_status_indicators = function(e)
   -- Tooltip shows progress for all languages.
-  local tooltip = {}
+  local tooltip = {
+    {'babelfish.translation-in-progress'}
+    }
   for dict in pairs(Savedata.incomplete_dictionaries) do
     table.insert(tooltip, 
       ('\n%3s%% %s'):format(dict:get_percentage(), dict.native_language_name))
     end
-  tooltip = {
-    'babelfish.status-indicator-tooltip-header',
-    Locale.merge(table.unpack(tooltip))
-    }
+  tooltip = {'', Locale.merge(table.unpack(tooltip)) }
   -- Sprite button shows progress for the owning player.
   for _, p in pairs(game.connected_players) do
     local pdata = Savedata:get_pdata(nil, p.index)
@@ -449,12 +454,12 @@ Babelfish.update_status_indicators = function(e)
 -- -------------------------------------------------------------------------- --
 -- Remote + Documentation                                                     --
 -- -------------------------------------------------------------------------- --
-  
+    
 --------------------------------------------------------------------------------
--- Startup.  
+-- Concepts.
 -- @section
 --------------------------------------------------------------------------------
-
+ 
 ----------
 -- Babelfish must be activated and configured before use by calling _both_
 -- public global functions explained in the example. Otherwise it
@@ -475,29 +480,26 @@ Babelfish.update_status_indicators = function(e)
 --
 -- @table HowToActivateBabelfish
 do end
-  
---------------------------------------------------------------------------------
--- Remote Interface Types.
--- @section
---------------------------------------------------------------------------------
 
 ----------
--- What to search. One of the following strings. This is also the
--- order in which translation occurs. Once translation for a type
+-- What to search. One of the following strings. __This is also the
+-- order in which translation occurs.__ Once translation for a type
 -- is complete it can be fully searched, regardless of the translation
 -- status of the other types.
 --
---    'item_name'      , 'item_description'
---    'fluid_name'     , 'fluid_description'
---    'recipe_name'    , 'recipe_description'
---    'technology_name', 'technology_description'
---    'equipment_name' , 'equipment_description'
---    'tile_name'      , 'tile_description'
---    'entity_name'    , 'entity_description'
+--    "item_name"          , "item_description"      ,
+--    "fluid_name"         , "fluid_description"     ,
+--    "recipe_name"        , "recipe_description"    ,
+--    "technology_name"    , "technology_description",
+--    "equipment_name"     , "equipment_description" ,
+--    "tile_name"          , "tile_description"      ,
+--    "entity_name"        , "entity_description"    ,
+--    "virtual_signal_name",
 --
 -- @table Babelfish.SearchType
+do end
 
-----------
+-- -------
 -- Identifies a language between different Babelfish function calls.
 -- Storing this in your global data will likely produce unexpected results.
 -- It's best to always retrieve this shortly before usage.
@@ -510,14 +512,38 @@ do end
 -- search prototype names directly.
 --
 -- @table Babelfish.LanguageCode
+do end
   
 --------------------------------------------------------------------------------
 -- Remote Interface.  
 -- @section
 --------------------------------------------------------------------------------
 
-local Remote = {}
-remote.add_interface(const.remote.interface_name, Remote)
+----------
+-- The remote interface is named `"babelfish`".
+-- @table RemoteInterfaceName
+do end
+
+  
+----------
+-- Reports if all of the given types are completely translated yet.
+--
+-- Uses the same parameters and does the same internal checks as 
+-- @{Babelfish.find_prototype_names} but does not conduct a search,
+-- and only returns the status code.
+--
+-- @param pindex
+-- @param types
+-- @param options
+--
+-- @treturn boolean|nil
+--
+-- @function Babelfish.can_find_prototype_names
+function Remote.can_find_prototype_names(pindex, types, options)
+  options = options or {}
+  options.limit = 0
+  return (Remote.find_prototype_names(pindex, types, '', options)) end
+  
 
 ----------
 -- Given a user input, finds prototype names.
@@ -538,6 +564,9 @@ remote.add_interface(const.remote.interface_name, Remote)
 -- 2) Babelfish does not filter prototypes. The serch result includes names
 -- of all matching prototypes including hidden items, void recipes, etc.  
 -- 3) Babelfish understands unicode language spaces (vanilla does _not_).
+-- 
+-- __Note:__ To avoid bad performance it is recommended to not search for
+-- very short or empty strings.
 -- 
 -- @usage
 -- 
@@ -566,23 +595,22 @@ remote.add_interface(const.remote.interface_name, Remote)
 -- @tparam NaturalNumber pindex A @{FOBJ LuaPlayer.index}.
 -- @tparam string|DenseArray types One or more @{Babelfish.SearchType|SearchTypes}.
 -- @tparam string word The user input. Interpreted according to the users chosen
--- search mode: plaintext, fuzzy or lua pattern. (Currently 
--- implemented as a per-player mod setting).
+-- search mode: plaintext, fuzzy or lua pattern (per-player mod setting).
+-- For best performance it is
+-- recommended to not search for strings shorter than length 2.
 -- @param options (@{table})
 -- @tparam[opt=inf] Integer options.limit Search will abort after this many
 -- hits and return the (partial) result.
--- @tparam[opt] LanguageCode options.language_code Defaults to the players current language.
--- Can be used to let a player search in the language of another player.
 -- 
 -- @treturn boolean|nil The status code.  
 --
---   @{nil} means: The requested language is not available. Either you used
---   `options.language_code` with an outdated code, or the player does not
---   yet have a @{Babelfish.LanguageCode|LanguageCode}.
+--   @{nil} means: The language for that player has not been detected yet.
+--   This will hardly ever happen in reality. Just try again a second later.
 --
 --   @{false} means: Babelfish is still translating some or all of the requested
 --   SearchTypes. A best-effort search result is included but likely to be
 --   incomplete. It is recommended to try again after translation is complete.  
+--   You can show `{'babelfish.translation-in-progress'}` to the player.
 --
 --   @{true} means: No problems occured.  
 --
@@ -600,6 +628,7 @@ function Remote.find_prototype_names(pindex, types, word, options)
   options.mode = Setting.get_value(pindex, const.setting_name.string_match_type)
   --
   if options.language_code then
+    stop('Deprecated') -- @future: mod setting? mini-gui?
     if options.language_code == 'internal' then
       -- Only created if anybody ever asks for it.
       dict = Savedata:sget_dict('internal')
@@ -614,52 +643,53 @@ function Remote.find_prototype_names(pindex, types, word, options)
 
   
 ----------
--- Reports if all of the given types are completely translated yet.
+-- Retrieves the localised name or description of a single prototype.
 --
--- Uses the same parameters and does the same internal checks as 
--- @{Babelfish.find_prototype_names} but does not conduct a search,
--- and only returns the status code.
+-- @tparam NaturalNumber pindex A @{FOBJ LuaPlayer.index}.
+-- @tparam string type A @{Babelfish.SearchType|SearchTypes}.
+-- @tparam string name A prototype name.
+-- @treturn string|nil The translation, or nil if that entry is
+-- not translated yet, or the name is unknown. Empty descriptions
+-- will return an empty string. Empty names return the usual "Unknown key:".
+-- The result should be used immediately or it may become outdated.
 --
--- @param pindex
--- @param types
--- @param options
---
--- @treturn boolean|nil
---
--- @function Babelfish.can_find
-function Remote.can_find(pindex, types, options)
-  options = options or {}
-  options.limit = 0
-  return (Remote.find_prototype_names(pindex, types, '', options)) end
+-- @function Babelfish.translate_prototype_name
+function Remote.translate_prototype_name(pindex, type, name)
+  -- The other mod might send the index of an offline player!
+  verify(pindex, 'NaturalNumber', 'No player with given index: ', pindex)
+  assertify(game.players[pindex], 'No player with given index: ', pindex)
+  local dict = Savedata:sget_pdata(nil, pindex).dict
+  --
+  return dict:translate_name(type, name) end
   
   
-----------
+-- -------
 -- Retrieves the LanguageCode of a player.
 -- 
 -- @tparam NaturalNumber pindex A @{FOBJ LuaPlayer.index}.
 -- @return (@{Babelfish.LanguageCode|LanguageCode} or @{nil}).
 --
 -- @function Babelfish.get_player_language_code
-function Remote.get_player_language_code(pindex)
+function Deprecated.get_player_language_code(pindex)
   verify(pindex, 'NaturalNumber', 'Babelfish: Invalid player index.')
   assertify(game.players[pindex], 'No player with given index: ', pindex)
   local dict = Savedata:sget_pdata(nil, pindex).dict
   return (dict and dict.language_code) or nil end
   
   
-----------
+-- -------
 -- Retrieves all translation percentages.
 -- This is the same data that the built-in status indicator uses.
 -- Includes only languages that have been seen on this map at least once.
 -- 
 -- This is the total percentage intended for GUI visualization only.
--- Use @{Babelfish.can_find} to get the proper per-SearchType status.
+-- Use @{Babelfish.can_find_prototype_names} to get the proper per-SearchType status.
 -- 
 -- @treturn table A mapping (@{Babelfish.LanguageCode|LanguageCode} → @{NaturalNumber})
 -- where the number is between 0 and 100 inclusive.
 -- 
 -- @function Babelfish.get_translation_percentages
-function Remote.get_translation_percentages()
+function Deprecated.get_translation_percentages()
   local r = {}
   for code, dict in ntuples(2, Savedata.dicts) do
     r[code] = dict:get_percentage()
@@ -667,7 +697,7 @@ function Remote.get_translation_percentages()
   return r end
 
   
-----------
+-- -------
 -- Triggers an internal update.
 --
 -- This is meant to be used to circumvent the hard engine limitation of
@@ -681,7 +711,8 @@ function Remote.get_translation_percentages()
 -- instead of just performing a normal update.
 --
 -- @function Babelfish.force_update
-function Remote.force_update(force)
+function Deprecated.force_update(force)
+  -- @future: This can be included in the eventual mini-gui.
   if (force == true) then
     -- Has to fix completely broken Savedata/Dictionary state!
     Table.overwrite(Savedata, Table.dcopy(DefaultSavedata))
@@ -698,20 +729,27 @@ function Remote.force_update(force)
 -- @section
 --------------------------------------------------------------------------------
 
-  do local subcommands
-script.on_event(defines.events.on_console_command, function(e)
-  if (e.command == 'babelfish') then
-    local pdata, p = Savedata:sget_pdata(e)
-    local f = subcommands[e.parameters]
-    if f then
-      if f(e, pdata, p) then
-        p.print {'babelfish.command-confirm'}
+do
+  local subcommands
+  local on_cmd = script.on_event(defines.events.on_console_command, function(e)
+    if (e.command == 'babelfish') then
+      local pdata, p = Savedata:sget_pdata(e)
+      local f = subcommands[e.parameters]
+      if f then
+        if f(e, pdata, p) then
+          p.print{'babelfish.command-confirm'}
+          end
+      else
+        p.print{'babelfish.unknown-command'}
         end
-    else
-      p.print{'babelfish.unknown-command'}
       end
-    end
-  end)
+    end)
+  script.on_event(EventManager.events.on_user_panic, function(e)
+    local pdata, p = Savedata:sget_pdata(e)
+    if subcommands.reset(nil, pdata, p) then
+      p.print{e.calming_words, {'babelfish.babelfish'}}
+      end
+    end)
   --
   subcommands = {
     ----------
@@ -721,7 +759,7 @@ script.on_event(defines.events.on_console_command, function(e)
       if game.is_multiplayer() then
         p.print {'babelfish.command-only-in-singleplayer'}
       else
-        Remote.force_update()
+        Deprecated.force_update()
         return true end
       end,
       
@@ -733,7 +771,7 @@ script.on_event(defines.events.on_console_command, function(e)
       if game.is_multiplayer() and not p.admin then
         p.print {'babelfish.command-only-by-admin'}
       else
-        Remote.force_update(true)
+        Deprecated.force_update(true)
         return true end
       end,
       
@@ -755,8 +793,10 @@ script.on_event(defines.events.on_console_command, function(e)
       Demo(p):toggle_gui()
       end,
       
-      
+    -- -------
+    --
     test = function(e, pdata, p)
+      assert(p.name == 'eradicator')
       --
       for k, v in pairs(pdata.dict) do
         if type(v) == 'table' then
@@ -767,9 +807,7 @@ script.on_event(defines.events.on_console_command, function(e)
           print(('%s had %s holes'):format(k, holes))
           end
         end
-      --
       end,
-      
       
     }
   end

@@ -34,8 +34,7 @@ return function(log, mod_name)
   local phase
   
   -- @tparam string phase
-  function Loader.init(_phase)
-    phase = assert(_phase)
+  function Loader.init(_phase) phase = assert(_phase)
     -- Debug ---------------------------------------------------------------- --
     -- if flag.IS_DEV_MODE then
       -- _ENV.Hydra = elreq('erlib/lua/Coding/Hydra')()
@@ -82,11 +81,15 @@ return function(log, mod_name)
   -- @tparam[opt] TrueSet enabled_set (plugin_name -> true) 
   -- If no enabled_set is given all plugins are considered enabled.
   function Loader.load_phase(enabled_set) assert(phase)
+    --
     if phase == 'ulocale' then
-      if remote.interfaces['__00-universal-locale__/remote'] then 
-        -- Load some modules for global ulocale usage.
-        rawset(_ENV, 'Locale', elreq('erlib/factorio/Locale')())
-      else return end
+      if not remote.interfaces['__00-universal-locale__/remote'] then return end
+      -- Some control-free plugins need PM just for ulocale (i.e. VRAM saver).
+      if not rawget(_ENV, 'PluginManager') then
+        rawset(_ENV, 'PluginManager', elreq ('erlib/factorio/PluginManagerLite-1')())
+        end
+      -- Load some modules for global ulocale usage.
+      rawset(_ENV, 'Locale', elreq('erlib/factorio/Locale')())
       end
     --
     local function wants_phase(phases)
