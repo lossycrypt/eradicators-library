@@ -152,6 +152,9 @@ PluginManager.classify_savedata('babelfish', {
 --   mod_changes = {},
 --   mod_startup_settings_changed = false }
 script.on_config(function(e)
+  --
+  Savedata.version = 1 -- reserved for future use
+  --
   Dictionary.precompile()
   --
   if (not e) or
@@ -539,12 +542,11 @@ do end
 --
 -- @param pindex
 -- @param types
--- @param options
 --
 -- @treturn boolean|nil
 --
--- @function Babelfish.can_find_prototype_names
-function Remote.can_find_prototype_names(pindex, types, options)
+-- @function Babelfish.can_translate
+function Remote.can_translate(pindex, types, options)
   options = options or {}
   options.limit = 0
   return (Remote.find_prototype_names(pindex, types, '', options)) end
@@ -627,6 +629,7 @@ function Remote.find_prototype_names(pindex, types, word, options)
   -- The other mod might send the index of an offline player!
   verify(pindex, 'NaturalNumber', 'No player with given index: ', pindex)
   assertify(game.players[pindex], 'No player with given index: ', pindex)
+  verify(options, 'tbl|nil', 'Invalid options.') --future: remove redundant verify
   local dict = Savedata:sget_pdata(nil, pindex).dict
   --
   options = options or {}

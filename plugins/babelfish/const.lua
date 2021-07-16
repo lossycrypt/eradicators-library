@@ -30,6 +30,8 @@ const.style = {
   
 const.sprite = {
   default_icon = 'er:babelfish-default-icon',
+  default_icon = 'er:babelfish-yellow-icon',
+  default_icon = 'er:babelfish-red-icon',
   }
 
 const.lstring = {
@@ -113,43 +115,39 @@ const.type_data = {
   {type = "virtual_signal_name"   , longest =   40},             
   --
   -- Deactivated prototype categories.
-  --
   --   This is a list of *all* prototypes with a compatible
   --   game.*_prototypes table. "_description" is not listed for brevity.
   --
-  --   Activating any of them will break the demo code
-  --   due to incompatibility with chose-elem-button!
-  --
   -- Type 1: Partially localised, but useless for find().
-  --   If someone finds a usecase where they actually need these
-  --   as a non-localised string I might add them.
-  true and {type = "virtual_signal_description", longest =  139, noicon = true},
-  true and {type = "custom_input_name"         , longest =   78, noicon = true},
-  true and {type = "custom_input_description"  , longest =   85, noicon = true},
-  true and {type = "mod_setting_name"          , longest =   87, noicon = true},
-  true and {type = "mod_setting_description"   , longest =  686, noicon = true},
-  true and {type = "achievement_name"          , longest =   57, noicon = true},
-  true and {type = "achievement_description"   , longest =  129, noicon = true},
-  true and {type = "shortcut_name"             , longest =   54, noicon = true},
-  true and {type = "ammo_category_name"        , longest =   57, noicon = true},
-  true and {type = "damage_name"               , longest =   21, noicon = true},
-  true and {type = "decorative_name"           , longest =   55, noicon = true},
-  true and {type = "item_group_name"           , longest =   21, noicon = false}, -- does not support localised_description
+  --   If someone finds a usecase (i.e. for translate())
+  --   as a non-localised string I might activate them.
+  nil and {type = "virtual_signal_description", longest =  139, noicon = true},
+  nil and {type = "custom_input_name"         , longest =   78, noicon = true},
+  nil and {type = "custom_input_description"  , longest =   85, noicon = true},
+  nil and {type = "mod_setting_name"          , longest =   87, noicon = true},
+  nil and {type = "mod_setting_description"   , longest =  686, noicon = true},
+  nil and {type = "achievement_name"          , longest =   57, noicon = true},
+  nil and {type = "achievement_description"   , longest =  129, noicon = true},
+  nil and {type = "shortcut_name"             , longest =   54, noicon = true},
+  nil and {type = "ammo_category_name"        , longest =   57, noicon = true},
+  nil and {type = "damage_name"               , longest =   21, noicon = true},
+  nil and {type = "decorative_name"           , longest =   55, noicon = true},
+  nil and {type = "item_group_name"           , longest =   21,              }, -- does not support localised_description
   --
   -- Type 2: Unlocalised. Technically supports localisation.
-  true and {type = "item_subgroup_name"        , longest =    0, noicon = true}, -- does not support localised_description
-  true and {type = "equipment_grid_name"       , longest =   63, noicon = true},
-  true and {type = "particle_name"             , longest =   92, noicon = true},
-  true and {type = "trivial_smoke_name"        , longest =   71, noicon = true},
-  true and {type = "autoplace_control_name"    , longest =   90, noicon = true},
-  true and {type = "noise_layer_name"          , longest =   53, noicon = true},
-  true and {type = "fuel_category_name"        , longest =   49, noicon = true},
-  true and {type = "resource_category_name"    , longest =   55, noicon = true},
-  true and {type = "module_category_name"      , longest =   60, noicon = true},
-  true and {type = "equipment_category_name"   , longest =   74, noicon = true},
-  true and {type = "recipe_category_name"      , longest =   63, noicon = true},
+  nil and {type = "item_subgroup_name"        , longest =    0, noicon = true}, -- does not support localised_description
+  nil and {type = "equipment_grid_name"       , longest =   63, noicon = true},
+  nil and {type = "particle_name"             , longest =   92, noicon = true},
+  nil and {type = "trivial_smoke_name"        , longest =   71, noicon = true},
+  nil and {type = "autoplace_control_name"    , longest =   90, noicon = true},
+  nil and {type = "noise_layer_name"          , longest =   53, noicon = true},
+  nil and {type = "fuel_category_name"        , longest =   49, noicon = true},
+  nil and {type = "resource_category_name"    , longest =   55, noicon = true},
+  nil and {type = "module_category_name"      , longest =   60, noicon = true},
+  nil and {type = "equipment_category_name"   , longest =   74, noicon = true},
+  nil and {type = "recipe_category_name"      , longest =   63, noicon = true},
   -- Type 3: Does not support localisation.
-  nil and {type = "font_name"                  , longest = 9001, noicon = true},
+  nil and {type = "font_name"                 , longest = 9001, noicon = true},
   }
 
 const.native_language_name = {

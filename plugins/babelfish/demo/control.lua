@@ -51,6 +51,10 @@ local W, H   = const.gui.width, const.gui.height
 local babelconst = require('plugins/babelfish/const')
 local Babelfish = Remote.get_interface(babelconst.remote.interface_name)
 
+local has_icon = Table.map(babelconst.type_data, function(v)
+  return not v.noicon, v.type
+  end, {})
+
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
@@ -157,33 +161,38 @@ script.on_event(defines.events.on_gui_text_changed, function(e)
     pane.clear()
 
     local last_type, type, tbl, args, add
-    for full_type, name in ntuples(3, status and result or nil) do
-      if last_type ~= full_type then
-        last_type = full_type
-        pane.add {type = 'label', caption = full_type }
-        tbl = pane.add {type = 'table', column_count = math.floor((W-64)/40)}
-        tbl.style.horizontal_spacing = 0
-        tbl.style.vertical_spacing = 0
-        --
-        type = full_type:gsub('_[^_]+$','')
-        add  = tbl.add
-        args = {
-          type      = 'choose-elem-button',
-          style     = 'slot_button',
-          elem_type = type,
-          }
-        if type == 'virtual_signal' then
-          args.elem_type = 'signal'
-          args.signal = {type = 'virtual'}
+    for full_type, _ in ntuples(2, status and result or nil) do
+      if has_icon[full_type] then
+        for name in pairs(_) do
+          if last_type ~= full_type then
+            last_type = full_type
+            pane.add {type = 'label', caption = full_type }
+            tbl = pane.add {type = 'table', column_count = math.floor((W-64)/40)}
+            tbl.style.horizontal_spacing = 0
+            tbl.style.vertical_spacing = 0
+            --
+            type = full_type:gsub('_[^_]+$','')
+            type = type:gsub('_','-') -- fix for "item_group" sprite path
+            add  = tbl.add
+            args = {
+              type      = 'choose-elem-button',
+              style     = 'slot_button',
+              elem_type = type,
+              }
+            if type == 'virtual-signal' then
+              args.elem_type = 'signal'
+              args.signal = {type = 'virtual'}
+              end
+            end
+          if type == 'virtual-signal' then
+            -- VirtualSignal uses "SignalID" table instead of name string.
+            args.signal.name = name
+          else
+            args[type] = name
+            end
+          add(args).locked = true
           end
         end
-      if type == 'virtual_signal' then
-        -- VirtualSignal uses "SignalID" table instead of name string.
-        args.signal.name = name
-      else
-        args[type] = name
-        end
-      add(args).locked = true
       end
       
     anchor[Name.gui.profiler_label].caption = 
