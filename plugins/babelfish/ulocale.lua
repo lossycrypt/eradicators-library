@@ -16,6 +16,9 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
     [const.setting_name.search_types] = {
       en = '[Hidden] Babelfish: Search Types _UL:NOAUTODESCRIPTION_',
       },
+    [const.setting_name.sp_instant_translation] = {
+      en = '[Hidden] Babelfish: Singleplayer Instant Translation _UL:NOAUTODESCRIPTION_',
+      },
     },
 
   ['[string-mod-setting]'] = {
@@ -87,7 +90,7 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
     ['command-only-by-admin'] = {
       en = 'This command can only be used by admins.',
       },
-      
+
     ['unknown-command'] = {
       en = 'Unknown command.',
       },

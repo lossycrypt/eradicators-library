@@ -332,10 +332,15 @@ Babelfish.on_string_translated = function(e)
 Babelfish.update_settings_cache = script.on_event(
   defines.events.on_runtime_mod_setting_changed,
   function()
-    Savedata.max_bytes_per_tick =
-      (game.is_multiplayer() or flag.IS_DEV_MODE)
-      and (1024 / 60) * Setting.get_value('map', const.setting_name.network_rate)
-      or math.huge
+    if (not game.is_multiplayer())
+    and Setting.get_value('map', const.setting_name.sp_instant_translation)
+    then
+      Savedata.max_bytes_per_tick
+        = math.huge
+    else
+      Savedata.max_bytes_per_tick
+        = (1024 / 60) * Setting.get_value('map', const.setting_name.network_rate)
+      end
     Savedata.max_bytes_in_transit
       = Savedata.max_bytes_per_tick * const.network.transit_window * 60
     log:debug('Updated settings max_bytes_per_tick: ', Savedata.max_bytes_per_tick)
@@ -776,37 +781,51 @@ do
       end,
       
     ----------
-    -- `/babelfish dump` Prints internal statistics to the attached terminal.
-    -- @table dump
-    dump = function(e, pdata, p)
-      for _, dict in pairs(Savedata.dicts) do
-        dict:dump_statistics_to_console()
-        end
-      end,
-      
-    ----------
     -- `/babelfish demo` Opens a rudimentary demonstration GUI. Just type
     -- in the upper box to start searching. The gui is not optimized so the
     -- generation of the result icons is a bit slow for large modpacks.
     -- @table demo
     demo = function(e, pdata, p)
-      Demo(p):toggle_gui()
+      if game.is_multiplayer() and not p.admin then
+        p.print {'babelfish.command-only-by-admin'}
+      else
+        Demo(p):toggle_gui()
+        end
+      end,
+      
+    ----------
+    -- `/babelfish dump` Prints internal statistics to the attached terminal.
+    -- @table dump
+    dump = function(e, pdata, p)
+      if game.is_multiplayer() and not p.admin then
+        p.print {'babelfish.command-only-by-admin'}
+      else
+        assert(flag.IS_DEV_MODE, 'Dumping is only correct in dev mode!')
+        for _, lcode in ipairs{'en', 'de', 'ja'} do
+          local dict = Savedata.dicts[lcode]
+          if dict then dict:dump_statistics_to_console() end
+        
+        -- for _, dict in pairs(Savedata.dicts) do
+          -- dict:dump_statistics_to_console()
+          end
+        return true end
       end,
       
     -- -------
     --
     test = function(e, pdata, p)
-      assert(p.name == 'eradicator')
-      --
-      for k, v in pairs(pdata.dict) do
-        if type(v) == 'table' then
-          local holes = 0
-          for i=1, v.max do 
-            if v[i] == nil then holes = holes + 1 end
+      if p.name == 'eradicator' then
+        --
+        for k, v in pairs(pdata.dict) do
+          if type(v) == 'table' then
+            local holes = 0
+            for i=1, v.max do 
+              if v[i] == nil then holes = holes + 1 end
+              end
+            print(('%s had %s holes'):format(k, holes))
             end
-          print(('%s had %s holes'):format(k, holes))
           end
-        end
+        return true end
       end,
       
     }

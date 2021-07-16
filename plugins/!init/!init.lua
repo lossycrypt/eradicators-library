@@ -115,9 +115,7 @@ return function(phase) assert(phase)
   elseif phase == 'settings-final-fixes' then
 
     if flag.IS_DEV_MODE then
-    
       local Table = elreq('erlib/lua/Table')()
-    
       erlib_enable_plugin('babelfish')
       erlib_configure_plugin('babelfish', {
         search_types = Table.map(
@@ -125,9 +123,12 @@ return function(phase) assert(phase)
           function(v) return v.type end,
           {})
         })
-
       end
 
+    if get_enabled_plugins(phase)['babelfish'] then
+      erlib_enable_plugin 'on_user_panic'
+      end
+      
     end
     
   -- ------------------------------------------------------------------------ --

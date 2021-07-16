@@ -19,9 +19,13 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
+local stop        = elreq('erlib/lua/Error'        )().Stopper 'Prototype'
+local assertify   = elreq('erlib/lua/Error'        )().Asserter(stop)
 
-local String       = elreq('erlib/lua/String'     )()
+local String      = elreq('erlib/lua/String'     )()
 
+local Verificate  = elreq('erlib/lua/Verificate')()
+local verify      = Verificate.verify
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -57,25 +61,45 @@ local Prototype,_Prototype,_uLocale = {},{},{}
 -- @treturn string
 -- @function Prototype.get_absolute_order
 do
-  local function _get_order(object_name, name)
+  local order = {}
+  --
+  local irregular = {
+    group    = 'item_group'   ,
+    subgroup = 'item_subgroup',
+    }
+  --
+  local function _get_category(object_name)
+    assertify(object_name ~= 'LuaGroup',
+      '"LuaGroup" is not unique. Please specify "(item_)group" or "(item_)subgroup".')
     local category = String.to_snake_case(object_name)
       :gsub('^lua_?',''):gsub('_?prototypes?$','')
-    local prot = game[category..'_prototypes'][name]
-    local has_group = (pcall(function() return prot.group    end))
+    return irregular[category] or category end
+  --
+  local function _get_order(category, name)
+    local prot = assert(game[category..'_prototypes'])[name]
+    verify(prot, 'LuaObject', 'Unknown prototype name.',
+      '\ncategory: '  , category,
+      '\nname      : ', name    )
+    local has_group    = (pcall(function() return prot.group    end))
+    local has_subgroup = (pcall(function() return prot.subgroup end))
+    local has_order    = (pcall(function() return prot.order    end))
     return table.concat{
       category,
-      has_group and prot.group.order    or '',
-      has_group and prot.subgroup.order or '',
-      prot.order,
+      has_group    and prot.group.order    or '',
+      has_subgroup and prot.subgroup.order or '',
+      has_order    and prot.order          or '',
       prot.name
       }
     end
   --
-  local order = setmetatable({}, {__index = function(self, object_name)
-    self[object_name] = setmetatable({}, {__index = function(self, name)
-      self[name] = _get_order(object_name, name)
-      return self[name]
-      end})
+  setmetatable(order, {__index = function(self, object_name)
+    local category = _get_category(object_name)
+    self[object_name]
+      = rawget(self, category)
+      or setmetatable({}, {__index = function(self, name)
+        self[name] = _get_order(category, name)
+        return self[name]
+        end})
     return self[object_name]
     end})
   --

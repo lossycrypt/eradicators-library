@@ -369,21 +369,20 @@ local get_ordered_requests = function()
   for _, type in ipairs(OrderedRequestedTypes) do
     if not sorted_prots[type] then
       local prots = {}
-      for name, prot in pairs(game[type:gsub('_[^_]+$','_prototypes')]) do
+      local category = type:gsub('_[^_]+$','')
+      for name, prot in pairs(game[category..'_prototypes']) do
         prots[#prots+1] = setmetatable({
           -- V1
           -- name = prot.name,
           -- real_order = get_full_prototype_order(prot), --12 times faster sorting
           -- V2
           name = name,
-          real_order = Prototype.get_absolute_order(
-            prot.object_name, name
-            )
+          real_order = Prototype.get_absolute_order(category, name)
           },{__index = prot})
         end
       table.sort(prots, function(a,b) return a.real_order < b.real_order end)
-      sorted_prots[type:gsub('_[^_]+$','_name'       )] = prots
-      sorted_prots[type:gsub('_[^_]+$','_description')] = prots
+      sorted_prots[category..'_name'       ] = prots
+      sorted_prots[category..'_description'] = prots
       end
     end
   profile('Prototype sorting took: ')
@@ -600,7 +599,7 @@ function Dictionary:update()
 -- Debug                                                                      --
 -- -------------------------------------------------------------------------- --
 function Dictionary:dump_statistics_to_console()
-  if flag.IS_DEV_MODE and (self.packets.n == 0) then
+  if assert(flag.IS_DEV_MODE) and (self.packets.n == 0) then
     print( ('-'):rep(80) )
     print( 'Dictionary Statistics:' )
     print( ('Language: %s'):format(self.language_code) )
@@ -608,7 +607,7 @@ function Dictionary:dump_statistics_to_console()
     print()
     print('Translated String Statistics:')
     -- print('Type | Longest | Shortest | Avearage | Mean | Unknown Key %')
-    print('Type                     | Longest  | Shortest | Average  | Median   | Unk. Key')
+    print('Type                         | Longest  | Shortest | Average  | Median   | Unk. Key')
     print()
     
     local function longest(arr)
@@ -640,15 +639,17 @@ function Dictionary:dump_statistics_to_console()
       if RequestedTypes[type] then
         local lengths = {}
         local untranslated = 0
+        if not self[type] then
+          game.print('Missing type. Use /babelfish update first.')
+          return end
         for _, entry in ipairs(self[type]) do
           local lower = Utf8.lower(entry[eindex.word])
           table.insert(lengths, #lower)
-          -- if lower:find('unknown key') then
-          if Utf8.find(lower, 'unknown key') then
+          if Utf8.find(lower, 'unknown key') or (lower:gsub('%s+','') == '') then
             untranslated = untranslated + 1
             end
           end
-        print( ('[%-22s] | %8s | %8s | %8.2f | %8.2f | %8.2f%%') :format(
+        print( ('[%-26s] | %8s | %8s | %8.2f | %8.2f | %8.2f%%') :format(
           type,
           longest(lengths), shortest(lengths), average(lengths), median(lengths),
           100 * (untranslated / #lengths)
@@ -767,6 +768,12 @@ function Dictionary:on_string_translated(lstrings, results)
   repeat; j = j + 1
     estimated_result_bytes = 
       estimated_result_bytes + TypeBytes[entries[j][1][eindex.type]]
+    if result == nil then
+      -- Seen for item_subgroup_name and at least one achievement.
+      -- All other functions assume result is of type string.
+      result = ''
+      log:debug('Translation result was nil: ', entries)
+      end
     for _, entry in ipairs(entries[j]) do
       --
       -- The engine translates unknown descriptions as "unknown key"
@@ -775,7 +782,13 @@ function Dictionary:on_string_translated(lstrings, results)
       if string_find(entry[eindex.type], '_description') then 
         local t = string_gsub(entry[eindex.type],'_','-')
         if result == 'Unknown key: "'..t..'.'..entry[eindex.name]..'"' then
-          result = ''
+          if flag.IS_DEV_MODE then
+            -- Length has to be preserved for dump_statistics()
+            -- but search results should be kept clean.
+            result = (' '):rep(#result)
+          else
+            result = ''
+            end
           end
         end
       --
