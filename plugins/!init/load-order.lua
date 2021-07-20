@@ -33,6 +33,7 @@ local plugin_array = {
   
   -- "magic"
   {'babelfish'                  , {s3, d3, c1, ul}},
+  {'babelfish-demo'             , {        c1,   }},
   {'gui-auto-styler'            , {        c1,   }},
   {'cursor-tracker'             , {              }},
   {'zoom-tracker'               , {              }},

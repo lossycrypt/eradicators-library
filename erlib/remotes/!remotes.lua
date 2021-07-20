@@ -7,7 +7,5 @@
 -- that can be @{LMAN require d} by other mods to get easy access
 -- to certain data.
 --
--- Most of these are wrappers around @{FOBJ LuaRemote  interfaces} that Erlib provides.
---
 -- @module remotes
   

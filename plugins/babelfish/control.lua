@@ -94,12 +94,15 @@ local Dictionary = import 'methods/Dictionary_NoIdent_PacketPregen'
 
 local StatusIndicator = import 'methods/StatusIndicator'
 
-local Demo = import 'demo/control'
+script.generate_event_name('on_babelfish_translation_state_changed') -- before Demo
+
+-- local Demo = import 'demo/control'
 
 local Remote = {}
 remote.add_interface(const.remote.interface_name, Remote)
 
 local Deprecated = {} -- disabled Remote methods
+
 
 -- -------------------------------------------------------------------------- --
 -- Savedata                                                                   --
@@ -162,9 +165,13 @@ script.on_config(function(e)
     or e.migration_applied
     or e.mod_startup_settings_changed )
   then
-    -- If any mod changes at all there is no way to know if and how
-    -- the locale has changed. Thus we need to start from scratch.
-    for _, dict in pairs(Savedata.dicts) do dict:update() end
+    for _, dict in pairs(Savedata.dicts) do
+      dict:update()
+      -- There are too many edge cases around half-translated dictionaries
+      -- and/or change in requested search types to reasonably detect 
+      -- if there was a change or not. So this must always be raised.
+      Babelfish.raise_on_translation_state_changed(dict)
+      end
     end
   Table.clear(Savedata.players)
   Babelfish.reclassify() -- probably redundant with on_load
@@ -305,6 +312,7 @@ Babelfish.on_string_translated = function(e)
     log:debug(("Player %s's language is %s (%s)."):format(
       pdata.p.name, pdata.dict.native_language_name, pdata.dict.language_code))
     Babelfish.on_player_language_changed()
+    Babelfish.raise_on_translation_state_changed(nil, e.player_index)
   --
   -- babelfish packet
   elseif (lstring[2] == const.network.master_header) then
@@ -312,11 +320,14 @@ Babelfish.on_string_translated = function(e)
     -- packed request
     if lstring[3] == const.network.packet_header.packed_request then
       if pdata.dict then
-        local bytes_estimate, packet_bytes
+        local bytes_estimate, packet_bytes, has_state_changed
           = pdata.dict:on_string_translated(lstring, e.result)
         Table['+='](Savedata, {'bytes'}, (bytes_estimate - #e.result))
         Table['+='](Savedata, {'bytes_in_transit'}, -packet_bytes)
         -- log:debug('Packet ok!')
+        if has_state_changed then
+          Babelfish.raise_on_translation_state_changed(pdata.dict)
+          end
       else
         log:debug('Packet recieved but player had not dictionary.', e)
         end
@@ -443,14 +454,12 @@ Babelfish.request_translations = function(e)
 -- -------------------------------------------------------------------------- --
 Babelfish.update_status_indicators = function(e)
   -- Tooltip shows progress for all languages.
-  local tooltip = {
-    {'babelfish.translation-in-progress'}
-    }
+  local tooltip = {'', {'babelfish.translation-in-progress'} }
   for dict in pairs(Savedata.incomplete_dictionaries) do
     table.insert(tooltip, 
       ('\n%3s%% %s'):format(dict:get_percentage(), dict.native_language_name))
     end
-  tooltip = {'', Locale.merge(table.unpack(tooltip)) }
+  Locale.compress(tooltip)
   -- Sprite button shows progress for the owning player.
   for _, p in pairs(game.connected_players) do
     local pdata = Savedata:get_pdata(nil, p.index)
@@ -469,22 +478,22 @@ Babelfish.update_status_indicators = function(e)
 --------------------------------------------------------------------------------
  
 ----------
--- Babelfish must be activated and configured before use by calling _both_
--- public global functions explained in the example. Otherwise it
--- will not load at all. This configuration is global for all mods.
--- This must be done in __settings.lua__.
+-- Babelfish must be activated before use by calling the global function 
+-- `erlib_enable_plugin` in __settings.lua__.
+-- You must also activate at __at least one__ @{Babelfish.SearchType|SearchType}
+-- by passing an array of search types (see the code box below).
+-- Once a search type has been activated by any mod it can not be deactivated
+-- again. You can call `erlib_enable_plugin` repeatedly to add more search 
+-- types later.
 --
--- You must first activate Babelfish and then add at least one
--- @{Babelfish.SearchType|SearchType}.
+--    erlib_enable_plugin('babelfish', {
+--      search_types = {'item_name', 'fluid_name', 'recipe_name'}
+--      })
 --
--- @usage
---  
---  erlib_enable_plugin('babelfish')
+-- The Demo-Gui must be activated seperately. It should only be activated
+-- during development.
 --
---  --This *ADDS* several types. Types can not be removed once added by any mod.
---  erlib_configure_plugin('babelfish', {
---    search_types = {'item_name', 'fluid_name', 'recipe_name'}
---    })
+--    erlib_enable_plugin('babelfish-demo')
 --
 -- @table HowToActivateBabelfish
 do end
@@ -521,6 +530,21 @@ do end
 --
 -- @table Babelfish.LanguageCode
 do end
+
+
+----------
+-- Babelfish built-in sprites. Can be used to decorate mod guis.
+-- All icons are 256x256 pixels with 4 mip-map levels.   
+--
+-- @{FAPI Concepts.SpritePath s}:
+-- 
+--     "er:babelfish-icon-default"
+--     "er:babelfish-icon-green"
+--     "er:babelfish-icon-red"
+-- 
+-- @table Sprites
+do end
+  
   
 --------------------------------------------------------------------------------
 -- Remote Interface.  
@@ -543,7 +567,7 @@ do end
 -- @param pindex
 -- @param types
 --
--- @treturn boolean|nil
+-- @treturn boolean|nil The status code.
 --
 -- @function Babelfish.can_translate
 function Remote.can_translate(pindex, types, options)
@@ -571,9 +595,6 @@ function Remote.can_translate(pindex, types, options)
 -- 2) Babelfish does not filter prototypes. The serch result includes names
 -- of all matching prototypes including hidden items, void recipes, etc.  
 -- 3) Babelfish understands unicode language spaces (vanilla does _not_).
--- 
--- __Note:__ To avoid bad performance it is recommended to not search for
--- very short or empty strings.
 -- 
 -- @usage
 -- 
@@ -612,7 +633,7 @@ function Remote.can_translate(pindex, types, options)
 -- @treturn boolean|nil The status code.  
 --
 --   @{nil} means: The language for that player has not been detected yet.
---   This will hardly ever happen in reality. Just try again a second later.
+--   This should hardly ever happen in reality. Just try again a second later.
 --
 --   @{false} means: Babelfish is still translating some or all of the requested
 --   SearchTypes. A best-effort search result is included but likely to be
@@ -654,7 +675,7 @@ function Remote.find_prototype_names(pindex, types, word, options)
 -- Retrieves the localised name or description of a single prototype.
 --
 -- @tparam NaturalNumber pindex A @{FOBJ LuaPlayer.index}.
--- @tparam string type A @{Babelfish.SearchType|SearchTypes}.
+-- @tparam string type A @{Babelfish.SearchType}.
 -- @tparam string name A prototype name.
 -- @treturn string|nil The translation, or nil if that entry is
 -- not translated yet, or the name is unknown. Empty descriptions
@@ -787,12 +808,22 @@ do
     -- `/babelfish demo` Opens a rudimentary demonstration GUI. Just type
     -- in the upper box to start searching. The gui is not optimized so the
     -- generation of the result icons is a bit slow for large modpacks.
+    -- The sidepanel dynamically shows in red/green which SearchTypes
+    -- are fully translated.
+    --
+    -- See also: @{Babelfish.HowToActivateBabelfish|HowToActivateBabelfish}.
+    --
     -- @table demo
     demo = function(e, pdata, p)
       if game.is_multiplayer() and not p.admin then
         p.print {'babelfish.command-only-by-admin'}
       else
-        Demo(p):toggle_gui()
+        local Demo = _ENV.package.loaded["plugins/babelfish-demo/control"]
+        if Demo then
+          Demo(p):toggle_gui()
+        else
+          p.print('Demo is not activated.')
+          end
         end
       end,
       
@@ -833,6 +864,100 @@ do
       
     }
   end
+
+--------------------------------------------------------------------------------
+-- Events.  
+-- @section
+--------------------------------------------------------------------------------
+
+----------
+-- Called when SearchType availability changes.
+-- SearchTypes can become available or unavailable.
+-- 
+-- Mods that want to dynamically adjust their gui or similar must
+-- call @{Babelfish.can_translate|can_translate} during this event to
+-- get the new state. Other mods can safely ignore this event.
+-- 
+-- Use @{remotes.events} or @{EventManagerLite.events} to get
+-- the event id.
+-- 
+-- @tfield NaturalNumber player_index
+-- @table on_babelfish_translation_state_changed
+do end
+
+-- dict   -> raise for all players with that dict
+-- pindex -> raise for just one player
+  do
+  local _raise = function(pindex)
+    log:debug('Babelfish: on_babelfish_translation_state_changed: ', pindex)
+    return script.raise_event(
+      -- Keep it simple! can_translate() already includes all important logic.
+      -- Not including extra data encourages mod authors
+      -- to use only one function for all updates instead of
+      -- writing a special event-data parser.
+      EventManager.events.on_babelfish_translation_state_changed,
+      {player_index = pindex}
+      )
+    end
+Babelfish.raise_on_translation_state_changed = function(dict, pindex)
+  if dict then 
+    for pindex, pdata in pairs(Savedata.players) do
+      if pdata.dict == dict then _raise(pindex) end
+      end
+  else
+    _raise(assert(pindex))
+    end
+  end
+  end
+  
+  
+  
+--------------------------------------------------------------------------------
+-- TechnicalDescription.  
+-- @section
+--------------------------------------------------------------------------------
+
+  
+--[[------
+A detailed explanation of Babelfish's internal processes.
+
+When a new player joins a game Babelfish asks the player what language they use.
+This also happens in any situation in which a player might have changed
+their language, or when any base or mod updates have happend. However the
+factorio API does not currently offer a way to detect language changes in
+Singleplayer.
+
+When Babelfish sees a new language in a game for the first time it makes a copy
+of the internal "list of strings that need translation" and sends requests to
+_the first connected_ player of that language to translate these strings. To
+conserve bandwidth in multiplayer only unique strings are sent. The requests
+are initially sent in SearchType priority order, but due to how real networks
+work the order in which translations are recieved might differ slightly.
+
+Only one translation process can run at a time - if there are multiple
+languages to be translated then they will be translated in sequential order.
+There is currently no cross-language priorization of SearchTypes.
+
+When a recieved package is the last package for that language and SearchType
+Babelfish will raise the on_babelfish_translation_state_changed event for
+each player of that language.
+
+When a change in mod or base game version is detected then Babelfish will
+re-start the process of translating all strings. It will also raise
+on_babelfish_translation_state_changed for _all_ players regardless of
+any actual changes.
+
+Because most mod
+updates only change small bits of the locale - if any at all - Babelfish keeps
+all old translations. If no _new_ locale keys have been added then
+all Babelfish API methods will use the old translations until the new ones
+arrive and
+
+
+
+@table InternalWorkflow
+]]
+
   
 -- -------------------------------------------------------------------------- --
 -- Draft                                                                      --

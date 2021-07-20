@@ -64,7 +64,7 @@ local function sget_indicator(p)
       name = button_name,
       style = const.style.status_indicator_button,
       type = 'sprite-button',
-      sprite = const.sprite.default_icon,
+      sprite = const.sprite.icon_default,
       }
   button.style.width  = button_width
   button.style.height = button_height

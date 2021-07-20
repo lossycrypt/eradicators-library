@@ -35,6 +35,8 @@
 <li><a href="#Concepts">Concepts</a></li>
 <li><a href="#Remote_Interface">Remote Interface </a></li>
 <li><a href="#Commands">Commands </a></li>
+<li><a href="#Events">Events </a></li>
+<li><a href="#TechnicalDescription">TechnicalDescription </a></li>
 </ul>
 
 
@@ -123,12 +125,16 @@
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#HowToActivateBabelfish">HowToActivateBabelfish</a></td>
-	<td class="summary">Babelfish must be activated and configured before use by calling <em>both</em>
- public global functions explained in the example.</td>
+	<td class="summary">Babelfish must be activated before use by calling the global function
+ <code>erlib_enable_plugin</code> in <strong>settings.lua</strong>.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#SearchType">SearchType</a></td>
 	<td class="summary">What to search.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Sprites">Sprites</a></td>
+	<td class="summary">Babelfish built-in sprites.</td>
 	</tr>
 </table>
 <h2><a href="#Remote_Interface">Remote Interface </a></h2>
@@ -169,6 +175,20 @@
 	<td class="summary"><code>/babelfish dump</code> Prints internal statistics to the attached terminal.</td>
 	</tr>
 </table>
+<h2><a href="#Events">Events </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#on_babelfish_translation_state_changed">on_babelfish_translation_state_changed</a></td>
+	<td class="summary">Called when SearchType availability changes.</td>
+	</tr>
+</table>
+<h2><a href="#TechnicalDescription">TechnicalDescription </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#InternalWorkflow">InternalWorkflow</a></td>
+	<td class="summary">A detailed explanation of Babelfish's internal processes.</td>
+	</tr>
+</table>
 
 <br/>
 <br/>
@@ -182,29 +202,34 @@
     <strong>HowToActivateBabelfish</strong>
     </dt>
     <dd>
-    Babelfish must be activated and configured before use by calling <em>both</em>
- public global functions explained in the example.  Otherwise it
- will not load at all. This configuration is global for all mods.
- This must be done in <strong>settings.lua</strong>.</p>
 
-<p> You must first activate Babelfish and then add at least one
- <a href="../modules/Babelfish.html#SearchType">SearchType</a>.
+<p>Babelfish must be activated before use by calling the global function
+ <code>erlib_enable_plugin</code> in <strong>settings.lua</strong>.
+ You must also activate at <strong>at least one</strong> <a href="../modules/Babelfish.html#SearchType">SearchType</a>
+ by passing an array of search types (see the code box below).
+ Once a search type has been activated by any mod it can not be deactivated
+ again. You can call <code>erlib_enable_plugin</code> repeatedly to add more search
+ types later.</p>
 
-
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example">erlib_enable_plugin(<span class="string">'babelfish'</span>)
-
-<span class="comment">--This *ADDS* several types. Types can not be removed once added by any mod.
-</span>erlib_configure_plugin(<span class="string">'babelfish'</span>, {
-  search_types = {<span class="string">'item_name'</span>, <span class="string">'fluid_name'</span>, <span class="string">'recipe_name'</span>}
+<pre><code>erlib_enable_plugin('babelfish', {
+  search_types = {'item_name', 'fluid_name', 'recipe_name'}
   })
-</pre>
-    </ul>
+</code></pre>
+
+<p> The Demo-Gui must be activated seperately. It should only be activated
+ during development.</p>
+
+<pre><code>erlib_enable_plugin('babelfish-demo')
+</code></pre>
+
+
+
+
+
+
+
+
+
 
 </dd>
     <dt>
@@ -226,6 +251,32 @@
 "tile_name"          , "tile_description"      ,
 "entity_name"        , "entity_description"    ,
 "virtual_signal_name",
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Sprites"></a>
+    <strong>Sprites</strong>
+    </dt>
+    <dd>
+
+<p>Babelfish built-in sprites.  Can be used to decorate mod guis.
+ All icons are 256x256 pixels with 4 mip-map levels.   </p>
+
+<p> <a href="../api/Concepts.html#SpritePath">SpritePaths</a>:</p>
+
+<pre><code> "er:babelfish-icon-default"
+ "er:babelfish-icon-green"
+ "er:babelfish-icon-red"
 </code></pre>
 
 
@@ -289,9 +340,7 @@
     <ol>
 
            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
-
-
-
+        The status code.
     </ol>
 
 
@@ -320,10 +369,7 @@
  that prototype will <em>additionally</em> be included in the search result. <br/>
  2) Babelfish does not filter prototypes. The serch result includes names
  of all matching prototypes including hidden items, void recipes, etc. <br/>
- 3) Babelfish understands unicode language spaces (vanilla does <em>not</em>).</p>
-
-<p> <strong>Note:</strong> To avoid bad performance it is recommended to not search for
- very short or empty strings.
+ 3) Babelfish understands unicode language spaces (vanilla does <em>not</em>).
 
 
     <h3>Parameters:</h3>
@@ -361,7 +407,7 @@
          The status code.  </p>
 
 <p>   <a href="https://www.lua.org/pil/2.1.html">nil</a> means: The language for that player has not been detected yet.
-   This will hardly ever happen in reality. Just try again a second later.</p>
+   This should hardly ever happen in reality. Just try again a second later.</p>
 
 <p>   <a href="../modules/Types.html#false">false</a> means: Babelfish is still translating some or all of the requested
    SearchTypes. A best-effort search result is included but likely to be
@@ -420,7 +466,7 @@
         </li>
         <li><span class="parameter">type</span>
             <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
-         A <a href="../modules/Babelfish.html#SearchType">SearchTypes</a>.
+         A <a href="../modules/Babelfish.html#SearchType">Babelfish.SearchType</a>.
         </li>
         <li><span class="parameter">name</span>
             <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-string">string</a></span>
@@ -486,6 +532,10 @@
     <code>/babelfish demo</code> Opens a rudimentary demonstration GUI.  Just type
  in the upper box to start searching. The gui is not optimized so the
  generation of the result icons is a bit slow for large modpacks.
+ The sidepanel dynamically shows in red/green which SearchTypes
+ are fully translated.</p>
+
+<p> See also: <a href="../modules/Babelfish.html#HowToActivateBabelfish">HowToActivateBabelfish</a>.
 
 
 
@@ -509,13 +559,104 @@
 
 </dd>
 </dl>
+    <h2 class="section-header has-description"><a name="Events"></a>Events </h2>
+
+          <div class="section-description">
+
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "on_babelfish_translation_state_changed"></a>
+    <strong>on_babelfish_translation_state_changed</strong>
+    </dt>
+    <dd>
+    Called when SearchType availability changes.
+ SearchTypes can become available or unavailable.</p>
+
+<p> Mods that want to dynamically adjust their gui or similar must
+ call <a href="../modules/Babelfish.html#can_translate">can_translate</a> during this event to
+ get the new state. Other mods can safely ignore this event.</p>
+
+<p> Use <a href="../modules/remotes.html#events">remotes.events</a> or <a href="../modules/EventManagerLite.html#events">EventManagerLite.events</a> to get
+ the event id.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">player_index</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="TechnicalDescription"></a>TechnicalDescription </h2>
+
+          <div class="section-description">
+
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "InternalWorkflow"></a>
+    <strong>InternalWorkflow</strong>
+    </dt>
+    <dd>
+    A detailed explanation of Babelfish's internal processes. </p>
+
+<p>When a new player joins a game Babelfish asks the player what language they use.
+This also happens in any situation in which a player might have changed
+their language, or when any base or mod updates have happend. However the
+factorio API does not currently offer a way to detect language changes in
+Singleplayer.</p>
+
+<p>When Babelfish sees a new language in a game for the first time it makes a copy
+of the internal "list of strings that need translation" and sends requests to
+<em>the first connected</em> player of that language to translate these strings. To
+conserve bandwidth in multiplayer only unique strings are sent. The requests
+are initially sent in SearchType priority order, but due to how real networks
+work the order in which translations are recieved might differ slightly.</p>
+
+<p>Only one translation process can run at a time - if there are multiple
+languages to be translated then they will be translated in sequential order.
+There is currently no cross-language priorization of SearchTypes.</p>
+
+<p>When a recieved package is the last package for that language and SearchType
+Babelfish will raise the on<em>babelfish</em>translation<em>state</em>changed event for
+each player of that language.</p>
+
+<p>When a change in mod or base game version is detected then Babelfish will
+re-start the process of translating all strings. It will also raise
+on<em>babelfish</em>translation<em>state</em>changed for <em>all</em> players regardless of
+any actual changes.</p>
+
+<p>Because most mod
+updates only change small bits of the locale - if any at all - Babelfish keeps
+all old translations. If no <em>new</em> locale keys have been added then
+all Babelfish API methods will use the old translations until the new ones
+arrive and
+
+
+
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-07-16 18:34:39 </i>
+<i style="float:right;">Last updated 2021-07-20 20:10:07 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

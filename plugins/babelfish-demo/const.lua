@@ -14,8 +14,16 @@ const.name = {
   }
   
 const.gui = {
+  -- width  = 1600,
+  -- height =  800,
   width  = 1600,
-  height =  800,
+  height =  680,
+  
+  sidebar_width = 180,
   }
 
+const.tags = {
+  is_sidebar = 'er:babelfish-demo-gui-is-sidebar',
+  }
+  
 return const

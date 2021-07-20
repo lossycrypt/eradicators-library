@@ -59,6 +59,19 @@ for _, v in ipairs(requested) do
   assert(allowed[v], 'Babelfish: Invalid search type: '..v)
   end
 
+-- deduplicate
+requested = Table.keys(Set.from_values(requested))
+
+-- sort by translation priority
+table.sort(requested, (function()
+  local indexes = Table.map(
+    const.type_data,
+    function(v, k) return k, v.type end,
+    {}
+    )
+  return function(a, b) return indexes[a] < indexes[b] end
+  end)())
+  
 Data.Inscribe{
   name           = const.setting_name.search_types,
   type           = 'string-setting'       ,
@@ -67,6 +80,7 @@ Data.Inscribe{
   hidden         = (not flag.IS_DEV_MODE) ,
   allow_blank    = false                  ,
   default_value  = requested[1]           , -- not used
-  allowed_values = requested              , -- copied by Inscribe
+  -- allowed_values = Table.keys(Set.from_values(requested)), -- deduplicate
+  allowed_values = requested              ,
   }
 

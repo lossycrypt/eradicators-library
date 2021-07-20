@@ -160,7 +160,7 @@ local SupportedTypes =
 local TypeBytes = 
   Table.map(const.type_data, function(v) return v.longest, v.type end, {})
   
-local function get_requested_search_types()
+local function get_requested_search_types() -- DenseArray
   return game.mod_setting_prototypes[const.setting_name.search_types].allowed_values
   end
   
@@ -184,6 +184,8 @@ local eindex = { -- Entry data index
   -- requested entries only
   index = 3,
   type  = 4,
+  -- transitional entries only (re-translation after on_config)
+  -- temp  = 5, -- boolean
   }
   
 local rindex = { -- Request data index
@@ -264,27 +266,27 @@ local function lstring_ident(lstring)
   
 -- Takes a generically joined localised string {'',{'__bla__'},'5'}
 -- and compresses it to fit the engine limit of 20 parameters + 1 key.
-local function lstring_compact(lstring)
-  -- Example:
-  -- 5 == #{'',1,2,3,4} 
-  -- 3 == #{'',{'',1,2},{'',3,4}}
-  -- 2 == #{'',{'',{'',1,2},{'',3,4}}}
-  --
-  assertify(lstring[1] == '', 'Uncompressible lstring: ', lstring)
-  local function f ()
-    local k = 1
-    for i=2, #lstring, 20 do
-      k = k + 1
-      local t = {''}
-      for j=0, 19 do
-        t[j+2] = lstring[i+j]
-        lstring[i+j] = nil
-        end
-      lstring[k] = t
-      end
-    end
-  while #lstring > 21 do f() end
-  return lstring end
+-- local function lstring_compact(lstring)
+--   -- Example:
+--   -- 5 == #{'',1,2,3,4} 
+--   -- 3 == #{'',{'',1,2},{'',3,4}}
+--   -- 2 == #{'',{'',{'',1,2},{'',3,4}}}
+--   --
+--   assertify(lstring[1] == '', 'Uncompressible lstring: ', lstring)
+--   local function f ()
+--     local k = 1
+--     for i=2, #lstring, 20 do
+--       k = k + 1
+--       local t = {''}
+--       for j=0, 19 do
+--         t[j+2] = lstring[i+j]
+--         lstring[i+j] = nil
+--         end
+--       lstring[k] = t
+--       end
+--     end
+--   while #lstring > 21 do f() end
+--   return lstring end
 
   
   
@@ -458,7 +460,7 @@ local get_request_packets = make_table_getter(function()
   local function finalize_packet()
     packet[rindex.bytes  ] = bytes
     packet[rindex.lstring] = 
-      {'', master_header, packet_header, null, packet[rindex.uid], null, lstring_compact(lstrings)}
+      {'', master_header, packet_header, null, packet[rindex.uid], null, Locale.compress(lstrings)}
     -- print(('Packet stat. Entries: %s, Bytes: %s'):format(#packet[rindex.entries], bytes))
     end
   local function new_packet()
@@ -556,11 +558,17 @@ function Dictionary:update()
           self[type][index] = {
             [eindex.word] = old_entries[type][name][eindex.word],
             [eindex.name] = name,
+            -- [eindex.temp] = true,
             }
           end
         end
       end
     end
+  --
+  for type in pairs(max_index) do
+    self:update_n(type)
+    end
+  --
   profile('Entry data cleanup took: ')
   end
   
@@ -674,9 +682,55 @@ function Dictionary:get_percentage()
     / self.packets.max )
   end
 
--- function Dictionary:can_translate(type)
-  -- assertify(RequestedTypes[type], 'Babelfish: Invalid translation type: ', type)
-  -- return (table_size(self[type]) - 1) == self[type].max end
+-- All keys have a translation, but some of the translations
+-- may be outdated due to on_config_changed.
+function Dictionary:is_type_fully_populated(type)
+  return self[type].n == self[type].max end
+  
+-- Measures the length of the DenseArray part.
+-- The SparseArray part I-n to I-max is ignored.
+-- @treturn boolean if n changed at all.
+function Dictionary:update_n(type)
+  local this = assert(self[type])
+  local old_n = this.n
+  for i = this.n or 1, this.max do
+    if this[i] then
+      this.n = i
+    else break end
+    end
+  if (old_n ~= this.max) and (this.n == this.max) then
+    log:debug(('WIP: Fully populated %s of %s'):format(type, self.language_code))
+    end
+  return old_n ~= this.n end
+  
+-- @treturn boolean true if the state changed.
+-- function Dictionary:update_is_fully_populated(type)
+  -- local old_state = not not this.is_fully_populated
+  -- this.is_fully_populated = (function()
+    -- for i = this.max, 1, -1 do -- inverse finds false results faster.
+      -- if not this[i] then return false end
+      -- end
+    -- return true end)()
+  -- local has_state_changed
+  -- if has_state_changed then
+    -- end
+  -- return (this.is_fully_populated ~= old_state) end
+
+-- All translations are up-to-date.
+-- function Dictionary:is_type_fully_translated(type)
+  -- local this = self[type]
+  -- if not this then return false end
+  -- for i = this.max, 1, -1 do
+    -- if (not this[i]) or this[i][eindex.temp] then return false end
+    -- end
+  -- return true end
+  
+-- function Dictionary:are_all_types_fully_translated()
+  -- local types = get_requested_search_types()
+  -- for i = 1, #types do
+    -- if not self:is_type_fully_translated(types[i]) then return false end
+    -- end
+  -- return true end
   
 -- -------------------------------------------------------------------------- --
 -- Network                                                                    --
@@ -765,6 +819,7 @@ function Dictionary:on_string_translated(lstrings, results)
   local estimated_result_bytes = 0
   --
   local j, result, entries = 0, next(), packet[rindex.entries]
+  local packet_types = {}
   repeat; j = j + 1
     estimated_result_bytes = 
       estimated_result_bytes + TypeBytes[entries[j][1][eindex.type]]
@@ -775,6 +830,7 @@ function Dictionary:on_string_translated(lstrings, results)
       log:debug('Translation result was nil: ', entries)
       end
     for _, entry in ipairs(entries[j]) do
+      packet_types[entry[eindex.type]] = true
       --
       -- The engine translates unknown descriptions as "unknown key"
       -- but unlike unknown item names vanilla shows them as empty.
@@ -792,10 +848,13 @@ function Dictionary:on_string_translated(lstrings, results)
           end
         end
       --
+      -- This should always *replace* the whole entry
+      -- to ensure smooth migration if the indexes ever change.
       self[ entry[eindex.type] ][ entry[eindex.index] ] = {
         -- [eindex.word] = string_lower(remove_rich_text_tags(result)),
         [eindex.word] = result,
         [eindex.name] = entry[eindex.name],
+        -- [eindex.temp] = nil, -- remove flag
         }
       -- print(Hydra.line{entry[eindex.type],self[ entry[eindex.type] ][ entry[eindex.index] ]})
       end
@@ -803,9 +862,16 @@ function Dictionary:on_string_translated(lstrings, results)
     until not result
   assert(j == #entries, 'Wrong result count.')
   --
-  return estimated_result_bytes, packet[rindex.bytes] end
-  
+  local has_state_changed = false
+  for type in pairs(packet_types) do
+    if self:update_n(type) and self:is_type_fully_populated(type) then
+      has_state_changed = true
+      end
+    end
+  --
+  return estimated_result_bytes, packet[rindex.bytes], has_state_changed end
 
+  
 -- -------------------------------------------------------------------------- --
 -- Find + Search                                                              --
 -- -------------------------------------------------------------------------- --
@@ -825,6 +891,17 @@ function Dictionary:on_string_translated(lstrings, results)
 -- User-input should not be cached to prevent
 -- high memory usage or exploits.
 local normalized_word_cache = Memoize(normalize_word) -- language agnostic!
+  
+-- Some malformed patterns do not fail if they
+-- don't actually have any matches in the input string.
+-- (This very likely still has false positives.)
+local ascii_array = (function(r)
+  for i=1, 255 do r[i] = string.char(i) end
+  return table.concat(r) end){}
+local function is_well_formed_pattern(word)
+  if word:sub(-1) ~= '%' then
+    return (pcall(string_find, ascii_array, word))
+  else return false end end
   
 -- Replaces all space by ascii space, then splits.
 local function split_by_space(ustr)
@@ -861,7 +938,7 @@ function Dictionary:find(types, word, opt)
   if opt.mode == 'lua' then
     -- Lua mode can fail with "weird" user input.
     -- But that case needs to behave like a search without results.
-    matcher = (pcall(string_find,'%',word)) and string_find or Filter.FALSE
+    matcher = is_well_formed_pattern(word) and string_find or Filter.FALSE
   elseif opt.mode == 'fuzzy' then
     matcher = Utf8.find_fuzzy
     -- word = String.to_array(String.remove_whitespace(word:lower()))
@@ -878,7 +955,8 @@ function Dictionary:find(types, word, opt)
     assertify(RequestedTypes[type], 'Babelfish: Type must be configured in settings stage: ', type)
     -- This will only fail on new maps or after an :update()
     -- added new prototypes.
-    if (table_size(self[type]) - 1) ~= self[type].max then status = false end
+    -- if (table_size(self[type]) - 1) ~= self[type].max then status = false end
+    if not self:is_type_fully_populated(type) then status = false end
     -- subtables are created regardless of n
     local this = {}; r[type] = this
     for i = 1, self[type].max do
@@ -902,7 +980,9 @@ function Dictionary:find(types, word, opt)
   and game.item_prototypes['raw-fish']
   then r.item_name['raw-fish'] = true end
   --
-  log:debug('Cache size: ', #normalized_word_cache)
+  if flag.IS_DEV_MODE then
+    log:debug('Cache size: ', table_size(normalized_word_cache))
+    end
   --
   return status, r end
 
@@ -910,13 +990,16 @@ function Dictionary:find(types, word, opt)
 -- There is no distinction between "that name isn't translated"
 -- and "that is not a prototype name". Even erroring on invalid
 -- names would incur a heavy performance penalty on every call.
+--
+-- Only translates one name at a time to discourage
+-- authors from mass-caching the results!
 function Dictionary:translate_name(type, name)
   assertify(SupportedTypes[type], 'Babelfish: Invalid translation type: ', type)
   assertify(RequestedTypes[type], 'Babelfish: Type must be configured in settings stage: ', type)
   verify(name, 'str', 'Babelfish: Invalid name: ', name)
   local this = self[type]
   for i = 1, self[type].max do
-    if this[i][eindex.name] == name then
+    if this[i] and (this[i][eindex.name] == name) then
       return this[i][eindex.word]
       end
     end

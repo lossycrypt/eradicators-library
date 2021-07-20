@@ -9,9 +9,8 @@
   
   Currently only 'babelfish' supports configuration, all others "just work".
   
-  Available functions:
-    erlib_enable_plugin('plugin_name')
-    erlib_configure_plugin() -- See html documentation for each plugin.
+  Usage:
+    erlib_enable_plugin('plugin_name', {options})
     
   ]]
 
@@ -29,6 +28,9 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 local log         = elreq('erlib/lua/Log'          )().Logger  'ER:LIB'
 local Loader      = elreq('plugins/!init/loader'   )(log, 'eradicators-library' )
 
+local Set         = elreq('erlib/lua/Set'   )()
+local String      = elreq('erlib/lua/String')()
+
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
 -- -------------------------------------------------------------------------- --
@@ -38,9 +40,6 @@ local const = require('__eradicators-library__/plugins/!init/const')
 -- Local Library                                                              --
 -- -------------------------------------------------------------------------- --
 local function get_enabled_plugins(phase)
-  local Set    = elreq('erlib/lua/Set'   )()
-  local String = elreq('erlib/lua/String')()
-  --
   local value
   if phase:find 'settings' then
     local db = data.raw['string-setting'][const.name.setting.enabled_plugins]
@@ -83,17 +82,7 @@ return function(phase) assert(phase)
       allowed_values = {'none'},
       hidden         = (not flag.IS_DEV_MODE),
       }
-    
-    rawset(_ENV, 'erlib_enable_plugin', function(plugin_name)
-      -- In data stage allowed_values can not be read!
-      local value = db.default_value..'|'..plugin_name
-      db.default_value  =  value
-      db.allowed_values = {value} -- paranoia: block changes
-      log:raw('Recieved request to enable plugin: "'..plugin_name..'".')
-      end)
-    
-    -- erlib_configure_plugin
-    
+      
     local configurators = {
       ['babelfish'] = function(options)
         assert(type(options) == 'table', 'Babelfish: Invalid options.')
@@ -105,10 +94,21 @@ return function(phase) assert(phase)
         end
       }
     
-    rawset(_ENV, 'erlib_configure_plugin', function(plugin_name, options)
-      assert(configurators[plugin_name], 'Unknown plugin.')(options)
+    rawset(_ENV, 'erlib_enable_plugin', function(plugin_name, options)
+      -- In data stage allowed_values can not be read!
+      local enabled_plugins = get_enabled_plugins(phase)
+      enabled_plugins[plugin_name] = true
+      local value = table.concat(Table.keys(enabled_plugins), '|')
+      --
+      db.default_value  =  value
+      db.allowed_values = {value} -- paranoia: block changes
+      log:raw('Recieved request to enable plugin: "'..plugin_name..'".')
+      --
+      local f = configurators[plugin_name]
+      if f then f(options) end
       end)
-      
+
+
   -- ------------------------------------------------------------------------ --
   -- Settings Final Fixes                                                     --
   -- ------------------------------------------------------------------------ --
@@ -116,8 +116,8 @@ return function(phase) assert(phase)
 
     if flag.IS_DEV_MODE then
       local Table = elreq('erlib/lua/Table')()
-      erlib_enable_plugin('babelfish')
-      erlib_configure_plugin('babelfish', {
+      erlib_enable_plugin('babelfish-demo')
+      erlib_enable_plugin('babelfish', {
         search_types = Table.map(
           require('plugins/babelfish/const').type_data,
           function(v) return v.type end,
@@ -125,9 +125,18 @@ return function(phase) assert(phase)
         })
       end
 
-    if get_enabled_plugins(phase)['babelfish'] then
+    local enabled_plugins = get_enabled_plugins(phase)
+    
+    -- Auto-activated dependencies.
+    
+    if enabled_plugins['babelfish'] then
       erlib_enable_plugin 'on_user_panic'
       end
+    
+    -- Explicit dependencies.
+    
+    assert((not enabled_plugins['babelfish-demo']) or enabled_plugins['babelfish'],
+      'Missing dependency: "babelfish-demo" requires "babelfish".')
       
     end
     

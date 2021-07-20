@@ -1,4 +1,4 @@
-﻿-- This is NOT a config file. Do not change things you don't understand 120%.
+﻿-- This is NOT a config file. Do not change.
 -- -------------------------------------------------------------------------- --
 
 local const = {}
@@ -29,9 +29,9 @@ const.style = {
   }
   
 const.sprite = {
-  default_icon = 'er:babelfish-default-icon',
-  default_icon = 'er:babelfish-yellow-icon',
-  default_icon = 'er:babelfish-red-icon',
+  icon_default = 'er:babelfish-icon-default',
+  icon_green   = 'er:babelfish-icon-green',
+  icon_red     = 'er:babelfish-icon-red',
   }
 
 const.lstring = {

@@ -43,7 +43,7 @@ local Gui         = elreq('erlib/factorio/Gui'     )()
 -- Constants                                                                  --
 -- -------------------------------------------------------------------------- --
 local script = EventManager .get_managed_script    'babelfish-demo'
-local import = PluginManager.make_relative_require 'babelfish/demo'
+local import = PluginManager.make_relative_require 'babelfish-demo'
 local const  = import '/const'
 local Name   = const.name
 local W, H   = const.gui.width, const.gui.height
@@ -54,7 +54,9 @@ local Babelfish = Remote.get_interface(babelconst.remote.interface_name)
 local has_icon = Table.map(babelconst.type_data, function(v)
   return not v.noicon, v.type
   end, {})
+  
 
+  
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
@@ -67,6 +69,11 @@ local Demo = Class.SimpleClass(
       }  
     return self end
   )
+  
+local function get_requested_search_types() -- DenseArray
+  return game.mod_setting_prototypes[babelconst.setting_name.search_types].allowed_values
+  end
+
 
 -- -------------------------------------------------------------------------- --
 -- Command                                                                    --
@@ -83,8 +90,9 @@ function Demo:sget_anchor()
   self.anchor = self.p.gui.screen.add{
     type      = 'frame',
     name      = Name.gui.anchor,
-    caption   = 'Babelfish Demo Gui (type /babelfish demo again to close.)',
-    direction = 'vertical',
+    -- caption   = 'Babelfish Demo Gui (type /babelfish demo again to close.)',
+    direction = 'horizontal',
+    style = 'invisible_frame',
     }
   return Gui.move(self.anchor, W, H) end
 
@@ -94,35 +102,117 @@ function Demo:toggle_gui()
   anchor = self:sget_anchor()
   self.p.opened = anchor
   --
-  Gui.move(anchor.add {
+  local content = self.anchor.add{
+    type      = 'frame',
+    name      = Name.gui.anchor,
+    caption   = 'Babelfish Demo Gui (type /babelfish demo again to close.)',
+    direction = 'vertical',
+    }
+    content.drag_target = anchor
+  Gui.move(content, W - const.gui.sidebar_width, H)
+  --
+  Gui.move(content.add {
     type = 'textfield',
     name = Name.gui.input1,
-    }, W-32, 24).focus()
+    }, W-32-const.gui.sidebar_width, 24).focus()
   --
   if flag.IS_DEV_MODE then
-    anchor.add {
+    content.add {
       type = 'label',
       caption = '[color=red]WARNING: In development mode the localised string '
         ..'is returned for each search result instead of <true>.[/color]',
       }
     end
-  Gui.move(anchor.add {
+  Gui.move(content.add {
     type = 'label',
     name = Name.gui.profiler_label,
-    }, W-32, 24 )
+    }, W-32-const.gui.sidebar_width, 24 )
   --
-  Gui.move(anchor.add {
+  Gui.move(content.add {
     type = 'text-box',
     name = Name.gui.output_serpent,
     -- enabled = false,
-    }, W-32, (H-128)/2 )
+    }, W-32-const.gui.sidebar_width, (H-128)/2 )
   --
-  Gui.move(anchor.add {
+  Gui.move(content.add {
     type = 'scroll-pane',
     name = Name.gui.output_table_pane,
-    }, W-32, (H-128)/2 )
-  
+    }, W-32-const.gui.sidebar_width, (H-128)/2 )
+  --
+  self:sget_sidebar()
+  self:update_sidebar()
   end
+  
+function Demo:get_sidebar()
+  if not self:get_anchor() then return end
+  return self.anchor.sidebar end
+  
+function Demo:sget_sidebar()
+  local sidebar = self:get_sidebar()
+  -- create bar
+  if not sidebar then
+    -- print('making sidebar')
+    sidebar = Gui.move(self.anchor.add {
+      name = 'sidebar',
+      type = 'frame',
+      direction = 'vertical'
+      }, const.gui.sidebar_width, H)
+    --
+    -- print(Hydra.lines(get_requested_search_types()))
+    for _, type in pairs(get_requested_search_types()) do
+      local this = sidebar.add {
+        name = type,
+        type = 'flow',
+        direction = 'horizontal',
+        }
+      this.add {
+        name = 'checkbox',
+        type = 'checkbox',
+        state = true,
+        tags = {[const.tags.is_sidebar] = true}
+        }
+      this.add {
+        name = 'label',
+        type = 'label',
+        caption = type,
+        tags = {[const.tags.is_sidebar] = true}
+        }
+      end
+    end
+  return sidebar end
+  
+function Demo:update_sidebar()
+  local sidebar = self:get_sidebar()
+  if not sidebar then return end
+  -- update labels
+  local ok = {
+    [true ] = 'bold_green_label',
+    [false] = 'bold_red_label'  ,
+    }
+  for _, child in pairs(sidebar.children) do
+    child.label.style = ok[Babelfish.can_translate(self.p.index, child.name)]
+    end
+  end
+  
+function Demo:get_types()
+  local sidebar = self:sget_sidebar()
+  local types = {}
+  for _, child in pairs(sidebar.children) do
+    if child.checkbox.state then
+      table.insert(types, child.name)
+      end
+    end
+  return types end
+  
+script.on_event(defines.events.on_gui_click, function(e)
+  if e.element.tags[const.tags.is_sidebar] then
+    Demo(game.players[e.player_index]):update_sidebar()
+    end
+  end)
+  
+script.on_event(EventManager.events.on_babelfish_translation_state_changed, function(e)
+  Demo(game.players[e.player_index]):update_sidebar()
+  end)
   
 script.on_event(defines.events.on_gui_closed, function(e)
   if e.element and e.element.name == Name.gui.anchor then
@@ -136,10 +226,9 @@ script.on_event(defines.events.on_gui_text_changed, function(e)
     -- For demonstration this grabs ALL types that have been
     -- requested by at least one mod. Your mod should NOT do this
     -- and instead only use the types you actually want.
-    local types =
-      game.mod_setting_prototypes[babelconst.setting_name.search_types]
-      .allowed_values
-  
+    local types = get_requested_search_types()
+    local types = Demo(game.players[e.player_index]):get_types()
+    
     local prfS = game.create_profiler()
     local status, result = Babelfish.find_prototype_names(
       e.player_index,

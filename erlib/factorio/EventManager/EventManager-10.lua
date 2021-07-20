@@ -454,7 +454,7 @@ Private.event_uid_pig
 -- This is the __recommended__ way of accessing shared EventUIDs of other mods.
 -- 
 -- __Note:__ If your mod doesn't use EventManager you can use 
--- @{remotes.get_erlib_event_uids} instead.
+-- @{remotes.events} instead.
 -- 
 -- @usage
 --   EventManager.new_handler{

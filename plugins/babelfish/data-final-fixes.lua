@@ -15,14 +15,16 @@ local asset = PluginManager.make_asset_getter('babelfish')
 
 -- -------------------------------------------------------------------------- --
 
-Data.Inscribe{
-  name          = const.sprite.default_icon     ,
-  type          = 'sprite'                      ,
-  filename      = asset 'babelfish-256-mip4.png',
-  size          = 256                           ,
-  mipmap_count  = 4                             ,
-  flags         = {'gui-icon'}                  ,
-  }
+for _, color in pairs{'default', 'red', 'green'} do
+  Data.Inscribe{
+    name          = const.sprite['icon_'..color]              ,
+    type          = 'sprite'                                  ,
+    filename      = asset 'babelfish-'..color..'-256-mip4.png',
+    size          = 256                                       ,
+    mipmap_count  = 4                                         ,
+    flags         = {'gui-icon'}                              ,
+    }
+  end
 
   
 data.raw['gui-style']['default']

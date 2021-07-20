@@ -19,6 +19,13 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
+-- local log         = elreq('erlib/lua/Log'       )().Logger  'Locale'
+local stop        = elreq('erlib/lua/Error'     )().Stopper 'Locale'
+
+-- local Verificate  = elreq('erlib/lua/Verificate')()
+-- local verify      = Verificate.verify
+local assertify   = elreq('erlib/lua/Error'     )().Asserter(stop)
+
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -31,12 +38,12 @@ local Locale,_Locale,_uLocale = {},{},{}
 -- @within Todo
 -- @field todo1
 
--- -----------------------------------------------------------------------------
--- Section.
+--------------------------------------------------------------------------------
+-- LocalisedString.
 -- @section
--- -----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
-----------
+-- -------
 -- Merges n localised strings into one.
 --
 -- Circumvents factorios hard limitation of allowing only
@@ -58,6 +65,7 @@ local Locale,_Locale,_uLocale = {},{},{}
 -- @treturn LocalisedString
 --
 function Locale.merge(...)
+  error('Locale.merge has been replaced by Locale.compress') -- @2021-07-20
 
   local function pack20(tbl)
     local r = {''} -- empty key joins all following elements.
@@ -82,6 +90,62 @@ function Locale.merge(...)
   return args
   end
 
+
+----------
+-- __In-place.__ Fixes very long localised strings.
+--
+-- Circumvents factorios hard limitation of allowing only
+-- up to 20 parameters per key by creating 
+-- a deeply nested table with <= 20 parameters per level.
+--
+-- Intended to create gui elements or tooltips with
+-- procedurally generated content.
+--
+-- @usage
+--   local test = {'', 'This', ' ', 'is', ' ', 'a', ' ', 'very', ' ', 'long'
+--                 , ' ', 'string', ' ', 'that', ' ', 'the', ' ', 'engine'
+--                 , ' ', 'would', ' ', 'not', ' ', 'normally', ' ', 'allow.'}
+--   
+--   game.print(test)
+--   > Error: Too many parameters for localised string: 25 > 20 (limit).
+--   
+--   Locale.compress(test)
+--   game.print(test)
+--   > This is a very long string that the engine would not normally allow.
+--
+-- @tparam LocalisedString lstr A generically 
+-- joined localised string `{"", string_1, lstring_2, ...}`. The
+-- key _must_ be `""` the empty string.
+-- 
+-- @treturn LocalisedString A reference to the now compressed input table.
+function Locale.compress(lstr)
+  -- Example of workflow:
+  -- 5 == #{'',1,2,3,4} 
+  -- 3 == #{'',{'',1,2},{'',3,4}}
+  -- 2 == #{'',{'',{'',1,2},{'',3,4}}}
+  --
+  assertify(lstr[1] == '', 'Uncompressible lstr: ', lstr)
+  local function pack21()
+    local k = 1
+    for i = 2, #lstr, 20 do
+      k = k + 1
+      local t = {''}
+      for j = 0, 19 do
+        t[j+2] = lstr[i+j]
+        lstr[i+j] = nil
+        end
+      lstr[k] = t
+      end
+    end
+  while #lstr > 21 do pack21() end
+  return lstr end
+  
+--------------------------------------------------------------------------------
+-- Misc.
+-- @section
+--------------------------------------------------------------------------------
+
+  
 ----------
 -- Applies rich text tags to mimic vanilla hotkey tooltips.
 -- Intended to format tooltips for custom guis that can't 

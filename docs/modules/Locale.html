@@ -32,7 +32,8 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Functions">Functions</a></li>
+<li><a href="#Misc">Misc </a></li>
+<li><a href="#LocalisedString">LocalisedString </a></li>
 </ul>
 
 
@@ -113,15 +114,18 @@
     </ul>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#Misc">Misc </a></h2>
 <table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#merge">merge(...)</a></td>
-	<td class="summary">Merges n localised strings into one.</td>
-	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#format_hotkey_tooltip">format_hotkey_tooltip(key, description)</a></td>
 	<td class="summary">Applies rich text tags to mimic vanilla hotkey tooltips.</td>
+	</tr>
+</table>
+<h2><a href="#LocalisedString">LocalisedString </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#compress">compress(lstr)</a></td>
+	<td class="summary"><strong>In-place.</strong> Fixes very long localised strings.</td>
 	</tr>
 </table>
 
@@ -129,56 +133,9 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="Misc"></a>Misc </h2>
 
     <dl class="function">
-    <dt>
-    <a name = "merge"></a>
-    <strong>merge(...)</strong>
-    </dt>
-    <dd>
-    Merges n localised strings into one. </p>
-
-<p> Circumvents factorios hard limitation of allowing only
- up to 20 subtables per localised string by creating
- a deeply nested table with &lt; 20 elemenst per level.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">...</span>
-            <span class="types"><a class="type" href="../api/Concepts.html#LocalisedString">LocalisedString</a></span>
-
-
-
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../api/Concepts.html#LocalisedString">LocalisedString</a></span>
-
-
-
-    </ol>
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> x = {}
-<span class="keyword">for</span> i=<span class="number">65</span>, <span class="number">65</span>*<span class="number">2</span> <span class="keyword">do</span> x[i-<span class="number">64</span>] = <span class="global">string</span>.char(i) <span class="keyword">end</span>
-
-game.<span class="global">print</span>(x)
-&gt; Error: Too many parameters <span class="keyword">for</span> localised <span class="global">string</span>: <span class="number">65</span> &gt; <span class="number">20</span> (limit).
-
-game.<span class="global">print</span>(Locale.merge(<span class="global">table</span>.unpack(x)))
-&gt; ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
-</pre>
-    </ul>
-
-</dd>
     <dt>
     <a name = "format_hotkey_tooltip"></a>
     <strong>format_hotkey_tooltip(key, description)</strong>
@@ -219,13 +176,67 @@ game.<span class="global">print</span>(Locale.merge(<span class="global">table</
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="LocalisedString"></a>LocalisedString </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "compress"></a>
+    <strong>compress(lstr)</strong>
+    </dt>
+    <dd>
+    <strong>In-place.</strong> Fixes very long localised strings. </p>
+
+<p> Circumvents factorios hard limitation of allowing only
+ up to 20 parameters per key by creating
+ a deeply nested table with &lt;= 20 parameters per level.</p>
+
+<p> Intended to create gui elements or tooltips with
+ procedurally generated content.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">lstr</span>
+            <span class="types"><a class="type" href="../api/Concepts.html#LocalisedString">LocalisedString</a></span>
+         A generically
+ joined localised string <code>{&quot;&quot;, string_1, lstring_2, ...}</code>. The
+ key <em>must</em> be <code>&quot;&quot;</code> the empty string.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../api/Concepts.html#LocalisedString">LocalisedString</a></span>
+        A reference to the now compressed input table.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> test = {<span class="string">''</span>, <span class="string">'This'</span>, <span class="string">' '</span>, <span class="string">'is'</span>, <span class="string">' '</span>, <span class="string">'a'</span>, <span class="string">' '</span>, <span class="string">'very'</span>, <span class="string">' '</span>, <span class="string">'long'</span>
+              , <span class="string">' '</span>, <span class="string">'string'</span>, <span class="string">' '</span>, <span class="string">'that'</span>, <span class="string">' '</span>, <span class="string">'the'</span>, <span class="string">' '</span>, <span class="string">'engine'</span>
+              , <span class="string">' '</span>, <span class="string">'would'</span>, <span class="string">' '</span>, <span class="string">'not'</span>, <span class="string">' '</span>, <span class="string">'normally'</span>, <span class="string">' '</span>, <span class="string">'allow.'</span>}
+
+game.<span class="global">print</span>(test)
+&gt; Error: Too many parameters <span class="keyword">for</span> localised <span class="global">string</span>: <span class="number">25</span> &gt; <span class="number">20</span> (limit).
+
+Locale.compress(test)
+game.<span class="global">print</span>(test)
+&gt; This is a very long <span class="global">string</span> that the engine would <span class="keyword">not</span> normally allow.
+</pre>
+    </ul>
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-07-16 18:34:39 </i>
+<i style="float:right;">Last updated 2021-07-20 20:10:07 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

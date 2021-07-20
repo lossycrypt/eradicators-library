@@ -111,19 +111,13 @@ local table_unpack, math_min, math_huge
     = table.unpack, math.min, math.huge
 
 -- -------------------------------------------------------------------------- --
--- Disable raw script access.
--- -------------------------------------------------------------------------- --
-local script = assert(_ENV.script) -- LuaObjects can not be copied!
-_ENV.script = setmetatable({},{
-  __index = function() stop('LuaBootstrap is disabled by EventManagerLite.') end
-  })
-    
--- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 local Public  = {}
 local Private = {}
-   
+
+local EventPIG
+local generate_event_name
 
 --------------------------------------------------------------------------------
 -- Public methods.
@@ -133,29 +127,53 @@ local Private = {}
 -- -------------------------------------------------------------------------- --
 -- PIG                                                                        --
 -- -------------------------------------------------------------------------- --
+-- Must be imported *before* disabling raw script access.
 
 ----------
 -- Custom event names.
--- This table contains all (event\_name → event\_id) mappings
+-- Erlibs equivalent to @{FOBJ defines.events} for modded event ids.
+-- 
+-- This table contains all dynamically generated (event\_name → event\_id) mappings
 -- that are contained in the @{Remote.PackedInterfaceGroup} `'erlib:managed-events'`.
 -- Take care to use the correct load order and declare dependencies as needed.
 --
+-- Trying to read event names that have not been defined yet is an error.
+-- It is possible, but discouraged to add event ids by writing them
+-- directly to this table. It is recommended to use 
+-- [generate\_event\_name](#ManagedLuaBootstrap.generate_event_name)
+-- to generate new names.
+--
+-- See also @{remotes.events}.
+--
 -- @usage
---   -- In Mod_A:
---   EventManagerLite.generate_event_name('on_something_happend')
+--   -- Mod_A:
+--   ManagedLuaBootstrap.generate_event_name('on_something_happend')
 --  
---   -- In Mod_A or any other mod:
---   script.on_event(EM.events.on_something_happend, function(e)
+--   -- Mod_X (can be Mod_A):
+--   script.on_event(events.on_something_happend, function(e)
 --     print('I just shared an event name without effort!')
 --     end)
 --
+--   -- Mod_A:
+--   script.raise_event(events.on_something_happend, {player_index = ...})
+--
+--   -- Mod_X (can be Mod_A):
+--   > I just shared an event name without effort!
+--
 -- @table events
-local EventPIG = Remote.PackedInterfaceGroup('erlib:managed-events')
-Public.events = setmetatable({}, {
-  __index = function(self, name)
-    return assertify(EventPIG:get(name), 'Unknown event name: ', name)
-    end})
+Public.events, generate_event_name, EventPIG
+  = elreq('erlib/remotes/events')('EventManagerLite')
+
     
+-- -------------------------------------------------------------------------- --
+-- Disable raw script access.
+-- -------------------------------------------------------------------------- --
+local script = assert(_ENV.script) -- LuaObjects can not be copied!
+assert(script.object_name == 'LuaBootstrap')
+_ENV.script = setmetatable({},{
+  __index = function() stop('LuaBootstrap is disabled by EventManagerLite.') end
+  })
+
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
 -- -------------------------------------------------------------------------- --
@@ -210,6 +228,8 @@ function Public.get_managed_script(module_name)
   if ModuleScripts[module_name] then return ModuleScripts[module_name] end
   local API = setmetatable({},{__index = script}) -- dcopy can't copy LuaObject!
   ModuleScripts[module_name] = API
+  --
+  API.object_name = 'ManagedLuaBootstrap'
   -- loaders
   local function make_loader(event_names)
     return function(f) return Private.on_event(module_name, event_names, f) end
@@ -241,12 +261,13 @@ function Public.get_managed_script(module_name)
   API.get_event_filter = function() stop('Not implemented') end
   API.set_event_filter = function() stop('Not implemented') end
   --
-  API.generate_event_name = function(name)
-    if name == nil then return script.generate_event_name() end
-    verify(name, 'string', 'Invalid event name.')
-    return EventPIG:get(name)
-        or EventPIG:set(name, script.generate_event_name())
-    end
+  -- API.generate_event_name = function(name)
+  --   if name == nil then return script.generate_event_name() end
+  --   verify(name, 'string', 'Invalid event name.')
+  --   return EventPIG:get(name)
+  --       or EventPIG:set(name, script.generate_event_name())
+  --   end
+  API.generate_event_name = generate_event_name
   return API end
 
 --------------------------------------------------------------------------------
@@ -741,12 +762,12 @@ do end
 
 ----------
 -- Changed. Now supports naming events.
--- Any named event ids are automatically published on a
--- @{Remote.PackedInterfaceGroup} called 'erlib:managed-events'.
--- And also made easily available to any mod using EventManagerLite
--- via @{EventManagerLite.events}.
+-- If a name is given it's id is automatically published to the
+-- @{Remote.PackedInterfaceGroup} called 'erlib:managed-events',
+-- which can easily be accessed via @{EventManagerLite.events}.
 -- 
--- See also @{FOBJ LuaBootstrap.generate_event_name}.
+-- See also @{FOBJ LuaBootstrap.generate_event_name} and 
+-- @{remotes.events}.
 -- 
 -- @tparam[opt] string event_name Your custom name for the event.
 -- 
@@ -775,6 +796,17 @@ do end
 -- See also @{EventManagerLite.event_handler_order}.
 --
 -- @number ManagedLuaBootstrap.module_index
+do end
+
+----------
+-- Changed. The name is `"ManagedLuaBootstrap"`. To distinguish from the real
+-- script which is named `"LuaBootstrap"`.
+--
+-- Read only. (Technically you can overwrite it but that won't affect anything.)
+--
+-- See also @{FOBJ Common.object_name}.
+--
+-- @number ManagedLuaBootstrap.object_name
 do end
 
 ----------

@@ -22,13 +22,17 @@ if flag.IS_DEV_MODE then
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
--- @param log A namederlib logger instance.
+-- @param log A named erlib logger instance.
 -- @param mod_name A mod name (not root or path!)
 return function(log, mod_name)
-  --
-  local mod_root = '__'..mod_name..'__/'
-  local load = function(path) return require(mod_root .. path) end
-  local plugin_array = load('plugins/!init/load-order')
+
+  -- V1: Explicit absolute path
+  -- local mod_root = '__'..mod_name..'__/'
+  -- local load = function(path) return require(mod_root .. path) end
+  -- local plugin_array = load('plugins/!init/load-order')
+  
+  -- V2: Implicit relative path
+  local plugin_array = require('plugins/!init/load-order')
   
   local Loader = {}
   local phase
@@ -105,7 +109,8 @@ return function(log, mod_name)
       then
         local file_path = table.concat({'plugins', plugin_name, phase}, '/')
         log:debug('require("', file_path, '")')
-        load(file_path)
+        -- load(file_path)
+        require(file_path)
         end
       end
     end
