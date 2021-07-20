@@ -88,11 +88,9 @@ local const  = import '/const'
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 local Babelfish = {}
--- local Dictionary = import 'methods/Dictionary_Naive'
--- local Dictionary = import 'methods/Dictionary_NoIdent'
-local Dictionary = import 'methods/Dictionary_NoIdent_PacketPregen'
 
-local StatusIndicator = import 'methods/StatusIndicator'
+local Dictionary      = import 'modules/Dictionary'
+local StatusIndicator = import 'modules/StatusIndicator'
 
 script.generate_event_name('on_babelfish_translation_state_changed') -- before Demo
 
