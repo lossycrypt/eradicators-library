@@ -14,8 +14,8 @@ const.setting_name = {
   }
   
 const.network = {
-  rerequest_delay = 60, -- in ticks
-  transit_window  = 30, -- in ticks
+  rerequest_delay = 1.0, -- in seconds
+  transit_window  = 0.5, -- in seconds
   master_header = '金魚',
   packet_header = {
     packed_request = '箱',
@@ -99,12 +99,12 @@ const.type_data = {
   -- This table hardcodes the order in which prototypes will be translated
   -- *if* they're activated in settings stage.
   {type = "item_name"             , longest =   88}, -- Unk. Key
-  {type = "item_description"      , longest = 1277}, -- 76%      
   {type = "fluid_name"            , longest =   44},             
-  {type = "fluid_description"     , longest =   98}, -- 86%      
   {type = "recipe_name"           , longest =   80},             
-  {type = "recipe_description"    , longest =  230}, -- 96%      
   {type = "technology_name"       , longest =   59},             
+  {type = "item_description"      , longest = 1277}, -- 76%      
+  {type = "fluid_description"     , longest =   98}, -- 86%      
+  {type = "recipe_description"    , longest =  230}, -- 96%      
   {type = "technology_description", longest =  408},             
   {type = "equipment_name"        , longest =   57},             
   {type = "equipment_description" , longest =  333}, -- 63%      

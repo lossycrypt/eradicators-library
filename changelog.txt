@@ -5,15 +5,19 @@ Date: 2021-7-16
     - Added Locale.compress which replaces Locale.merge
     - Added EventManagerLite.object_name
     - Added remotes.events for easy cross-mod event sharing.
+    - Added Array.deduplicate + Tests.
+    - Added __len support to Cache.AutoCache
   Bugfixes:
     - Fixed Prototype.get_absolute_order for item sub/group.
+    - Babelfish: Fixed network rate control for non-default game speeds.
+    - Babelfish: Fixed another "malformed pattern" error in lua-find-mode.
+    - Babelfish: Fixed error with empty string translation (so-long-and-thanks-for-all-the-fish achievement description).
   Plugins:
+    - Integrated erlib_configure_plugin into erlib_enable_plugin.
     - Babelfish: Added 3 icons for mods to use.
     - Babelfish: Added on_babelfish_translation_state_changed event.
     - Babelfish: Updated demo to include event demonstration and type selection.
-    - Babelfish: Fixed another "malformed pattern" error in lua-find-mode.
     - Babelfish: Made babelfish-demo a seperate plugin.
-    - Integrated erlib_configure_plugin into erlib_enable_plugin.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.19
 Date: 2021-7-15

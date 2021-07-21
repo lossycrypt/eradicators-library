@@ -48,14 +48,15 @@ local const  = import '/const'
 local Name   = const.name
 local W, H   = const.gui.width, const.gui.height
 
-local babelconst = require('plugins/babelfish/const')
+local babelconst  = require 'plugins/babelfish/const'
+local SearchTypes = require 'plugins/babelfish/modules/SearchTypes'
+
 local Babelfish = Remote.get_interface(babelconst.remote.interface_name)
 
 local has_icon = Table.map(babelconst.type_data, function(v)
   return not v.noicon, v.type
   end, {})
   
-
   
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -69,12 +70,8 @@ local Demo = Class.SimpleClass(
       }  
     return self end
   )
+
   
-local function get_requested_search_types() -- DenseArray
-  return game.mod_setting_prototypes[babelconst.setting_name.search_types].allowed_values
-  end
-
-
 -- -------------------------------------------------------------------------- --
 -- Command                                                                    --
 -- -------------------------------------------------------------------------- --
@@ -154,12 +151,11 @@ function Demo:sget_sidebar()
     -- print('making sidebar')
     sidebar = Gui.move(self.anchor.add {
       name = 'sidebar',
-      type = 'frame',
+      type = 'scroll-pane',
       direction = 'vertical'
       }, const.gui.sidebar_width, H)
     --
-    -- print(Hydra.lines(get_requested_search_types()))
-    for _, type in pairs(get_requested_search_types()) do
+    for _, type in SearchTypes.requested_ipairs() do
       local this = sidebar.add {
         name = type,
         type = 'flow',
@@ -226,7 +222,6 @@ script.on_event(defines.events.on_gui_text_changed, function(e)
     -- For demonstration this grabs ALL types that have been
     -- requested by at least one mod. Your mod should NOT do this
     -- and instead only use the types you actually want.
-    local types = get_requested_search_types()
     local types = Demo(game.players[e.player_index]):get_types()
     
     local prfS = game.create_profiler()

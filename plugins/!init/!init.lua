@@ -60,8 +60,11 @@ local function get_enabled_plugins(phase)
 -- -------------------------------------------------------------------------- --
 return function(phase) assert(phase)
 
-  ------------------------------------------------------------------------------
+  -- ------------------------------------------------------------------------ --
+  -- All Phases                                                               --
+  -- ------------------------------------------------------------------------ --
   Loader.init(phase)
+  Loader.enable_pm()
 
   -- ------------------------------------------------------------------------ --
   -- Settings                                                                 --
@@ -89,7 +92,7 @@ return function(phase) assert(phase)
         assert(type(options.search_types) == 'table', 'Babelfish: Translation types must be a table.')
         local search_types = Table.sget(db, {'babelfish_search_types'}, {})
         for _, v in pairs(options.search_types) do
-          table.insert(search_types, v)
+          search_types[v] = true
           end
         end
       }
@@ -115,13 +118,11 @@ return function(phase) assert(phase)
   elseif phase == 'settings-final-fixes' then
 
     if flag.IS_DEV_MODE then
-      local Table = elreq('erlib/lua/Table')()
       erlib_enable_plugin('babelfish-demo')
       erlib_enable_plugin('babelfish', {
-        search_types = Table.map(
-          require('plugins/babelfish/const').type_data,
-          function(v) return v.type end,
-          {})
+        search_types = 
+          require 'plugins/babelfish/modules/SearchTypes'
+          .get_supported_array()
         })
       end
 
@@ -144,7 +145,6 @@ return function(phase) assert(phase)
   -- All Phases                                                               --
   -- ------------------------------------------------------------------------ --
   
-  Loader.enable_pm()
 
   if table_size(get_enabled_plugins(phase)) > 0 then
     Loader.enable_em()

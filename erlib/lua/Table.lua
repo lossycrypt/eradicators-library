@@ -1256,15 +1256,15 @@ function Table.deep_clear_metatables(tbl)
   
 
 ----------
--- Removes the metatable from a table.
+-- Removes any metatable from a table.
 -- Does not recurse into the table. Useful for finalizing tables in data stage,
 -- when the automatically attached metatables of a @{Table}, @{Array}, @{Set}
 -- etc. shouldn't be inherited into data.raw.
 -- 
 -- @tparam table tbl
--- @treturn table The input table. *Doesn't* have a Table module metatable.
+-- @treturn table The input table. Without any metatable whatsoever.
 function Table.clear_meta(tbl)
-  return debug_setmetatable(tbl,nil)
+  return debug_setmetatable(tbl, nil)
   end
 
   

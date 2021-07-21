@@ -32,8 +32,8 @@ local plugin_array = {
   {'on_user_panic'              , {        c1,   }},
   
   -- "magic"
-  {'babelfish'                  , {s3, d3, c1, ul}},
-  {'babelfish-demo'             , {        c1,   }},
+  {'babelfish'                  , {s3, d3, c1, ul}}, -- dependency: on_user_panic
+  {'babelfish-demo'             , {        c1,   }}, -- dependency: babelfish
   {'gui-auto-styler'            , {        c1,   }},
   {'cursor-tracker'             , {              }},
   {'zoom-tracker'               , {              }},

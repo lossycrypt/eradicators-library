@@ -128,8 +128,10 @@ local Locale      = elreq('erlib/factorio/Locale' )()
 local Setting     = elreq('erlib/factorio/Setting')()
 local Prototype   = elreq('erlib/factorio/Prototype')()
 
-local pairs, pcall, string_find, type, string_gmatch, string_lower, string_gsub
-    = pairs, pcall, string.find, type, string.gmatch, string.lower, string.gsub
+local pairs, pcall, string_find, type, string_gmatch, string_lower, string_gsub,
+      string_sub
+    = pairs, pcall, string.find, type, string.gmatch, string.lower, string.gsub,
+      string.sub
 
 -- -------------------------------------------------------------------------- --
 -- UTF8 (Dummy Implementation)                                                --
@@ -154,24 +156,27 @@ local import = PluginManager.make_relative_require'babelfish'
 local const  = import '/const'
 local null   = '\0'
 
-local SupportedTypes = 
-  Table.map(const.type_data, function(v) return true, v.type end, {})
+local SearchTypes = import '/modules/SearchTypes'
+
+
+-- local SupportedTypes = 
+  -- Table.map(const.type_data, function(v) return true, v.type end, {})
   
 local TypeBytes = 
   Table.map(const.type_data, function(v) return v.longest, v.type end, {})
   
-local function get_requested_search_types() -- DenseArray
-  return game.mod_setting_prototypes[const.setting_name.search_types].allowed_values
-  end
+-- local function get_requested_search_types() -- DenseArray
+  -- return game.mod_setting_prototypes[const.setting_name.search_types].allowed_values
+  -- end
   
-local function get_not_requested_search_types()
-  return Set.from_keys(SupportedTypes)
-    :complement(Set.from_values(get_requested_search_types()))
-  end
+-- local function get_not_requested_search_types()
+  -- return Set.from_keys(SupportedTypes)
+    -- :complement(Set.from_values(get_requested_search_types()))
+  -- end
   
-local RequestedTypes = Cache.AutoCache(function(r) -- PseudoSet
-  for k, v in ipairs(get_requested_search_types()) do r[v] = true end
-  end)
+-- local RequestedTypes = Cache.AutoCache(function(r) -- PseudoSet
+  -- for k, v in ipairs(get_requested_search_types()) do r[v] = true end
+  -- end)
 
 -- -------------------------------------------------------------------------- --
 -- Indexes                                                                    --
@@ -357,18 +362,18 @@ local normalize_word = function(word)
 --
 local get_ordered_requests = function()
   -- Prepare constants
-  local OrderedRequestedTypes = (function(r) -- DenseArray
-    for _, tdata in ipairs(const.type_data) do
-      if RequestedTypes[tdata.type] then
-        r[#r+1] = tdata.type
-        end
-      end
-    return r end){}
+  -- local OrderedRequestedTypes = (function(r) -- DenseArray
+    -- for _, tdata in ipairs(const.type_data) do
+      -- if RequestedTypes[tdata.type] then
+        -- r[#r+1] = tdata.type
+        -- end
+      -- end
+    -- return r end){}
   -- Prepare profiler
   local profile = get_profiler()
   -- Pre-sort required prototypes
   local sorted_prots = {}
-  for _, type in ipairs(OrderedRequestedTypes) do
+  for _, type in SearchTypes.requested_ipairs() do
     if not sorted_prots[type] then
       local prots = {}
       local category = type:gsub('_[^_]+$','')
@@ -395,7 +400,7 @@ local get_ordered_requests = function()
   local lookup          = {}
   local unique_requests = {}
   --
-  for _, type in ipairs(OrderedRequestedTypes) do
+  for _, type in SearchTypes.requested_ipairs() do
     max_index[type] = #sorted_prots[type]
     --
     local arr = {}
@@ -460,7 +465,8 @@ local get_request_packets = make_table_getter(function()
   local function finalize_packet()
     packet[rindex.bytes  ] = bytes
     packet[rindex.lstring] = 
-      {'', master_header, packet_header, null, packet[rindex.uid], null, Locale.compress(lstrings)}
+      -- {'', master_header, packet_header, null, packet[rindex.uid], null, Locale.compress(lstrings)}
+      {'', master_header, packet_header, null, packet[rindex.uid], Locale.compress(lstrings)}
     -- print(('Packet stat. Entries: %s, Bytes: %s'):format(#packet[rindex.entries], bytes))
     end
   local function new_packet()
@@ -485,8 +491,8 @@ local get_request_packets = make_table_getter(function()
     bytes = bytes + request[rindex.bytes]
     count = count + 1
     table.insert(packet[rindex.entries], request[rindex.entries])
+    table.insert(lstrings, null) -- final translated result may never end with null
     table.insert(lstrings, request[rindex.lstring])
-    table.insert(lstrings, null)
     end
   finalize_packet()
   profile('Packing requests together took: ')
@@ -501,7 +507,7 @@ local get_request_packets = make_table_getter(function()
 function Dictionary:update()
   log:debug('Updating dictionary: ', self.language_code)
   --
-  Table.clear(self, get_not_requested_search_types(), false)
+  Table.clear(self, SearchTypes.get_not_requested_array(), false)
   --
   local packets, max_index = get_request_packets()
   local profile = get_profiler()
@@ -513,6 +519,7 @@ function Dictionary:update()
   profile('Packets dcopy took: ')
   --
   if self.language_code == 'internal' then
+    error('"internal" is deprecated')
     for type, max in pairs(max_index) do
       self[type] = {max = max}
       end
@@ -607,11 +614,17 @@ function Dictionary:update()
 -- Debug                                                                      --
 -- -------------------------------------------------------------------------- --
 function Dictionary:dump_statistics_to_console()
-  if assert(flag.IS_DEV_MODE) and (self.packets.n == 0) then
+  if not flag.IS_DEV_MODE then
+    print('Dev mode is required for correct statistics!')
+  else
+    assert(flag.IS_DEV_MODE)
     print( ('-'):rep(80) )
     print( 'Dictionary Statistics:' )
     print( ('Language: %s'):format(self.language_code) )
     print( ('Total requests: %s'):format(self.packets.max) )
+    if (self.packets.n ~= 0) then
+      print(('Dictionary has %s untranslated packets. Skipped.'):format(self.packets.n))
+      return end
     print()
     print('Translated String Statistics:')
     -- print('Type | Longest | Shortest | Avearage | Mean | Unknown Key %')
@@ -642,27 +655,24 @@ function Dictionary:dump_statistics_to_console()
       return numlist[math.ceil(#numlist/2)]
       end
     
-    for _, tdata in ipairs(const.type_data) do
-      local type = tdata.type
-      if RequestedTypes[type] then
-        local lengths = {}
-        local untranslated = 0
-        if not self[type] then
-          game.print('Missing type. Use /babelfish update first.')
-          return end
-        for _, entry in ipairs(self[type]) do
-          local lower = Utf8.lower(entry[eindex.word])
-          table.insert(lengths, #lower)
-          if Utf8.find(lower, 'unknown key') or (lower:gsub('%s+','') == '') then
-            untranslated = untranslated + 1
-            end
+    for _, type in SearchTypes.requested_ipairs() do
+      local lengths = {}
+      local untranslated = 0
+      if not self[type] then
+        game.print('Missing type. Use /babelfish update first.')
+        return end
+      for _, entry in ipairs(self[type]) do
+        local lower = Utf8.lower(entry[eindex.word])
+        table.insert(lengths, #lower)
+        if Utf8.find(lower, 'unknown key') or (lower:gsub('%s+','') == '') then
+          untranslated = untranslated + 1
           end
-        print( ('[%-26s] | %8s | %8s | %8.2f | %8.2f | %8.2f%%') :format(
-          type,
-          longest(lengths), shortest(lengths), average(lengths), median(lengths),
-          100 * (untranslated / #lengths)
-          ) )
         end
+      print( ('[%-26s] | %8s | %8s | %8.2f | %8.2f | %8.2f%%') :format(
+        type,
+        longest(lengths), shortest(lengths), average(lengths), median(lengths),
+        100 * (untranslated / #lengths)
+        ) )
       end
     end
   end
@@ -685,7 +695,27 @@ function Dictionary:get_percentage()
 -- All keys have a translation, but some of the translations
 -- may be outdated due to on_config_changed.
 function Dictionary:is_type_fully_populated(type)
-  return self[type].n == self[type].max end
+  if self[type] == nil then
+    -- 2021-07-21: I am unsure if this can happen naturally or
+    -- if this only happens when changing const.type_data in the dev environment
+    -- where on_config_changed isn't triggered properly.
+    self:update()
+    game.auto_save('babelfish-bugreport')
+    game.print(
+      '[color=red]WARNING![/color]\n'
+      ..'[color=acid]'
+      ..'Babelfish has missed a change in requested search_types.\n'
+      ..'Please submit a detailed report which mods you just\n'
+      ..'installed and uninstalled, and/or which mod settings you changed.\n'
+      ..'Your game has been fixed and saved as [color=red]_autosave-babelfish-bugreport[/color].\n'
+      ..'You should use the [color=red]/babelfish reset[/color] command now and save again.'
+      ..'[/color]'
+      )
+    end
+  assert(self[type])
+  -- return (self[type]   ~= nil)
+  return (self[type].n == self[type].max)
+  end
   
 -- Measures the length of the DenseArray part.
 -- The SparseArray part I-n to I-max is ignored.
@@ -749,10 +779,12 @@ function Dictionary.precompile()
   
 -- Iterator that waits a while after wrapping around.
 function Dictionary:iter_packets(tick)
+  local ticks_per_second = 60 * game.speed
   return function()
     if (self.packets.i == 0) then
       self.packets.i = self.packets.n
-      self.packets.block_iter_until = tick + const.network.rerequest_delay
+      self.packets.block_iter_until
+        = tick + (const.network.rerequest_delay * ticks_per_second)
       return nil end
     if (self.packets.block_iter_until or 0) < tick then
       self.packets.block_iter_until = nil
@@ -781,8 +813,13 @@ function Dictionary:on_string_translated(lstrings, results)
     log:debug('Recieved results but had no open requests: ', results)
     return end
   --
+  -- gmatch parsing will produce one result too much
+  -- if there's a superfluous null at the end.
+  assert(string_sub(results, -1) ~= null, 'Result packet must not end with "null".')
+  --
   -- results → {header+id, uid, result1, result2}
-  local next   = string_gmatch(results,'\0([^\0]+)') -- faster than String.split
+  -- (sequence {null,'',null} must return the empty string in-between.)
+  local next   = string_gmatch(results,'\0([^\0]*)') -- faster than String.split
   local uid = next()
   --
   local i = self.packets.n + 1;
@@ -951,8 +988,7 @@ function Dictionary:find(types, word, opt)
   --
   for i=1, #types do
     local type = types[i]
-    assertify(SupportedTypes[type], 'Babelfish: Invalid translation type: ', type)
-    assertify(RequestedTypes[type], 'Babelfish: Type must be configured in settings stage: ', type)
+    SearchTypes.assert(type)
     -- This will only fail on new maps or after an :update()
     -- added new prototypes.
     -- if (table_size(self[type]) - 1) ~= self[type].max then status = false end
@@ -980,9 +1016,9 @@ function Dictionary:find(types, word, opt)
   and game.item_prototypes['raw-fish']
   then r.item_name['raw-fish'] = true end
   --
-  if flag.IS_DEV_MODE then
-    log:debug('Cache size: ', table_size(normalized_word_cache))
-    end
+  -- if flag.IS_DEV_MODE then
+    -- log:debug('Cache size: ', table_size(normalized_word_cache))
+    -- end
   --
   return status, r end
 
@@ -994,8 +1030,7 @@ function Dictionary:find(types, word, opt)
 -- Only translates one name at a time to discourage
 -- authors from mass-caching the results!
 function Dictionary:translate_name(type, name)
-  assertify(SupportedTypes[type], 'Babelfish: Invalid translation type: ', type)
-  assertify(RequestedTypes[type], 'Babelfish: Type must be configured in settings stage: ', type)
+  SearchTypes.assert(type)
   verify(name, 'str', 'Babelfish: Invalid name: ', name)
   local this = self[type]
   for i = 1, self[type].max do

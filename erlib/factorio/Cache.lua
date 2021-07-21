@@ -130,6 +130,11 @@ Cache.AutoCache = function(constructor)
       return ipairs(self)
       end,
       
+    __len = function(self)
+      fill(self,constructor)
+      return #self
+      end,
+      
       --@future: allow clearing the cache to be refilled
       -- on next write. Usecase: rebuilding the cache after data
       -- changes such as on_research_finished for caching a

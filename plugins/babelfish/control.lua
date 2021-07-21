@@ -39,6 +39,9 @@
     Detect non-headless multiplayer host. If there's only 
     one player use instant-translation before others can join.
   
+  ? Needs engine support.
+    Detect game.speed changes outside of on_runtime_mod_setting_changed.
+  
   ]]
 
 --[[ Facts:
@@ -93,8 +96,6 @@ local Dictionary      = import 'modules/Dictionary'
 local StatusIndicator = import 'modules/StatusIndicator'
 
 script.generate_event_name('on_babelfish_translation_state_changed') -- before Demo
-
--- local Demo = import 'demo/control'
 
 local Remote = {}
 remote.add_interface(const.remote.interface_name, Remote)
@@ -235,6 +236,9 @@ Babelfish.on_player_language_changed = script.on_event({
   --
   for pindex, p in pairs(game.players) do
     if not p.connected then
+      -- Keeping the dict would cause no harm, but needs
+      -- code restructuring.
+    
       -- language must be re-evaluated on re-join
       Savedata:del_pdata(nil, pindex)
       log:debug('Player removed from game: ', p.name)
@@ -245,7 +249,9 @@ Babelfish.on_player_language_changed = script.on_event({
         if ((pdata.next_request_tick or 0) <= game.tick) then
           log:debug('Sent language code request to: ', pdata.p.name)
           assert(pdata.p.request_translation(const.lstring.language_code))
-          pdata.next_request_tick = game.tick + const.network.rerequest_delay
+          local ticks_per_second = 60 * game.speed
+          pdata.next_request_tick
+            = game.tick + (const.network.rerequest_delay * ticks_per_second)
           end
       else
         if pdata.dict:has_requests() then
@@ -327,7 +333,7 @@ Babelfish.on_string_translated = function(e)
           Babelfish.raise_on_translation_state_changed(pdata.dict)
           end
       else
-        log:debug('Packet recieved but player had not dictionary.', e)
+        log:debug('Packet recieved but player had no dictionary.', e)
         end
     else
       stop('Babelfish packet had unknown id.', e)
@@ -344,6 +350,8 @@ Babelfish.on_string_translated = function(e)
 Babelfish.update_settings_cache = script.on_event(
   defines.events.on_runtime_mod_setting_changed,
   function()
+    local ticks_per_second = 60 * game.speed
+    --
     if (not game.is_multiplayer())
     and Setting.get_value('map', const.setting_name.sp_instant_translation)
     then
@@ -351,10 +359,13 @@ Babelfish.update_settings_cache = script.on_event(
         = math.huge
     else
       Savedata.max_bytes_per_tick
-        = (1024 / 60) * Setting.get_value('map', const.setting_name.network_rate)
+        = (1024 * Setting.get_value('map', const.setting_name.network_rate))
+        / ticks_per_second
       end
     Savedata.max_bytes_in_transit
-      = Savedata.max_bytes_per_tick * const.network.transit_window * 60
+      = (const.network.transit_window * ticks_per_second)
+      * Savedata.max_bytes_per_tick
+    --
     log:debug('Updated settings max_bytes_per_tick: ', Savedata.max_bytes_per_tick)
     log:debug('Updated settings max_bytes_in_transit: ', Savedata.max_bytes_in_transit)
     end)
@@ -502,14 +513,25 @@ do end
 -- is complete it can be fully searched, regardless of the translation
 -- status of the other types.
 --
---    "item_name"          , "item_description"      ,
---    "fluid_name"         , "fluid_description"     ,
---    "recipe_name"        , "recipe_description"    ,
---    "technology_name"    , "technology_description",
---    "equipment_name"     , "equipment_description" ,
---    "tile_name"          , "tile_description"      ,
---    "entity_name"        , "entity_description"    ,
---    "virtual_signal_name",
+-- __Note:__ In vanilla factorio all search functions search only the name,
+-- never the description. As descriptions can be very long and thus slow to
+-- translate it is recommended to not activate them.
+--
+--    "item_name"             
+--    "fluid_name"            
+--    "recipe_name"           
+--    "technology_name"       
+--    "item_description"      
+--    "fluid_description"     
+--    "recipe_description"    
+--    "technology_description"
+--    "equipment_name"        
+--    "equipment_description" 
+--    "tile_name"             
+--    "tile_description"      
+--    "entity_name"           
+--    "entity_description"    
+--    "virtual_signal_name"   
 --
 -- @table Babelfish.SearchType
 do end
@@ -589,7 +611,7 @@ function Remote.can_translate(pindex, types, options)
 -- 
 -- With some intentional exceptions:  
 -- 1) If `word` is an exact prototype name (i.e. "iron-plate") 
--- that prototype will _additionally_ be included in the search result.  
+-- that name will _additionally_ be included in the search result.  
 -- 2) Babelfish does not filter prototypes. The serch result includes names
 -- of all matching prototypes including hidden items, void recipes, etc.  
 -- 3) Babelfish understands unicode language spaces (vanilla does _not_).
@@ -816,6 +838,7 @@ do
       if game.is_multiplayer() and not p.admin then
         p.print {'babelfish.command-only-by-admin'}
       else
+        -- Don't want to create a global just for this...
         local Demo = _ENV.package.loaded["plugins/babelfish-demo/control"]
         if Demo then
           Demo(p):toggle_gui()
@@ -831,14 +854,14 @@ do
     dump = function(e, pdata, p)
       if game.is_multiplayer() and not p.admin then
         p.print {'babelfish.command-only-by-admin'}
+      elseif not flag.IS_DEV_MODE then
+        p.print('Dev mode is required for correct statistics!')
       else
-        assert(flag.IS_DEV_MODE, 'Dumping is only correct in dev mode!')
+        print('############ DUMP ############')
         for _, lcode in ipairs{'en', 'de', 'ja'} do
           local dict = Savedata.dicts[lcode]
-          if dict then dict:dump_statistics_to_console() end
-        
-        -- for _, dict in pairs(Savedata.dicts) do
-          -- dict:dump_statistics_to_console()
+          if dict then dict:dump_statistics_to_console()
+          else print('No dictionary with language_code: '.. lcode) end
           end
         return true end
       end,
@@ -916,7 +939,7 @@ Babelfish.raise_on_translation_state_changed = function(dict, pindex)
 --------------------------------------------------------------------------------
 
   
---[[------
+--[[ ------
 A detailed explanation of Babelfish's internal processes.
 
 When a new player joins a game Babelfish asks the player what language they use.

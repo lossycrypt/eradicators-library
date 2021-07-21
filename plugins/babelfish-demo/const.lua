@@ -14,12 +14,9 @@ const.name = {
   }
   
 const.gui = {
-  -- width  = 1600,
-  -- height =  800,
   width  = 1600,
   height =  680,
-  
-  sidebar_width = 180,
+  sidebar_width = 200,
   }
 
 const.tags = {

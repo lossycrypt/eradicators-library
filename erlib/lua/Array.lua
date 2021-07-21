@@ -377,6 +377,37 @@ function Array.reverse(arr,target,i,j)
   return _toArray(target)
   end
   
+
+----------
+-- __In-place.__ Removes redundant and nil values. Order of elements is unaffected.
+-- 
+-- @tparam DenseArray|SparseArray arr
+-- @tparam[opt=nil] table target __Copy Mode.__ This table will be changed and arr remains unchanged.
+--
+-- @tparam[opt=1]    NaturalNumber i First index to process. Mandatory for sparse input.
+-- @tparam[opt=#arr] NaturalNumber j Last index to process. Mandatory for sparse input.
+-- 
+-- @treturn DenseArray|SparseArray Can only become sparse if `j` was given and
+-- was smaller than the largest array key. In copy mode if `i` was given
+-- all indexes will be shifted down by `i-1` so that the array always starts at 1.
+-- 
+function Array.deduplicate(arr, target, i, j)
+  -- (no test yet)
+  i, j = (i or 1), (j or #arr)
+  local n = target and 1 or i
+  target = target or arr
+  local seen = {}
+  for k = i, j do
+    local v = arr[k]
+    target[k] = nil
+    if (v ~= nil) and not seen[v] then
+      seen  [v] = true
+      target[n] = v
+      n = n + 1
+      end
+    end
+  return target end
+  
   
 ----------
 -- __In-place.__ Appends a value at the end of an array __only if__ no other

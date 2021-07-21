@@ -12,8 +12,9 @@ local Data    = elreq('erlib/factorio/Data/!init')()
 local Setting = elreq('erlib/factorio/Setting')()
 
 -- -------------------------------------------------------------------------- --
-local const     = require 'plugins/babelfish/const'
-local initconst = require 'plugins/!init/const'
+local const       = require 'plugins/babelfish/const'
+local initconst   = require 'plugins/!init/const'
+local SearchTypes = require 'plugins/babelfish/modules/SearchTypes'
 
 -- -------------------------------------------------------------------------- --
 
@@ -48,29 +49,15 @@ Setting.make {
 -- -------------------------------------------------------------------------- --
 -- search_types
 
-local allowed
-  = Table.map(const.type_data, function(v) return true, v.type end, {})
-
 local db = data.raw['string-setting'][initconst.name.setting.enabled_plugins]
-local requested = Table.values(assert(Table.pop(db, 'babelfish_search_types')))
+local requested = Table.keys(assert(Table.pop(db, 'babelfish_search_types')))
 
 assert(#requested > 0, 'Babelfish: At least one search type must be configured.')
-for _, v in ipairs(requested) do
-  assert(allowed[v], 'Babelfish: Invalid search type: '..v)
+for _, type in ipairs(requested) do
+  assert(SearchTypes.is_supported(type), 'Babelfish: Invalid search type: '..type)
   end
 
--- deduplicate
-requested = Table.keys(Set.from_values(requested))
-
--- sort by translation priority
-table.sort(requested, (function()
-  local indexes = Table.map(
-    const.type_data,
-    function(v, k) return k, v.type end,
-    {}
-    )
-  return function(a, b) return indexes[a] < indexes[b] end
-  end)())
+SearchTypes.sort(requested) -- Important! Determines translation priority!
   
 Data.Inscribe{
   name           = const.setting_name.search_types,
@@ -80,7 +67,6 @@ Data.Inscribe{
   hidden         = (not flag.IS_DEV_MODE) ,
   allow_blank    = false                  ,
   default_value  = requested[1]           , -- not used
-  -- allowed_values = Table.keys(Set.from_values(requested)), -- deduplicate
   allowed_values = requested              ,
   }
 
