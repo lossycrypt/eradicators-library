@@ -719,6 +719,8 @@ do end
 -- Because factorio only raises on_init once per mod this
 -- is not reliable for adding new modules to an existing savegame.
 -- To prevent any confusion it is completely disabled.
+-- Use [on\_configuration\_changed](#ManagedLuaBootstrap.on_configuration_changed)
+-- instead.
 --
 -- @function ManagedLuaBootstrap.on_init
 do end

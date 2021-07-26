@@ -151,8 +151,8 @@ script.on_event(
 -- actually on that surface.
 -- 
 -- Abstracts:  
--- @{FAPI Events on_player_changed_position}  
--- @{FAPI Events on_player_changed_surface}  
+-- @{FAPI events on_player_changed_position}  
+-- @{FAPI events on_player_changed_surface}  
 -- 
 -- @tfield uint player_index
 -- @tfield uint|nil surface_index _If_ the player changed surfaces then this is

@@ -33,7 +33,7 @@ local on_user_panic = script.generate_event_name 'on_user_panic'
 -- collection of your mods internal state now.
 -- 
 -- Abstract:
--- @{FAPI Events on_console_chat}  
+-- @{FAPI events on_console_chat}  
 --
 -- @usage
 --   script.on_event(EventManager.events.on_user_panic, function(e)

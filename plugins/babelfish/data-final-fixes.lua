@@ -51,7 +51,7 @@ data:extend{{
              .tips.category_name,
   starting_status = "not-to-be-suggested",
   indent = 1,
-  tag = ('[img=%s] '):format(const.sprite.default_icon),
+  tag = ('[img=%s] '):format(const.sprite.icon_default),
   order = 'babelfish',
   -- trigger = {
     -- There is no lua-script based trigger. (base 1.1.34)

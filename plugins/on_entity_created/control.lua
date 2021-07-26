@@ -39,12 +39,12 @@ local raise_event       = script.raise_event
 -- All-in-one entity building event.
 --
 -- Combines the following events:  
--- @{FAPI Events on_built_entity}  
--- @{FAPI Events on_robot_built_entity}  
--- @{FAPI Events script_raised_built}  
--- @{FAPI Events script_raised_revive}  
--- @{FAPI Events on_entity_cloned}  
--- @{FAPI Events on_trigger_created_entity}  
+-- @{FAPI events on_built_entity}  
+-- @{FAPI events on_robot_built_entity}  
+-- @{FAPI events script_raised_built}  
+-- @{FAPI events script_raised_revive}  
+-- @{FAPI events on_entity_cloned}  
+-- @{FAPI events on_trigger_created_entity}  
 --
 -- @tfield LuaEntity created_entity The entity built.
 -- @tfield[opt] NaturalNumber player_index

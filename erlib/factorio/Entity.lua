@@ -193,7 +193,13 @@ function Entity.set_ignored_by_enemy_units(onoff) -- ignored_by_biters()
   end
   
   
-
+----------
+--@tparam LuaEntityPrototype prototype
+--@treturn boolean
+function Entity.is_blueprintable(prototype)
+  return (not prototype.has_flag("not-blueprintable"))
+     and (prototype.items_to_place_this > 0)
+  end
 
 
 -- -------------------------------------------------------------------------- --
