@@ -264,6 +264,11 @@ function Public.enable_savedata_management()
       end
     end
     
+  local function ensure_savedata_root_exists()
+    -- Must be created even if no plugins are registered.
+    assert(Table.sget(_ENV.global, {'plugin_manager', 'plugins'}, {}))
+    end
+    
   script.on_load(function()
     -- print('PM on_load')
     relink_savedatas()
@@ -272,6 +277,7 @@ function Public.enable_savedata_management()
   script.on_config(function(e)
     -- print('PM on_init')
     -- print('PM on_config')
+    ensure_savedata_root_exists()
     relink_savedatas()
     delete_unused_savedatas()
     end)

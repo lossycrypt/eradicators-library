@@ -704,6 +704,8 @@ do end
 -- event table when the handler is called.  
 -- For example: `f{nth_tick = 30, offset = 9, tick = 39}`. 
 -- 
+-- The offset always fullfills the condition:  
+-- `(tick % nth_tick) == offset`.
 --
 -- @tparam NaturalNumber period Unchanged.
 -- @tparam function|nil f Unchanged.
