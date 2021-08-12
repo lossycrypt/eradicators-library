@@ -257,17 +257,13 @@ function Public.get_managed_script(module_name)
   -- strings
   API.module_name  = module_name
   API.module_index = ModuleIndexes[module_name] -- auto-generates new index
-  -- nips
-  API.get_event_filter = function() stop('Not implemented') end
-  API.set_event_filter = function() stop('Not implemented') end
+  -- not supported
+  API.get_event_filter = function() stop('Not supported.') end
+  API.set_event_filter = function() stop('Not supported.') end
   --
-  -- API.generate_event_name = function(name)
-  --   if name == nil then return script.generate_event_name() end
-  --   verify(name, 'string', 'Invalid event name.')
-  --   return EventPIG:get(name)
-  --       or EventPIG:set(name, script.generate_event_name())
-  --   end
   API.generate_event_name = generate_event_name
+  -- links / shortcuts
+  API.events = Public.events
   return API end
 
 --------------------------------------------------------------------------------
@@ -811,6 +807,11 @@ do end
 -- See also @{FOBJ Common.object_name}.
 --
 -- @number ManagedLuaBootstrap.object_name
+do end
+
+----------
+-- New: Alias for @{EventManagerLite.events}.
+-- @table ManagedLuaBootstrap.events
 do end
 
 ----------

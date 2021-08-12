@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.1.22
+Date: 2021-8-12
+  Functions:
+    - Added Player.get_selected_entity
+    - Added Entity.is_real_car
+    - Added EventManagerLite.ManagedLuaBootstrap.events
+    - Added Gui.constructioneer
+  Bugfixes:
+    - Fixed: Color was returning a reference to the internal table for named colors.
+---------------------------------------------------------------------------------------------------
 Version: 4.1.21
 Date: 2021-7-28
   Bugfixes:

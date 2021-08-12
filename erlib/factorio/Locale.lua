@@ -26,6 +26,7 @@ local stop        = elreq('erlib/lua/Error'     )().Stopper 'Locale'
 -- local verify      = Verificate.verify
 local assertify   = elreq('erlib/lua/Error'     )().Asserter(stop)
 
+local Array       = elreq('erlib/lua/Array'     )()
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -155,17 +156,29 @@ function Locale.compress(lstr)
 -- @usage
 --   game.print{'', Locale.format_hotkey_tooltip('Left mouse button', 'to do something awesome!')}
 --
--- @tparam string key The hotkey
--- @tparam string description The description
+-- @tparam[opt] string key The hotkey
+-- @tparam[opt] string description The description
 -- @treturn string A richt-text-tag decorated plain string.
 function Locale.format_hotkey_tooltip(key, description)
-  return table.concat {
-    '[font=default-semibold]',
-    '[color=#7dcff3]', key        , '[/color] ',
-    '[color=#ffe5bd]', description, '[/color]',
-    '[/font]'
-    }
-  end
+  -- V1
+  -- return table.concat {
+  --   '[font=default-semibold]',
+  --   '[color=#7dcff3]', key        , '[/color] ',
+  --   '[color=#ffe5bd]', description, '[/color]',
+  --   '[/font]'
+  --   }
+  
+  -- V2
+  assert(key or description, 'Must give either key or description.')
+  local r = Array {'[font=default-semibold]'}
+  if key then
+    r:extend{'[color=#7dcff3]', key        , '[/color] '}
+    end
+  if description then
+    r:extend{'[color=#ffe5bd]', description, '[/color]' }
+    end
+  r:extend{'[/font]'}
+  return table.concat(r) end
   
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

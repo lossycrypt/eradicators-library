@@ -55,8 +55,7 @@ local Prototype,_Prototype,_uLocale = {},{},{}
 -- `"LuaVirtualSignalPrototype"`, 
 -- `"LuaVirtualSignal"`,
 -- `"VirtualSignal"` or
--- `"virtual_signal"`. Try to stick to one format as __mixing them
---   costs additional memory__ for memoization.
+-- `"virtual_signal"`.
 -- @tparam string name
 -- @treturn string
 -- @function Prototype.get_absolute_order
@@ -64,8 +63,9 @@ do
   local order = {}
   --
   local irregular = {
-    group    = 'item_group'   ,
-    subgroup = 'item_subgroup',
+    group      = 'item_group'   ,
+    subgroup   = 'item_subgroup',
+    item_stack = 'item'         ,
     }
   --
   local function _get_category(object_name)

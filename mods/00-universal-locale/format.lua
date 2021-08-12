@@ -142,6 +142,7 @@ local pattern_functions = {
       ['[map-gen-preset-description]'      ] = true,
       ['[technology-description]'          ] = true,
       ['[mod-description]'                 ] = true,
+      ['[item-description]'                ] = true,
       -- Reason: Automatically added by engine! Wtf!
       ['[controls-description]'] = true,
       }
@@ -183,6 +184,7 @@ local pattern_strings = {
   {'_UL:ICON_TOOLTIP_', '[img=info]'     },
 
   --hackfix
+  {'_UL:0SPACE_', ''},
   {'_UL:1SPACE_', ' '},
   {'_UL:2SPACE_', '  '},
   

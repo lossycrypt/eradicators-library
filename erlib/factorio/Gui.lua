@@ -20,9 +20,16 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 
+-- local log         = elreq('erlib/lua/Log'       )().Logger  'Gui'
+local stop        = elreq('erlib/lua/Error'     )().Stopper 'Gui'
+
 local Table       = elreq('erlib/lua/Table'        )()
 local Array       = elreq('erlib/lua/Array'        )()
 
+local Verificate  = elreq('erlib/lua/Verificate')()
+local verify      = Verificate.verify
+
+local isTable     = Verificate.isType.table
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -215,6 +222,246 @@ do
     return elm end
 
   end
+  
+  
+--------------------------------------------------------------------------------
+-- Constructor.
+-- @section
+--------------------------------------------------------------------------------
+
+--[[ Todo:
+
+  + Should have a seperate function that "normalized" an
+    input argument table.
+    
+    
+  + Gui.Constructor(theme)(spec)(element)
+    
+  + This is really old code (2020-03) and should be reviewed @ 2021-08.
+
+  ]]
+do -- start Constructor block
+    
+  local DefaultTheme = {
+    --if the default theme ever has table properties then it needs
+    --to be copied before merging in constructor.
+    ["button"            ] = {type="button"            },
+    ["sprite-button"     ] = {type="sprite-button"     },
+    ["choice-button"     ] = {type="choose-elem-button"},
+    ["choose-elem-button"] = {type="choose-elem-button"},
+    ["checkbox"          ] = {type="checkbox"          },
+    ["flow"              ] = {type="flow"              },
+    ["frame"             ] = {type="frame"             },
+    ["label"             ] = {type="label"             },
+    ["line"              ] = {type="line"              },
+    ["progressbar"       ] = {type="progressbar"       },
+    ["table"             ] = {type="table"             },
+    ["textfield"         ] = {type="textfield"         },
+    ["text-field"        ] = {type="textfield"         }, --typo protection
+    ["textbox"           ] = {type="text-box"          }, --typo protection
+    ["text-box"          ] = {type="text-box"          }, 
+    ["radiobutton"       ] = {type="radiobutton"       },
+    ["sprite"            ] = {type="sprite"            },
+    ["scroll-pane"       ] = {type="scroll-pane"       },
+    ["drop-down"         ] = {type="drop-down"         },
+    ["list-box"          ] = {type="list-box"          },
+    ["camera"            ] = {type="camera"            },
+    ["slider"            ] = {type="slider"            },
+    ["minimap"           ] = {type="minimap"           },
+    ["entity-preview"    ] = {type="entity-preview"    },
+    ["empty-widget"      ] = {type="empty-widget"      },
+    ["empty"             ] = {type="empty-widget"      },
+    ["tabbed-pane"       ] = {type="tabbed-pane"       },
+    ["tab"               ] = {type="tab"               },
+    ["switch"            ] = {type="switch"            },
+    
+    --some very basic shortcuts without styler
+    ['vertical_flow'     ] = {type='flow' ,direction='vertical'  },
+    ['horizontal_flow'   ] = {type='flow' ,direction=nil         }, --default direction! ;)
+    ['vertical_frame'    ] = {type='frame',direction='vertical'  },
+    ['horizontal_frame'  ] = {type='frame',direction=nil         }, --default direction! ;)
+    ["vertical_line"     ] = {type="line" ,direction='vertical'  },            
+    ["horizontal_line"   ] = {type="line" ,direction=nil         },      
+
+    }
+  
+  --these attributes are ignored by LuaGuiElement.add()
+  --and need to be applied *after* creating a new element.
+  local post_creation_attributes = {
+    'entity', 'word_wrap', 'locked', 'ignored_by_interaction',
+    }
+  
+  --resolves all parent relationships in the theme so that each ThemedType
+  --becomes fully specified and does not need additional lookups at runtime.
+  local themed_type_remapper = Table.remapper{
+    [1] = 'type',
+    [2] = 'path',
+    }
+  local styler_remapper = Table.remapper{
+    [1] = 'width' ,
+     w  = 'width' ,
+    [2] = 'height',
+     h  = 'height',
+    }
+  local function merge_stylers(s1,s2)
+    return Table.smerge(
+      styler_remapper(Table.fcopy(s1) or {}), -- hotfix: "or {}" 2021-08-10
+      styler_remapper(Table.fcopy(s2) or {})
+      )
+    end
+  local function _normalise_theme (user_theme)
+    --don't touch input table!
+    -- local theme = Table.fcopy(Table.smerge({},DefaultTheme,user_theme))
+    local theme = Table.normalizer(DefaultTheme)(Table.fcopy(user_theme)) -- potential change of DefaultTheme, relevant?
+    --remap shortcuts
+    for name,themed_type in pairs(theme) do
+      theme[name] = themed_type_remapper(themed_type)
+      end
+    --resolve inheritance
+    local done
+    repeat
+      done = true
+      for name,themed_type in pairs(theme) do
+        local parent = theme[themed_type.type]
+        themed_type = Table.fcopy(themed_type)
+        if parent and (parent.type ~= themed_type.type) then
+          parent = Table.fcopy(parent)
+          local parent_type = parent.type
+          theme[name] = Table.smerge(parent,themed_type)
+          theme[name].type = parent_type --keep parent type
+          theme[name].styler = merge_stylers(parent.styler,themed_type.styler)
+          done = false
+          end
+        end
+      until done == true
+    return theme end
+  
+  --hardcodes all ThemedType properties directly into the layout
+  --@norm_theme: a *normalised* theme
+  --@user_layout: a user supplied layout table
+  local function _normalise_layout (norm_theme,user_layout)
+    local normalizers = {}
+    for name,themed_type in pairs(norm_theme) do
+      normalizers[name] = Table.normalizer(themed_type)
+      end
+    local function walk(user_layout)
+      verify(user_layout,'NonEmptyArray')
+      local norm_layout = {}
+      for i=1,#user_layout do
+        local this = user_layout[i]
+        assert(this[1], 'Empty table in layout')
+        if isTable(this[1]) then --a group of children
+          norm_layout[i] = walk(this)
+        else
+          --1) translate [1] -> ['type'], etc...
+          this = themed_type_remapper(Table.fcopy(this)) --copy per node to make reused stylers unique
+          local parent_styled_type = norm_theme[this.type]
+          --2) insert ThemedType into layout
+          this = normalizers[this.type or stop('Layout has unknown ThemedType',this)](this)
+          --3) fix type non-inheritance
+          this.type = parent_styled_type.type
+          --4) translate [1] -> ['width'], etc...
+          this.styler = merge_stylers(parent_styled_type.styler,this.styler)
+          --5) extract extras
+          this.extras = {}
+          for _,name in pairs(post_creation_attributes) do
+            if this[name] ~= nil then this.extras[name] = this[name]; this[name] = nil end
+            end
+          --6) pluralize path
+          if this.path then this.path = Table.plural(this.path) end
+          --7) remove empty
+          this.tags   = Table.nil_if_empty(this.tags  )
+          this.styler = Table.nil_if_empty(this.styler)
+          this.extras = Table.nil_if_empty(this.extras)
+          --8) store
+          norm_layout[i] = this
+          end
+        end
+      return norm_layout end
+    return walk(user_layout) end
+    
+  --@norm_layout: a layout table with all themed properties pre-encoded
+  --@root: LuaGuiElement. The root element that the layout will be added to.
+  local Table_simple_set = Table.set
+  local function _construct (norm_layout,root,return_last_first)
+    if not root.valid then stop('Invalid root elemeent for gui construction') end
+    local r = {}
+    local last = root
+    local function build (parent,layout)
+      local next_parent = parent
+      for i=1,#layout do
+        local this = layout[i]
+        if not this.type then
+          build(next_parent,this)
+        else
+          last = parent.add(this)
+          next_parent = last
+          if this.path   then Table_simple_set(r,this.path,last)                     end
+          if this.extra  then for k,v in pairs(this.extras) do last[k] = v           end end
+          if this.tags   then last.tags = this.tags end
+          -- if this.tags   then for k,v in pairs(this.tags  ) do Gui.set_tag(last,k,v) end end
+          if this.styler then
+            local style = last.style; for k,v in pairs(this.styler) do style[k] = v end
+            end
+          end
+        end
+      end
+    build(root, norm_layout)
+    if return_last_first then return last, r end
+    return r end
+  
+  ----------
+  -- Makes Guis.
+  -- __Curried function__. __Unsupported draft.__
+  -- @usage Gui.constructioneer(theme)(layout)(root, return_last_first)
+  -- 
+  -- @tparam[opt] RuntimeTheme theme
+  -- @tparam GuiLayout layout
+  -- @tparam LuaGuiElement root 
+  -- @tparam boolean return_last_first
+  -- 
+  -- @treturn table 
+  -- 
+  -- @function Gui.constructioneer
+  function Gui.constructioneer (user_theme)
+    local norm_theme = _normalise_theme(user_theme)
+    return function (user_layout)
+      local norm_layout = _normalise_layout(norm_theme, user_layout)
+      return function (root, return_last_first) -- constructor function
+        return _construct(norm_layout, root, return_last_first)
+        end
+      end
+    end
+  
+  ----------
+  -- Constructioneer theme.
+  -- @tfield string type A LuaGuiElement type.
+  -- @field[opt] ... Additional @{FOBJ LuaGuiElement.add} arguments.
+  -- @table RuntimeTheme
+
+  ----------
+  -- Constructioneer layout.
+  -- Recursively specifies a Guis layout. Each ElementSpec creates a new
+  -- relative root element for the subsequent GuiLayouts.
+  -- 
+  -- @tfield DenseArray ... An array of ElementSpec or GuiLayout.
+  -- @table GuiLayout
+  
+  ----------
+  -- Constructioneer Element.
+  -- @tfield string 1 ThemedType
+  -- @tfield string type ThemedType
+  -- @tfield RuntimeStyle styler
+  -- @table ElementSpec
+  
+  ----------
+  -- Constructioneer style.
+  -- A table of LuaStyle (key -> value) pairs.
+  -- @table RuntimeStyle
+  
+  end -- end Constructor block
+  
+  
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --

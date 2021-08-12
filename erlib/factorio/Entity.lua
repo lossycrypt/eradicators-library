@@ -108,6 +108,21 @@ function Entity.get_vehicle_driver_player(vehicle)
     end
   end
   end
+  
+  
+----------
+-- Filter out fake cars. 
+-- "Car" type entities are often used as mod hacks, such as frame stepped
+-- animations or letting the player enter buildings.
+-- This checks if a car is actually movable and rotatable by the player.
+--
+-- @tparam LuaEntity entity An entity of type `"car"`.
+-- @treturn boolean
+function Entity.is_real_car(entity)
+  local prot = entity.prototype
+  return ( prot.rotation_speed > 0.001 ) 
+     and ((prot.effectivity * entity.effectivity_modifier) > 0.001)
+  end
 
 --------------------------------------------------------------------------------
 -- Inventory.
@@ -120,6 +135,7 @@ function Entity.get_vehicle_driver_player(vehicle)
 --
 -- @tparam LuaEntity entity
 -- @return dictionary[string → number]
+-- @function Entity.get_item_contents
 do
   -- It does not matter what the inventory index means
   -- because all inventories are scanned.
@@ -141,7 +157,7 @@ do
         local inv = entity.get_inventory(i)
         if inv then
           for name, count in pairs(inv.get_contents()) do
-            r[name] = (r[name] and r[name] + count) or count
+            r[name] = (r[name] or 0) + count
             end
           end
         end

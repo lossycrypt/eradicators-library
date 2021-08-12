@@ -317,6 +317,7 @@ function Table.is_empty(tbl)
 -- @tparam table|nil tbl
 -- @treturn table|nil  
 function Table.nil_if_empty(tbl)
+  if tbl == nil then return nil end
   for _ in pairs(tbl) do return _toTable(tbl) end
   end
 
@@ -593,11 +594,11 @@ function Table.first_value(tbl)
 -- 
 -- @treturn NotNil|nil 
 -- 
-function Table.get(tbl,path,default)
+function Table.get(tbl, path, default)
   -- path actually allows MixedTable
   -- the extra data in the non-array part must be silently ignored
   local r = tbl
-  for i=1,#path do
+  for i=1, #path do
     if type(r) == 'table' then
       r = r[ path[i] ]
     else
@@ -625,7 +626,7 @@ function Table.get(tbl,path,default)
 function Table.set(tbl,path,value)
   local r = tbl
   local n = #path
-  for i=1,n-1 do
+  for i=1, n-1 do
     local k = path[i]
     if r[k] == nil then r[k] = {} end -- checking type(r[k])=='table') makes it slower.
     r = r[k]
@@ -870,7 +871,8 @@ function Table.smerge(tbl,tbl2)
       tbl[k] = v
       end
     end
-  return _toTable(tbl)
+  -- return _toTable(tbl)
+  return tbl
   end
 
 ----------
@@ -1331,7 +1333,8 @@ function Table.remapper (mappings,allow_tables_as_keys)
           for i=1,#new do tbl[ new[i] ] = v end
           end
         end
-      return _toTable(tbl)
+      -- return _toTable(tbl)
+      return tbl
       end
   else
     --edge case: tables as keys
@@ -1341,7 +1344,8 @@ function Table.remapper (mappings,allow_tables_as_keys)
           tbl[new], tbl[old] = tbl[old], nil
           end
         end
-      return _toTable(tbl)
+      -- return _toTable(tbl)
+      return tbl
       end
     end
   end

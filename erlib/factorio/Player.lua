@@ -39,6 +39,7 @@ local Table      = elreq('erlib/lua/Table'     )()
 -- local Compose    = elreq('erlib/lua/Meta/Compose')()
 -- local L          = elreq('erlib/lua/Lambda'    )()
 
+local Memoize = elreq('erlib/lua/Meta/Memoize')()
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -142,6 +143,55 @@ function Player.toggle_shortcut (p, name)
   p.set_shortcut_toggled(name,state)
   return state end
 
+--------------------------------------------------------------------------------
+-- Draft.
+-- @section
+--------------------------------------------------------------------------------
+
+  
+----------
+-- Gets the currently selected entity.
+--
+-- While holding a blueprint entity selection is not updated naturally
+-- and @{FOBJ LuaControl.update_selected_entity} does not work. In that case
+-- a best-guess result using @{FOBJ LuaSurface.find_entities_filtered}
+-- is returned.
+--
+-- __Note:__ Emulation does _not_ check for entity visibility
+-- (`force_visibility`, `render_to_forces`, etc). Emulation 
+-- is based on `collision_box` instead of `selection_box`.
+--
+-- __Related MIR:__
+-- [Method to get "selected" entity while player is holding a blueprint.](https://forums.factorio.com/viewtopic.php?f=28&t=99478)
+--
+-- @tparam LuaPlayer p
+-- @tparam Position position
+--
+-- @treturn nil|LuaEntity
+-- @function Player.get_selected_entity
+do
+  local priorities = Memoize(function(name)
+    return game.entity_prototypes[name].selection_priority end)
+  --
+  function Player.get_selected_entity(p, position)
+    if p.is_cursor_blueprint() and assert(position) then
+      -- @future: Check size difference of selection_box and collision_box. 
+      -- @future: prototype.force_visibility is not available at runtime?
+      local selected
+      local next, tbl, key = pairs(
+        p.surface.find_entities_filtered{position = position}
+        )
+      key, selected = next(tbl, key)
+      for _, entity in next, tbl, key do
+        local a, b = priorities[entity.name], priorities[selected.name]
+        if (a > b) or ((a == b) and (entity.position.y > selected.position.y)) then
+          selected = entity
+          end
+        end
+      return selected
+      end
+    return p.selected end
+  end
   
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

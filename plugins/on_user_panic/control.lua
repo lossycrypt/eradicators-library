@@ -41,7 +41,8 @@ local on_user_panic = script.generate_event_name 'on_user_panic'
 --     Player.get_event_player(e).print{e.calming_words, 'name-of-your-content'}
 --     end)
 -- 
--- @tfield[opt] uint player_index
+-- @tfield[opt] uint player_index Commands typed on the server console do
+-- not have a `player_index`.
 -- @tfield string message
 -- @tfield string calming_words The key for the localised string you
 -- should print when you're done.
