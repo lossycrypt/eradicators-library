@@ -483,7 +483,8 @@ function Array.unsorted_remove_value(arr,value,i)
       arr[n],arr[k] = nil,arr[n] -- order is important to delete k==n
       end
     end
-  return _toArray(arr), count
+  -- return _toArray(arr), count
+  return arr, count
   end
   
   

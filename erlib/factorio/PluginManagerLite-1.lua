@@ -171,15 +171,19 @@ function Public.enable_savedata_management()
   --
   -- @tparam string plugin_name
   -- @tparam function setter Will be called setter(Savedata) in on\_load and on\_config.
-  -- (See @{EventManagerLite.boostrap_event_order} regarding on_init.)
+  -- (See @{EventManagerLite.boostrap_event_order} regarding on\_init.)
   -- @tparam[opt] table default The default layout for your Savedata.
   -- Use if you want certain subtables to always exist. In on_config any
   -- key that doesn't exist in the Savegame yet will be copied from this.
+  -- This parameter may only be given once for each plugin\_name.
   --
   -- @usage
-  --   local Savedata; PM.manage_savedata('plugin_name', function(_) Savedata = _ end, {
-  --     players = {}, forces = {}, surfaces = {}, map = {}
-  --     })
+  --   local Savedata
+  --   PluginManager.manage_savedata(
+  --      'plugin_name',
+  --      function(_) Savedata = _ end,
+  --      {players = {}, forces = {}, surfaces = {}, map = {}}
+  --      )
   --
   -- @function PluginManagerLite.manage_savedata
   function Public.manage_savedata(plugin_name, setter, default)
@@ -188,6 +192,10 @@ function Public.enable_savedata_management()
     log:debug('Recieved savedata setter for ', plugin_name)
     local this   = Table.sget(ManagedPlugins, {plugin_name}, {})
     this.path    = {'plugin_manager', 'plugins', plugin_name}
+    if default ~= nil then 
+      assert( (this.default == nil) or (Table.size(this.default) == 0)
+        , 'Savedata defaults may only be specified once.')
+      end
     this.default = Table.dcopy(default or {})
     table.insert(Table.sget(this, {'setters'}, {}), setter)
     end

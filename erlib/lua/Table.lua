@@ -1078,7 +1078,8 @@ function Table.scopy(tbl)
   else
     local r = {}
     for k,v in pairs(tbl) do r[k] = v end
-    return _toTable(r)
+    -- return _toTable(r)
+    return r
     end
   end
   

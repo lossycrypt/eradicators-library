@@ -55,12 +55,16 @@ local table_insert, table_remove = table.insert, table.remove
 -- in the first event you need it.
 -- 
 -- __Warning:__ Because the constructor is called in a non-deterministic
--- way it will cause desyncs if you try to do anything else except reading
--- startup settings or game.*_prototypes.
+-- way it will cause desyncs or other weird bugs if you try to do anything
+-- else than reading startup settings or game.*_prototypes.
 -- 
--- @tparam function constructor This is called exactly once with an empty table
--- as the only argument. Is must then fill that table with the desired values.
+-- @tparam function constructor This is called exactly once __with an empty table__
+-- as the only argument. Is __must then fill that table__ with the desired values.
+-- It __must absolutely not__ change any other part of the lua state except this table.
+-- Any values returned by this function are discarted.
+--
 -- @treturn table the AutoCache'ed table.
+--
 --
 -- @function Cache.AutoCache
 --

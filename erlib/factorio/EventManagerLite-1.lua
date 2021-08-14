@@ -170,7 +170,10 @@ Public.events, generate_event_name, EventPIG
 -- -------------------------------------------------------------------------- --
 local script = assert(_ENV.script) -- LuaObjects can not be copied!
 assert(script.object_name == 'LuaBootstrap')
-_ENV.script = setmetatable({},{
+_ENV.script = setmetatable({
+  -- secret exception for sub-modules *without* events.
+  mod_name = script.mod_name,
+  },{
   __index = function() stop('LuaBootstrap is disabled by EventManagerLite.') end
   })
 
