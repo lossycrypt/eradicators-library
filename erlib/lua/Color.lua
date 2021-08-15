@@ -104,7 +104,9 @@ local color_table = (function(r)
   -- Factorio Colors
   ['active-provider' ] = {r=107/255,g= 52/255,b=129/255,a= 90/255}, -- why alpha?
   ['passive-provider'] = {r=139/255,g= 50/255,b= 34/255,a= 90/255},
-  ['storage'         ] = {r=192/255,g=146/255,b= 68/255,a= 90/255},
+  -- ['storage'         ] = {r=192/255,g=146/255,b= 68/255,a= 90/255}, -- too orange?
+  -- ['storage'         ] = {r=226/255,g=182/255,b= 45/255,a= 90/255}, -- screenshot
+  ['storage'         ] = {r=213/255,g=170/255,b= 20/255,a= 90/255}, -- /color yellow
   ['buffer'          ] = {r= 98/255,g=185/255,b=111/255,a= 90/255},
   ['requester'       ] = {r= 48/255,g= 72/255,b=121/255,a= 90/255},
   ['infinity-chest'  ] = {r=147/255,g= 34/255,b= 95/255,a= 30/255},

@@ -20,6 +20,14 @@ local NIL = ercfg.NIL
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 
+-- local Verificate  = elreq('erlib/lua/Verificate'   )()
+-- local verify      = Verificate.verify
+-- local isType      = Verificate.isType
+
+
+local Table      = elreq('erlib/lua/Table'     )()
+local Filter     = elreq('erlib/lua/Filter'    )()
+
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -30,19 +38,33 @@ local Memoize,_Memoize,_uLocale = {},{},{}
 local _Memo1, _MemoN
 
 
+-- -- V1
+-- -- Simple argument splitter 1<>N
+-- local function Memoize(constructor, n, max_cache_size)
+--   assert(type(constructor) == 'function', 'Constructor must be a function.')
+--   if (n or 1) == 1 then
+--     -- does not check max_cache_size because it would be too expensive to
+--     -- check on every call.
+--     return _Memo1(constructor)
+--   else
+--     return _MemoN(n, constructor, max_cache_size)
+--     end
+--   end
 
+-- V2  
 -- Simple argument splitter 1<>N
-local function Memoize(constructor, n, max_cache_size)
-  assert(type(constructor) == 'function', 'Constructor must be a function.')
-  if (n or 1) == 1 then
-    -- does not check max_cache_size because it would be too expensive to
-    -- check on every call.
-    return _Memo1(constructor)
+local function Memoize(a, b, c)
+  if type(a) == 'function' then
+    return _Memo1(a)
+  elseif type(c) == 'function' then
+    return _MemoN(a, b, c)
   else
-    return _MemoN(n, constructor, max_cache_size)
+    error('No function given to Memoize().')
     end
   end
 
+-- -------------------------------------------------------------------------- --
+  
 
 ----------
 -- A single-argument-function memory-table. Very fast.
@@ -52,7 +74,7 @@ local function Memoize(constructor, n, max_cache_size)
 -- any returned table before you alter them, or you will alter the cached
 -- table, and therefore all future results.
 -- 
--- @tparam function constructor
+-- @tparam function f
 -- @treturn table a function-like indexable MemoTable.
 -- @function Memoize
 --
@@ -71,10 +93,10 @@ local function Memoize(constructor, n, max_cache_size)
 --   local four = memodoubleup[2]
 
 -- Simple one-argument Memoizer (V2)
-function _Memo1(constructor)
+function _Memo1(f)
   return setmetatable({}, {
     __index = function(self, key)
-      local value = constructor(key) -- Can be nil.
+      local value = f(key) -- Can be nil.
       rawset(self, key, value)
       return value end,
     __call = function(self, key)
@@ -86,8 +108,54 @@ function _Memo1(constructor)
     })
   end
 
-  
+-- -------------------------------------------------------------------------- --
+
+
 ----------
+-- A multi-argument-function memoizer.
+-- 
+-- @tparam NaturalNumber arg_count The number of arguments that `f` takes.
+-- @tparam boolean copy_result If true then calling the memoized function
+-- will use @{Table.dcopy} to copy the result before returning it. This is
+-- only useful if the returned value is a table. If false
+-- a direct reference will be passed.
+-- 
+-- @tparam function f The function to memoize. The function must return
+-- __exactly one__ @{NotNil} value when called.
+-- 
+-- @treturn function A memoized version of `f`. It must be called with
+-- exactly `arg_count` arguments of type @{NotNil}. `{args} -> result`
+-- loopup uses lua object identity, so be careful when passing tables.
+-- 
+-- @function Memoize
+  do
+  local _returners = {[true] = Table.dcopy, [false] = Filter.PASS}
+  local get, set = Table.get, Table.set
+function _MemoN(arg_count, copy_result, f)
+  --
+  assert(type(arg_count) == 'number')
+  assert(arg_count > 0, 'arg_count must be NaturalNumber')
+  local copy = assert(_returners[copy_result], 'copy_result must be boolean')
+  local cache = {}
+  --
+  return function(...)
+    local path = {...}
+    assert(#path == arg_count, 'Wrong number of arguments')
+    local r = get(cache, path)
+    if r == nil then
+      r = set(cache, path, (f(...)))
+      assert(r ~= nil, 'Function result was nil')
+      end
+    return copy(r) end
+  end
+  end
+  
+  
+--[==[
+-- -------------------------------------------------------------------------- --
+-- Trash
+  
+-- -------
 -- __EXPERIMENTAL__ A multi-argument function memoizing wrapper.
 --
 -- __NOTE:__ Argument comparison is based on standard Lua identity. All arguments
@@ -174,7 +242,7 @@ do
     end
   end
   
-
+--]==]
   
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

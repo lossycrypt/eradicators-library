@@ -781,7 +781,7 @@ function Deprecated.force_update(force)
 do
   local subcommands
   local on_cmd = script.on_event(defines.events.on_console_command, function(e)
-    if (e.command == 'babelfish') then
+    if (e.command == 'babelfish') and e.player_index then
       local pdata, p = Savedata:sget_pdata(e)
       local f = subcommands[e.parameters]
       if f then

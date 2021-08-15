@@ -56,10 +56,10 @@ local table_insert, table_remove = table.insert, table.remove
 -- 
 -- __Warning:__ Because the constructor is called in a non-deterministic
 -- way it will cause desyncs or other weird bugs if you try to do anything
--- else than reading startup settings or game.*_prototypes.
+-- other than reading startup settings or game.*_prototypes.
 -- 
 -- @tparam function constructor This is called exactly once __with an empty table__
--- as the only argument. Is __must then fill that table__ with the desired values.
+-- as the only argument. It __must then fill that table__ with the desired values.
 -- It __must absolutely not__ change any other part of the lua state except this table.
 -- Any values returned by this function are discarted.
 --

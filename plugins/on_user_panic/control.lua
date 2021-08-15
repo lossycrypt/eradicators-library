@@ -32,6 +32,10 @@ local on_user_panic = script.generate_event_name 'on_user_panic'
 -- You should trigger some generic sanity checking and garbage
 -- collection of your mods internal state now.
 -- 
+-- Commands typed on the server console and commands raised by mods
+-- do not have a `player_index`, making them indistinguishable
+-- from each other, so they are filtered out.
+-- 
 -- Abstract:
 -- @{FAPI events on_console_chat}  
 --
@@ -41,8 +45,7 @@ local on_user_panic = script.generate_event_name 'on_user_panic'
 --     Player.get_event_player(e).print{e.calming_words, 'name-of-your-content'}
 --     end)
 -- 
--- @tfield[opt] uint player_index Commands typed on the server console do
--- not have a `player_index`.
+-- @tfield uint player_index (__not optional__)
 -- @tfield string message
 -- @tfield string calming_words The key for the localised string you
 -- should print when you're done.
@@ -51,7 +54,7 @@ local on_user_panic = script.generate_event_name 'on_user_panic'
 -- @table on_user_panic
 
 script.on_event(defines.events.on_console_chat, function(e)
-  if e.message == "DON'T PANIC!" then
+  if e.player_index and (e.message == "DON'T PANIC!") then
     e.calming_words = 'er.dont-panic-calming-words'
     script.raise_event(on_user_panic, e)
     end

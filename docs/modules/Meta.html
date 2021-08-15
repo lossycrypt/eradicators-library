@@ -131,12 +131,12 @@
 <h2><a href="#lua_Meta_Memoize_Functions">lua.Meta.Memoize Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Memoize">Memoize(constructor)</a></td>
+	<td class="name" nowrap><a href="#Memoize">Memoize(f)</a></td>
 	<td class="summary">A single-argument-function memory-table.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Memoize">Memoize(constructor[, argcount=1[, max_cache_size=9000]])</a></td>
-	<td class="summary"><strong>EXPERIMENTAL</strong> A multi-argument function memoizing wrapper.</td>
+	<td class="name" nowrap><a href="#Memoize">Memoize(arg_count, copy_result, f)</a></td>
+	<td class="summary">A multi-argument-function memoizer.</td>
 	</tr>
 </table>
 <h2><a href="#lua_Meta_SwitchCase_Functions">lua.Meta.SwitchCase Functions</a></h2>
@@ -279,7 +279,7 @@
     <dl class="function">
     <dt>
     <a name = "Memoize"></a>
-    <strong>Memoize(constructor)</strong>
+    <strong>Memoize(f)</strong>
     </dt>
     <dd>
     A single-argument-function memory-table.  Very fast.</p>
@@ -292,7 +292,7 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">constructor</span>
+        <li><span class="parameter">f</span>
             <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
 
 
@@ -329,37 +329,29 @@
 </dd>
     <dt>
     <a name = "Memoize"></a>
-    <strong>Memoize(constructor[, argcount=1[, max_cache_size=9000]])</strong>
+    <strong>Memoize(arg_count, copy_result, f)</strong>
     </dt>
     <dd>
-    <strong>EXPERIMENTAL</strong> A multi-argument function memoizing wrapper. </p>
-
-<p> <strong>NOTE:</strong> Argument comparison is based on standard Lua identity. All arguments
- must be valid table keys or nil. There is
- no magic that checks if the content of a table given as argument machtes
- the content of a table given in a previous function call. Therefore it is advisable
- to only memoize functions that take number and string arguments exclusively.</p>
-
-<p> <strong>NOTE:</strong> If the function returns tables you should copy them before use. See
- note above.
+    A multi-argument-function memoizer.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">constructor</span>
+        <li><span class="parameter">arg_count</span>
+            <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
+         The number of arguments that <code>f</code> takes.
+        </li>
+        <li><span class="parameter">copy_result</span>
+            <span class="types"><a class="type" href="../api/Builtin-Types.html#boolean">boolean</a></span>
+         If true then calling the memoized function
+ will use <a href="../modules/Table.html#dcopy">Table.dcopy</a> to copy the result before returning it. This is
+ only useful if the returned value is a table. If false
+ a direct reference will be passed.
+        </li>
+        <li><span class="parameter">f</span>
             <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
-         the function to be memoized
-        </li>
-        <li><span class="parameter">argcount</span>
-            <span class="types"><a class="type" href="../api/Builtin-Types.html#int">int</a></span>
-         the maximum number of positional arguments that the function takes.
-         (<em>default</em> 1)
-        </li>
-        <li><span class="parameter">max_cache_size</span>
-            <span class="types"><a class="type" href="../api/Builtin-Types.html#int">int</a></span>
-         the maximum size of the set of possible argument
- combinations to cache. If the cache grows beyond this size it will be flushed.
-         (<em>default</em> 9000)
+         The function to memoize. The function must return
+ <strong>exactly one</strong> <a href="../modules/Types.html#NotNil">NotNil</a> value when called.
         </li>
     </ul>
 
@@ -367,21 +359,13 @@
     <ol>
 
            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
-         the memoized wrapper that behaves like the original function
- except that it does not call the function if there is a known cached result
- for the given combination of arguments.
+         A memoized version of <code>f</code>. It must be called with
+ exactly <code>arg_count</code> arguments of type <a href="../modules/Types.html#NotNil">NotNil</a>. <code>{args} -&gt; result</code>
+ loopup uses lua object identity, so be careful when passing tables.
     </ol>
 
 
 
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> g = <span class="keyword">function</span>(a,b,c,d,e) <span class="keyword">return</span> a*b*c*d*e <span class="keyword">end</span>
-<span class="keyword">local</span> f = Memoize(g,<span class="number">5</span>)
-<span class="global">print</span>(f(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>))
-&gt; <span class="number">120</span>
-</pre>
-    </ul>
 
 </dd>
 </dl>
@@ -446,7 +430,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-08-14 04:31:05 </i>
+<i style="float:right;">Last updated 2021-08-15 02:45:19 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

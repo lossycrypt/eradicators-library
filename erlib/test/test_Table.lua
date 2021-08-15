@@ -271,7 +271,8 @@ local function Test()
   do
     local t1 = {'a',nil,'b'}
     local t2 = {nil,'b','c'}
-    assert(Table.smerge(t1,t2):is_equal{'a','b','c'})
+    -- assert(Table.smerge(t1,t2):is_equal{'a','b','c'})
+    assert(Table(t1):smerge(t2):is_equal{'a','b','c'})
     end
     
   -- Table.insert_once

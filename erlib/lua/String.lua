@@ -27,7 +27,7 @@ local string_gsub,string_gmatch,string_find,string_format,string_sub,
       table.concat,math.floor,math.ceil,string.lower
 
 local Hydra    = elreq ('erlib/lua/Coding/Hydra')()
-local Meta     = elreq ('erlib/lua/Meta/!init')()
+-- local Meta     = elreq ('erlib/lua/Meta/!init')()
 
 local stop = elreq('erlib/lua/Error')().Stopper('String')
 

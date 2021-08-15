@@ -885,6 +885,7 @@ function Table.smerge(tbl,tbl2)
 --
 function Table.sort(tbl, comp)
   table_sort(tbl, comp)
+  -- return _toTable(tbl)
   return _toTable(tbl)
   end
   
@@ -1117,7 +1118,8 @@ function Table.dcopy(tbl,remove_metatables)
     end
   -- Table metatable can only be attached to table types but should only
   -- be attached to the outer shell, not all subtables.
-  return _toTableIfTable(_copy(tbl))
+  -- return _toTableIfTable(_copy(tbl))
+  return _copy(tbl)
   end
   
 ----------
@@ -1153,7 +1155,8 @@ function Table.fcopy(tbl,remove_metatables)
         end
       end
     end
-  return _toTableIfTable(_copy(tbl,0))
+  -- return _toTableIfTable(_copy(tbl,0))
+  return _copy(tbl,0)
   end
 
   

@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.1.23
+Date: 2021-8-14
+  Functions:
+    - on_user_panic now filters out useless events without player_index.
+    - Properly implemented Meta.Memoize for multi-argument functions.
+---------------------------------------------------------------------------------------------------
 Version: 4.1.22
 Date: 2021-8-12
   Functions:
