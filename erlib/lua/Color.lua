@@ -102,15 +102,16 @@ local color_table = (function(r)
   ['White'          ]='FFFFFF', ['WhiteSmoke'       ]='F5F5F5', ['Yellow'              ]='FFFF00', ['YellowGreen'     ]='9ACD32',
   
   -- Factorio Colors
-  ['active-provider' ] = {r=107/255,g= 52/255,b=129/255,a= 90/255}, -- why alpha?
-  ['passive-provider'] = {r=139/255,g= 50/255,b= 34/255,a= 90/255},
-  -- ['storage'         ] = {r=192/255,g=146/255,b= 68/255,a= 90/255}, -- too orange?
-  -- ['storage'         ] = {r=226/255,g=182/255,b= 45/255,a= 90/255}, -- screenshot
-  ['storage'         ] = {r=213/255,g=170/255,b= 20/255,a= 90/255}, -- /color yellow
-  ['buffer'          ] = {r= 98/255,g=185/255,b=111/255,a= 90/255},
-  ['requester'       ] = {r= 48/255,g= 72/255,b=121/255,a= 90/255},
-  ['infinity-chest'  ] = {r=147/255,g= 34/255,b= 95/255,a= 30/255},
-  
+  -- (Question from the future: Why did these have hardcoded alpha?)
+  ['active-provider' ] = {r=107/255,g= 52/255,b=129/255,a= 90/255, a=1},
+  ['passive-provider'] = {r=139/255,g= 50/255,b= 34/255,a= 90/255, a=1},
+  -- ['storage'         ] = {r=192/255,g=146/255,b= 68/255,a= 90/255, a=1}, -- too orange?
+  -- ['storage'         ] = {r=226/255,g=182/255,b= 45/255,a= 90/255, a=1}, -- screenshot
+  ['storage'         ] = {r=213/255,g=170/255,b= 20/255,a= 90/255, a=1}, -- /color yellow
+  ['buffer'          ] = {r= 98/255,g=185/255,b=111/255,a= 90/255, a=1},
+  ['requester'       ] = {r= 48/255,g= 72/255,b=121/255,a= 90/255, a=1},
+  ['infinity-chest'  ] = {r=147/255,g= 34/255,b= 95/255,a= 30/255, a=1},
+
   ['black'           ] = {r=  0/255,g=  0/255,b=  0/255,a=255/255},
   ['white'           ] = {r=255/255,g=255/255,b=255/255,a=255/255},
   }

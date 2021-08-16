@@ -25,6 +25,7 @@
 # Keep assets
 !*.png
 !*.ogg
+!*.ttf
 
 # Keep documentation
 !/docs/**/*.html

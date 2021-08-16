@@ -156,7 +156,7 @@ script.on_event(
 -- 
 -- @tfield uint player_index
 -- @tfield uint|nil surface_index _If_ the player changed surfaces then this is
--- the old surfaces index.
+-- the _old_ surfaces index.
 -- @tfield ChunkPositionAndArea old_chunk
 -- @tfield ChunkPositionAndArea new_chunk
 --

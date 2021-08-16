@@ -568,10 +568,42 @@ function Array.extend(arr,arr2,i,j)
 function Array.sort(arr,comparator)
   if not comparator then err('Missing sorting function') end
   table_sort(arr,comparator)
-  return _toArray(arr)
+  -- return _toArray(arr)
+  return arr
   end
   
-
+----------
+-- __In-place.__ Randomized the order of the arrays values.
+--
+-- @tparam DenseArray arr
+-- @tparam[opt] NaturalNumber seed
+-- 
+-- @treturn DenseArray The now shuffled array.
+--
+function Array.fisher_yates_shuffle(arr, seed) -- Fisher-Yates
+  -- Factorio doc says:
+  -- "Using math.randomseed() in Factorio has no effect." (Libraries.html)
+  -- "The map's global random generator is shared between all mods and the core game" (Libraries.html)
+  -- "Seeds from 0 to 341 will produce the same results." (LuaRandomGenerator.html)
+  --
+  local rnd = math.random
+  --
+  if seed then
+    assert(seed >= 0, 'Seed too small')
+    if flag.IS_FACTORIO then
+      rnd = game.create_random_generator()
+      rnd.re_seed(seed+342) 
+    else
+      math.randomseed(seed)
+      end
+    end
+  --
+  for i = #arr, 2, -1 do
+    local j = rnd(1, i)
+    arr[i], arr[j] = arr[j], arr[i]
+    end
+  return arr end
+  
   
 --------------------------------------------------------------------------------
 -- Copy Methods.

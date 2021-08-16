@@ -123,9 +123,12 @@ function _Memo1(f)
 -- @tparam function f The function to memoize. The function must return
 -- __exactly one__ @{NotNil} value when called.
 -- 
--- @treturn function A memoized version of `f`. It must be called with
+-- @treturn function The memoized version of `f`. It must be called with
 -- exactly `arg_count` arguments of type @{NotNil}. `{args} -> result`
 -- loopup uses lua object identity, so be careful when passing tables.
+--
+-- @treturn function A parameterless function that can be called
+-- to clear the cached results. In case you want to free up memory.
 -- 
 -- @function Memoize
   do
@@ -147,6 +150,8 @@ function _MemoN(arg_count, copy_result, f)
       assert(r ~= nil, 'Function result was nil')
       end
     return copy(r) end
+    ,
+    function() cache = {} end
   end
   end
   
