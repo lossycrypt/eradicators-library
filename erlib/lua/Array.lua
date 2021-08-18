@@ -384,11 +384,11 @@ function Array.reverse(arr,target,i,j)
 -- __In-place.__ Removes redundant and nil values. Order of elements is unaffected.
 -- 
 -- @tparam DenseArray|SparseArray arr
--- @tparam[opt=nil] table target __Copy Mode.__ This table will be changed and arr remains unchanged.
 -- @tparam[opt] function f_ident A function `f(v)` that must take each value in the
 -- array and produce a unique @{NotNil} identifier value for comparision. Defaults
 -- to @{Filter.PASS}.
 -- 
+-- @tparam[opt=nil]  table target __Copy Mode.__ This table will be changed and arr remains unchanged.
 -- @tparam[opt=1]    NaturalNumber i First index to process. Mandatory for sparse input.
 -- @tparam[opt=#arr] NaturalNumber j Last index to process. Mandatory for sparse input.
 -- 

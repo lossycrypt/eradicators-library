@@ -629,32 +629,31 @@ players.akira.ammo[<span class="string">'ref'</span>] = players.yurie.ammo
     <dd>
     Iterates n-nested sub-tables in a single for-loop. </p>
 
-<p> Internally uses <a href="../lua-5.2/doc/manual.html#pdf-pairs">pairs()</a> to get each
- sub-table's __pairs metamethod or <a href="../lua-5.2/doc/manual.html#pdf-next">next()</a>.</p>
-
-<p> If a sub-table does not contain enough sub-tables to reach
- depth n it will be ignored. Likewise any non-table values
- at depth &lt; n will also be ignored.</p>
-
-<p> Returns every possible path of length n. This might
+<p> Returns every possible path of length n-1 and its value. This might
  lead to <strong>unexpected results</strong> when the input table is <strong>recursive</strong>
- or has multiple references to the same sub-table. See also <a href="../modules/Iter.html#dpairs">Iter.dpairs</a>.</p>
+ or has multiple references to the same sub-table. <br/>
+ See also <a href="../modules/Iter.html#dpairs">Iter.dpairs</a>.</p>
 
-<p> See also <a href="../lua-5.2/doc/manual.html#2.4   ">Metatables and Metamethods</a>.
+<p> Internally uses <a href="../lua-5.2/doc/manual.html#pdf-pairs">pairs()</a> to get each
+ sub-table's __pairs metamethod or <a href="../lua-5.2/doc/manual.html#pdf-next">next()</a>. <br/>
+ See also <a href="../lua-5.2/doc/manual.html#2.4   ">Metatables and Metamethods</a>.</p>
+
+<p> Every sub-table must be at least of depth <code>n-1</code> or
+ the loop will crash. Completely empty sub-tables are
+ the only exception and will instead be ignored.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">n</span>
             <span class="types"><a class="type" href="../modules/Types.html#NaturalNumber">NaturalNumber</a></span>
-         The length of the desired tuple. Values 1 and 2
- return pairs(tbl) instead.
+         The length of the desired tuple. The returned tuple
+ is of the form <code>(&quot;Key 1&quot;, &quot;Key 2&quot;, ..., &quot;Key n-1&quot;, &quot;Value&quot;)</code>, thus the value is
+ included in the length of the touple.
         </li>
         <li><span class="parameter">tbl</span>
             <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
-
-
-
+         The parent table to iterate into.
          (<em>optional</em>)
         </li>
     </ul>
@@ -662,12 +661,12 @@ players.akira.ammo[<span class="string">'ref'</span>] = players.yurie.ammo
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a> or <a class="type" href="https://www.lua.org/pil/2.1.html">nil</a></span>
+           <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
          There are three cases:</p>
 
 <p> When tbl == nil returns <a href="../modules/Filter.html#SKIP">Filter.SKIP</a>. <br/>
- When n &lt;= 2 returns the three result values of calling pairs(tbl). <br/>
- When n >  2 returns a stateful iterator function and nothing else.
+ When n &lt;= 2 returns the three values returned by <a href="../lua-5.2/doc/manual.html#pdf-pairs">pairs(tbl)</a>. <br/>
+ When n >  2 returns a stateful ntuples-iterator function and nothing else.
     </ol>
 
 
@@ -678,17 +677,14 @@ players.akira.ammo[<span class="string">'ref'</span>] = players.yurie.ammo
   yurie = {
     items = {<span class="string">'iron-plate'</span>, <span class="string">'copper-plate'</span>},
     ammo  = {<span class="string">'piercing'</span>  , <span class="string">'uranium'</span>     },
-    play_time = <span class="number">9001</span>, <span class="comment">-- ignored because it's not a table.
-</span>    },
+    },
   tarou = {
     items = {<span class="string">'iron-gear'</span> , <span class="string">'copper-gear'</span> },
-    ammo  = {}, <span class="comment">-- ignored because it's not deep enough.
-</span>    play_time = <span class="number">42</span>,
-    },
+    ammo  = {}, <span class="comment">-- empty table is ignored because it's not deep enough.
+</span>    },
   akira = {
     items = {},
     ammo  = {<span class="string">'exploding'</span> , <span class="string">'magic'</span>       },
-    play_time = <span class="number">7</span>,
     },
   }
 
@@ -696,14 +692,14 @@ players.akira.ammo[<span class="string">'ref'</span>] = players.yurie.ammo
   <span class="global">print</span>(nickname, <span class="global">type</span>, item_index, item_name)
   <span class="keyword">end</span>
 
-&gt; akira  ammo   <span class="number">1</span>  exploding
-&gt; akira  ammo   <span class="number">2</span>  magic
-&gt; yurie  ammo   <span class="number">1</span>  piercing
-&gt; yurie  ammo   <span class="number">2</span>  uranium
-&gt; yurie  items  <span class="number">1</span>  iron-plate
-&gt; yurie  items  <span class="number">2</span>  copper-plate
-&gt; tarou  items  <span class="number">1</span>  iron-gear
-&gt; tarou  items  <span class="number">2</span>  copper-gear
+&gt; yurie items <span class="number">1</span> iron-plate
+&gt; yurie items <span class="number">2</span> copper-plate
+&gt; yurie ammo  <span class="number">1</span> piercing
+&gt; yurie ammo  <span class="number">2</span> uranium
+&gt; tarou items <span class="number">1</span> iron-gear
+&gt; tarou items <span class="number">2</span> copper-gear
+&gt; akira ammo  <span class="number">1</span> exploding
+&gt; akira ammo  <span class="number">2</span> magic
 </pre>
     </ul>
 
@@ -950,7 +946,7 @@ players.akira.ammo[<span class="string">'ref'</span>] = players.yurie.ammo
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-08-18 19:07:33 </i>
+<i style="float:right;">Last updated 2021-08-18 23:54:20 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

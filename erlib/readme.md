@@ -36,6 +36,3 @@
   "EM": EventManagerLite
   "PM": PluginManagerLite
   
-  
-
-  

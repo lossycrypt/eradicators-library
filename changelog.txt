@@ -4,6 +4,8 @@ Date: 2021-8-18
   Functions:
     - Breaking Change! Array.deduplicate now takes a parameter "f_ident"
       to facilitate deduplicating complex arrays.
+    - Breaking Change! Iter.ntuples no longer accepts tables containing
+      non-tables at depths lower than n-1 to improve performance.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.24
 Date: 2021-8-15
