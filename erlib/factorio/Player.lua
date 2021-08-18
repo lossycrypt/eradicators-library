@@ -130,6 +130,31 @@ do
     
   end
   
+  
+----------
+-- Gets the item in the players cursor.
+--
+-- @tparam[opt] LuaPlayer p 
+-- @tparam[opt] table e If you don't have a LuaPlayer object you can
+-- instead pass an event table containing `player_index`.
+--
+-- @treturn nil|LuaItemStack Returns nil if the cursor was not
+-- @{FOBJ LuaItemStack.valid_for_read}.
+-- @treturn LuaPlayer
+--
+-- @function Player.get_valid_for_read_cursor_stack
+do local _msg = 'No player index given.'
+function Player.get_valid_for_read_cursor_stack(p, e)
+  local p  = p or Player.get_event_player(e)
+  local cs = p.cursor_stack
+  if cs and cs.valid and cs.valid_for_read then
+    return cs, p
+  else
+    return nil, p
+    end
+  end
+  end
+  
 ----------
 -- Sets a shortcut to the opposite state it is in now.
 --

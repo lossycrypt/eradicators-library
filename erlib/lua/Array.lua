@@ -51,6 +51,8 @@ local Table_size
 
 local Array,_Array,_uLocale = {},{},{}
 
+local FilterPASS = function(obj) return obj end -- recursive dependency avoidance
+
 -- -------------------------------------------------------------------------- --
 -- Metatable                                                                  --
 -- -------------------------------------------------------------------------- --
@@ -383,7 +385,10 @@ function Array.reverse(arr,target,i,j)
 -- 
 -- @tparam DenseArray|SparseArray arr
 -- @tparam[opt=nil] table target __Copy Mode.__ This table will be changed and arr remains unchanged.
---
+-- @tparam[opt] function f_ident A function `f(v)` that must take each value in the
+-- array and produce a unique @{NotNil} identifier value for comparision. Defaults
+-- to @{Filter.PASS}.
+-- 
 -- @tparam[opt=1]    NaturalNumber i First index to process. Mandatory for sparse input.
 -- @tparam[opt=#arr] NaturalNumber j Last index to process. Mandatory for sparse input.
 -- 
@@ -391,19 +396,22 @@ function Array.reverse(arr,target,i,j)
 -- was smaller than the largest array key. In copy mode if `i` was given
 -- all indexes will be shifted down by `i-1` so that the array always starts at 1.
 -- 
-function Array.deduplicate(arr, target, i, j)
-  -- (no test yet)
+function Array.deduplicate(arr, f_ident, target, i, j)
   i, j = (i or 1), (j or #arr)
   local n = target and 1 or i
   target = target or arr
+  f_ident = f_ident or FilterPASS
   local seen = {}
   for k = i, j do
     local v = arr[k]
     target[k] = nil
-    if (v ~= nil) and not seen[v] then
-      seen  [v] = true
-      target[n] = v
-      n = n + 1
+    if (v ~= nil) then
+      local v_ident = f_ident(v)
+      if not seen[v_ident] then
+        seen[v_ident] = true
+        target[n] = v
+        n = n + 1
+        end
       end
     end
   return target end

@@ -143,6 +143,7 @@ local pattern_functions = {
       ['[technology-description]'          ] = true,
       ['[mod-description]'                 ] = true,
       ['[item-description]'                ] = true,
+      ['[entity-description]'              ] = true,
       -- Reason: Automatically added by engine! Wtf!
       ['[controls-description]'] = true,
       }

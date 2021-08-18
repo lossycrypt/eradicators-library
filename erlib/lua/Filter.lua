@@ -142,7 +142,7 @@ function Filter.string_postfix(postfix)
 -- @tparam string infix The exact plain infix to look for. Not a lua pattern.
 -- 
 -- @treturn function The filter function f(str) returns true if __str contains__
--- the infix.
+-- the infix anywhere, including as a pre- or post-fix.
 -- 
 function Filter.string_infix(infix)
   return function(str)

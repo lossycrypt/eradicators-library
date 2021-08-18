@@ -228,15 +228,15 @@ local function Test()
     local t1, t2, t3 = f1(), f2(), f3()
     
     -- full copy mode
-    assert(equ(Array.deduplicate(t1, {}), {1,2,3,4,5}))
-    assert(equ(Array.deduplicate(t2, {}), {'a', 'b'}))
-    assert(equ(Array.deduplicate(t3, {}), {t1 , t2 }))
-    assert(equ(Array.deduplicate(t3, {}), {f1(), f2()}))
+    assert(equ(Array.deduplicate(t1, nil, {}), {1,2,3,4,5}))
+    assert(equ(Array.deduplicate(t2, nil, {}), {'a', 'b'}))
+    assert(equ(Array.deduplicate(t3, nil, {}), {t1 , t2 }))
+    assert(equ(Array.deduplicate(t3, nil, {}), {f1(), f2()}))
     
     -- partial copy mode
-    assert(equ(Array.deduplicate(t1, {}, 4   ), {4,1,2,3,5   }))
-    assert(equ(Array.deduplicate(t2, {}, 1, 3), {'a'         }))
-    assert(equ(Array.deduplicate(t3, {}, 2, 4), {f2() , f1() }))
+    assert(equ(Array.deduplicate(t1, nil, {}, 4   ), {4,1,2,3,5   }))
+    assert(equ(Array.deduplicate(t2, nil, {}, 1, 3), {'a'         }))
+    assert(equ(Array.deduplicate(t3, nil, {}, 2, 4), {f2() , f1() }))
     
     -- did copy change original?
     assert(equ(t1, f1()))
@@ -244,15 +244,21 @@ local function Test()
     assert(equ(t3, f3()))
     
     -- partial in-place mode
-    assert(equ(Array.deduplicate(f1(), nil, 2, 6 ), {1,2,3,4,1,nil,3,4,5}))
-    assert(equ(Array.deduplicate(f2(), nil, 2, 10), {'a','a','b'        }))
-    assert(equ(Array.deduplicate(f3(), nil, 2,  0), {f1(),f2(),f1(),f2()}))
-    assert(equ(Array.deduplicate(f3(), nil, 2    ), {f1(),f2(),f1()     }))
+    assert(equ(Array.deduplicate(f1(), nil, nil, 2, 6 ), {1,2,3,4,1,nil,3,4,5}))
+    assert(equ(Array.deduplicate(f2(), nil, nil, 2, 10), {'a','a','b'        }))
+    assert(equ(Array.deduplicate(f3(), nil, nil, 2,  0), {f1(),f2(),f1(),f2()}))
+    assert(equ(Array.deduplicate(f3(), nil, nil, 2    ), {f1(),f2(),f1()     }))
     
     -- full in-place mode
     Array.deduplicate(t1) assert(equ(t1, {1,2,3,4,5}))
     Array.deduplicate(t2) assert(equ(t2, {'a', 'b' }))
     Array.deduplicate(t3) assert(equ(t3, {f1() , f2()}))
+    
+    -- f_ident
+    local a  = { {a=2}, {a=3}, {a=2}, {b=4, a=2} }
+    local ar = { {a=2}, {a=3} }
+    local af = function(v) return v.a end
+    assert(equ(Array.deduplicate(a, af), ar)); assert(equ(a, ar)) -- in-place!
     end
     
   -- Array.insert_once
