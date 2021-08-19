@@ -115,6 +115,14 @@ local flag = shared[5]
     print(('―'):rep(100)..'\nshared.lua\n' )
   else
     -- log('ErLib is booting now.') -- Just don't. Not Warn or Error -> not important.
+    
+    -- It would be nice to have a method to print a line *once*
+    -- before loading a new save-game even in normal mode. Not
+    -- once per mod, just once for all mods.
+    if flag.IS_LIBRARY_MOD then
+      print(('―'):rep(100))
+      end
+    
     end
 
     

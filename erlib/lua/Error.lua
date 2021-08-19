@@ -62,7 +62,10 @@ if flag.IS_FACTORIO then
   template = {
     "  [color=default]                                                 ",
     "  ##### [%s : %s] #####                                           ",
-    "  I suspected this might happen. Please tell me how you got here. ",
+    -- "  I suspected this might happen. Please tell me how you got here. ",
+    "  Unexpected error. Please submit a bug report including this     ",
+    -- "  error message. Details on how this happend are also useful.     ",
+    "  error message. Detailed info how this happend would also help.  ",
     "                                                                  ",
     "  [color=red]%s[/color]                                           ",
     "                                                                  ",
