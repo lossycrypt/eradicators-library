@@ -14,6 +14,7 @@ return {
   'test_Json', 
   'test_Logic', 
   'test_Math', 
+  'test_Set', 
   'test_Sha2', 
   'test_Stacktrace', 
   'test_Table', 

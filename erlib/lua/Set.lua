@@ -6,12 +6,9 @@
 -- and @{wiki List_of_logic_symbols}. In unions and intersections of PseudoSets
 -- the values of Set B take precedence.
 --
--- __Note:__ All methods of this module that return a set also set the metatable
--- of the result to this module.
---
 -- __Note:__ This module inherits all @{Table} module methods.
 --
--- @{Introduction.DevelopmentStatus|Module Status}: Polishing.
+-- @{Introduction.DevelopmentStatus|Module Status}: Stable.
 --
 -- @module Set
 -- @usage
@@ -71,9 +68,17 @@ for k,v in pairs(_Table) do _Set[k] = v end
 
 local _obj_mt = {__index=Set}
 -- attach meta if safe
-local _toSet = function(tbl)
-  if not getmetatable(tbl) then setmetatable(tbl,_obj_mt) end
-  return tbl end
+-- local _toSet = function(tbl)
+  -- if not getmetatable(tbl) then setmetatable(tbl,_obj_mt) end
+  -- return tbl end
+-- force attach meta
+local _toSet = function(tbl, A, keep_meta)
+  if  (keep_meta ~= false)
+  and (getmetatable(A) == _obj_mt)
+    then return setmetatable(tbl, _obj_mt)
+    else return tbl end
+  end
+  
 -- user request to attach meta unconditionally
 do setmetatable( Set,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) end}) end
 do setmetatable(_Set,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) end}) end
@@ -90,11 +95,14 @@ do setmetatable(_Set,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) 
 
 
 ----------
--- Attaches the Set modules metatable to the tbl.
--- @tparam table tbl
--- @treturn PseudoSet
+-- Attaches this Set module as metatable to a table.  
+-- Alias for `setmetatable(set, {__index = Set})`.
+--
+-- @tparam table set
+-- @treturn PseudoSet The unchanged input table, now with metatable attached.
 -- @function Set
 do end
+
 
 --------------------------------------------------------------------------------
 -- Conversion
@@ -109,8 +117,8 @@ do end
 function Set.from_values(tbl)
   local s = {}
   for _,v in pairs(tbl) do s[v] = true end
-  return _toSet(s)
-  end
+  -- return _toSet(s) end
+  return s end
 
 ----------
 -- Creates a @{Set} that maps all keys from the input table to @{true} 
@@ -119,11 +127,18 @@ function Set.from_values(tbl)
 function Set.from_keys(tbl)
   local s = {}
   for k   in pairs(tbl) do s[k] = true end
-  return _toSet(s)
-  end
+  -- return _toSet(s) end
+  return s end
 
 --------------------------------------------------------------------------------
--- Creation
+-- Creation.
+--
+-- For all of these functions: If the input set `A` had the module metatable
+-- attached by calling `Set(A)` then the resulting set will automatically
+-- inherit the metatable. This behavior can be disabled by passing @{false}
+-- as a third parameter. Any metatable not created by `Set()` will never be
+-- inherited.
+--
 -- @section
 --------------------------------------------------------------------------------
 
@@ -131,37 +146,37 @@ function Set.from_keys(tbl)
   
 --- →∀x (Ax ∨ Bx)
 -- @treturn set
-function Set.union(A,B)
+function Set.union(A, B, keep_meta)
   local s = {}
   for k,v in pairs(A) do s[k]=v end
   for k,v in pairs(B) do s[k]=v end
-  return _toSet(s)
-  end
+  return _toSet(s, A, keep_meta) end
 
 --- →∀x (Ax ∧ Bx)
 -- @treturn set
-function Set.intersection(A,B)
+function Set.intersection(A, B, keep_meta)
   local s = {}
   for k,v in pairs(B) do
     if A[k] ~= nil then s[k]=v end
     end
-  return _toSet(s)
-  end
+  return _toSet(s, A, keep_meta) end
   
 --- →∀x (Ax ∧ ¬Bx)  
 -- @treturn set
-function Set.complement(A,B)
+function Set.complement(A, B, keep_meta)
   local s = {}
   for k,v in pairs(A) do
     if B[k] == nil then s[k]=v end
     end
-  return _toSet(s)
-  end
+  return _toSet(s, A, keep_meta) end
   
 --- →∀x (¬(Ax ∧ Bx))    
 -- @treturn set
-function Set.difference(A,B)
-  return Set.complement(A,B):union(Set.complement(B,A))
+function Set.difference(A, B, keep_meta)
+  return _toSet(Set.union(
+    Set.complement(A, B, false),
+    Set.complement(B, A, false)
+    ), A, keep_meta)
   end
 
 --------------------------------------------------------------------------------
@@ -173,40 +188,35 @@ function Set.difference(A,B)
 --- →∃e (Ae)
 -- @treturn boolean
 function Set.contains(A,e)
-  return A[e] ~= nil
-  end
+  return A[e] ~= nil end
   
 --- A⊃B, ∀xBx (Ax) ∧ ∃xAx (¬Bx)
 -- @treturn boolean
 function Set.is_superset(A,B)
   for k in pairs(B) do if A[k] == nil then return false end end
   for k in pairs(A) do if B[k] == nil then return true  end end
-  return false -- A==B
-  end
+  return false end -- A==B
 
 --- A⊂B, ∀xAx (Bx) ∧ ∃xBx (¬Ax)
 -- @treturn boolean
 function Set.is_subset(A,B)
-  return Set.is_superset(B,A)
-  end
+  return Set.is_superset(B,A) end
   
 --- A⇔B, ∀xAx (Bx) ∧ ∀xBx (Ax)
 -- @treturn boolean
 function Set.is_equal(A,B)
   for k in pairs(B) do if A[k] == nil then return false end end
   for k in pairs(A) do if B[k] == nil then return false end end
-  return true
-  end
+  return true end
 
 --- A∩B==∅, ¬∃xAx (Bx) ∧ ¬∃xBx (Ax), ∀xAx (¬Bx) ∧ ∀xBx (¬Ax).    
--- The empty set is disjoint from every other set.
+-- The empty set is disjoint from every set, including from itself.
 -- @treturn boolean
 function Set.is_disjoint(A,B)
   if Table_size(A) == 0 or Table_size(B) == 0 then return true end
   for k in pairs(A) do if B[k] ~= nil then return false end end
   for k in pairs(B) do if A[k] ~= nil then return false end end
-  return true
-  end
+  return true end
   
   
 --------------------------------------------------------------------------------

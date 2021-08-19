@@ -54,7 +54,6 @@
   <li><a href="../modules/Data.html">Data</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
-  <li><a href="../modules/EventManager.html">EventManager</a></li>
   <li><a href="../modules/EventManagerLite.html">EventManagerLite</a></li>
   <li><a href="../modules/Force.html">Force</a></li>
   <li><a href="../modules/Gui.html">Gui</a></li>
@@ -111,7 +110,7 @@
 <p> <strong>Note:</strong> This module inherits all native-Lua <a href="../lua-5.2/doc/manual.html#pdf-table">table</a> module methods unless
  overwritten by same-named local methods.</p>
 
-<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Experimental 2020-10-31.</p>
+<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Stable.</p>
     <h3>Usage:</h3>
     <ul>
         <pre class="example">local Table = require(&apos;__eradicators-library__/erlib/lua/Table&apos;)()
@@ -123,7 +122,7 @@
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#Table">Table(tbl)</a></td>
-	<td class="summary">Attaches the Table modules metatable to any table.</td>
+	<td class="summary">Attaches this Table module as metatable to a table.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#NIL">NIL</a></td>
@@ -209,10 +208,6 @@
 	<tr>
 	<td class="name" nowrap><a href="#smerge">smerge(tbl[, tbl2])</a></td>
 	<td class="summary"><strong>In-place.</strong> <strong>Shallow Merge.</strong> Copies data from one table into another.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#sort">sort(tbl, comp)</a></td>
-	<td class="summary"><strong>In-place.</strong> <a href="../lua-5.2/doc/manual.html#pdf-table.sort">table.sort</a> with table return.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#insert_once">insert_once(tbl, key, value)</a></td>
@@ -328,7 +323,7 @@
 	<td class="name" nowrap><a href="#TablePatch">TablePatch</a></td>
 	<td class="summary"><strong>Concept.</strong>
  A <a href="../modules/Types.html#DenseArray">DenseArray</a> consisting of a <a href="../modules/Table.html#TablePath">TablePath</a> followed by a
- <a href="../modules/Table.html#TablePatchValue">TablePatchValue</a>.</td>
+ <a href="../modules/Table.html#TablePatch">TablePatchValue</a>.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#TablePatchValue">TablePatchValue</a></td>
@@ -374,7 +369,8 @@
     <strong>Table(tbl)</strong>
     </dt>
     <dd>
-    Attaches the Table modules metatable to any table.
+    Attaches this Table module as metatable to a table. <br/>
+ Alias for <code>setmetatable(tbl, {__index = Table})</code>.
 
 
     <h3>Parameters:</h3>
@@ -390,8 +386,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">Table</span></span>
-        The unchanged input table.
+           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+        The unchanged input table, now with metatable attached.
     </ol>
 
 
@@ -1096,41 +1092,6 @@
             <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
          The table from which to take the data.
          (<em>optional</em>)
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
-        The input table.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "sort"></a>
-    <strong>sort(tbl, comp)</strong>
-    </dt>
-    <dd>
-    <strong>In-place.</strong> <a href="../lua-5.2/doc/manual.html#pdf-table.sort">table.sort</a> with table return.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">tbl</span>
-            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
-
-
-
-        </li>
-        <li><span class="parameter">comp</span>
-            <span class="types"><a class="type" href="https://www.lua.org/pil/2.6.html">function</a></span>
-
-
-
         </li>
     </ul>
 
@@ -1852,9 +1813,7 @@ Table.deep_clear_metatables(test)
     </dt>
     <dd>
     Removes any metatable from a table.
- Does not recurse into the table. Useful for finalizing tables in data stage,
- when the automatically attached metatables of a <a href="../modules/Table.html#">Table</a>, <a href="../modules/Array.html#">Array</a>, <a href="../modules/Set.html#">Set</a>
- etc. shouldn't be inherited into data.raw.
+ Does not recurse into the table.
 
 
     <h3>Parameters:</h3>
@@ -2122,7 +2081,7 @@ Table.deep_clear_metatables(test)
     <dd>
     <strong>Concept.</strong>
  A <a href="../modules/Types.html#DenseArray">DenseArray</a> consisting of a <a href="../modules/Table.html#TablePath">TablePath</a> followed by a
- <a href="../modules/Table.html#TablePatchValue">TablePatchValue</a>.
+ <a href="../modules/Table.html#TablePatch">TablePatchValue</a>.
 
 
 
@@ -2364,7 +2323,7 @@ test:patch({
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-08-18 23:54:20 </i>
+<i style="float:right;">Last updated 2021-08-19 02:39:21 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

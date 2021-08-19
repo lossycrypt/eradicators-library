@@ -2,10 +2,18 @@
 Version: 4.1.25
 Date: 2021-8-18
   Functions:
-    - Breaking Change! Array.deduplicate now takes a parameter "f_ident"
+    - Breaking change! Array.deduplicate now takes a parameter "f_ident"
       to facilitate deduplicating complex arrays.
-    - Breaking Change! Iter.ntuples no longer accepts tables containing
+    - Breaking change! Iter.ntuples no longer accepts tables containing
       non-tables at depths lower than n-1 to improve performance.
+    - Breaking change! Removed redundant Table.sort. Use Array.sort instead.
+    - Breaking change! Removed all undocumented metatable attachment and 
+      inheritance from Table, Array and Set modules.
+    - Made metatable inheritance for Set.*(A,B) operations a third parameter.
+      Defaults to true to keep previous behavior.
+  Deprecated:
+    - Long deprecated old EventManager has been completely removed.
+      Did some small updates to the documentation of EventManagerLite.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.24
 Date: 2021-8-15
@@ -133,7 +141,9 @@ Date: 2021-06-08
     - Player.get_player now uses lua-side caching to be very fast.
     - Added Player.get_event_player
     - Added Tool.try_require
-    - The deprecated old EventManager and PluginManager have been removed.
+  Deprecated:
+    - Old EventManager has been officially replaced with EventManagerLite.
+    - Old PluginManager have been completely removed.
   Utility Mods:
     - Universal Locale: Removed info icon from map-gen-preset-description.
   Plugins:

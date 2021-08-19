@@ -6,7 +6,7 @@
 -- __Note:__ This module inherits all native-Lua @{table} module methods unless
 -- overwritten by same-named local methods.
 --
--- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2020-10-31.
+-- @{Introduction.DevelopmentStatus|Module Status}: Stable.
 --
 -- @module Table
 -- @usage
@@ -66,17 +66,19 @@ for k,v in pairs( table) do  Table[k] = v end
 
 local _obj_mt = {__index=Table}
 -- attach meta if safe
-local _toTable = function(tbl)
-  if not getmetatable(tbl) then setmetatable(tbl,_obj_mt) end
-  return tbl end
+-- local _toTable = function(tbl)
+  -- if not getmetatable(tbl) then setmetatable(tbl,_obj_mt) end
+  -- return tbl end
 -- attach meta if really safe
-local _toTableIfTable = function(obj)
-  if isPlainTable(obj) then return _toTable(obj) else return obj end
-  end
+-- local _toTableIfTable = function(obj)
+  -- if isPlainTable(obj) then return _toTable(obj) else return obj end
+  -- end
 -- user request to attach meta unconditionally
 do setmetatable( Table,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) end}) end
 do setmetatable(_Table,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) end}) end
 
+local _toTable        = function() error('Inheritance is deprecated') end
+local _toTableIfTable = function() error('Inheritance is deprecated') end
 
 --------------------------------------------------------------------------------
 -- Module.
@@ -90,9 +92,11 @@ do setmetatable(_Table,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt
 
 
 ----------
--- Attaches the Table modules metatable to any table.
+-- Attaches this Table module as metatable to a table.  
+-- Alias for `setmetatable(tbl, {__index = Table})`.
+--
 -- @tparam table tbl
--- @treturn Table The unchanged input table.
+-- @treturn table The unchanged input table, now with metatable attached.
 -- @function Table
 do end
 
@@ -173,8 +177,8 @@ function Table.range(a,b,step)
   for i=(b and a or 1),(b or a),(step or ((b and a>b) and -1) or 1) do
     r[#r+1]=i
     end
-  return _toTable(r)
-  end
+  -- return _toTable(r) end
+  return r end
 function _Table.range(a,b,step)
   Verify(a   ,    'NaturalNumber')
   Verify(b   ,'nil|NaturalNumber')
@@ -194,8 +198,8 @@ function Table.values(tbl)
   for _,v in pairs(tbl) do
     r[#r+1] = v
     end
-  return _toTable(r)
-  end
+  -- return _toTable(r) end
+  return r end
   
   
 ----------
@@ -210,8 +214,8 @@ function Table.keys(tbl)
   for k in pairs(tbl) do
     r[#r+1] = k
     end
-  return _toTable(r)
-  end
+  -- return _toTable(r) end
+  return r end
 
 
 ----------
@@ -244,8 +248,8 @@ function Table.keys(tbl)
 function Table.flip(tbl)
   local r = {}
   for k,v in pairs(tbl) do r[v] = k end
-  return _toTable(r)
-  end
+  -- return _toTable(r) end
+  return r end
   
 ----------
 -- Wraps the object in a table if it is not already a table.
@@ -255,9 +259,11 @@ function Table.plural(obj)
   -- if  type(obj) == 'table'
   -- and type(obj.__self) ~= 'userdata' then
   if isPlainTable(obj) then
-    return _toTable(obj)
+    -- return _toTable(obj)
+    return obj
   else
-    return _toTable{obj}
+    -- return _toTable{obj}
+    return {obj}
     end
   end
 
@@ -308,8 +314,7 @@ function Table.is_equal(tbl,tbl2)
 -- @treturn boolean
 function Table.is_empty(tbl)
   for _ in pairs(tbl) do return false end
-  return true
-  end
+  return true end
 
   
 ----------
@@ -318,7 +323,8 @@ function Table.is_empty(tbl)
 -- @treturn table|nil  
 function Table.nil_if_empty(tbl)
   if tbl == nil then return nil end
-  for _ in pairs(tbl) do return _toTable(tbl) end
+  -- for _ in pairs(tbl) do return _toTable(tbl) end end
+  for _ in pairs(tbl) do return tbl end
   end
 
 
@@ -424,8 +430,8 @@ function Table.rep (tbl,variation_count,patterns)
       end
     r[#r+1] = Table.dcopy(new) --@future: fcopy?
     end
-  return _toTable(r)
-  end
+  -- return _toTable(r) end
+  return r end
   
 ----------
 -- __In-place.__ Shallowly replaces @{Table.NIL} keys and values with @{nil},
@@ -441,8 +447,8 @@ function Table.remove_nil(tbl)
       tbl[k] = nil
       end
     end
-  return _toTable(tbl)
-  end
+  -- return _toTable(tbl) end
+  return tbl end
   
 --------------------------------------------------------------------------------
 -- Conversion.
@@ -469,12 +475,14 @@ function Table.to_array(tbl,target)
     for k,v in pairs(tbl) do
       if isNaturalNumber(k) then target[k] = v end
       end
-    return _toTable(target)
+    -- return _toTable(target)
+    return target
   else
     for k in pairs(tbl) do
       if not isNaturalNumber(k) then tbl[k] = nil end
       end
-    return _toTable(tbl)
+    -- return _toTable(tbl)
+    return tbl
     end
   end
 
@@ -764,8 +772,8 @@ function Table.patch(tbl,patches)
       end
     Table.set(tbl,patch,v) -- can be NIL
     end
-  return _toTable(tbl)
-  end
+  -- return _toTable(tbl) end
+  return tbl end
 
   
   
@@ -827,8 +835,8 @@ function Table.map(tbl,f,target)
         end
       end
     end
-  return _toTable(target)
-  end
+  -- return _toTable(target) end
+  return target end
 
 
 ----------
@@ -851,8 +859,8 @@ function Table.filter(tbl,f,target)
   else
     for k,v in pairs(tbl) do if     f(v,k,tbl) then target[k] = v   end end
     end
-  return _toTable(target)
-  end
+  -- return _toTable(target) end
+  return target end
   
 
 ----------
@@ -872,22 +880,7 @@ function Table.smerge(tbl,tbl2)
       end
     end
   -- return _toTable(tbl)
-  return tbl
-  end
-
-----------
--- __In-place.__ @{LMAN table.sort} with table return.
---
--- @tparam table tbl
--- @tparam function comp
---
--- @treturn table The input table.
---
-function Table.sort(tbl, comp)
-  table_sort(tbl, comp)
-  -- return _toTable(tbl)
-  return _toTable(tbl)
-  end
+  return tbl end
   
 ----------
 -- __In-place.__ Inserts value into tbl __only if__ no other key in the table
@@ -901,11 +894,12 @@ function Table.sort(tbl, comp)
 -- 
 function Table.insert_once(tbl,key,value)
   for _,v in pairs(tbl) do
-    if v == value then return _toTable(tbl) end
+    -- if v == value then return _toTable(tbl) end
+    if v == value then return tbl end
     end
   tbl[key] = value
-  return _toTable(tbl)
-  end
+  -- return _toTable(tbl)
+  return tbl end
 
 
 
@@ -921,17 +915,20 @@ function Table.insert_once(tbl,key,value)
 function Table.clear(tbl,except_keys,is_whitelist)
   if not except_keys then
     for k in pairs(tbl) do tbl[k] = nil end
-    return _toTable(tbl)
+    -- return _toTable(tbl)
+    return tbl
   else
     -- whitelist, keep only listed keys (default)
     if is_whitelist ~= false then
       local keep = {}; for _,k in pairs(except_keys) do keep[k] = true end
       for k in pairs(tbl) do if not keep[k] then tbl[k] = nil end end
-      return _toTable(tbl)
+      -- return _toTable(tbl)
+      return tbl
     -- blacklist, keep only unlisted keys
     else
       for _, k in pairs(except_keys) do tbl[k] = nil end
-      return _toTable(tbl)
+      -- return _toTable(tbl)
+      return tbl
       end
     end
   end
@@ -965,8 +962,8 @@ function Table.clear(tbl,except_keys,is_whitelist)
 function Table.overwrite(tbl,tbl2)
   for k   in pairs(tbl ) do tbl[k] = nil end --clear
   for k,v in pairs(tbl2) do tbl[k] = v   end --smerge
-  return _toTable(tbl)
-  end
+  -- return _toTable(tbl) end
+  return tbl end
   
   
 ----------
@@ -1257,21 +1254,17 @@ function Table.deep_clear_metatables(tbl)
       end
     return obj
     end
-  return _clear(tbl)
-  end
+  return _clear(tbl) end
   
 
 ----------
 -- Removes any metatable from a table.
--- Does not recurse into the table. Useful for finalizing tables in data stage,
--- when the automatically attached metatables of a @{Table}, @{Array}, @{Set}
--- etc. shouldn't be inherited into data.raw.
+-- Does not recurse into the table.
 -- 
 -- @tparam table tbl
 -- @treturn table The input table. Without any metatable whatsoever.
 function Table.clear_meta(tbl)
-  return debug_setmetatable(tbl, nil)
-  end
+  return debug_setmetatable(tbl, nil) end
 
   
 --------------------------------------------------------------------------------
@@ -1291,8 +1284,8 @@ function Table.normalizer (defaults)
     for k,v in pairs(defaults) do
       if tbl[k] == nil then tbl[k] = v end
       end
-    return _toTable(tbl)
-    end
+    -- return _toTable(tbl) end
+    return tbl end
   end
   
 ----------

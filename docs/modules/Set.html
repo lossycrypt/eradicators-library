@@ -49,7 +49,6 @@
   <li><a href="../modules/Data.html">Data</a></li>
   <li><a href="../modules/Template.html">Template</a></li>
   <li><a href="../modules/Entity.html">Entity</a></li>
-  <li><a href="../modules/EventManager.html">EventManager</a></li>
   <li><a href="../modules/EventManagerLite.html">EventManagerLite</a></li>
   <li><a href="../modules/Force.html">Force</a></li>
   <li><a href="../modules/Gui.html">Gui</a></li>
@@ -108,12 +107,9 @@
  and <a href="https://en.wikipedia.org/wiki/List_of_logic_symbols">List of logic symbols</a>. In unions and intersections of PseudoSets
  the values of Set B take precedence.</p>
 
-<p> <strong>Note:</strong> All methods of this module that return a set also set the metatable
- of the result to this module.</p>
-
 <p> <strong>Note:</strong> This module inherits all <a href="../modules/Table.html#">Table</a> module methods.</p>
 
-<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Polishing.</p>
+<p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Stable.</p>
     <h3>Usage:</h3>
     <ul>
         <pre class="example">local Set = require(&apos;__eradicators-library__/erlib/lua/Set&apos;)()
@@ -124,8 +120,8 @@
 <h2><a href="#Module">Module </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Set">Set(tbl)</a></td>
-	<td class="summary">Attaches the Set modules metatable to the tbl.</td>
+	<td class="name" nowrap><a href="#Set">Set(set)</a></td>
+	<td class="summary">Attaches this Set module as metatable to a table.</td>
 	</tr>
 </table>
 <h2><a href="#Conversion">Conversion </a></h2>
@@ -153,19 +149,19 @@
 <h2><a href="#Creation">Creation </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#union">union(A, B)</a></td>
+	<td class="name" nowrap><a href="#union">union(A, B, keep_meta)</a></td>
 	<td class="summary">→∀x (Ax ∨ Bx)</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#intersection">intersection(A, B)</a></td>
+	<td class="name" nowrap><a href="#intersection">intersection(A, B, keep_meta)</a></td>
 	<td class="summary">→∀x (Ax ∧ Bx)</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#complement">complement(A, B)</a></td>
+	<td class="name" nowrap><a href="#complement">complement(A, B, keep_meta)</a></td>
 	<td class="summary">→∀x (Ax ∧ ¬Bx)</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#difference">difference(A, B)</a></td>
+	<td class="name" nowrap><a href="#difference">difference(A, B, keep_meta)</a></td>
 	<td class="summary">→∀x (¬(Ax ∧ Bx))</td>
 	</tr>
 </table>
@@ -202,15 +198,16 @@
     <dl class="function">
     <dt>
     <a name = "Set"></a>
-    <strong>Set(tbl)</strong>
+    <strong>Set(set)</strong>
     </dt>
     <dd>
-    Attaches the Set modules metatable to the tbl.
+    Attaches this Set module as metatable to a table. <br/>
+ Alias for <code>setmetatable(set, {__index = Set})</code>.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">tbl</span>
+        <li><span class="parameter">set</span>
             <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
 
 
@@ -222,9 +219,7 @@
     <ol>
 
            <span class="types"><a class="type" href="../modules/Types.html#PseudoSet">PseudoSet</a></span>
-
-
-
+        The unchanged input table, now with metatable attached.
     </ol>
 
 
@@ -330,12 +325,19 @@
 
 </dd>
 </dl>
-    <h2 class="section-header "><a name="Creation"></a>Creation </h2>
+    <h2 class="section-header has-description"><a name="Creation"></a>Creation </h2>
 
+          <div class="section-description">
+           For all of these functions: If the input set <code>A</code> had the module metatable
+ attached by calling <code>Set(A)</code> then the resulting set will automatically
+ inherit the metatable. This behavior can be disabled by passing <a href="../modules/Types.html#false">false</a>
+ as a third parameter. Any metatable not created by <code>Set()</code> will never be
+ inherited.
+          </div>
     <dl class="function">
     <dt>
     <a name = "union"></a>
-    <strong>union(A, B)</strong>
+    <strong>union(A, B, keep_meta)</strong>
     </dt>
     <dd>
     →∀x (Ax ∨ Bx)
@@ -349,6 +351,11 @@
 
         </li>
         <li><span class="parameter">B</span>
+
+
+
+        </li>
+        <li><span class="parameter">keep_meta</span>
 
 
 
@@ -370,7 +377,7 @@
 </dd>
     <dt>
     <a name = "intersection"></a>
-    <strong>intersection(A, B)</strong>
+    <strong>intersection(A, B, keep_meta)</strong>
     </dt>
     <dd>
     →∀x (Ax ∧ Bx)
@@ -384,6 +391,11 @@
 
         </li>
         <li><span class="parameter">B</span>
+
+
+
+        </li>
+        <li><span class="parameter">keep_meta</span>
 
 
 
@@ -405,7 +417,7 @@
 </dd>
     <dt>
     <a name = "complement"></a>
-    <strong>complement(A, B)</strong>
+    <strong>complement(A, B, keep_meta)</strong>
     </dt>
     <dd>
     →∀x (Ax ∧ ¬Bx)
@@ -419,6 +431,11 @@
 
         </li>
         <li><span class="parameter">B</span>
+
+
+
+        </li>
+        <li><span class="parameter">keep_meta</span>
 
 
 
@@ -440,7 +457,7 @@
 </dd>
     <dt>
     <a name = "difference"></a>
-    <strong>difference(A, B)</strong>
+    <strong>difference(A, B, keep_meta)</strong>
     </dt>
     <dd>
     →∀x (¬(Ax ∧ Bx))
@@ -454,6 +471,11 @@
 
         </li>
         <li><span class="parameter">B</span>
+
+
+
+        </li>
+        <li><span class="parameter">keep_meta</span>
 
 
 
@@ -623,7 +645,7 @@
     </dt>
     <dd>
     A∩B==∅, ¬∃xAx (Bx) ∧ ¬∃xBx (Ax), ∀xAx (¬Bx) ∧ ∀xBx (¬Ax). <br/>
- The empty set is disjoint from every other set.
+ The empty set is disjoint from every set, including from itself.
 
 
     <h3>Parameters:</h3>
@@ -660,7 +682,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-08-18 23:54:20 </i>
+<i style="float:right;">Last updated 2021-08-19 02:39:21 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

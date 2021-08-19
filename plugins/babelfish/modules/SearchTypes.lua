@@ -46,11 +46,11 @@ local SearchTypes = {}
 
 -- {priority_index -> search_type}
 local supported_array = Table.map(const.type_data, function(v) return v.type end, {})
-                        :clear_meta()
+                        -- :clear_meta()
 
 -- {search_type -> priority_index}
 local supported_set   = Table.flip(supported_array)
-                        :clear_meta()
+                        -- :clear_meta()
 
 -- Sorts an array of search_type by translation priority
 function SearchTypes.sort(array)

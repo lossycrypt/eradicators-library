@@ -350,7 +350,7 @@ local function Test()
     local copy  = Array(dense):scopy()
     assert(dense ~= copy)
     assert(equ(dense,copy))
-    assert(13 == copy:size())
+    assert(13 == Array.size(copy))
     end
   
   -- Array.keys, Array.values
@@ -374,7 +374,7 @@ local function Test()
     --full
     assert(clear == dense)
     assert(equ({},clear))
-    assert(0 == clear:size())
+    assert(0 == Array.size(clear))
     --partial
     assert(equ({'a','b','c','d',nil,nil,nil,nil,nil,'j','k','l','m'},
       Array.clear(make_dense(),5,9)))
@@ -394,11 +394,11 @@ local function Test()
     
   -- Array.splice, Array.fray
   do
-    local spliced_array = Array.splice({1,2,3},42,{'a','b','c'},nil,'end')
+    local spliced_array = Array(Array.splice({1,2,3},42,{'a','b','c'},nil,'end'))
     assert( spliced_array:to_string()
       == '{1, 42, "a", nil, "end", 2, 42, "b", nil, "end", 3, 42, "c", [15] = "end"}' )
       
-    assert( spliced_array:fray(5,1,15):to_string()
+    assert( Array(spliced_array:fray(5,1,15)):to_string()
       == '{{1, 2, 3}, {42, 42, 42}, {"a", "b", "c"}, {}, {"end", "end", "end"}}' )
       
     assert(equ(spliced_array, Array.splice(table.unpack(spliced_array:fray(5,1,15)))))

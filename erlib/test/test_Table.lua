@@ -79,7 +79,7 @@ local function Test()
   -- Table.flip
   do
     local t1 = Table{'a','b','c','d','e'}
-    local t2 = t1:flip()
+    local t2 = Table(t1:flip())
     assert(5 == t1:size      ())
     assert(5 == t2:size      ())
     assert(5 == t1:array_size())
@@ -264,7 +264,7 @@ local function Test()
     assert(equ(Table.filter(t1,L['x->x   <3'],{}),{1,2,nil,nil}))
     assert(equ(Table.filter(t1,L['x->x  >=3'],{}),{nil,nil,3,4}))
     assert(equ(t1,{1,2,3,4})) -- copy mode did not change table
-    assert(Table.filter(t1,L'-> nil'):is_empty())
+    assert(Table(t1):filter(L'-> nil'):is_empty())
     end
     
   -- Table.smerge
@@ -280,7 +280,7 @@ local function Test()
     local t1 = {}
     assert(t1 == Table.insert_once(t1,'foo','bar'))
     assert(t1.foo == 'bar')
-    assert(Table.insert_once(t1,'notfoo','bar'):is_equal{foo='bar'})
+    assert(Table(t1):insert_once('notfoo','bar'):is_equal{foo='bar'})
     end
   
   -- Table.clear  
@@ -447,7 +447,7 @@ local function Test()
   do
   
     local my_norm = Table.normalizer{name='no name',value=0}
-    assert('{name = "testrr", value = 0}' == my_norm{name='testrr'}:to_string())
+    assert('{name = "testrr", value = 0}' == Table(my_norm{name='testrr'}):to_string())
         
     local my_remapper1 = Table.remapper {name='surname',value={'cur','act'}}
     local test_person1 = {name='Adicator',value=42}

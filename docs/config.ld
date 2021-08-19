@@ -58,7 +58,7 @@ file = {
     
     root..'/erlib/test/_TemplateTest.lua',
     
-    root..'/erlib/factorio/EventManager/_TemplateEvent.lua',
+    -- root..'/erlib/factorio/EventManager/_TemplateEvent.lua',
     },
   
   }

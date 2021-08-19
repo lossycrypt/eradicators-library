@@ -65,7 +65,7 @@
 --   This is the best time to give feedback.
 --
 --   * __Stable__: The module has been unchanged and without bug-reports
---   for at least 4 weeks. Bugfixes or optimizations will result in a
+--   for at least 4 weeks. Bugfixes or optimizations may result in a
 --   status downgrade to Experimental.
 -- 
 -- @within Information about this Library

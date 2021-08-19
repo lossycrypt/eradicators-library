@@ -6,10 +6,11 @@
 -- EventManagerLite mimics the @{FOBJ LuaBootstrap} api to allow mods
 -- to register multiple handlers to any event with only minimal code changes.
 --
--- To prevent errors EventManagerLite blocks direct access to LuaBootstrap,
--- but most functionality is available from the ManagedLuaBootstrap object.
+-- To prevent errors, EventManagerLite __blocks direct access to__
+-- @{FOBJ LuaBootstrap}. It's methods must instead be accessed via 
+-- a ManagedLuaBootstrap object.
 --
--- @{Introduction.DevelopmentStatus|Module Status}: Work in progress.
+-- @{Introduction.DevelopmentStatus|Module Status}: Experimental 2021-08-19.
 --
 -- @module EventManagerLite
 -- @usage
@@ -132,6 +133,7 @@ local generate_event_name
 ----------
 -- Custom event names.
 -- Erlibs equivalent to @{FOBJ defines.events} for modded event ids.
+-- This is the __recommended__ way of __sharing EventNames between mods__.
 -- 
 -- This table contains all dynamically generated (event\_name → event\_id) mappings
 -- that are contained in the @{Remote.PackedInterfaceGroup} `'erlib:managed-events'`.
@@ -631,6 +633,29 @@ if flag.IS_DEV_MODE then
 -- -------------------------------------------------------------------------- --
 
 --------------------------------------------------------------------------------
+-- Concepts.
+-- @section
+--------------------------------------------------------------------------------
+
+----------
+-- The unique name of an event.
+-- 
+-- An EventName is any @{NaturalNumber} or @{string} that would normally
+-- be used to register
+-- an event handler with @{FOBJ LuaBootstrap.on_event|script.on_event()}.
+-- 
+-- That means any NaturalNumber from @{FOBJ defines.events},
+-- any NaturalNumber number generated with
+-- @{FOBJ LuaBootstrap.generate_event_name|script.generate_event_name}(),
+-- any name string of a @{FOBJ LuaCustomInputPrototype},
+-- or one of the literal strings
+-- `"on_load`", `"on_config`" and `"on_configuration_changed`".
+-- 
+-- @within Concepts
+-- @table EventName
+do end
+
+--------------------------------------------------------------------------------
 -- Examples.
 -- @section
 --------------------------------------------------------------------------------
@@ -682,8 +707,9 @@ do end
 -- @usage
 --    local my_handler = script.on_event(defines.events, function(e) end)
 --
--- @tparam string|Integer|table event_name Changed: Now works with non-arrays
--- and recognizes `'on_load'` and `'on_configuration_changed'`.
+-- @tparam EventName|table event_name Changed: Accepts values of 
+-- any type of table, not only of arrays, 
+-- and recognizes the strings `'on_load'`, `'on_config'` and `'on_configuration_changed'`.
 -- @tparam function|nil f Unchanged.
 -- @tparam nil filters Removed. Because filtering would need to be done on the
 -- lua side there would be no performance benefit.
@@ -774,8 +800,10 @@ do end
 -- 
 -- @tparam[opt] string event_name Your custom name for the event.
 -- 
--- @treturn NaturalNumber The id for your event. Events with the same
--- name get the same id.
+-- @treturn NaturalNumber The @{EventManagerLite.EventName|EventName}
+-- for your event. A new EventName will only be generated on the first
+-- call for each `event_name`. Subsequent calls with the same `event_name`
+-- will return the previously generated EventName.
 -- 
 -- @function ManagedLuaBootstrap.generate_event_name
 do end
@@ -852,8 +880,8 @@ do end
   I can do about that so you have to take countermeasures yourself.
   Don't forget to use migrations if nessecary.
   
-  See ManagedLuaBootstrap.on\_init for why EventManagerLite 
-  never raises on\_init.
+  See [ManagedLuaBootstrap.on_init](#ManagedLuaBootstrap.on_init)
+  for why EventManagerLite never raises on\_init.
   
   Base game order:
     InstallMod -> StartMap                         : on_init      -         -      

@@ -2,10 +2,6 @@
 
 --------------------------------------------------
 -- Numerically indexed table manipulation. Optimized for speed.
--- 
--- __Note:__ All methods of this module that return an array also set the
--- metatable of the result to this module, except for in-place methods that
--- recieve an input that already had a metatable.
 --
 -- __Note:__ Some methods of this module apply their result directly to the 
 -- input table to be faster. If you want the input table to be unaffected you
@@ -16,7 +12,7 @@
 -- __Note:__ This module inherits all @{Table} module methods. Same-named
 -- Array methods override inherited Table methods.
 --
--- @{Introduction.DevelopmentStatus|Module Status}: Polishing.
+-- @{Introduction.DevelopmentStatus|Module Status}: Stable.
 --
 -- @module Array
 -- @usage
@@ -64,13 +60,14 @@ for k,v in pairs(_Table) do _Array[k] = v end
 
 local _obj_mt = {__index=Array}
 -- attach meta if safe
-local _toArray = function(tbl)
-  if not getmetatable(tbl) then setmetatable(tbl,_obj_mt) end
-  return tbl end
+-- local _toArray = function(tbl)
+  -- if not getmetatable(tbl) then setmetatable(tbl,_obj_mt) end
+  -- return tbl end
 -- user request to attach meta unconditionally
 do setmetatable( Array,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) end}) end
 do setmetatable(_Array,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt) end}) end
 
+local _toArray = function() error('Inheritance is deprecated') end
 
 --------------------------------------------------------------------------------
 -- Module.
@@ -83,11 +80,12 @@ do setmetatable(_Array,{__call = function(_,tbl) return setmetatable(tbl,_obj_mt
 -- @field todo1
 
 
-
 ----------
--- Attaches the Array modules metatable to any table.
+-- Attaches this Array module as metatable to a table.  
+-- Alias for `setmetatable(arr, {__index = Array})`.
+--
 -- @tparam table arr
--- @treturn DenseArray|SparseArray|MixedTable The unchanged input table.
+-- @treturn DenseArray|SparseArray|MixedTable The unchanged input table, now with metatable attached.
 -- @function Array
 do end
 
@@ -132,8 +130,8 @@ function Array.keys(arr,i,j)
   for k=(i or 1),(j or #arr) do
     if arr[k] ~= nil then r[#r+1] = k end
     end
-  return _toArray(r)
-  end
+  -- return _toArray(r) end
+  return r end
   
   
 ----------
@@ -151,9 +149,8 @@ function Array.values(arr,i,j)
   for k=(i or 1),(j or #arr) do
     if arr[k] ~= nil then r[#r+1] = arr[k] end
     end
-  return _toArray(r)
-  end
-
+  -- return _toArray(r) end
+  return r end
 
   
 --------------------------------------------------------------------------------
@@ -226,9 +223,8 @@ function Array.find_all(arr,value,i,j)
   for k=(i or 1),(j or #arr) do
     if arr[k] == value then r[#r+1]= k end
     end
-  return _toArray(r)
-  end
-  
+  -- return _toArray(r) end
+  return r end
 
   
 --------------------------------------------------------------------------------
@@ -265,8 +261,8 @@ function Array.compress(arr,target,i,j)
       n = n + 1
       end
     end
-  return _toArray(target)
-  end
+  -- return _toArray(target) end
+  return target end
 
 
 ----------
@@ -297,7 +293,8 @@ function Array.map(arr,f,target,i,j)
     for k=(i or 1),(j or #arr) do
       arr[k] = f(arr[k],k,arr)
       end
-    return _toArray(arr)
+    -- return _toArray(arr)
+    return arr
   -- copy
   else
     for k=(i or 1), (j or #arr) do
@@ -308,7 +305,8 @@ function Array.map(arr,f,target,i,j)
         target[k2] = v2
         end
       end
-    return _toArray(target)
+    -- return _toArray(target)
+    return target
     end
   end
 
@@ -352,8 +350,8 @@ function Array.filter(arr,f,target,i,j)
       target[k] = nil
       end
     end
-  return _toArray(target)
-  end
+  -- return _toArray(target) end
+  return target end
 
   
 ----------
@@ -376,8 +374,8 @@ function Array.reverse(arr,target,i,j)
     target[k],target[n] = arr[n],arr[k]
     n = n-1
     end
-  return _toArray(target)
-  end
+  -- return _toArray(target) end
+  return target end
   
 
 ----------
@@ -436,14 +434,15 @@ function Array.insert_once(arr,value,i)
   -- is no obvious correct place to insert the value inside a range.
   -- Therefore the user should use Array.find() and handle that themselfs.
   for k=(i or 1),#arr do
-    if arr[k] == value then return _toArray(arr),false end
+    -- if arr[k] == value then return _toArray(arr),false end
+    if arr[k] == value then return arr, false end
     end
   -- The position is also fixed because if the user knew the position they
   -- could just check themselfs. Also it'd be ambigious if insert should
   -- overwrite or shift all later keys up in that case.
   arr[#arr+1] = value
-  return _toArray(arr),true
-  end
+  -- return _toArray(arr),true
+  return arr, true end
 
 
 ----------
@@ -464,8 +463,8 @@ function Array.insert_array(arr,arr2,i,target)
   target = target or arr
   for k = n1, i+1, -1 do target[k + n2] = arr [k] end -- shift old data back
   for k = 1 , n2      do target[i + k ] = arr2[k] end -- insert new data
-  return _toArray(target)
-  end
+  -- return _toArray(target) end
+  return target end
   
 
 ----------
@@ -492,8 +491,7 @@ function Array.unsorted_remove_value(arr,value,i)
       end
     end
   -- return _toArray(arr), count
-  return arr, count
-  end
+  return arr, count end
   
   
 ----------
@@ -539,8 +537,8 @@ function Array.clear(arr,i,j)
   for k=(i or 1),(j or #arr) do
     arr[k] = nil
     end
-  return _toArray(arr)
-  end
+  -- return _toArray(arr) end
+  return arr end
   
   
 ----------
@@ -559,13 +557,15 @@ function Array.extend(arr,arr2,i,j)
   for k=(i or 1),(j or #arr2) do
     arr[n+k] = arr2[k]
     end
-  return _toArray(arr)
-  end
+  -- return _toArray(arr) end
+  return arr end
   
   
 ----------
 -- __In-place.__ Applies a sorting function to an array.
 -- See the @{Compare} module for built-in comparing functions.
+--
+-- See also: @{LMAN table.sort}
 --
 -- @tparam DenseArray arr
 -- @tparam function comparator A function f(a,b)→boolean which determines
@@ -577,8 +577,7 @@ function Array.sort(arr,comparator)
   if not comparator then err('Missing sorting function') end
   table_sort(arr,comparator)
   -- return _toArray(arr)
-  return arr
-  end
+  return arr end
   
 ----------
 -- __In-place.__ Randomized the order of the arrays values.
@@ -635,8 +634,8 @@ function Array.fisher_yates_shuffle(arr, seed) -- Fisher-Yates
 --
 function Array.scopy(arr,i,j)
   i,j = (i or 1), (j or #arr)
-  return _toArray { table_unpack(arr,i,j) } -- 120% faster than for-i-loop
-  end
+  -- return _toArray { table_unpack(arr,i,j) } end -- 120% faster than for-i-loop
+  return { table_unpack(arr,i,j) } end -- 120% faster than for-i-loop
 
 -- V1
 -- function Array.scopy(arr,i,j)
@@ -687,8 +686,8 @@ function Array.splice(arr,...)
         end
       end
     end
-  return _toArray(r)
-  end
+  -- return _toArray(r) end
+  return r end
 
 
 ----------
@@ -736,8 +735,8 @@ function Array.fray(arr,count,i,j)
       r[l][n] = arr[m+l]
       end
     end
-  return _toArray(r)
-  end
+  -- return _toArray(r) end
+  return r end
 
   
 ----------
@@ -778,8 +777,8 @@ function Array.flatten(arr)
         end
       end
     until v == nil
-  return _toArray(arr)
-  end
+  -- return _toArray(arr) end
+  return arr end
   
 --------------------------------------------------------------------------------
 -- Conversion.
@@ -804,8 +803,8 @@ function Array.from_iterator(f_iter)
     r[n] = {f_iter()}
     until Table_size(r[n]) == 0
   r[n],n = nil,n-1 -- loop counts one too far
-  return _toArray(r),n
-  end
+  -- return _toArray(r), n end
+  return r, n end
 
 --------------------------------------------------------------------------------
 -- Metamethods.
