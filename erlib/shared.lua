@@ -99,6 +99,8 @@ local flag = shared[5]
     (nil ~= (debug.traceback():match('^.*\n%s*.*/(control%.lua):')))
     )
 
+  -- flag.MOD_NAME = -- only for error messages!
+    
 
     
 -- -------------------------------------------------------------------------- --

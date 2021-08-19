@@ -42,6 +42,15 @@ local table,type,pairs,tostring
     = table,type,pairs,tostring
 
 -- -------------------------------------------------------------------------- --
+-- Local Library (Recursive Dependency Avoidance)                             --
+-- -------------------------------------------------------------------------- --
+
+-- local String = {}
+-- function String.remove_rich_text_tags(str)
+  -- return (str:gsub('%[[^%]]*[=/][^%]]+%]',''))
+  -- end
+    
+-- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
@@ -56,35 +65,63 @@ local Error,_Error,_uLocale = {},{},{}
 
 
 -- the error message
-local template
+local template; do
 
-if flag.IS_FACTORIO then
-  template = {
-    "  [color=default]                                                 ",
-    "  ##### [%s : %s] #####                                           ",
-    -- "  I suspected this might happen. Please tell me how you got here. ",
-    "  Unexpected error. Please submit a bug report including this     ",
-    -- "  error message. Details on how this happend are also useful.     ",
-    "  error message. Detailed info how this happend would also help.  ",
-    "                                                                  ",
-    "  [color=red]%s[/color]                                           ",
-    "                                                                  ",
-    "  [color=green](%s nil values removed.)[/color]                   ",
-    "  [color=green]%s > %s[/color]                                    ",
-    "  ############################                                    ",
-    "  [/color]                                                        ",
-    }
-else
-  template = {
-    "  ##### [%s : %s] #####                                           ",
-    "  Error.                                                          ",
-    "                                                                  ",
-    "  %s                                                              ",
-    "                                                                  ",
-    "  (%s nil values removed.)                                        ",
-    "  %s > %s                                                         ",
-    "  ############################                                    ",
-    }
+  local end_color, end_font = '[/color]', '[/font]'
+  
+  local hotkey_hint = 
+       "[font=default-semibold][color=#ffe5bd]"
+    .. "[color=#7dcff3]Left Click[/color] [color=pink]THIS TEXT[/color], "
+    .. "then press [color=#7dcff3]CTRL+A[/color], "
+    .. "then press [color=#7dcff3]CTRL+C[/color]"
+    .. "\n"
+    .. "to copy this message to the clipboard."
+    .. end_color .. end_font
+    
+  local seperator = 
+    "＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿" -- simple is best
+    -- "[color=black]■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■[/color]"
+  
+  if flag.IS_FACTORIO_CONTROL then
+    template = {
+         -- seperator,
+         hotkey_hint,
+      -- "                                                                  ",
+      "  [font=default-semibold][color=#ffe5bd]                          ",
+      "  Please submit a bug report with this message.                   ",
+      "  If you can, please also describe exactly how this happend.      ",
+         end_color .. end_font .. seperator                               ,
+      "  [color=default]                                                 ",
+      "  ### [%s : %s] ###                                               ",
+      "  Error in [color=acid]%s[/color].                                ",
+      -- "  I suspected this might happen. Please tell me how you got here. ",
+      "                                                                  ",
+      "  [color=red]%s[/color]                                           ",
+      "                                                                  ",
+      "  [color=green](%s nil values removed.)[/color]                   ",
+      "  [color=green]%s > %s[/color]                                    ",
+      "  ############################                                    ",
+      "  [/color]                                                        ",
+      }
+  else
+    template = {
+      "                                                                  ",
+      "                                                                  ",
+      "  Please submit a bug report with a picture of this message.      ",
+      "  If you can, please also describe exactly how this happend.      ",
+      "                                                                  ",
+      seperator,
+      "  ### [%s : %s] ###                                               ",
+      "  Error in %s.                                                    ",
+      "                                                                  ",
+      "  %s                                                              ",
+      "                                                                  ",
+      "  (%s nil values removed.)                                        ",
+      "  %s > %s                                                         ",
+      "  ############################                                    ",
+      "                                                                  ",
+      }
+    end
   end
   
 -- remove extra whitespace (from indented code representation)
@@ -170,6 +207,7 @@ local _error = function(prefix,postfix,...)
   local err = template:format(
     args[1],
     args[2],
+    Stacktrace.get_mod_name(-1),
     -- table.concat({table.unpack(args,3)},'\n'), -- don't impose any formatting
     table.concat({table.unpack(args,3)},''),
     select('#',...) - #args + 2,

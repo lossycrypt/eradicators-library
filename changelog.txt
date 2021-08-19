@@ -2,7 +2,11 @@
 Version: 4.2.1
 Date: 2021-8-19
   Functions:
-    - ?
+    - Improved Error module messages. Messages now includes the name of the mod
+      that was running while the error occured, instead of only the name of the
+      mod that contains the erroring file (cross-mod-require). During startup
+      messages no longer include rich text tags. During runtime messages
+      now include instructions on how to copy the message text.
 ---------------------------------------------------------------------------------------------------
 Version: 4.2.0
 Date: 2021-8-18
