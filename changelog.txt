@@ -1,17 +1,21 @@
 ---------------------------------------------------------------------------------------------------
 Version: 4.2.1
-Date: 2021-8-19
+Date: 2021-08-19
   Functions:
     - Improved Error module messages. Messages now includes the name of the mod
       that was running while the error occured, instead of only the name of the
       mod that contains the erroring file (cross-mod-require). During startup
       messages no longer include rich text tags. During runtime messages
       now include instructions on how to copy the message text.
+  Deprecated:
+    - Removed redundant Data.Icon.SimpleIconTable. Use Data.Sprite.format_icon.
+  Plugins:
+    - Moved dummy-items from core directly into erlib.
 ---------------------------------------------------------------------------------------------------
 Version: 4.2.0
-Date: 2021-8-18
+Date: 2021-08-18
   Functions:
-    - Breaking change! Array.deduplicate now takes a parameter "f_ident"
+    - Breaking change! Array.deduplicate now takes a new parameter "f_ident"
       to facilitate deduplicating complex arrays.
     - Breaking change! Iter.ntuples no longer accepts tables containing
       non-tables at depths lower than n-1 to improve performance.
@@ -25,7 +29,7 @@ Date: 2021-8-18
       Did some small updates to the documentation of EventManagerLite.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.24
-Date: 2021-8-15
+Date: 2021-08-15
   Functions:
     - Added Array.fisher_yates_shuffle
     - Added cache clearing function for multi-argument Memoize.
@@ -33,13 +37,13 @@ Date: 2021-8-15
     - Removed hardcoded alpha from Color() logistic colors.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.23
-Date: 2021-8-14
+Date: 2021-08-14
   Functions:
     - on_user_panic now filters out useless events without player_index.
     - Properly implemented Meta.Memoize for multi-argument functions.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.22
-Date: 2021-8-12
+Date: 2021-08-12
   Functions:
     - Added Player.get_selected_entity
     - Added Entity.is_real_car
@@ -49,13 +53,13 @@ Date: 2021-8-12
     - Fixed: Color was returning a reference to the internal table for named colors.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.21
-Date: 2021-7-28
+Date: 2021-07-28
   Bugfixes:
     - PluginManagerLite errored when savedata management was enabled but
       no plugin actually used it.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.20
-Date: 2021-7-21
+Date: 2021-07-21
   Functions:
     - Added Locale.compress which replaces Locale.merge
     - Added EventManagerLite.object_name
@@ -75,7 +79,7 @@ Date: 2021-7-21
     - Babelfish: Made babelfish-demo a seperate plugin.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.19
-Date: 2021-7-15
+Date: 2021-07-15
   Plugins:
     - Babelfish: Added translate_prototype_name
     - Babelfish: Added on_user_panic compatibility.
@@ -86,7 +90,7 @@ Date: 2021-7-15
     - Babelfish: Prepared for potential future Utf8 improvements.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.18
-Date: 2021-7-14
+Date: 2021-07-14
   Functions:
     - Added Lock.is_locked
     - Renamed Lock.RemoveLock to Lock.remove_lock
@@ -97,13 +101,13 @@ Date: 2021-7-14
     - Standardized and cleaned up plugin init logic.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.17
-Date: 2021-7-13
+Date: 2021-07-13
   Functions:
     - New module Prototype
     - Added Prototype.get_absolute_order
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.16
-Date: 2021-7-12
+Date: 2021-07-12
   Bugfixes:
     - Fixed something. Forgot what it was. ^_^"
 ---------------------------------------------------------------------------------------------------

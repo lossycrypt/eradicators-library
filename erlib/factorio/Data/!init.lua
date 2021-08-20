@@ -271,7 +271,7 @@ function Data.Path.join(...)
 --------------------------------------------------------------------------------
 Data.Icon = {}
 
-----------
+-- -------
 -- Creates a basic icon table.
 -- 
 -- @tparam string root The path of the folder containing the image.
@@ -294,6 +294,8 @@ Data.Icon = {}
 --   > }
 --
 function Data.Icon.SimpleIconTable(root, filename, size, tint)
+  error('Data.Icon.SimpleIconTable is deprecated')
+  
   local size = size or tonumber(filename:match'(%d+)²%.png$')
   Verify(size, 'number', 'Missing icon size.')
 

@@ -28,8 +28,10 @@ local Array       = elreq('erlib/lua/Array'        )()
 
 local Verificate  = elreq('erlib/lua/Verificate')()
 local verify      = Verificate.verify
-
 local isTable     = Verificate.isType.table
+
+local Player      = elreq('erlib/factorio/Player'    )()
+local get_player  = Player.get_player
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -107,7 +109,7 @@ function Gui.get_ancestors(elm)
 -- @treturn LuaGuiElement The given element.
 function Gui.move(elm, w, h, x, y)
   x,y = x or 0.5, y or 0.5 --range 0~1, how far on each axis the elm center is displaced from center
-  local p     = game.players[elm.player_index]
+  local p     = get_player(elm.player_index)
   local res   = p.display_resolution
   local scale = p.display_scale
   local loc   = {(res.width - (w*scale)) * x, (res.height - (h*scale)) * y}

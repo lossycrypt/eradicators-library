@@ -25,6 +25,9 @@ local plugin_array = {
   -- "framework"
   {'tips-group'                 , {    d3,     ul, enabled = true}},
                 
+  -- "shared prototypes"
+  {'dummy-items'                , {    d3,     ul, enabled = true}},
+
   -- "event"
   {'on_entity_created'          , {        c1,   }},
   {'on_player_changed_chunk'    , {        c1,   }},

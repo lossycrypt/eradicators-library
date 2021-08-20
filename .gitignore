@@ -16,6 +16,7 @@
 
 # Keep everything in modportal
 !/modportal/**
+!/tools/**
 
 # Keep text files
 !*.lua
