@@ -1,0 +1,81 @@
+﻿Copyright (c) 2017-2021 lossycrypt, a.k.a. "eradicator"
+
+Part I. The applicable license
+
+  This software package (hereafter "this mod") is divided into
+  several parts. Each part has it's own license. The full text
+  of each license can be found in the /tools/license-texts directory.
+
+  Hereafter "this mod" means the software package as a whole, including
+  all code, image, audio files and any other files included in the package.
+
+  All parts of this mod not explicitly listed in Part III of this
+  file are made and copyrighted by lossycrypt, hereafter "me" or
+  "the mod author". All parts made by me are licensed under:
+  
+  Creative Commons Attribution-NoDerivatives 4.0 International License.
+
+  This mod is available free of charge on the factorio mod portal and github.
+  https://mods.factorio.com/user/eradicator
+  https://github.com/lossycrypt?tab=repositories
+
+
+
+Part II. Summary
+
+  This is a human-readable summary of (and not a substitute for, or part of)
+  the license.
+
+  1. You are allowed to distribute this mod in unmodified form only (i.e. as
+     the original zip file), including this license text. You may similarly
+     include the unmodified zip file in a modpack.
+
+  2. You are allowed to use this mod in video streams (i.e. mod spotlights),
+     monetized or not. But if you make money with my mods donating some of it
+     to me would greatly encourage me to make more and better mods.
+
+  3. You may make changes to this mod for personal use only.
+
+  4. You may not distribute changed versions of this mod, or parts of this mod.
+     This includes not renaming the mod, and not forking the mod.
+
+  5. You must include this text file when you distribute this mod.
+
+  6. You must give me appropriate credit when you distribute this mod.
+
+
+
+Part III. Parts of this mod.
+
+Part III, Section A. Seperately licensed third-party assets and code.
+
+  The following is a list of files included in this mod which are not made by
+  the mod author. These files are licensable seperately from this mod. Some of
+  these files may have been modified by the mod author. Modification details
+  are logged within the respective module files.
+  
+  Base64.lua       - LGPL2        , Alex Kloss           , 2009     , http://lua-users.org/wiki/BaseSixtyFour
+  Crc32.lua        - Unkown/Public, Haoqian He           , 2019     , https://gist.github.com/SafeteeWoW/080e784e5ebfda42cad486c58e6d26e4
+  Json.lua         - MIT License  , rxi                  , 2020     , https://github.com/rxi/json.lua
+  LibDeflate.lua   - zlib License , Haoqian He           , 2018-2020, https://github.com/SafeteeWoW/LibDeflate
+  Serpent.lua      - MIT License  , Paul Kulchenko       , 2012-2018, https://github.com/pkulchenko/serpent
+  Sha2.lua         - MIT License  , Egor Skriptunoff     , 2020     , https://github.com/Egor-Skriptunoff/pure_lua_SHA
+  Sha256.lua       - MIT License  , Roberto Ierusalimschy, 2014     , http://lua-users.org/wiki/SecureHashAlgorithm
+  
+  /docs/lua-5.2/*  - Lua license  , Lua.org PUC-Rio      , 2015–2018, http://www.lua.org/manual/5.2/
+  
+  /docs/api/*      - Wube Software Ltd. Terms of Service , 2020     , https://lua-api.factorio.com/latest/
+
+  
+  /docs/mods/Raiguards_GUI_Style_Guide
+                   - MIT License  , raiguard             , 2020     , https://github.com/raiguard/Factorio-SmallMods/wiki/GUI-Style-Guide
+
+
+
+Part III, Section B. Stand-alone mods made by lossycrypt
+
+  The content of the /mods subdirectory is not licensable for commercial
+  use. The content of the /mods directory is only licensable under:
+  
+  Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International.
+

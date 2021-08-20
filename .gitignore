@@ -9,6 +9,7 @@
 
 # Keep these special files
 !licence.txt
+!license.txt
 !readme.md
 !changelog.txt
 !attribution.txt
