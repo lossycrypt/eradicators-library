@@ -11,6 +11,9 @@ Date: 2021-08-19
     - Removed redundant Data.Icon.SimpleIconTable. Use Data.Sprite.format_icon.
   Plugins:
     - Moved dummy-items from core directly into erlib.
+  Utility Mods:
+    - Universal Locale: Mod setting tooltip hint icons now come in different
+      colors depending on the content of the tooltip.
 ---------------------------------------------------------------------------------------------------
 Version: 4.2.0
 Date: 2021-08-18
