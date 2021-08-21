@@ -27,6 +27,7 @@ local plugin_array = {
                 
   -- "shared prototypes"
   {'dummy-items'                , {    d3,     ul, enabled = true}},
+  {'universal-locale'           , {    d3,         enabled = true}},
 
   -- "event"
   {'on_entity_created'          , {        c1,   }},

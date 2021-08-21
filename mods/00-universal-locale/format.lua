@@ -1,4 +1,9 @@
 ﻿
+local string_find, string_match, string_gsub
+    = string.find, string.match, string.gsub
+-- -------------------------------------------------------------------------- --
+
+
 local apply_formatting --scoping
 
 local String = require('__eradicators-library__/erlib/lua/String')()
@@ -8,15 +13,21 @@ local lt = {
    
   power_user_setting_description_header = {
     en = 'This is an advanced setting. Be careful when changing it.',
-    ja = 'こちらはヘビーユーザー専用の設定です。\\n変更時はご注意ください。',
     de = 'Dies ist eine Power-User Einstellung. Vorsicht beim Ändern.',
+    ja = 'こちらはヘビーユーザー専用の設定です。\\n    変更時はご注意ください。',
     },
 
   default_value = {
     en = 'Default Value:',
     de = 'Standardwert:',
     ja = 'デフォルト値→',
-    }
+    },
+
+  multiplayer_setting_description_header = {
+    en = 'Multiplayer-only setting. Has no effect in Singleplayer.',
+    de = 'Mehrspielereinstellung. Hat keinen Effekt im Einzelspieler.',
+    ja = 'マルチプレイ専用設定。\\n    シングルプレイに影響はありません。',
+    },
     
   }
   
@@ -44,8 +55,15 @@ local function find_description(entry, db)
 -- entry. Generates a new description if there was none.
 local function add_description_header(entry, db, msg)
   --
+  
+  -- V1:
   local x; entry.value, x = entry.value:gsub('_UL:NOAUTODESCRIPTION_','')
-  if x > 0 then return end
+  -- if x > 0 then return false end
+  
+  -- V2: Now that default values have a seperate info icon color
+  --     it's no longer nessecary to prevent dev-setting descriptions.
+  --     (Still need to remove the tag from old translations.)
+  
   --
   local desc = find_description(entry, db)
   --
@@ -71,34 +89,33 @@ local function add_description_header(entry, db, msg)
       value     = msg .. '_UL:ENDOFHEADER_'
       }, db)
     end  
+  return true end
+  
+  
+local function has_icon(entry, icon)
+  return not not string_find(entry.value, icon, 1, true)
+  end
+  
+local function append_icon_once(entry, icon)
+  if not has_icon(entry, icon) then
+    entry.value = entry.value .. ' ' .. icon
+    end
+  end
+  
+local function remove_icon(entry, icon)
+  entry.value = string_gsub(entry.value, icon .. ' ?', '')
   end
   
 local pattern_functions = {
   -- Array of *ordered* patterns. Can influence each other.
 
-
-  -- _UL:PowerUserSetting_
+  -- (MUST BE FIRST)
+  -- Remember if a non-generated description existed.
   function(entry, db)
-  
-    local count
-    entry.value, count = entry.value:gsub('%s*_UL:PowerUserSetting_%s*','')
-    if count > 0 then
-      --
-      assert(not is_description(entry), 'Power user flag must be in name not description')
-      -- Put an icon at the end of the name.
-      entry.value = entry.value .. ' _UL:ICON_TOOLTIP_ _UL:ICON_DEV_'
-      
-      -- Put a warning at the beginning of the description.
-      add_description_header(entry, db,
-         '_UL:ICON_DEV_[color=blue] '
-        .. assert(lt.power_user_setting_description_header[entry.language])
-        ..'[/color]\\n')
-      
-      end
+    entry.has_real_description = not not find_description(entry, db)
     end,
     
     
-  
   -- Inject mod setting default value description.
   function(entry, db)
     if entry.header == '[mod-setting-name]' then
@@ -121,15 +138,35 @@ local pattern_functions = {
             end
           end
         -- default_value = '"'..default_value..'"' -- Quotes are not for end-users.
-     elseif type(default_value) == 'boolean' then
-      default_value = default_value
-        and '☑' -- U+2611 ☑ BALLOT BOX WITH CHECK
-         or '☐' -- U+2610 ☐ BALLOT BOX
-      end
-      add_description_header(entry, db, 
-        ("[color=orange]%s[/color] [color=acid]%s[/color]\\n")
+      elseif type(default_value) == 'boolean' then
+        default_value = default_value
+          and '☑' -- U+2611 ☑ BALLOT BOX WITH CHECK
+           or '☐' -- U+2610 ☐ BALLOT BOX
+        end
+      if add_description_header(entry, db, 
+        '_UL:ICON_TTIP_DEFAULT_VALUE_'..
+        ("[color=orange] %s[/color] [color=acid]%s[/color]\\n")
         :format( lt.default_value[entry.language], default_value )
         )
+      then
+        if not has_icon(entry, '_UL:ICON_TOOLTIP_') then
+          append_icon_once(entry, '_UL:ICON_TTIP_DEFAULT_VALUE_')
+          end
+        end
+      end
+    end,
+
+  -- _UL:MultiPlayerSetting_
+  function(entry, db)
+    local count
+    entry.value, count = entry.value:gsub('%s*_UL:MultiPlayerSetting_%s*','')
+    if count > 0 then
+      assert(not is_description(entry), 'Multiplayer flag must be in name not description')
+      append_icon_once(entry, '_UL:ICON_TTIP_MULTIPLAYER_')
+      add_description_header(entry, db,
+         '_UL:ICON_TTIP_MULTIPLAYER_[color=purple] '
+        .. assert(lt.multiplayer_setting_description_header[entry.language])
+        ..'[/color]\\n')
       end
     end,
 
@@ -147,10 +184,32 @@ local pattern_functions = {
       -- Reason: Automatically added by engine! Wtf!
       ['[controls-description]'] = true,
       }
-    local desc = find_description(entry, db)
-    if desc and not entry.value:find '_UL:ICON_TOOLTIP_' then
+    if entry.has_real_description then
+      local desc = find_description(entry, db)
       if no_header_icon[desc.header] then return end
-      entry.value = entry.value ..' _UL:ICON_TOOLTIP_'
+      append_icon_once(entry, '_UL:ICON_TOOLTIP_')
+      end
+    end,
+
+  
+  -- _UL:PowerUserSetting_
+  function(entry, db)
+  
+    local count
+    entry.value, count = entry.value:gsub('%s*_UL:PowerUserSetting_%s*','')
+    if count > 0 then
+      --
+      assert(not is_description(entry), 'Power user flag must be in name not description')
+      -- Put an icon at the end of the name.
+      -- append_icon_once(entry, '_UL:ICON_TOOLTIP_')
+      append_icon_once(entry, '_UL:ICON_DEV_')
+      
+      -- Put a warning at the beginning of the description.
+      add_description_header(entry, db,
+         '_UL:ICON_DEV_[color=blue] '
+        .. assert(lt.power_user_setting_description_header[entry.language])
+        ..'[/color]\\n')
+      
       end
     end,
     
@@ -181,9 +240,13 @@ local pattern_functions = {
   
 local pattern_strings = {
 
-  {'_UL:ICON_DEV_'    , '[img=developer]'},
-  {'_UL:ICON_TOOLTIP_', '[img=info]'     },
+  {'_UL:ICON_DEV_ ?'    , '[img=developer]'},
+  {'_UL:ICON_TOOLTIP_ ?', '[img=info]'     },
+  
+  {'_UL:ICON_TTIP_DEFAULT_VALUE_ ?', '[img=ul:info-default]'   },
+  {'_UL:ICON_TTIP_MULTIPLAYER_ ?'  , '[img=ul:info-purple]'},
 
+  
   --hackfix
   {'_UL:0SPACE_', ''},
   {'_UL:1SPACE_', ' '},

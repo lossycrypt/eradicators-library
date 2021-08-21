@@ -33,8 +33,8 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Concepts">Concepts</a></li>
-<li><a href="#Remote_Interface">Remote Interface </a></li>
 <li><a href="#Commands">Commands </a></li>
+<li><a href="#Remote_Interface">Remote Interface </a></li>
 <li><a href="#Events">Events </a></li>
 </ul>
 
@@ -135,25 +135,6 @@
 	<td class="summary">Babelfish built-in sprites.</td>
 	</tr>
 </table>
-<h2><a href="#Remote_Interface">Remote Interface </a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#RemoteInterfaceName">RemoteInterfaceName</a></td>
-	<td class="summary">The remote interface is named <code>&quot;babelfish</code>".</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#can_translate">can_translate(pindex, types)</a></td>
-	<td class="summary">Reports if all of the given types are completely translated yet.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#find_prototype_names">find_prototype_names(pindex, types, word, options)</a></td>
-	<td class="summary">Given a user input, finds prototype names.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#translate_prototype_name">translate_prototype_name(pindex, type, name)</a></td>
-	<td class="summary">Retrieves the localised name or description of a single prototype.</td>
-	</tr>
-</table>
 <h2><a href="#Commands">Commands </a></h2>
 <table class="function_list">
 	<tr>
@@ -171,6 +152,25 @@
 	<tr>
 	<td class="name" nowrap><a href="#dump">dump</a></td>
 	<td class="summary"><code>/babelfish dump</code> Prints internal statistics to the attached terminal.</td>
+	</tr>
+</table>
+<h2><a href="#Remote_Interface">Remote Interface </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#RemoteInterfaceName">RemoteInterfaceName</a></td>
+	<td class="summary">The remote interface is named <code>&quot;babelfish</code>".</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#can_translate">can_translate(pindex, types)</a></td>
+	<td class="summary">Reports if all of the given types are completely translated yet.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#find_prototype_names">find_prototype_names(pindex, types, word, options)</a></td>
+	<td class="summary">Given a user input, finds prototype names.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#translate_prototype_name">translate_prototype_name(pindex, type, name)</a></td>
+	<td class="summary">Retrieves the localised name or description of a single prototype.</td>
 	</tr>
 </table>
 <h2><a href="#Events">Events </a></h2>
@@ -283,6 +283,73 @@
 
 
 
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Commands"></a>Commands </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "update"></a>
+    <strong>update</strong>
+    </dt>
+    <dd>
+    <code>/babelfish update</code> Updates Singleplayer language when detection failed.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "reset"></a>
+    <strong>reset</strong>
+    </dt>
+    <dd>
+    <code>/babelfish reset</code> Deletes all translations and starts from scratch.
+ Use only when everything else failed.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "demo"></a>
+    <strong>demo</strong>
+    </dt>
+    <dd>
+    <code>/babelfish demo</code> Opens a rudimentary demonstration GUI.  Just type
+ in the upper box to start searching. The gui is not optimized so the
+ generation of the result icons is a bit slow for large modpacks.
+ The sidepanel dynamically shows in red/green which SearchTypes
+ are fully translated.</p>
+
+<p> See also: <a href="../modules/Babelfish.html#HowToActivateBabelfish">HowToActivateBabelfish</a>.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "dump"></a>
+    <strong>dump</strong>
+    </dt>
+    <dd>
+    <code>/babelfish dump</code> Prints internal statistics to the attached terminal.
 
 
 
@@ -491,76 +558,6 @@
 
 </dd>
 </dl>
-    <h2 class="section-header has-description"><a name="Commands"></a>Commands </h2>
-
-          <div class="section-description">
-
-          </div>
-    <dl class="function">
-    <dt>
-    <a name = "update"></a>
-    <strong>update</strong>
-    </dt>
-    <dd>
-    <code>/babelfish update</code> Updates Singleplayer language when detection failed.
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "reset"></a>
-    <strong>reset</strong>
-    </dt>
-    <dd>
-    <code>/babelfish reset</code> Deletes all translations and starts from scratch.
- Use only when everything else failed.
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "demo"></a>
-    <strong>demo</strong>
-    </dt>
-    <dd>
-    <code>/babelfish demo</code> Opens a rudimentary demonstration GUI.  Just type
- in the upper box to start searching. The gui is not optimized so the
- generation of the result icons is a bit slow for large modpacks.
- The sidepanel dynamically shows in red/green which SearchTypes
- are fully translated.</p>
-
-<p> See also: <a href="../modules/Babelfish.html#HowToActivateBabelfish">HowToActivateBabelfish</a>.
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "dump"></a>
-    <strong>dump</strong>
-    </dt>
-    <dd>
-    <code>/babelfish dump</code> Prints internal statistics to the attached terminal.
-
-
-
-
-
-
-
-</dd>
-</dl>
     <h2 class="section-header has-description"><a name="Events"></a>Events </h2>
 
           <div class="section-description">
@@ -605,7 +602,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-08-20 02:14:23 </i>
+<i style="float:right;">Last updated 2021-08-21 02:57:20 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

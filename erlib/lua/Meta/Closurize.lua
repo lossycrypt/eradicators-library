@@ -1,4 +1,4 @@
--- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
+-- (c) eradicator a.k.a lossycrypt, 2017-2021, not seperately licensable
 
 --------------------------------------------------
 -- Creates wrapper functions that store arguments for later use.

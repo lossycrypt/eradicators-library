@@ -1,4 +1,4 @@
--- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
+-- (c) eradicator a.k.a lossycrypt, 2017-2021, not seperately licensable
 
 --------------------------------------------------
 -- Performance optimized multi- and complex-type detection and comparison.

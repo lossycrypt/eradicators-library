@@ -34,9 +34,10 @@
 <ul>
 <li><a href="#Public_methods">Public methods </a></li>
 <li><a href="#Concepts">Concepts</a></li>
+<li><a href="#Factorio_Behavior">Factorio Behavior </a></li>
 <li><a href="#Examples">Examples </a></li>
 <li><a href="#ManagedLuaBootstrap">ManagedLuaBootstrap </a></li>
-<li><a href="#Factorio_Behavior">Factorio Behavior </a></li>
+<li><a href="#Commands">Commands </a></li>
 <li><a href="#ExtraEvents">ExtraEvents</a></li>
 <li><a href="#TickedAction">TickedAction </a></li>
 </ul>
@@ -138,6 +139,21 @@
 	<td class="summary">The unique name of an event.</td>
 	</tr>
 </table>
+<h2><a href="#Factorio_Behavior">Factorio Behavior </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#api_availability">api_availability</a></td>
+	<td class="summary">What apis are available during on_init, on_load and on_config?</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#boostrap_event_order">boostrap_event_order</a></td>
+	<td class="summary">In what order do on_init, on_load and on_config happen?</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#event_handler_order">event_handler_order</a></td>
+	<td class="summary">In what order are handlers executed?</td>
+	</tr>
+</table>
 <h2><a href="#Examples">Examples </a></h2>
 <table class="function_list">
 	<tr>
@@ -206,19 +222,11 @@
 	<td class="summary">Removed.</td>
 	</tr>
 </table>
-<h2><a href="#Factorio_Behavior">Factorio Behavior </a></h2>
+<h2><a href="#Commands">Commands </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#api_availability">api_availability</a></td>
-	<td class="summary">What apis are available during on_init, on_load and on_config?</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#boostrap_event_order">boostrap_event_order</a></td>
-	<td class="summary">In what order do on_init, on_load and on_config happen?</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#event_handler_order">event_handler_order</a></td>
-	<td class="summary">In what order are handlers executed?</td>
+	<td class="name" nowrap><a href="#dump">dump</a></td>
+	<td class="summary">Dumps handler registration data to the attached terminal.</td>
 	</tr>
 </table>
 <h2><a href="#ExtraEvents">ExtraEvents</a></h2>
@@ -363,6 +371,96 @@
  any name string of a <a href="../api/LuaCustomInputPrototype.html#LuaCustomInputPrototype.">LuaCustomInputPrototype</a>,
  or one of the literal strings
  <code>&quot;on_load</code>", <code>&quot;on_config</code>" and <code>&quot;on_configuration_changed</code>".
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Factorio_Behavior"></a>Factorio Behavior </h2>
+
+          <div class="section-description">
+           See also <a href="../api/Data-Lifecycle.html#">-Lifecycle</a>.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "api_availability"></a>
+    <strong>api_availability</strong>
+    </dt>
+    <dd>
+    What apis are available during on_init, on_load and on_config?
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">on_init   : remote commands settings rcon rendering script game global[R/W]
+on_load   : remote commands settings rcon           script      global[R]
+on_config : remote commands settings rcon rendering script game global[R/W]
+</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "boostrap_event_order"></a>
+    <strong>boostrap_event_order</strong>
+    </dt>
+    <dd>
+
+<p>In what order do on_init, on_load and on_config happen? </p>
+
+<p>  Absurdly the engine raises on_load* <em>before</em> on_config, at best causing
+  unnesscary work, at worst running it on outdated global data. There's nothing
+  I can do about that so you have to take countermeasures yourself.
+  Don't forget to use migrations if nessecary.</p>
+
+<p>  See <a href="#ManagedLuaBootstrap.on_init">ManagedLuaBootstrap.on_init</a>
+  for why EventManagerLite never raises on_init.</p>
+
+<p>  Base game order:</p>
+<pre><code>InstallMod -&gt; StartMap                         : on_init      -         -
+InstallMod -&gt; StartMap -&gt; SaveMap    -&gt; LoadMap:   -        on_load     -
+InstallMod -&gt; StartMap -&gt; ChangeMod  -&gt; LoadMap:   -        on_load*  on_config
+StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_init      -       on_config
+</code></pre>
+
+<p>  EventManagerLite order:                                                </p>
+<pre><code>InstallMod -&gt; StartMap                         : on_config     -        -
+InstallMod -&gt; StartMap -&gt; SaveMap    -&gt; LoadMap:   -        on_load     -
+InstallMod -&gt; StartMap -&gt; UpdateMod  -&gt; LoadMap:   -        on_load*  on_config
+StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_config    -       on_config
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "event_handler_order"></a>
+    <strong>event_handler_order</strong>
+    </dt>
+    <dd>
+    In what order are handlers executed? </p>
+
+<p> When two mods or two ManagedLuaBootstrap instances each have a handler
+ for the same event, then the events are executed in the order that they
+ were loaded in. For ManagedLuaBootstrap this is determined by the module_index.</p>
+
+<p> When multiple On_nth_tick handlers occur on the same tick then the handlers
+ are executed in order from smallest to largest period. All on_tick handlers
+ are always executed before any on_nth_tick handlers.
 
 
 
@@ -756,87 +854,19 @@ script.on_config(<span class="keyword">function</span>(e)
 
 </dd>
 </dl>
-    <h2 class="section-header has-description"><a name="Factorio_Behavior"></a>Factorio Behavior </h2>
+    <h2 class="section-header "><a name="Commands"></a>Commands </h2>
 
-          <div class="section-description">
-           See also <a href="../api/Data-Lifecycle.html#">-Lifecycle</a>.
-          </div>
     <dl class="function">
     <dt>
-    <a name = "api_availability"></a>
-    <strong>api_availability</strong>
+    <a name = "dump"></a>
+    <strong>dump</strong>
     </dt>
     <dd>
-    What apis are available during on_init, on_load and on_config?
+    Dumps handler registration data to the attached terminal.
+ This command only works when the erlib debug-mode sub-mod is active.
+ Any incorrect usage is silently ignored.  </p>
 
-
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example">on_init   : remote commands settings rcon rendering script game global[R/W]
-on_load   : remote commands settings rcon           script      global[R]
-on_config : remote commands settings rcon rendering script game global[R/W]
-</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "boostrap_event_order"></a>
-    <strong>boostrap_event_order</strong>
-    </dt>
-    <dd>
-
-<p>In what order do on_init, on_load and on_config happen? </p>
-
-<p>  Absurdly the engine raises on_load* <em>before</em> on_config, at best causing
-  unnesscary work, at worst running it on outdated global data. There's nothing
-  I can do about that so you have to take countermeasures yourself.
-  Don't forget to use migrations if nessecary.</p>
-
-<p>  See <a href="#ManagedLuaBootstrap.on_init">ManagedLuaBootstrap.on_init</a>
-  for why EventManagerLite never raises on_init.</p>
-
-<p>  Base game order:</p>
-<pre><code>InstallMod -&gt; StartMap                         : on_init      -         -
-InstallMod -&gt; StartMap -&gt; SaveMap    -&gt; LoadMap:   -        on_load     -
-InstallMod -&gt; StartMap -&gt; ChangeMod  -&gt; LoadMap:   -        on_load*  on_config
-StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_init      -       on_config
-</code></pre>
-
-<p>  EventManagerLite order:                                                </p>
-<pre><code>InstallMod -&gt; StartMap                         : on_config     -        -
-InstallMod -&gt; StartMap -&gt; SaveMap    -&gt; LoadMap:   -        on_load     -
-InstallMod -&gt; StartMap -&gt; UpdateMod  -&gt; LoadMap:   -        on_load*  on_config
-StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_config    -       on_config
-</code></pre>
-
-
-
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "event_handler_order"></a>
-    <strong>event_handler_order</strong>
-    </dt>
-    <dd>
-    In what order are handlers executed? </p>
-
-<p> When two mods or two ManagedLuaBootstrap instances each have a handler
- for the same event, then the events are executed in the order that they
- were loaded in. For ManagedLuaBootstrap this is determined by the module_index.</p>
-
-<p> When multiple On_nth_tick handlers occur on the same tick then the handlers
- are executed in order from smallest to largest period. All on_tick handlers
- are always executed before any on_nth_tick handlers.
+<p> <code>/erlib event-manager dump &lt;mod_name&gt;</code>
 
 
 
@@ -854,7 +884,9 @@ StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_config    -       o
     <strong>HowToActivateExtraEvents</strong>
     </dt>
     <dd>
-    Extra events must be activated in settings stage prior to usage.
+    Extra events must be activated in settings stage prior to usage. </p>
+
+<p> <code>erlib_enable_plugin(&lt;extra_event_name&gt;)</code>
 
 
 
@@ -863,8 +895,10 @@ StartMap   -&gt; SaveMap  -&gt; InstallMod -&gt; LoadMap: on_config    -       o
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example"><span class="comment">-- settings-updates.lua
-</span>erlib_enable_plugin(<span class="string">'on_player_changed_chunk'</span>)
+        <pre class="example"><span class="comment">-- settings.lua
+</span>erlib_enable_plugin(<span class="string">'on_entity_created'</span>)
+erlib_enable_plugin(<span class="string">'on_player_changed_chunk'</span>)
+erlib_enable_plugin(<span class="string">'on_ticked_action'</span>)
 </pre>
     </ul>
 
@@ -1173,7 +1207,7 @@ script.on_event(defines.events.on_something_happend, <span class="keyword">funct
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-08-20 02:14:23 </i>
+<i style="float:right;">Last updated 2021-08-21 02:57:20 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

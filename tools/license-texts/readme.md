@@ -14,5 +14,8 @@
   
   Creative Commons:
   
-  HTML: https://creativecommons.org/licenses/by-nd/4.0/
-  Text: https://creativecommons.org/licenses/by-nd/4.0/legalcode.txt
+  https://creativecommons.org/licenses/by-nd/4.0/
+  https://creativecommons.org/licenses/by-nd/4.0/legalcode.txt
+  
+  https://creativecommons.org/licenses/by-nc-nd/4.0/
+  https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.txt

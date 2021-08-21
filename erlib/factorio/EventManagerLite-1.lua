@@ -621,8 +621,12 @@ if flag.IS_DEV_MODE then
   Private.on_event('event-manager',
     defines.events.on_console_command,
     function(e)
-      if e.command == 'erlib' and e.parameters == 'event-manager dump' then
-        Private.dump_data_to_console()
+      if e.command == 'erlib' then
+        local mod_name = e.parameters:match('^event%-manager dump ([^ ]+)$')
+        if script.mod_name == mod_name then
+          -- e.parameters == 'event-manager dump' then
+          Private.dump_data_to_console()
+          end
         end
       end)
   end
@@ -653,6 +657,66 @@ if flag.IS_DEV_MODE then
 -- 
 -- @within Concepts
 -- @table EventName
+do end
+
+
+--------------------------------------------------------------------------------
+-- Factorio Behavior.
+-- See also @{FAPI Data-Lifecycle}.
+-- @section
+--------------------------------------------------------------------------------
+
+----------
+-- What apis are available during on\_init, on\_load and on\_config?
+--
+-- @usage
+--   on_init   : remote commands settings rcon rendering script game global[R/W]
+--   on_load   : remote commands settings rcon           script      global[R]
+--   on_config : remote commands settings rcon rendering script game global[R/W]
+-- 
+-- @table api_availability
+do end
+
+--[[------
+  In what order do on\_init, on\_load and on\_config happen?
+
+  Absurdly the engine raises on\_load* *before* on\_config, at best causing
+  unnesscary work, at worst running it on outdated global data. There's nothing
+  I can do about that so you have to take countermeasures yourself.
+  Don't forget to use migrations if nessecary.
+  
+  See [ManagedLuaBootstrap.on_init](#ManagedLuaBootstrap.on_init)
+  for why EventManagerLite never raises on\_init.
+  
+  Base game order:
+    InstallMod -> StartMap                         : on_init      -         -      
+    InstallMod -> StartMap -> SaveMap    -> LoadMap:   -        on_load     -      
+    InstallMod -> StartMap -> ChangeMod  -> LoadMap:   -        on_load*  on_config
+    StartMap   -> SaveMap  -> InstallMod -> LoadMap: on_init      -       on_config
+                                                                         
+  EventManagerLite order:                                                
+    InstallMod -> StartMap                         : on_config     -        -
+    InstallMod -> StartMap -> SaveMap    -> LoadMap:   -        on_load     -      
+    InstallMod -> StartMap -> UpdateMod  -> LoadMap:   -        on_load*  on_config
+    StartMap   -> SaveMap  -> InstallMod -> LoadMap: on_config    -       on_config
+    
+ @table boostrap_event_order
+--]]
+do end
+
+----------
+-- In what order are handlers executed?
+--
+-- When two mods or two ManagedLuaBootstrap instances each have a handler
+-- for the same event, then the events are executed in the order that they
+-- were loaded in. For ManagedLuaBootstrap this is determined by the module\_index.
+--
+-- When multiple On\_nth\_tick handlers occur on the same tick then the handlers
+-- are executed in order from smallest to largest period. All on\_tick handlers
+-- are always executed before any on\_nth\_tick handlers.
+--
+--
+-- @table event_handler_order
 do end
 
 --------------------------------------------------------------------------------
@@ -855,63 +919,20 @@ do end
 -- @function ManagedLuaBootstrap.get_event_filter
 do end
 
+
 --------------------------------------------------------------------------------
--- Factorio Behavior.
--- See also @{FAPI Data-Lifecycle}.
+-- Commands.
 -- @section
 --------------------------------------------------------------------------------
 
 ----------
--- What apis are available during on\_init, on\_load and on\_config?
+-- Dumps handler registration data to the attached terminal.
+-- This command only works when the erlib debug-mode sub-mod is active.
+-- Any incorrect usage is silently ignored.  
 --
--- @usage
---   on_init   : remote commands settings rcon rendering script game global[R/W]
---   on_load   : remote commands settings rcon           script      global[R]
---   on_config : remote commands settings rcon rendering script game global[R/W]
--- 
--- @table api_availability
-do end
-
---[[------
-  In what order do on\_init, on\_load and on\_config happen?
-
-  Absurdly the engine raises on\_load* *before* on\_config, at best causing
-  unnesscary work, at worst running it on outdated global data. There's nothing
-  I can do about that so you have to take countermeasures yourself.
-  Don't forget to use migrations if nessecary.
-  
-  See [ManagedLuaBootstrap.on_init](#ManagedLuaBootstrap.on_init)
-  for why EventManagerLite never raises on\_init.
-  
-  Base game order:
-    InstallMod -> StartMap                         : on_init      -         -      
-    InstallMod -> StartMap -> SaveMap    -> LoadMap:   -        on_load     -      
-    InstallMod -> StartMap -> ChangeMod  -> LoadMap:   -        on_load*  on_config
-    StartMap   -> SaveMap  -> InstallMod -> LoadMap: on_init      -       on_config
-                                                                         
-  EventManagerLite order:                                                
-    InstallMod -> StartMap                         : on_config     -        -
-    InstallMod -> StartMap -> SaveMap    -> LoadMap:   -        on_load     -      
-    InstallMod -> StartMap -> UpdateMod  -> LoadMap:   -        on_load*  on_config
-    StartMap   -> SaveMap  -> InstallMod -> LoadMap: on_config    -       on_config
-    
- @table boostrap_event_order
---]]
-do end
-
-----------
--- In what order are handlers executed?
+-- `/erlib event-manager dump <mod_name>`
 --
--- When two mods or two ManagedLuaBootstrap instances each have a handler
--- for the same event, then the events are executed in the order that they
--- were loaded in. For ManagedLuaBootstrap this is determined by the module\_index.
---
--- When multiple On\_nth\_tick handlers occur on the same tick then the handlers
--- are executed in order from smallest to largest period. All on\_tick handlers
--- are always executed before any on\_nth\_tick handlers.
---
---
--- @table event_handler_order
+-- @table dump
 do end
 
 
@@ -922,13 +943,18 @@ do end
 ----------
 -- Extra events must be activated in settings stage prior to usage.
 -- 
+-- `erlib_enable_plugin(<extra_event_name>)`
+-- 
 -- @usage
---   -- settings-updates.lua
+--   -- settings.lua
+--   erlib_enable_plugin('on_entity_created')
 --   erlib_enable_plugin('on_player_changed_chunk')
+--   erlib_enable_plugin('on_ticked_action')
 --
 -- @within ExtraEvents
 -- @table HowToActivateExtraEvents
 do end
+
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

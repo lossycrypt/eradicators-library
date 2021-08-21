@@ -1,4 +1,4 @@
-﻿-- (c) eradicator a.k.a lossycrypt, 2017-2020, not seperately licensable
+﻿-- (c) eradicator a.k.a lossycrypt, 2017-2021, not seperately licensable
 
 --[[------------------------------------------------
 
@@ -40,7 +40,7 @@
  
   @file Introduction
   @author lossycrypt (factorio: eradicator)
-  @copyright Eradicators Library, lossycrypt, 2017-2020
+  @copyright Eradicators Library, lossycrypt, 2017-2021
   @license CC Attribution-NoDerivatives 4.0 International
 
 ]]

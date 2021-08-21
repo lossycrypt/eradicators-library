@@ -8,7 +8,9 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
 
   ['[mod-setting-name]'] = {
     [const.setting_name.network_rate] = {
-      en = '_UL:PowerUserSetting_ Babelfish: Maximum Network Usage (KiB/s)',
+      en = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ Babelfish: Maximum Network Usage (KiB/s)',
+      de = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ Babelfisch: Maximaler Datenverbrauch (KiB/s)',
+      ja = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ バベルフィッシュさん: 最大使用帯域 (KiB/秒)',
       },
     [const.setting_name.string_match_type] = {
       en = 'Babelfish: Search Mode',
@@ -50,7 +52,6 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
   ['[mod-setting-description]'] = {
     [const.setting_name.network_rate] = {
       en = 'Rough approximation of how much network bandwidth Babelfish will use while translating. '
-        .. 'Has no effect in Singleplayer. '
         .. 'No bandwidth is used once translation is done. '
         .. '\\n\\n'
         .. 'While Babelfish is working you can hover the small icon in the upper '
@@ -60,6 +61,13 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
         .. 'translated on the server, then they might be dropped or unable to '
         .. 'join a server if this setting is too high. In that case '
         .. 'temporarily lower the setting until translation is done. ',
+        
+      -- STUB!
+      de = 'Grobe Schätzung des Datenverbrauchs während der Übersetzung.'
+        ,
+      ja = '翻訳中に使用される大よその回線帯域。'
+        ,
+      
       },
     [const.setting_name.string_match_type] = {
       en = 'Changes how text you enter into the search fields of '
