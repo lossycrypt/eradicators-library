@@ -14,19 +14,42 @@ local Setting = elreq('erlib/factorio/Setting')()
 -- -------------------------------------------------------------------------- --
 local const       = require 'plugins/babelfish/const'
 local initconst   = require 'plugins/!init/const'
-local SearchTypes = require 'plugins/babelfish/modules/SearchTypes'
+local SearchTypes = require 'plugins/babelfish/control/SearchTypes'
 
 -- -------------------------------------------------------------------------- --
+-- map
 
 Data.Inscribe{
   name          = const.setting_name.network_rate,
   type          = 'double-setting'          ,
   setting_type  = 'runtime-global'          ,
-  order         = 'babelfish-101'           ,
+  order         = 'babelfish-1-1'           ,
   default_value = 64                        ,
   minimum_value = 0.000001                  ,
   maximum_value = 10000000                  , -- 10GiB/s
   }
+  
+  
+Setting.make {
+  const.setting_name.sp_instant_translation,
+  'map', 'bool', true,
+  'babelfish-1-2',
+  hidden         = (not flag.IS_DEV_MODE),
+  forced_value   = true                  , -- only loaded when hidden
+  }
+  
+
+Setting.make {
+  const.setting_name.enable_packaging,
+  'map', 'bool', true,
+  'babelfish-1-3',
+  -- hidden         = (not flag.IS_DEV_MODE),
+  -- forced_value   = true                  , -- only loaded when hidden
+  }
+
+
+-- -------------------------------------------------------------------------- --
+-- player
 
 Data.Inscribe{
   name          = const.setting_name.string_match_type,
@@ -35,14 +58,6 @@ Data.Inscribe{
   order         = 'babelfish-102'           ,
   default_value = 'plain'                   ,
   allowed_values= {'plain', 'fuzzy', 'lua'} ,
-  }
-
-Setting.make {
-  const.setting_name.sp_instant_translation,
-  'map', 'bool', true,
-  'babelfish-1',
-  hidden         = (not flag.IS_DEV_MODE),
-  forced_value   = true                  , -- only loaded when hidden
   }
 
   

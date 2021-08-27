@@ -662,7 +662,7 @@ do end
 
 --------------------------------------------------------------------------------
 -- Factorio Behavior.
--- See also @{FAPI Data-Lifecycle}.
+-- See also @{FAPI Data-Lifecycle|Data-Lifecycle}.
 -- @section
 --------------------------------------------------------------------------------
 

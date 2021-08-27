@@ -199,6 +199,11 @@
 -- @name Pattern
 -- @class field
 
+----------
+-- A @{string} of length 0 that has no content.
+--
+-- @name EmptyString
+-- @class field
 
 
 --------------------------------------------------------------------------------

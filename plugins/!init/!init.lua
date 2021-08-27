@@ -121,7 +121,7 @@ return function(phase) assert(phase)
       erlib_enable_plugin('babelfish-demo')
       erlib_enable_plugin('babelfish', {
         search_types = 
-          require 'plugins/babelfish/modules/SearchTypes'
+          require 'plugins/babelfish/control/SearchTypes'
           .get_supported_array()
         })
       end

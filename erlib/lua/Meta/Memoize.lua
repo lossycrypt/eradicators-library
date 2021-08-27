@@ -75,8 +75,11 @@ local function Memoize(a, b, c)
 -- table, and therefore all future results.
 -- 
 -- @tparam function f
+--
 -- @treturn table a function-like indexable MemoTable.
--- @function Memoize
+--
+-- @treturn function A parameterless function that can be called
+-- to clear the cached results. In case you want to free up memory.
 --
 -- @usage
 --   -- Simply call Memoize() with the function you want to memoize.
@@ -91,10 +94,16 @@ local function Memoize(a, b, c)
 --   -- is really fast! Even for this simple 2*a example it only takes 1/3rd
 --   -- of the time it would to call the un-memoized function.
 --   local four = memodoubleup[2]
+--
+-- @function Memoize
+--
 
 -- Simple one-argument Memoizer (V2)
 function _Memo1(f)
-  return setmetatable({}, {
+
+  local cache = {}
+  
+  local mt = {
     __index = function(self, key)
       local value = f(key) -- Can be nil.
       rawset(self, key, value)
@@ -105,8 +114,15 @@ function _Memo1(f)
     __pairs    = function() err('Memoized function is not iterable.') end,
     __ipairs   = function() err('Memoized function is not iterable.') end,
     __newindex = function() err('Memoized function is not writable.') end,
-    })
-  end
+    }
+    
+  local function f_clear()
+    setmetatable(cache, nil)
+    Table.clear(cache)
+    setmetatable(cache, mt)
+    end
+    
+  return setmetatable(cache, mt), f_clear end
 
 -- -------------------------------------------------------------------------- --
 

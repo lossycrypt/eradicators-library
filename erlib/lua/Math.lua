@@ -109,7 +109,7 @@ function Math.ceil(n, base)
 -- @tparam number limitB
 --
 -- @treturn number The given number or one of the limits.
-function Math.limit_range(limitA, number, limitB) 
+function Math.limit(limitA, number, limitB) 
   --@future: rename "clamp"?
   local low  = (limitA < limitB) and limitA or limitB
   local high = (limitA == low  ) and limitB or limitA

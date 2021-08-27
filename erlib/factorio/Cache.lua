@@ -55,8 +55,9 @@ local table_insert, table_remove = table.insert, table.remove
 -- in the first event you need it.
 -- 
 -- __Warning:__ Because the constructor is called in a non-deterministic
--- way it will cause desyncs or other weird bugs if you try to do anything
--- other than reading startup settings or game.*_prototypes.
+-- way it will cause __desync__s or other weird bugs if you try to do anything
+-- other than reading startup settings or game.*_prototypes. You __must not__
+-- store any LuaObject wrappers, only pure lua values are desync-safe.
 -- 
 -- @tparam function constructor This is called exactly once __with an empty table__
 -- as the only argument. It __must then fill that table__ with the desired values.
@@ -102,8 +103,10 @@ do
     -- allowing to read nil can make the cache significantly smaller
     -- respect metatable set by the constructor
     local mt = (debug.getmetatable(self) or {})
-    debug.setmetatable(self,mt)
-    if not mt.__newindex then mt.__newindex = read_only_error end
+    debug.setmetatable(self, mt)
+    -- But block writing because that can't possibly be desync safe.
+    mt.__newindex = read_only_error
+    -- if not mt.__newindex then mt.__newindex = read_only_error end
     end
 
 --v4.0

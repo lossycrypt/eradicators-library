@@ -1,4 +1,25 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.2.2
+Date: 2021-08-26
+  Functions:
+    - Breaking change! Renamed Math.limit_range to Math.limit.
+    - Added cache clearing function for single-argument Memoize.
+    - Added PluginManagerLite.get_savedata_default
+    - Added some documentation to the still mostly undocumented Log module.
+    - Added Locale.normalise
+    - Added Locale.nlstring_size
+    - Added Locale.nlstring_to_string
+    - Added Locale.nlstring_is_equal
+  Plugins:
+    - Babelfish: API finalized.
+    - Babelfish: Reduced code complexity.
+  Bugfixes:
+    - Fixed PluginManagerLite.manage_savedata overwriting default savedata
+      with nil when called more than once.
+  Utility Mods:
+    - Universal Locale: Fixed that auto-generated descriptions were sometimes
+      not fully formatted.
+---------------------------------------------------------------------------------------------------
 Version: 4.2.1
 Date: 2021-08-19
   Functions:

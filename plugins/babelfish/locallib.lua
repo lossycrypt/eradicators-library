@@ -48,49 +48,37 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
 -- -------------------------------------------------------------------------- --
-local script = EventManager .get_managed_script    'template'
 -- local import = PluginManager.make_relative_require 'template'
 -- local const  = import '/const'
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
--- local This = {}
+local Local = {}
 
 -- -------------------------------------------------------------------------- --
 -- Local Library                                                              --
 -- -------------------------------------------------------------------------- --
 
--- -------------------------------------------------------------------------- --
--- Savedata                                                                   --
--- -------------------------------------------------------------------------- --
--- local Savedata
--- local SavedataDefaults = {players = {}}
--- PluginManager.manage_savedata  ('template', function(_) Savedata = _ end, SavedataDefaults)
--- PluginManager.manage_garbage   ('template')
--- PluginManager.classify_savedata('template', {
--- 
---   init_pdata = function(self, pindex)
---     return Table.set(self.players, {assert(pindex)}, {
---       p = game.players[pindex],
---       })
---     end,
--- 
---   get_pdata = function(self, e, pindex)
---     local pdata = assert(self.players[pindex or e.player_index])
---     return pdata, pdata.p end,
--- 
---   sget_pdata = function(self, e, pindex)
---     local pdata = self.players[pindex or e.player_index]
---             or self:init_pdata(pindex or e.player_index)
---     return pdata, pdata.p end,
--- 
---   del_pdata = function(self, e, pindex)
---     self.players[pindex or e.player_index] = nil
---     end,
---   
---   })
+-- Creates an auto-resetting profiler or a dummy function.
+function Local.get_profiler()
+  return (not flag.IS_DEV_MODE) and ercfg.SKIP or (function(profiler)
+    return function(msg) _ENV.log{'', msg, profiler}; profiler.restart() end
+    end)(game.create_profiler())
+  end
+
+ 
+-- -- Creates a function that automatically calls a constructor
+-- -- function f once. And returns the result of f() on all 
+-- -- subsequent calls.
+-- function Local.make_table_getter(f)
+--   local r1, r2, g
+--   function g() r1, r2 = f(); g = function() return r1, r2 end; return g() end
+--   return function() return g() end
+--   end
+
+-- ticks per second
+function Local.ticks_per_second_float() return            60 * game.speed  end
+function Local.ticks_per_second_int  () return math.floor(60 * game.speed) end
   
--- -------------------------------------------------------------------------- --
--- Events                                                                     --
--- -------------------------------------------------------------------------- --
+return Local

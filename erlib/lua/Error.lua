@@ -84,7 +84,7 @@ local template; do
   
   if flag.IS_FACTORIO_CONTROL then
     template = {
-         -- seperator,
+         seperator,
          hotkey_hint,
       -- "                                                                  ",
       "  [font=default-semibold][color=#ffe5bd]                          ",

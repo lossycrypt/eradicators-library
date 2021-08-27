@@ -55,6 +55,7 @@ file = {
     root..'/erlib/test/_TemplateModule.lua',
     root..'/erlib/lua/_TemplateModule.lua',
     root..'/erlib/factorio/_TemplateModule.lua',
+    root..'/erlib/factorio/Data/_TemplateModule.lua',
     
     root..'/erlib/test/_TemplateTest.lua',
     

@@ -66,7 +66,7 @@ local _SwitchCase = function(analyzer,cases)
   end
 local function SwitchCase (analyzer,cases)
   local default = cases.default or ercfg.SKIP
-  return function(...)    
+  return function(...)
     local f = cases[analyzer(...)] or default
     return f(...)
     end

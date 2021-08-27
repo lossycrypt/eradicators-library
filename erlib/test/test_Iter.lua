@@ -317,8 +317,35 @@ local function Test()
     say('  TESTR  @  erlib.Iter.ntuples → Ok.')
     end
     
+  do -- Iter.array_pairs
+  
+    local function f(tbl, arr, i, j)
+      local n = 0
+      for k, v in Iter.array_pairs(tbl, i, j) do
+        n = n + 1
+        assert(k ~= nil)
+        assert(v ~= nil)
+        assert(tbl[k] == v)
+        print(n, k, v)
+        assert(arr[n] == v)
+        end
+      assert(n == #arr)
+      assert((j == nil) or (n <= j))
+      end
+    
+    f(  {'a', nil, nil, 'b', nil, 'c', 'd', nil, 'e'}
+      , {'a', 'b', 'c', 'd', 'e'} )
+    f(  {'a', nil, nil, 'b', nil, 'c', 'd', nil, 'e'}
+      , {'b', 'c', 'd'} , 3, 8)
+      
+    f( {1,2,3,4,5,6,7,8,9,10}, {1,2,3,4,5,6,7,8,9,10} )
+    
+    f( {1,2,3,4,5,6,7,8,9,10}, {3,4,5,6}, 3, 6 )
+  
+    say('  TESTR  @  erlib.Iter.array_pairs → No test implemented.')
+    end
+  
 
-  say('  TESTR  @  erlib.Iter.array_pairs → No test implemented.')
   say('  TESTR  @  erlib.Iter.dpairs → No test implemented.')
   say('  TESTR  @  erlib.Iter.fpairs → No test implemented.')
   end

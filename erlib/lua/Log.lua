@@ -33,9 +33,9 @@ local Hydra      = elreq('erlib/lua/Coding/Hydra')()
 -- can't use String because it requires Verificate, which is too large
 -- and Log should be light-weight.
 
-local stop = Error.Stopper('Logger')
+local stop       = Error.Stopper('Logger')
+local assertify  = elreq('erlib/lua/Error'     )().Asserter(stop)
 
-local SKIP       = ercfg.SKIP
 
 local const = {
 
@@ -61,6 +61,8 @@ local const = {
     warn  = 1            ,
     info  = 2            ,
     debug = 3            ,
+    --
+    debugf= 3            ,
     --
     say   = 4            ,
     tell  = 4            ,
@@ -101,7 +103,7 @@ local const = {
 
 local Log,_Log,_uLocale = {},{},{}
 
-----------
+-- -------
 -- Nothing.
 -- @within Todo
 -- @field todo1
@@ -279,69 +281,70 @@ function Log:do_log_seperator(sep, ...)
   
   
 --------------------------------------------------------------------------------
--- Base Class.
+-- Module methods.
 -- @section
 --------------------------------------------------------------------------------
 
--- Loggers shouldn't be created at runtime and
--- they also should never alter the game-state
--- so this should be safe?
--- local known_loggers = {}
-
-
--- local _obj_mt = {__index=Log} -- needs to contain individual print/log/SKIP functions
-
-function Log.Logger(logger_name,opts)
-
-  if not (type(logger_name) == 'string' and logger_name ~= '') then
-    stop('Missing logger_name.')
+do 
+    
+  local assert_name = function(name)
+    return assertify(
+      (type(name) == 'string') and (name ~= ''),
+      'Missing logger name.')
     end
 
+  local new = function(name)
+    local log = {}
+    log .name            = assert_name(name)
+    log .module_mod_name = Stacktrace.get_mod_name( 2) -- Results in library most of the time
+    log .user_mod_name   = Stacktrace.get_mod_name(-1) -- The mod that *uses* the library.
+    Log.update_log_level(log) -- applies leveled metatable
+    return log end
 
-  opts = opts or {}
+  local loggers = setmetatable({}, {
+    __index=function(self, name)
+      local log = new(name)
+      self[name] = log
+      return log end,
+    })
 
-  -- local mod_name = Stacktrace.get_mod_name(2)
-  
-  -- local new = setmetatable({},_obj_mt)
-  local new = {}
-
-  new .module_mod_name = Stacktrace.get_mod_name(2) -- Results in library most of the time
-  new .user_mod_name = Stacktrace.get_mod_name(-1) -- The mod that *uses* the library.
-  
-  new .logger_name = logger_name
-  
-  Log.update_log_level(new) -- applies leveled metatable
-  
-  
-  -- Extra init option instead of auto-detection by mode?
-  -- Would allow me to persontally have terminal print even in lower log-levels.
-  -- But makes testing non-dev-mode logging slightly more annoying.
-  if opts.print_to_terminal then
-    new.stdout = print
-  -- else
-    -- new.stdout = stdout_log
+  ----------
+  -- Creates or retrieves a Logger object.
+  -- 
+  -- @tparam string logger_name
+  -- 
+  -- @treturn Logger Returns a references to the previously created object
+  -- of the same name if one exists. Else creates a new one.
+  -- 
+  -- @function Log.Logger
+  function Log.Logger(name)
+    return loggers[name]
     end
-  
-  
-  -- I want some method that allows remotely changing *all* 
-  -- existing loggers at once. That way each plugin can have a seperate logger.
-  -- Without them all needing to watch settings changes.
-  -- Or would it be better to just have on generic logger?
-  -- With custom prefix maybe?
-  --
-  -- Usecase: Disable all but specific plugin logging to reduce logspam.
-  -- if not _ENV.game then
-    -- Is excluding runtime loggers enough?
-    -- known_loggers[#known_loggers+1] = new
-    -- end
-  
-  return new
+    
+  ----------
+  -- Makes one or more loggers silent. For reducing logspam.
+  -- 
+  -- @tparam nil|DenseArray names A list of logger names to silence.
+  -- If no list is given then all loggers created so far are silenced.
+  -- 
+  -- @function Log.set_silent
+  function Log.set_silent(names)
+    local tbl = (function(r)
+      if type(names) == 'table' then
+        for _, name in ipairs(names) do r[name] = loggers[name] end
+        return r end
+      end){}
+    for name, log in pairs(tbl or loggers) do
+      log:set_log_level(0)
+      end
+    end
+    
   end
 
 
   
 --------------------------------------------------------------------------------
--- Log functions.
+-- Logger methods.
 -- @section
 --------------------------------------------------------------------------------
   
@@ -357,7 +360,7 @@ function Log:err(...)
   -- Tail call removes this function from the
   -- stack, resulting in correct file:line info
   -- for the caller.
-  return Error.Error('Logger',self.module_mod_name,...)
+  return Error.Error('Logger', self.module_mod_name,...)
   end
   
 function Log:warn  (...) return self:do_log_line (const.level['Warnings'   ],...) end 
@@ -366,27 +369,31 @@ function Log:debug (...) return self:do_log_line (const.level['Everything' ],...
 function Log:say   (...) return self:do_log_line (const.level['DEV_MODE'   ],...) end
 function Log:tell  (...) return self:do_log_block(const.level['DEV_MODE'   ],...) end
 
+function Log:debugf(...) return self:do_log_line (const.level['Everything' ],string.format(...)) end
+
+
+
 local _head, _foot = ('―'):rep(100)..'\n', ('.'):rep(200)..'\n'
 function Log:header(...) return self:do_log_seperator(_head, ...) end
 function Log:footer(...) return self:do_log_seperator(_foot, ...) end
 
 function Log:raw   (...) return log(...) end -- Factorio native logger
 
---------------------------------------------------------------------------------
--- Methods.
--- @section
---------------------------------------------------------------------------------
+-- -------------------------------------------------------------------------- --
 
 
 -- Should log level be from module or user... or always library?
 -- I thought the point was to try user first and then try library!
 function Log:update_log_level()
-  return Log.set_log_level(self,get_log_level_setting_value(self.module_mod_name))
+  return Log.set_log_level(self, get_log_level_setting_value(self.module_mod_name))
   end
 
 
   
-  
+----------
+-- Change log level
+-- @tparam number log_level 0,1,2,3,4
+-- @function Logger:set_log_level
 function Log:set_log_level(log_level)
   local index = {}
   
@@ -431,7 +438,7 @@ do
       end
     for name,level in pairs(const.method_level) do
       if log_level < level then
-        this[name] = SKIP
+        this[name] = ercfg.SKIP
         -- this[name] = nil --debug
         end
       end

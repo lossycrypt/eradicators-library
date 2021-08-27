@@ -49,7 +49,7 @@ local Name   = const.name
 local W, H   = const.gui.width, const.gui.height
 
 local babelconst  = require 'plugins/babelfish/const'
-local SearchTypes = require 'plugins/babelfish/modules/SearchTypes'
+local SearchTypes = require 'plugins/babelfish/control/SearchTypes'
 
 local Babelfish = Remote.get_interface(babelconst.remote.interface_name)
 
@@ -182,11 +182,13 @@ function Demo:update_sidebar()
   if not sidebar then return end
   -- update labels
   local ok = {
-    [true ] = 'bold_green_label',
-    [false] = 'bold_red_label'  ,
+    ['true' ] = 'bold_green_label',
+    ['false'] = 'bold_red_label'  ,
+    ['nil'  ] = 'bold_red_label'  ,
     }
   for _, child in pairs(sidebar.children) do
-    child.label.style = ok[Babelfish.can_translate(self.p.index, child.name)]
+    child.label.style
+      = ok[tostring(Babelfish.can_translate(self.p.index, child.name))]
     end
   end
   

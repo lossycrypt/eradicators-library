@@ -1,5 +1,9 @@
 ﻿-- (c) eradicator a.k.a lossycrypt, 2017-2021, not seperately licensable
--- -------------------------------------------------------------------------- --
+
+--------------------------------------------------------------------------------
+-- Babelfish.
+-- @module Babelfish
+
 
 --[[ Notes:
   ]]
@@ -36,6 +40,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- local Set         = elreq('erlib/lua/Set'          )()
 -- local Filter      = elreq('erlib/lua/Filter'       )()
 -- local Vector      = elreq('erlib/lua/Vector'       )()
+local String      = elreq('erlib/lua/String'    )()
 
 -- local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
 -- local dpairs      = elreq('erlib/lua/Iter/dpairs'  )()
@@ -48,49 +53,26 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
 -- -------------------------------------------------------------------------- --
-local script = EventManager .get_managed_script    'template'
--- local import = PluginManager.make_relative_require 'template'
--- local const  = import '/const'
+
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 -- local This = {}
 
--- -------------------------------------------------------------------------- --
--- Local Library                                                              --
--- -------------------------------------------------------------------------- --
 
 -- -------------------------------------------------------------------------- --
--- Savedata                                                                   --
+-- UTF8 (Dummy Implementation)                                                --
 -- -------------------------------------------------------------------------- --
--- local Savedata
--- local SavedataDefaults = {players = {}}
--- PluginManager.manage_savedata  ('template', function(_) Savedata = _ end, SavedataDefaults)
--- PluginManager.manage_garbage   ('template')
--- PluginManager.classify_savedata('template', {
--- 
---   init_pdata = function(self, pindex)
---     return Table.set(self.players, {assert(pindex)}, {
---       p = game.players[pindex],
---       })
---     end,
--- 
---   get_pdata = function(self, e, pindex)
---     local pdata = assert(self.players[pindex or e.player_index])
---     return pdata, pdata.p end,
--- 
---   sget_pdata = function(self, e, pindex)
---     local pdata = self.players[pindex or e.player_index]
---             or self:init_pdata(pindex or e.player_index)
---     return pdata, pdata.p end,
--- 
---   del_pdata = function(self, e, pindex)
---     self.players[pindex or e.player_index] = nil
---     end,
---   
---   })
+-- for future compatibility
+
+local Utf8 = {
+  lower = string.lower,
+  find  = string.find ,
+  to_array              = String.to_array,
+  find_fuzzy            = String.find_fuzzy,
+  remove_whitespace     = String.remove_whitespace,
+  remove_rich_text_tags = String.remove_rich_text_tags,
+  }
   
--- -------------------------------------------------------------------------- --
--- Events                                                                     --
--- -------------------------------------------------------------------------- --
+return Utf8

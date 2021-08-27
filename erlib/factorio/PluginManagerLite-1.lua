@@ -192,14 +192,29 @@ function Public.enable_savedata_management()
     log:debug('Recieved savedata setter for ', plugin_name)
     local this   = Table.sget(ManagedPlugins, {plugin_name}, {})
     this.path    = {'plugin_manager', 'plugins', plugin_name}
-    if default ~= nil then 
-      assert( (this.default == nil) or (Table.size(this.default) == 0)
-        , 'Savedata defaults may only be specified once.')
+    if default ~= nil then
+      assert(this.default == nil, 'Savedata default may only be specified once.')
+      this.default = Table.dcopy(default)
       end
-    this.default = Table.dcopy(default or {})
     table.insert(Table.sget(this, {'setters'}, {}), setter)
     end
 
+  ----------
+  -- Retrieves the previously supplied default table.
+  --
+  -- @tparam string plugin_name
+  --
+  -- @treturn table A __reference__ to the `default` table
+  -- given to @{PluginManagerLite.manage_savedata}. Changing
+  -- the table __will directly affect__ the default for this plugin.
+  -- It is an error if the plugin does not have a `default` table set yet.
+  --
+  -- @function PluginManagerLite.get_savedata_default
+  function Public.get_savedata_default(plugin_name)
+    local this = assert(Table.get(ManagedPlugins, {plugin_name}),
+      'Invalid plugin_name')
+    return assert(this.default, 'No default given for this plugin.') end
+    
   ----------
   -- Automatically adds meta-methods to Savedata in on\_load and on\_config.
   -- 
@@ -219,16 +234,6 @@ function Public.enable_savedata_management()
   function Public.classify_savedata(plugin_name, methods)
     local this = assert(ManagedPlugins[plugin_name], 'Unknown plugin name.')
     this.mt    = {__index = methods}
-    --
-    -- (2021-05-23: metatable magic replaced by default table)
-    -- local auto_subtables = Set.from_values{'players','forces','surfaces','map'}
-    -- if not getmetatable(methods) then
-    --   setmetatable(methods, {__index=function(_, key)
-    --     if auto_subtables[key] and _ENV.game then -- not in on_load!
-    --       return Table.set(Table.get(_ENV.global, this.path), {key}, {})
-    --       end
-    --     end})
-    --   end
     end
 
   --
@@ -237,10 +242,8 @@ function Public.enable_savedata_management()
     local is_on_load = not ((rawget(_ENV, 'game') or {}).object_name)
     local method     = (not is_on_load) and 'sget' or 'get'
     for plugin_name, this in pairs(ManagedPlugins) do
-      -- local default  = (not is_on_load) and    {plugin_name=plugin_name}  or  nil
-      local default  = (not is_on_load) and Table.dcopy(this.default) or nil
+      local default  = (not is_on_load) and (Table.dcopy(this.default) or {}) or nil
       local Savedata = Table[method](_ENV.global, this.path, default)
-      -- print(plugin_name, serpent.block(Savedata))
       if (Savedata == nil) then -- can be nil in on_load
         log:debug('No Savedata found for: ', plugin_name)
       else
@@ -259,7 +262,6 @@ function Public.enable_savedata_management()
         log:debug('Completed linking Savedata for: ', plugin_name)
         end
       end
-    -- print(serpent.block(_ENV.global))
     end
 
   local function delete_unused_savedatas()

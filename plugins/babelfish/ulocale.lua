@@ -7,19 +7,25 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
   require(_)('babelfish', {
 
   ['[mod-setting-name]'] = {
+    -- map
     [const.setting_name.network_rate] = {
-      en = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ Babelfish: Maximum Network Usage (KiB/s)',
-      de = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ Babelfisch: Maximaler Datenverbrauch (KiB/s)',
-      ja = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ バベルフィッシュさん: 最大使用帯域 (KiB/秒)',
+      en = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ Babelfish: Maximum Upload Speed (KiB/s)',
+      de = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ Babelfisch: Maximale Uploadrate (KiB/s)',
+      ja = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ バベルフィッシュさん: 最大アップロード速度 (KiB/秒)',
       },
+    [const.setting_name.sp_instant_translation] = {
+      en = '_UL:DevModeSetting_ Babelfish: Singleplayer Instant Translation _UL:NOAUTODESCRIPTION_',
+      },
+    [const.setting_name.enable_packaging] = {
+      en = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ Babelfish: Enable Packaging',
+      },
+    -- player
     [const.setting_name.string_match_type] = {
       en = 'Babelfish: Search Mode',
       },
+    -- startup
     [const.setting_name.search_types] = {
       en = '[Hidden] Babelfish: Search Types _UL:NOAUTODESCRIPTION_',
-      },
-    [const.setting_name.sp_instant_translation] = {
-      en = '[Hidden] Babelfish: Singleplayer Instant Translation _UL:NOAUTODESCRIPTION_',
       },
     },
 
@@ -68,6 +74,9 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       ja = '翻訳中に使用される大よその回線帯域。'
         ,
       
+      },
+    [const.setting_name.enable_packaging] = {
+      en = 'Packaging can reduce network overhead and cpu usage in some cases.',
       },
     [const.setting_name.string_match_type] = {
       en = 'Changes how text you enter into the search fields of '

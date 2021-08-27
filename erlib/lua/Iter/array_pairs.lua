@@ -60,19 +60,28 @@ local Table_array_size = Table.array_size
 --   > 6 f
 --   > 42 u
 --
-local function array_pairs(tbl,i,j)
+local function array_pairs(tbl, i, j)
   j = j or Table_array_size(tbl)
 
-  local function _iter(arr,k)
-    local v
-    while (v == nil) and (k < j) do
+  -- V1
+  -- local function _iter(arr,k)
+  --   local v
+  --   while (v == nil) and (k < j) do
+  --     k = k + 1
+  --     v = arr[k]
+  --     end
+  --   if v ~= nil then return k,v end
+  --   end
+    
+  -- V2
+  local function _iter(arr, k)
+    while (k < j) do
       k = k + 1
-      v = arr[k]
+      if arr[k] ~= nil then return k, arr[k] end
       end
-    if v ~= nil then return k,v end
     end
     
-  return _iter,tbl,(i and i-1 or 0) -- iteration starts at the *next* number.
+  return _iter, tbl, (i and i-1 or 0) -- iteration starts at the *next* number.
   end
 
 
@@ -80,4 +89,4 @@ local function array_pairs(tbl,i,j)
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
 do (STDOUT or log or print)('  Loaded → erlib.array_pairs') end
-return function() return array_pairs,_array_pairs,_uLocale end
+return function() return array_pairs, nil end

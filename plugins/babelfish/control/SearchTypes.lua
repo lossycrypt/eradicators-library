@@ -1,5 +1,9 @@
 ﻿-- (c) eradicator a.k.a lossycrypt, 2017-2021, not seperately licensable
--- -------------------------------------------------------------------------- --
+
+--------------------------------------------------------------------------------
+-- Babelfish.
+-- @module Babelfish
+
 
 --[[ Notes:
 
@@ -20,7 +24,9 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
-local stop        = elreq('erlib/lua/Error'        )().Stopper 'BabelfishSearchTypes'
+-- local log         = elreq('erlib/lua/Log'       )().Logger  'babelfish'
+local stop        = elreq('erlib/lua/Error'     )().Stopper 'babelfish'
+
 local assertify   = elreq('erlib/lua/Error'        )().Asserter(stop)
 
 local Table       = elreq('erlib/lua/Table'        )()
@@ -28,6 +34,9 @@ local Array       = elreq('erlib/lua/Array'        )()
 local Set         = elreq('erlib/lua/Set'          )()
 
 local Cache       = elreq('erlib/factorio/Cache'   )()
+
+local ipairs
+    = ipairs
 
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
@@ -46,11 +55,9 @@ local SearchTypes = {}
 
 -- {priority_index -> search_type}
 local supported_array = Table.map(const.type_data, function(v) return v.type end, {})
-                        -- :clear_meta()
 
 -- {search_type -> priority_index}
 local supported_set   = Table.flip(supported_array)
-                        -- :clear_meta()
 
 -- Sorts an array of search_type by translation priority
 function SearchTypes.sort(array)
@@ -77,13 +84,11 @@ local function get_allowed_values()
 -- {ordered_index -> search_type}
 local requested_array = Cache.AutoCache(function(r)
   Table.overwrite(r, get_allowed_values())
-  setmetatable(r, nil)
   end)
   
 -- {search_type -> true}
 local requested_set = Cache.AutoCache(function(r)
   Table.overwrite(r, Set.from_values(get_allowed_values()))
-  setmetatable(r, nil)
   end)
   
 -- {ordered_index -> search_type}
@@ -94,7 +99,6 @@ local not_requested_array = Cache.AutoCache(function(r)
   local requested_set = Set(Table.scopy(requested_set))
   Table.overwrite(r, Table.keys(supported_set - requested_set))
   SearchTypes.sort(r) -- not currently required
-  setmetatable(r, nil)
   end)
   
 --
@@ -108,9 +112,14 @@ function SearchTypes.requested_ipairs()
   return ipairs(requested_array)
   end
   
--- for Table.clear()
+--
 function SearchTypes.get_not_requested_array()
   return Array.scopy(not_requested_array)
+  end
+
+--
+function SearchTypes.get_requested_array()
+  return Array.scopy(requested_array)
   end
   
 -- -------------------------------------------------------------------------- --

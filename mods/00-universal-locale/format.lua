@@ -29,6 +29,12 @@ local lt = {
     ja = 'マルチプレイ専用設定。\\n    シングルプレイに影響はありません。',
     },
     
+  dev_mode_setting_description_header = {
+    en = 'Dev-Mode-only setting. Is hidden to normal players.',
+    de = 'Entwicklereinstellung. Für normale Spieler nicht sichtbar.',
+    ja = '開発者専用設定。通常プレイヤーには見えません。',
+    },
+    
   }
   
 local function is_description(entry)
@@ -79,18 +85,16 @@ local function add_description_header(entry, db, msg)
     desc.value = table.concat(desc_value, '')
   
   else
-    -- don't forget to format newly generated entries!
-    db[#db+1] = apply_formatting({
+    db[#db+1] = {
       header    = get_description_header(entry),
       mod_name  = entry.mod_name ,
       file_name = entry.file_name,
       language  = entry.language ,
       key       = entry.key      ,
       value     = msg .. '_UL:ENDOFHEADER_'
-      }, db)
+      }
     end  
   return true end
-  
   
 local function has_icon(entry, icon)
   return not not string_find(entry.value, icon, 1, true)
@@ -105,6 +109,25 @@ local function append_icon_once(entry, icon)
 local function remove_icon(entry, icon)
   entry.value = string_gsub(entry.value, icon .. ' ?', '')
   end
+    
+local function make_mod_setting_tagger(
+  external_tag, internal_tag, color, template_name
+  )
+  return function(entry, db)
+    local count
+    entry.value, count = entry.value:gsub('%s*'..external_tag..'%s*','')
+    if count > 0 then
+      assert(not is_description(entry)
+        , external_tag..' must be in name not description.')
+      append_icon_once(entry, internal_tag)
+      add_description_header(entry, db,
+        internal_tag .. '[color='..color..'] '
+        .. assert(lt[template_name][entry.language])
+        ..'[/color]\\n')
+      end
+    end
+  end
+  
   
 local pattern_functions = {
   -- Array of *ordered* patterns. Can influence each other.
@@ -149,26 +172,43 @@ local pattern_functions = {
         :format( lt.default_value[entry.language], default_value )
         )
       then
-        if not has_icon(entry, '_UL:ICON_TOOLTIP_') then
+        -- if not has_icon(entry, '_UL:ICON_TOOLTIP_') then
           append_icon_once(entry, '_UL:ICON_TTIP_DEFAULT_VALUE_')
-          end
+          -- end
         end
       end
     end,
 
+
+  -- _UL:DevModeSetting_
+  make_mod_setting_tagger(
+    '_UL:DevModeSetting_',
+    '_UL:ICON_TTIP_DEV_MODE_',
+    'pink',
+    'dev_mode_setting_description_header'
+    ),
+    
   -- _UL:MultiPlayerSetting_
-  function(entry, db)
-    local count
-    entry.value, count = entry.value:gsub('%s*_UL:MultiPlayerSetting_%s*','')
-    if count > 0 then
-      assert(not is_description(entry), 'Multiplayer flag must be in name not description')
-      append_icon_once(entry, '_UL:ICON_TTIP_MULTIPLAYER_')
-      add_description_header(entry, db,
-         '_UL:ICON_TTIP_MULTIPLAYER_[color=purple] '
-        .. assert(lt.multiplayer_setting_description_header[entry.language])
-        ..'[/color]\\n')
-      end
-    end,
+  make_mod_setting_tagger(
+    '_UL:MultiPlayerSetting_',
+    '_UL:ICON_TTIP_MULTIPLAYER_',
+    'purple',
+    'multiplayer_setting_description_header'
+    ),
+    
+    
+  -- function(entry, db)
+    -- local count
+    -- entry.value, count = entry.value:gsub('%s*_UL:MultiPlayerSetting_%s*','')
+    -- if count > 0 then
+      -- assert(not is_description(entry), 'Multiplayer flag must be in name not description')
+      -- append_icon_once(entry, '_UL:ICON_TTIP_MULTIPLAYER_')
+      -- add_description_header(entry, db,
+         -- '_UL:ICON_TTIP_MULTIPLAYER_[color=purple] '
+        -- .. assert(lt.multiplayer_setting_description_header[entry.language])
+        -- ..'[/color]\\n')
+      -- end
+    -- end,
 
 
   -- Add Info Icon to all settings with description.
@@ -243,9 +283,9 @@ local pattern_strings = {
   {'_UL:ICON_DEV_ ?'    , '[img=developer]'},
   {'_UL:ICON_TOOLTIP_ ?', '[img=info]'     },
   
-  {'_UL:ICON_TTIP_DEFAULT_VALUE_ ?', '[img=ul:info-default]'   },
-  {'_UL:ICON_TTIP_MULTIPLAYER_ ?'  , '[img=ul:info-purple]'},
-
+  {'_UL:ICON_TTIP_DEFAULT_VALUE_ ?', '[img=ul:info-default]'},
+  {'_UL:ICON_TTIP_MULTIPLAYER_ ?'  , '[img=ul:info-purple]' },
+  {'_UL:ICON_TTIP_DEV_MODE_ ?'     , '[img=ul:info-pink]'   },
   
   --hackfix
   {'_UL:0SPACE_', ''},
@@ -272,8 +312,18 @@ function apply_formatting(entry, db)
 -- All manipulation is in-place.
 return function(db)
   
-  for i=1, #db do
-    apply_formatting(db[i], db)
+  -- V1
+  -- for i=1, #db do
+  --   apply_formatting(db[i], db)
+  --   end
+    
+  -- V2
+  -- Don't forget to format newly generated entries
+  -- created while parsing old ones!
+  local i = 0
+  while true do
+    i = i + 1
+    if db[i] then apply_formatting(db[i], db) else break end
     end
   
   end

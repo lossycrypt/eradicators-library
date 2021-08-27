@@ -3,10 +3,45 @@
 
 local const = {}
 
+const.index = {
+
+  entry = { -- Entry data index
+    -- all entries
+    name    = 2,
+    -- translated entries only
+    word    = 1,
+    -- requested entries only
+    index   = 3,
+    type    = 4,
+    lstring = 5,
+    },
+
+  request = { -- Request data index
+    lstring = 1,
+    entries = 2,
+    bytes   = 3,
+    uid     = 4,
+    },
+
+  }
+  
+const.version = {
+  -- Prevents on_load for old versions.
+  -- Version history:
+  --  1 : eradicators-library 4.1.4 ~ 4.2.1
+  --  2 : eradicators-library 4.2.2 ~ now
+  --
+  savedata = 2,
+  }
+
+
 const.setting_name = {
   -- user
-  network_rate      = 'er:babelfish-network-rate',
   string_match_type = 'er:babelfish-string-match-type',
+  
+  -- map
+  network_rate      = 'er:babelfish-network-rate',
+  enable_packaging  = 'er:babelfish-enable-packaging',
   
   -- hidden
   search_types           = 'er:babelfish-search-types',
@@ -15,13 +50,21 @@ const.setting_name = {
   
 const.network = {
   rerequest_delay = 1.0, -- in seconds
-  transit_window  = 0.5, -- in seconds
+  transit_window  = 15/60, -- in seconds
+  ticks_per_packet = 2, -- in ticks
   master_header = '金魚',
   packet_header = {
     packed_request = '箱',
     ping           = '音', -- not used yet
     },
-  mtu_bytes = 1452,
+
+  bytes = {
+    -- https://en.wikipedia.org/wiki/Maximum_transmission_unit
+    mtu             = 1452,
+    packet_overhead =   18,
+    -- dict:dump_statistics()
+    packet_median   =   65, -- better estimate means batter bandwitdh control
+    },
   }
   
 const.style = {
