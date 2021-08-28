@@ -11,7 +11,7 @@ require(_)('erlib-plugin-init', {
 
   ['[mod-setting-name]'] = {
     [const.name.setting.enabled_plugins] = {
-      en = "[Hidden] Enabled Plugins _UL:NOAUTODESCRIPTION_",
+      en = "_UL:DevModeSetting_ Enabled Plugins _UL:NOAUTODESCRIPTION_",
       -- de = "",
       -- ja = "",
       },

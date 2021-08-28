@@ -46,16 +46,22 @@ local function get_description_header(entry)
   end
   
 local function find_description(entry, db)
-  -- [controls] and [controls-description] but
-  -- [mod-setting-name] and [mod-setting-description]
-  local desc_header = get_description_header(entry)
-  --
-  for _, dbentry in pairs(db) do
-    if  (dbentry.header   == desc_header   )
-    and (dbentry.key      == entry.key     )
-    and (dbentry.language == entry.language)
-    then return dbentry end end
+  return entry.description or (function()
+    -- [controls] and [controls-description] but
+    -- [mod-setting-name] and [mod-setting-description]
+    local desc_header = get_description_header(entry)
+    --
+    for _, dbentry in pairs(db) do
+      if  (dbentry.header   == desc_header   )
+      and (dbentry.key      == entry.key     )
+      and (dbentry.language == entry.language)
+      then
+        entry.description = dbentry
+        return dbentry end
+        end
+      end)()
   end
+  
   
 -- Takes a string and puts it into the description of the corresponding
 -- entry. Generates a new description if there was none.
@@ -69,20 +75,28 @@ local function add_description_header(entry, db, msg)
   -- V2: Now that default values have a seperate info icon color
   --     it's no longer nessecary to prevent dev-setting descriptions.
   --     (Still need to remove the tag from old translations.)
-  
+
+  -- To ensure it always splits into exactly two parts
+  local one_space = ' '
+  local end_of_header = '_UL:ENDOFHEADER_'
   --
   local desc = find_description(entry, db)
   --
   if desc then
   
-    local desc_value = String.split(desc.value, '_UL:ENDOFHEADER_')
-    assert(#desc_value <= 2, 'Too many headers?!')
-    assert(#desc_value >  0, 'No string content?')
+    if not desc.value:find(end_of_header, 1, true) then
+      desc.value = end_of_header .. desc.value
+      end
+  
+    local desc_value = String.split(desc.value, end_of_header)
+    assert(#desc_value == 2, 'Incorrect split length.')
     
     -- insert as second-last
-    table.insert(desc_value, #desc_value, msg)
-    table.insert(desc_value, #desc_value, '_UL:ENDOFHEADER_')
-    desc.value = table.concat(desc_value, '')
+    desc.value =
+      desc_value[1]            -- previous header tags
+      .. msg                   -- new headder tag
+      .. end_of_header
+      ..(desc_value[2] or one_space) -- description if any
   
   else
     db[#db+1] = {
@@ -91,7 +105,7 @@ local function add_description_header(entry, db, msg)
       file_name = entry.file_name,
       language  = entry.language ,
       key       = entry.key      ,
-      value     = msg .. '_UL:ENDOFHEADER_'
+      value     = msg .. end_of_header .. one_space,
       }
     end  
   return true end
@@ -172,9 +186,7 @@ local pattern_functions = {
         :format( lt.default_value[entry.language], default_value )
         )
       then
-        -- if not has_icon(entry, '_UL:ICON_TOOLTIP_') then
-          append_icon_once(entry, '_UL:ICON_TTIP_DEFAULT_VALUE_')
-          -- end
+        append_icon_once(entry, '_UL:ICON_TTIP_DEFAULT_VALUE_')
         end
       end
     end,
@@ -195,21 +207,6 @@ local pattern_functions = {
     'purple',
     'multiplayer_setting_description_header'
     ),
-    
-    
-  -- function(entry, db)
-    -- local count
-    -- entry.value, count = entry.value:gsub('%s*_UL:MultiPlayerSetting_%s*','')
-    -- if count > 0 then
-      -- assert(not is_description(entry), 'Multiplayer flag must be in name not description')
-      -- append_icon_once(entry, '_UL:ICON_TTIP_MULTIPLAYER_')
-      -- add_description_header(entry, db,
-         -- '_UL:ICON_TTIP_MULTIPLAYER_[color=purple] '
-        -- .. assert(lt.multiplayer_setting_description_header[entry.language])
-        -- ..'[/color]\\n')
-      -- end
-    -- end,
-
 
   -- Add Info Icon to all settings with description.
   function(entry, db)
@@ -270,9 +267,9 @@ local pattern_functions = {
 -- !FINAL FIXES!
     
   -- Remove trailing newlines.
-  function(entry, db)
-    entry.value = entry.value:gsub('_UL:ENDOFHEADER_$',''):gsub('\\n+$','')
-    end,
+  -- function(entry, db)
+  --   entry.value = entry.value:gsub('_UL:ENDOFHEADER_$',''):gsub('\\n+$','')
+  --   end,
     
   }
   
@@ -280,9 +277,9 @@ local pattern_functions = {
   
 local pattern_strings = {
 
-  {'_UL:ICON_DEV_ ?'    , '[img=developer]'},
-  {'_UL:ICON_TOOLTIP_ ?', '[img=info]'     },
-  
+  -- colored (i) tags.
+  {'_UL:ICON_DEV_ ?'               , '[img=developer]'      },
+  {'_UL:ICON_TOOLTIP_ ?'           , '[img=info]'           },
   {'_UL:ICON_TTIP_DEFAULT_VALUE_ ?', '[img=ul:info-default]'},
   {'_UL:ICON_TTIP_MULTIPLAYER_ ?'  , '[img=ul:info-purple]' },
   {'_UL:ICON_TTIP_DEV_MODE_ ?'     , '[img=ul:info-pink]'   },
@@ -295,9 +292,12 @@ local pattern_strings = {
   --internal use
   {'_UL:ENDOFHEADER_','\\n'},
   
+  -- remove trailing space
+  {'[%s\\n]+$', ''},
+  
   }
 
-
+  
 function apply_formatting(entry, db)
   for j=1, #pattern_functions do
     -- Functions may create new locale entries!
@@ -305,6 +305,9 @@ function apply_formatting(entry, db)
     end
   for j=1, #pattern_strings do
     entry.value = entry.value:gsub(table.unpack(pattern_strings[j]))
+    end
+  if entry.value:find('_UL:', 1, true) then
+    error('Entry has unknown UL tags:\n' .. serpent.block(entry))
     end
   return entry end
   

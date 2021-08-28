@@ -216,10 +216,11 @@ RawEntries.requests = Cache.AutoCache(function(r)
         r[uid], lookup[ident]   = request, request
         request[rindex.lstring] = entry[eindex.lstring]
         request[rindex.entries] = {}
-        request[rindex.bytes  ] = #ident + TypeBytes[type]
+        -- request[rindex.bytes  ] = #ident + TypeBytes[type]
         request[rindex.uid    ] = uid
         return request end){}
       --
+      entry[eindex.request] = request
       table_insert(request[rindex.entries], entry)
       end
     end
@@ -228,7 +229,9 @@ RawEntries.requests = Cache.AutoCache(function(r)
   end)
   
   
-  
+-- RawEntries.get_entry_request(type, index)
+  -- local uid = RawEntries.ordered[type][index][eindex.request_uid]
+  -- return RawEntries.requests[uid] end
   
 -- -------------------------------------------------------------------------- --
 return RawEntries

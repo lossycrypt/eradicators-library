@@ -151,7 +151,7 @@ function Dictionary.is_type_fully_populated(dict, type)
 function Dictionary.update(dict)
   local profile = Local.get_profiler()
   --
-  log:debug('Dictionary.update: ', Savedata:get_dict_lcode(dict))
+  log:debug('Dictionary.update: ', Savedata:get_dict_lcode(dict) or '(new)')
   dict:repair()
   dict:set_request_uids(Array.reverse(Table.keys(RawEntries.requests)))
   --
@@ -200,7 +200,7 @@ function Dictionary.update_n(dict, type)
 function Dictionary.repair(dict)
   --
   -- Wipe ALL old data.
-  Table.clear(dict, SearchTypes.get_requested_array())
+  Table.clear(dict, SearchTypes.get_requested_array_ref())
   local old_translations = Table.scopy(dict)
   Table.clear(dict)
   --
@@ -209,6 +209,12 @@ function Dictionary.repair(dict)
   for _, type in SearchTypes.requested_ipairs() do
     dict[type] = {n = 0, max = RawEntries.max_indexes[type]}
     end
+    
+  -- mark all entries dirty
+  -- for _, request in ipairs(RawEntries.requests) do
+    -- dict:set_lstring_translation(request[rindex.lstring], nil, true)
+    -- end
+    
   --
   -- Most mod updates only have minor or no locale changes.
   -- Keep old translations until new ones arrive for a smoother transition.
@@ -227,43 +233,6 @@ function Dictionary.repair(dict)
 -- Translation                                                                --
 -- -------------------------------------------------------------------------- --
   
-  
--- Must be called EVERY TICK when translating.
--- 
--- Let's `i` run negative after all packets have been requested
--- to prevent re-requesting the final n packages multiple times.
--- 
-
--- V1
-function Dictionary.iter_request_uids_loop(dict, tick)
-  local uids  = dict.request_uids
-  local delay = -1 * const.network.rerequest_delay * Local.ticks_per_second_int()
-  --
-  return function()
-    local uid = uids[uids.i]
-    uids.i = uids.i - 1
-    if uids.i < delay then uids.i = uids.n end
-    return uid end
-  --
-  end
-
--- V2
-do
-  local requests = RawEntries.requests
-  function Dictionary.iter_requests(dict, tick)
-    local uids  = dict.request_uids
-    local delay = -1 * const.network.rerequest_delay * Local.ticks_per_second_int()
-    --
-    return function()
-      local uid = uids[uids.i]
-      uids.i = uids.i - 1
-      if uids.i < delay then uids.i = uids.n end
-      return requests[uid] end
-    --
-    end
-  end
-
-  
 -- Set a single translation from a single entry
 function Dictionary.set_entry_translation(dict, raw_entry, word)
   local type = raw_entry[eindex.type]
@@ -271,15 +240,97 @@ function Dictionary.set_entry_translation(dict, raw_entry, word)
     [eindex.word] = word or '',
     [eindex.name] = raw_entry[eindex.name],
     }
-  return dict:update_n(type) end
+  dict:update_n(type)
+  end
   
+-- -------------------------------------------------------------------------- --
+  
+-- Must be called EVERY TICK when translating for correct delay handling.
+-- 
+-- Let's `i` run negative after all packets have been requested
+-- to prevent re-requesting the final n packages multiple times.
+do
+  local requests = RawEntries.requests
+  function Dictionary.iter_requests(dict)
+    local uids  = dict.request_uids
+    local delay = -1 * const.network.rerequest_delay * Local.ticks_per_second_int()
+    return function()
+      local uid = uids[uids.i] -- uid becomes nil when i falls below 0
+      uids.i = uids.i - 1
+      if uids.i < delay then uids.i = uids.n end
+      return requests[uid] end
+    end
+  end
+
+
+-- do
+-- 
+--   local ordered_raw_entries = RawEntries.ordered
+--   -- local ordered_types       = SearchTypes.get_requested_array_ref()
+--   
+--   function Dictionary.iter_untranslated_entries(dict, tick, stable)
+--   
+--     -- local delay = -1 * const.network.rerequest_delay * Local.ticks_per_second_int()
+--     
+--     -- must be inside function to be after on_load
+-- 
+--     -- local itype, type = 1, ordered_types[1]
+--     
+--     if not stable then -- 
+--     
+--       local next, arr, key = SearchTypes.requested_ipairs()
+--     
+--       -- local next = ipairs(ordered_types)
+--       -- local type      = next_type()
+--       local type
+--       
+--       local entries
+--       -- local n = assert(entries.n)
+--       
+--       local i = 0
+--       
+--       return function()
+--         while true do
+--           if not type then
+--             key, type = next(arr, key)
+--             if not type then return end
+--             end
+--           
+--           if not entries then
+--             entries = assert(dict[type])
+--             end
+--           
+--           if entries[ entries.n + i ] == nil then
+--             print(entries.n, entries.max, i, #ordered_raw_entries[type])
+--             return assert(ordered_raw_entries[type][entries.n + i])
+--           else
+--             i = i + 1
+--             if i > entries.max then
+--               type = nil
+--               entries = nil
+--               i = 0
+--               end
+--             end
+--           end
+--         end
+--           
+--     else
+--       entries.i = assert(entries.i or entries.n)
+--       error()
+-- 
+--       end
+-- 
+--     end
+--   end
+
+
+  
+-- -------------------------------------------------------------------------- --
   
 do
     
   -- Remove uid by index. Fix i and n.
-  local _remove_uid = function(dict, index)
-    local uids = dict.request_uids
-    assert(uids[index])
+  local _remove_uid = function(uids, index)
     assert(uids.n == #uids)
     Array.shuffle_pop(uids, index);
     uids.n = #uids
@@ -289,39 +340,33 @@ do
   -- Remove the uid that contains lstring and return the request.
   -- @treturn RawRequest
   -- @treturn number Iterations used to find the lstring uid.
-  local _pop = function(dict, lstring)
-    for uid, index in sriapi(dict.request_uids) do
-      local raw_request
-        = assertify(RawEntries.requests[uid], 'Invalid request uid: ', uid)
+  local _iter = function(dict, lstring)
+    local uids = dict.request_uids
+    for uid, index in sriapi(uids) do
+      local raw_request = RawEntries.requests[uid]
       if nlstring_is_equal(raw_request[rindex.lstring], lstring) then
-        _remove_uid(dict, index)
-        return raw_request, (#dict.request_uids - index + 2)
+        --
+        if flag.IS_DEV_MODE then
+          local count = uids.n - index + 2
+          if count > 1 then log:debugf('Lstring->request took %s trials.', count) end
+          end
+        --
+        _remove_uid(uids, index)
+        return sriapi(raw_request[rindex.entries])
         end
+      end
+    log:debug('Recieved unrequested lstring. Ignoring')
+    return ercfg.SKIP end
+
+  -- Set all translations from a single requests entries.
+  -- Implicitly ignores
+  --
+  function Dictionary.set_lstring_translation(dict, lstring, word)
+    for entry in _iter(dict, lstring) do
+      dict:set_entry_translation(entry, word)
       end
     end
     
-  -- Set all translations from a single requests entries.
-  --
-  -- @treturn did_translation_state_change
-  --
-  function Dictionary.set_lstring_translation(dict, lstring, word)
-    local raw_request, count = _pop(dict, lstring)
-    if not raw_request then
-      log:debug('Recieved unrequested lstring. Ignoring')
-      return false
-    else
-      local r = false
-      for _, entry in ipairs(raw_request[rindex.entries]) do
-        r = r or dict:set_entry_translation(entry, word)
-        end
-      -- log:debug('Recieved lstring.'
-        -- , ' Uid: ', raw_request[rindex.uid]
-        -- , ' Trials: ', count
-        -- , ' Entries: ' , #raw_request[rindex.entries])
-      return r
-      end
-    end
-
   end
   
 

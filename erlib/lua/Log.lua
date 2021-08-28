@@ -369,9 +369,9 @@ function Log:debug (...) return self:do_log_line (const.level['Everything' ],...
 function Log:say   (...) return self:do_log_line (const.level['DEV_MODE'   ],...) end
 function Log:tell  (...) return self:do_log_block(const.level['DEV_MODE'   ],...) end
 
+function Log:warnf (...) return self:do_log_line (const.level['Warnings'   ],string.format(...)) end 
+function Log:infof (...) return self:do_log_line (const.level['Information'],string.format(...)) end
 function Log:debugf(...) return self:do_log_line (const.level['Everything' ],string.format(...)) end
-
-
 
 local _head, _foot = ('―'):rep(100)..'\n', ('.'):rep(200)..'\n'
 function Log:header(...) return self:do_log_seperator(_head, ...) end

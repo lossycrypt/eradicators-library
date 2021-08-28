@@ -142,6 +142,20 @@ PluginManager.classify_savedata('babelfish', {
     return const.native_language_name[self:get_dict_lcode(dict)]
     end,
     
+  remove_unused_dictionaries = function(self)
+    local used = Table.map(
+      self.players, function(pdata) return true, pdata.dict end,
+      {})
+    for lcode, dict in pairs(self.dicts) do
+      if (not used[dict]) and (not flag.IS_DEV_MODE) then
+        log:infof('Removed unused dictionary %s (%s)', 
+          self:get_dict_lname(dict), lcode)
+        self.dicts[lcode] = nil
+        end
+      end
+    log:info('Currently held dictionaries: ', Table.keys(self.dicts))
+    end,
+      
 -- -------------------------------------------------------------------------- --
 -- bandwidth
     

@@ -236,7 +236,7 @@ local function set_all_lcodes_dirty()
     Savedata:set_pdata_lcode_dirty(nil, pindex, true)
     end
   end
-
+  
 -- Sometimes an empty event is raised?
 -- { migration_applied = false,
 --   mod_changes = {},

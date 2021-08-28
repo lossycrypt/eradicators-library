@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.2.3
+Date: 2021-08-27
+  Functions:
+    - ?
+  Plugins:
+    - Babelfish: API finalized.
+  Utility Mods:
+    - Universal Locale: Fixed auto-generated description headers sometimes
+      had the wrong order.
+---------------------------------------------------------------------------------------------------
 Version: 4.2.2
 Date: 2021-08-26
   Functions:
@@ -11,8 +21,8 @@ Date: 2021-08-26
     - Added Locale.nlstring_to_string
     - Added Locale.nlstring_is_equal
   Plugins:
-    - Babelfish: API finalized.
-    - Babelfish: Reduced code complexity.
+    - Babelfish: Increased upload speed measurement precision.
+    - Babelfish: Refractored prototype implementation, reduced code complexity.
   Bugfixes:
     - Fixed PluginManagerLite.manage_savedata overwriting default savedata
       with nil when called more than once.

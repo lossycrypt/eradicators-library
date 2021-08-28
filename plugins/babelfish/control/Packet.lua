@@ -94,21 +94,18 @@ do
     
   function Packet.send(p, dict, count)
     local index = Packet.get_uid()
-    local request_uids = Table.set(Savedata.packets, {index}, {})
-
-    -- local header = {
-      -- }
+    local nlstrings = Table.set(Savedata.packets, {index}, {})
+    --
     local i, packet = 1, {''}
-      
-    local next = dict:iter_requests(game.tick)
+    local next = dict:iter_requests()
     for j=i+1, i+count*2, 2 do
       local request = next()
       if not request then break end
-      table.insert(request_uids, request[rindex.uid])
+      table.insert(nlstrings, request[rindex.lstring])
       packet[j  ] = null
       packet[j+1] = request[rindex.lstring]
       end
-      
+    --
     if #packet > 1 then -- dict re-request pause
       p.request_translation{
         '',
@@ -133,17 +130,17 @@ function Packet.unpack(dict, e)
   assert(packet[3] == const.network.packet_header.packed_request)
   -- assert(packet[5] == null)
   
-  local request_uids = Table.pop(Savedata.packets, assert(tonumber(packet[4])))
-  if not request_uids then
+  local nlstrings = Table.pop(Savedata.packets, assert(tonumber(packet[4])))
+  if not nlstrings then
     log:debug('Recieved packed request with unknown index.')
   else
     local i = 0
     for word in string_gmatch(results, '\0([^\0]*)') do
       i = i + 1
-      dict:set_lstring_translation(
-        RawEntries.requests[request_uids[i]][rindex.lstring], word)
+      dict:set_lstring_translation(nlstrings[i], word)
+        -- RawEntries.requests[nlstrings[i]][rindex.lstring], word)
       end
-    assert(i == #request_uids, 'Incorrect packet length.')
+    assert(i == #nlstrings, 'Incorrect packet length.')
     log:debugf('Pack.unpack unpacked %s requests', i)
     end
   end

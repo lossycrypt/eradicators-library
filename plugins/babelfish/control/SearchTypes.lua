@@ -118,8 +118,9 @@ function SearchTypes.get_not_requested_array()
   end
 
 --
-function SearchTypes.get_requested_array()
-  return Array.scopy(requested_array)
+function SearchTypes.get_requested_array_ref()
+  -- return Array.scopy(requested_array)
+  return requested_array
   end
   
 -- -------------------------------------------------------------------------- --

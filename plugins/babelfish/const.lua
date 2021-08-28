@@ -10,10 +10,13 @@ const.index = {
     name    = 2,
     -- translated entries only
     word    = 1,
-    -- requested entries only
-    index   = 3,
-    type    = 4,
-    lstring = 5,
+    -- entries waiting for translation
+    dirty   = 3,
+    -- raw entries only
+    index   = 4,
+    type    = 5,
+    lstring = 6,
+    request = 7,
     },
 
   request = { -- Request data index
@@ -63,7 +66,7 @@ const.network = {
     mtu             = 1452,
     packet_overhead =   18,
     -- dict:dump_statistics()
-    packet_median   =   65, -- better estimate means batter bandwitdh control
+    packet_median   =   75, -- better estimate means batter bandwitdh control
     },
   }
   

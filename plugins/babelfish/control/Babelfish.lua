@@ -143,7 +143,7 @@ do
 -- Class Tick Handlers                                                        --
 -- -------------------------------------------------------------------------- --
 
--- on_nth_tick(30)
+-- on_nth_tick(20)
 Babelfish.request_language_codes = function(e)
   local players = Savedata:get_lcode_requesters()
   assert(players, 'Failure to deactivate request_language_codes (no dirty lcodes).')
@@ -152,57 +152,7 @@ Babelfish.request_language_codes = function(e)
     assert(p.request_translation(const.lstring.language_code))
     end
   end
-  
--- V5
--- on_nth_tick(1)
--- Babelfish.request_translations = function(e)
--- 
---   -- Try to hide lag-spike in load screen by pre-emptive compilation.
---   RawEntries.precompile()
--- 
---   local dict, p = Savedata:get_active_dict()
---   assert(dict, 'Failure to deactivate request_translations (no active dict)')
---   
---   -- Remove too-large request from last tick from this ticks allowance.
---   -- This compensates requests from other mods and too large packet estimates.
---   local max  = Babelfish.get_max_bytes_per_tick()
---   local last = Savedata:pop_bytes_recieved_last_tick()
---   -- local bytes_allowed_this_tick = math.min(0, max + math.max(0, (max - last)))
---   -- local bytes_allowed_this_tick = math.min(0, max + Math.limit(-max, max - last, max))
---   local bytes_allowed_this_tick = Math.limit(0, 1.5 * max - last, 1.5 * max)
---   local pack_count_this_tick = 
---     math.floor(bytes_allowed_this_tick / const.network.bytes.packet_median)
---   
---   -- Log current bandwidth usage
---   if flag.IS_DEV_MODE then
---     -- if pack_count_this_tick == 0 then
---       -- log:debug('Bandwidth overuse, sending no packets this tick.', )
---     -- else
---       log:debugf('Tick allowance %7.f bytes, %3.f packets.'
---         ,max - last, pack_count_this_tick)
---       -- end
---     Table['+='](Savedata, {'bytes_last_second'}, last)
---     if e.tick % Local.ticks_per_second_int() == 0 then
---       log:debug(('Estimated bandwidth: %5.fkb/s')
---         :format(Savedata.bytes_last_second / 1024))
---       Savedata.bytes_last_second = nil
---       end
---     end
---     
---   local requests = RawEntries.requests
---   
---   local next = dict:iter_request_uids_loop(e.tick)
---   local i = 0; repeat i = i + 1
---     local uid = next()
---     if uid then
---       -- log:debug('Sent translation request for uid: ', uid)
---       p.request_translation(requests[uid][rindex.lstring])
---     else
---       break end
---     until i >= pack_count_this_tick
--- 
---   -- log:info('Player "', p.name, '" is timing out.')
---   end 
+
 
 -- V6
 -- on_nth_tick(1)
@@ -220,12 +170,21 @@ Babelfish.request_translations = function(e)
   local allowance = Savedata:get_byte_allowance()
   
   if e.tick % window == 0 then
-    local new_allowance = window * max
+    local max_allowance = window * max
     log:debugf('Estimated bandwidth: %5.fkb/s'
-      , -1 * (ups/window) * (allowance - new_allowance) / 1024)
-    allowance = new_allowance
-    Savedata:set_byte_allowance(allowance)
-  elseif 0 >= allowance then
+      , -1 * (ups/window) * (allowance - max_allowance) / 1024)
+    -- allowance = max_allowance
+    -- Savedata:set_byte_allowance(allowance)
+    
+    Savedata:set_byte_allowance(
+      math.min(allowance + max_allowance, max_allowance)
+      -- Math.limit(0, allowance + max_allowance, max_allowance)
+      )
+    
+    allowance = Savedata:get_byte_allowance()
+    end
+    
+  if allowance < const.network.bytes.packet_median then
     log:debugf('Byte allowance %7.f bytes, NO PACKET SENT.', allowance)
     return end
     
@@ -237,20 +196,17 @@ Babelfish.request_translations = function(e)
   local requests = RawEntries.requests
   
   if Babelfish.is_packaging_enabled() then
-    -- multi-tick-packet might simply not be feasible considering
-    -- laggy connections
-    Packet.send(p, dict, math.floor(allowance / const.network.bytes.packet_median) )
-    -- Packet.send(p, dict, pack_count_this_tick * const.network.ticks_per_packet)
+    -- rejected: multi-tick-packet produces too much overuse
+    -- Packet.send(p, dict, pack_count_this_tick)
+    Packet.send(p, dict, math.floor(0.5*allowance / const.network.bytes.packet_median) )
+    Savedata:substract_byte_allowance(0.5*allowance)
   else
-    local next = dict:iter_request_uids_loop(e.tick)
+    local next = dict:iter_requests()
     local i = 0; repeat i = i + 1
-      local uid = next()
-      if uid then
-        p.request_translation(requests[uid][rindex.lstring])
-      else
-        break end
+      local request = next()
+      if not request then break end
+      p.request_translation(request[rindex.lstring])
       until i >= pack_count_this_tick
-      
     end
 
   end 
@@ -272,9 +228,14 @@ do
   local function try_finalize_dictionary(dict)
     -- If no other dictionary are open this shuts down
     -- all Babelfish handlers, ending the translation cycle.
+    -- 
+    -- Because Babelfish.update_handlers() can not manipulate
+    -- global (due to on_load compatibility) this is the 
+    -- final place to change Savedata before Babelfish shuts down.
     if not dict:has_requests() then
       Savedata:set_byte_allowance(nil)
       Savedata:purge_packets()
+      Savedata:remove_unused_dictionaries()
       StatusIndicator.destroy_all()
       Babelfish.update_handlers()
       end
@@ -285,6 +246,8 @@ do
   local function get_packet_size(e)
     local bytes = 0
       + 4 -- e.player_index (32-bit unsigned integer)
+      + 4 -- e.name         (32-bit unsigned integer)
+      + 4 -- e.tick         (32-bit unsigned integer)
       + 1 -- e.translated   (boolean, rounded up    )
       + #(e.result or '')
       + nlstring_size(e.localised_string)
@@ -435,8 +398,8 @@ do
     
   local is_packaging_enabled, f4_clear = Memoize(function()
     return 
-     (not game.is_multiplayer())
-      and Setting.get_value('map', const.setting_name.sp_instant_translation)
+     (not game.is_multiplayer()) and (not flag.IS_DEV_MODE)
+      -- and Setting.get_value('map', const.setting_name.sp_instant_translation)
        or Setting.get_value('map', const.setting_name.enable_packaging)
     end)
     
@@ -457,7 +420,7 @@ do
     = function() return assert(transit_window_ticks[true]) end
       
   Babelfish.is_packaging_enabled
-    = function() return assert(is_packaging_enabled[true]) end
+    = function() return is_packaging_enabled[true] end
     
     end
     

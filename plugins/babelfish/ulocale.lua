@@ -17,7 +17,7 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       en = '_UL:DevModeSetting_ Babelfish: Singleplayer Instant Translation _UL:NOAUTODESCRIPTION_',
       },
     [const.setting_name.enable_packaging] = {
-      en = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ Babelfish: Enable Packaging',
+      en = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ Babelfish: Use large packets',
       },
     -- player
     [const.setting_name.string_match_type] = {
@@ -25,7 +25,7 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       },
     -- startup
     [const.setting_name.search_types] = {
-      en = '[Hidden] Babelfish: Search Types _UL:NOAUTODESCRIPTION_',
+      en = '_UL:DevModeSetting_ Babelfish: Search Types',
       },
     },
 
@@ -64,7 +64,7 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
         .. 'right corner to see more detailed status info. '
         .. '\\n\\n'
         .. 'If a player has slow internet AND uses a language that is not yet '
-        .. 'translated on the server, then they might be dropped or unable to '
+        .. 'translated on the server, then they might be dropped from or unable to '
         .. 'join a server if this setting is too high. In that case '
         .. 'temporarily lower the setting until translation is done. ',
         
@@ -76,7 +76,10 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       
       },
     [const.setting_name.enable_packaging] = {
-      en = 'Packaging can reduce network overhead and cpu usage in some cases.',
+      en = 'Instead of sending each translation request seperately, Babelfish '
+        .. 'will bundle them together. Slightly reduces cpu and bandwidth '
+        .. 'cost, but may sometimes use slightly more than the maximum upload speed.'
+        ,
       },
     [const.setting_name.string_match_type] = {
       en = 'Changes how text you enter into the search fields of '
