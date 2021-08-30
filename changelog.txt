@@ -1,8 +1,11 @@
 ---------------------------------------------------------------------------------------------------
 Version: 4.2.3
-Date: 2021-08-27
+Date: 2021-08-30
   Functions:
-    - ?
+    - Added mod-setting to easily change logging level of all Log.Logger instance.
+      Adapted EventManagerLite to allow logging outside of dev-mode.
+    - Added dev-mode only per-mod logging level setting to selectively silence mods.
+      List of supported mods is hardcoded until further notice.
   Plugins:
     - Babelfish: API finalized.
   Utility Mods:

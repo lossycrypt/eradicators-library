@@ -29,6 +29,7 @@ local table_concat
     
     
 local stop = elreq('erlib/lua/Error')().Stopper('Verificate')
+local log  = elreq('erlib/Lua/Log'  )().Logger ('Verificate')
     
 -- local Iter_combinations = elreq('erlib/lua/Iter/combinations')()
 local Iter_permutations = elreq('erlib/lua/Iter/permutations')()
@@ -152,7 +153,7 @@ local _mt_isType = {
   
   -- Typo protection + Generate arbitrary type combinations.
   __index = function(self,types)
-    say('  Generated new isType: "'.. types.. '".')
+    log:say('  Generated new isType: "'.. types.. '".')
     -- split string by "|" pipe
     local r, n = {}, 0
     local _types = types:gsub('[^|]+', function(typ)

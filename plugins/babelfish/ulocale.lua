@@ -77,7 +77,7 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       },
     [const.setting_name.enable_packaging] = {
       en = 'Instead of sending each translation request seperately, Babelfish '
-        .. 'will bundle them together. Slightly reduces cpu and bandwidth '
+        .. 'will bundle them together. Reduces cpu '
         .. 'cost, but may sometimes use slightly more than the maximum upload speed.'
         ,
       },

@@ -15,16 +15,17 @@ local s1, d1, c1,   s2, d2, c2,   s3, d3, c3,   ul =
 --------------------------------------------------------------------------------
 
 local plugin_array = {
-  
+
   -- "dev"
   -- {'dev-tweaks'                 , {    d1,         dev_only = true}},
-  
+
   -- "ulocale only"
   {'!init'                      , {            ul, enabled = true}},
-                  
+
   -- "framework"
   {'tips-group'                 , {    d3,     ul, enabled = true}},
-                
+  {'log-level-settings'         , {s1,         ul, enabled = true}},
+
   -- "shared prototypes"
   {'dummy-items'                , {    d3,     ul, enabled = true}},
   {'universal-locale'           , {    d3,         enabled = true}},
@@ -34,14 +35,14 @@ local plugin_array = {
   {'on_player_changed_chunk'    , {        c1,   }},
   {'on_ticked_action'           , {        c1,   }},
   {'on_user_panic'              , {        c1,   }},
-  
+
   -- "magic"
   {'babelfish'                  , {s3, d3, c1, ul}}, -- dependency: on_user_panic
   {'babelfish-demo'             , {        c1,   }}, -- dependency: babelfish
   {'gui-auto-styler'            , {        c1,   }},
   {'cursor-tracker'             , {              }},
   {'zoom-tracker'               , {              }},
-  
+
   }
 
 return plugin_array

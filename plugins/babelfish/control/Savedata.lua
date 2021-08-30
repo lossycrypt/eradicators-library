@@ -56,6 +56,7 @@ local import = PluginManager.make_relative_require 'babelfish'
 local const  = import '/const'
 
 local Dictionary       = import '/control/Dictionary'
+-- local Babelfish        = import '/control/Babelfish'
 
 
 -- -------------------------------------------------------------------------- --
@@ -108,8 +109,9 @@ PluginManager.classify_savedata('babelfish', {
 -- pdata extended
   
   -- flag player lcode as outdated
+  -- (must handle on_player_created)
   set_pdata_lcode_dirty = function(self, e, pindex, true_or_nil)
-    local pdata = self:get_pdata(e, pindex)
+    local pdata = self:sget_pdata(e, pindex)
     pdata.is_lcode_dirty = true_or_nil
     return nil end,
     
@@ -161,6 +163,7 @@ PluginManager.classify_savedata('babelfish', {
     
   set_byte_allowance = function(self, bytes)
     self.byte_allowance = bytes -- set to nil when not translating
+    return bytes
     end, 
    
   get_byte_allowance = function(self)

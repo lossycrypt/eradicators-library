@@ -326,7 +326,7 @@ local function Test()
         assert(k ~= nil)
         assert(v ~= nil)
         assert(tbl[k] == v)
-        print(n, k, v)
+        -- print(n, k, v)
         assert(arr[n] == v)
         end
       assert(n == #arr)

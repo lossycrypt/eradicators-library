@@ -1,4 +1,14 @@
 ﻿
+-- -------------------------------------------------------------------------- --
+-- Built-In                                                                   --
+-- -------------------------------------------------------------------------- --
+local elroot = (pcall(require,'erlib/empty')) and '' or '__eradicators-library__/'
+local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared'))
+
+-- -------------------------------------------------------------------------- --
+
+local log  = elreq('erlib/Lua/Log'  )().Logger ('ULocale')
+
 local string_find, string_match, string_gsub
     = string.find, string.match, string.gsub
 -- -------------------------------------------------------------------------- --
@@ -7,6 +17,7 @@ local string_find, string_match, string_gsub
 local apply_formatting --scoping
 
 local String = require('__eradicators-library__/erlib/lua/String')()
+local Locale = require('__eradicators-library__/erlib/factorio/Locale')()
 
 -- localised templates
 local lt = {
@@ -24,9 +35,9 @@ local lt = {
     },
 
   multiplayer_setting_description_header = {
-    en = 'Multiplayer-only setting. Has no effect in Singleplayer.',
-    de = 'Mehrspielereinstellung. Hat keinen Effekt im Einzelspieler.',
-    ja = 'マルチプレイ専用設定。\\n    シングルプレイに影響はありません。',
+    en = 'Network setting. Has no effect in Singleplayer.',
+    de = 'Netzwerkeinstellung. Hat keinen Effekt im Einzelspieler.',
+    ja = 'ネットワーク設定。\\n    シングルプレイに影響はありません。',
     },
     
   dev_mode_setting_description_header = {
@@ -156,9 +167,24 @@ local pattern_functions = {
   -- Inject mod setting default value description.
   function(entry, db)
     if entry.header == '[mod-setting-name]' then
-      local prot = assert(game.mod_setting_prototypes[entry.key],
-        'Can not add default value for non-existant settings prototype: '
-        ..entry.key)
+      -- V1
+      -- local prot = assert(game.mod_setting_prototypes[entry.key],
+        -- 'Can not add default value for non-existant settings prototype: '
+        -- ..entry.key)
+      -- V2 (dynamically generated settings)
+      local prot = game.mod_setting_prototypes[entry.key]
+      if not prot then
+        for _, this in pairs(game.mod_setting_prototypes) do 
+          if Locale.nlstring_is_equal({entry.key}, this.localised_name) then
+            prot = this
+            break end
+          end
+        if not prot then
+          log:say('Ulocale: No default value found for mod-setting:'
+            , entry.language, entry.key)
+          return end
+        end
+      --
       local default_value = prot.default_value
       if type(default_value) == 'string' then
         -- Drop-Down Items can be localised. But UL does not have
@@ -180,6 +206,7 @@ local pattern_functions = {
           and '☑' -- U+2611 ☑ BALLOT BOX WITH CHECK
            or '☐' -- U+2610 ☐ BALLOT BOX
         end
+      --
       if add_description_header(entry, db, 
         '_UL:ICON_TTIP_DEFAULT_VALUE_'..
         ("[color=orange] %s[/color] [color=acid]%s[/color]\\n")
@@ -228,31 +255,17 @@ local pattern_functions = {
       end
     end,
 
-  
   -- _UL:PowerUserSetting_
-  function(entry, db)
-  
-    local count
-    entry.value, count = entry.value:gsub('%s*_UL:PowerUserSetting_%s*','')
-    if count > 0 then
-      --
-      assert(not is_description(entry), 'Power user flag must be in name not description')
-      -- Put an icon at the end of the name.
-      -- append_icon_once(entry, '_UL:ICON_TOOLTIP_')
-      append_icon_once(entry, '_UL:ICON_DEV_')
-      
-      -- Put a warning at the beginning of the description.
-      add_description_header(entry, db,
-         '_UL:ICON_DEV_[color=blue] '
-        .. assert(lt.power_user_setting_description_header[entry.language])
-        ..'[/color]\\n')
-      
-      end
-    end,
+  make_mod_setting_tagger(
+    '_UL:PowerUserSetting_',
+    '_UL:ICON_TTIP_ADVANCED_',
+    'blue',
+    'power_user_setting_description_header'
+    ),
     
-    
-  -- FINAL FIXES
   
+-- -------------------------------------------------------------------------- --
+-- !FINAL FIXES!
   
   -- Fix missing newline escapes.
   -- Remove space at the start of text blocks. (Allows using real [[]] blocks.)
@@ -262,24 +275,17 @@ local pattern_functions = {
       :gsub('^%s*' ,''   ) -- left-trim
       :gsub('\n%s*','\\n') -- escape newlines
     end,
-
--- -------------------------------------------------------------------------- --
--- !FINAL FIXES!
-    
-  -- Remove trailing newlines.
-  -- function(entry, db)
-  --   entry.value = entry.value:gsub('_UL:ENDOFHEADER_$',''):gsub('\\n+$','')
-  --   end,
     
   }
-  
   
   
 local pattern_strings = {
 
   -- colored (i) tags.
-  {'_UL:ICON_DEV_ ?'               , '[img=developer]'      },
-  {'_UL:ICON_TOOLTIP_ ?'           , '[img=info]'           },
+  -- {'_UL:ICON_TOOLTIP_ ?'           , '[img=info]'           },
+  {'_UL:ICON_TOOLTIP_ ?'           , '[img=ul:info-white]'  },
+  
+  {'_UL:ICON_TTIP_ADVANCED_ ?'     , '[img=developer]'      },
   {'_UL:ICON_TTIP_DEFAULT_VALUE_ ?', '[img=ul:info-default]'},
   {'_UL:ICON_TTIP_MULTIPLAYER_ ?'  , '[img=ul:info-purple]' },
   {'_UL:ICON_TTIP_DEV_MODE_ ?'     , '[img=ul:info-pink]'   },
@@ -292,11 +298,19 @@ local pattern_strings = {
   --internal use
   {'_UL:ENDOFHEADER_','\\n'},
   
-  -- remove trailing space
-  {'[%s\\n]+$', ''},
-  
   }
 
+local function remove_trailing_whitespace(entry)
+  local arr = {'\\n$','\n+$','%s+$'} -- lua does not have real regex :|
+  repeat
+    local count = 0
+    for i=1, #arr do
+      local c
+      entry.value, c = entry.value:gsub(arr[i], '')
+      count = count + c
+      end
+    until count == 0
+  end
   
 function apply_formatting(entry, db)
   for j=1, #pattern_functions do
@@ -326,7 +340,12 @@ return function(db)
   local i = 0
   while true do
     i = i + 1
-    if db[i] then apply_formatting(db[i], db) else break end
+    if db[i] then
+      apply_formatting(db[i], db)
+      remove_trailing_whitespace(db[i])
+    else
+      break
+      end
     end
   
   end

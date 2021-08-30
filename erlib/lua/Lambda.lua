@@ -19,6 +19,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
+local log  = elreq('erlib/Lua/Log'  )().Logger ('Lambda')
 
 local Hydra = elreq('erlib/lua/Coding/Hydra')()
 
@@ -99,7 +100,7 @@ local get_loader = setmetatable({},{
     local f_loader,err = load(upstr..f_str,repr,'t',LambdaEnv) -- chunk,name_on_stack,text_mode,env
     if (f_loader==nil) or (err~=nil) then lambda_err('Error:'..err,repr) end
     ---@todo implement multi-argument say()
-    say('  Lambda loader cached: '..repr)
+    log:say('  Lambda loader cached: '..repr)
     self[spec] = f_loader
     return f_loader
     end})
@@ -118,7 +119,7 @@ setmetatable(Lambda,{
   __index = function(self,spec)
     cache_size = cache_size + 1
     if cache_size > 9000 then
-      warn('  Lambda cache was OVER NINE THOUSAND! Wiping cache.')
+      log:warn('  Lambda cache was OVER NINE THOUSAND! Wiping cache.')
       for k in pairs(self) do self[k] = nil end
       end
     self[spec] = get_loader[spec]() 

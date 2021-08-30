@@ -23,6 +23,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- -------------------------------------------------------------------------- --
 -- Greeting                                                                   --
 -- -------------------------------------------------------------------------- --
+say(('.'):rep(200))
 say('>>> Erlib Core Boot Sequence Started  >>>')
 
 -- -------------------------------------------------------------------------- --
@@ -133,7 +134,7 @@ local Modules = {
 -- returns a parameterless function that returns {Module,Strict,uLocale}.
 for name,path in pairs(Modules) do
   say('  File   → '..path)
-  Modules[name] = {elreq(path)()} --
+  Modules[name] = {elreq(path)()}
   end
 
 -- -------------------------------------------------------------------------- --
@@ -188,9 +189,7 @@ local function uplift(target,names,setter)
 -- Main                                                                       --
 -- -------------------------------------------------------------------------- --
 say('<<< Erlib Core Boot Sequence Finished <<<')
-
-
-if flag.IS_DEV_MODE then print(('.'):rep(200)..'\n') end -- log:footer()
+say(('.'):rep(200)..'\n') -- log:footer()
 
 
 local function EradicatorsLibraryMain(options)

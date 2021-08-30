@@ -1,4 +1,4 @@
--- (c) eradicator a.k.a lossycrypt, 2021, not seperately licensable
+Ôªø-- (c) eradicator a.k.a lossycrypt, 2021, not seperately licensable
 
 --------------------------------------------------------------------------------
 -- Helper for developing mod-like plugins and softmods.
@@ -352,7 +352,7 @@ function Public.enable_savedata_management()
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
-do (STDOUT or log or print)('  Loaded Å® erlib.PluginManagerLite') end
+do (STDOUT or log or print)('  Loaded ‚Üí erlib.PluginManagerLite') end
 return function() return Public, nil, nil end
 
 

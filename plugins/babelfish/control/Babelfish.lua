@@ -117,7 +117,8 @@ do
   -- to use only one function for all updates instead of
   -- writing a special event-data parser.
   local _raise = function(pindex)
-    log:debug('Babelfish: raised on_babelfish_translation_state_changed: ', pindex)
+    log:debugf('Babelfish: raised on_babelfish_translation_state_changed (pindex %s). '
+      , pindex)
     return script.raise_event(
       script.events.on_babelfish_translation_state_changed,
       {player_index = pindex}
@@ -127,7 +128,8 @@ do
   -- dict   -> raise for all players with that dict
   -- pindex -> raise for just one player
   Babelfish.raise_on_translation_state_changed = function(dict, pindex)
-    if dict then 
+    if dict
+    then 
       for pindex, pdata in pairs(Savedata.players) do
         if pdata.dict == dict then _raise(pindex) end
         end
@@ -149,6 +151,7 @@ Babelfish.request_language_codes = function(e)
   assert(players, 'Failure to deactivate request_language_codes (no dirty lcodes).')
 
   for _, p in pairs(players) do
+    log:debugf('Sent lcode request to "%s".', p.name)
     assert(p.request_translation(const.lstring.language_code))
     end
   end
@@ -169,46 +172,71 @@ Babelfish.request_translations = function(e)
   local window    = Babelfish.get_transit_window_ticks()
   local allowance = Savedata:get_byte_allowance()
   
-  if e.tick % window == 0 then
+  local is_first_window_tick = e.tick % window == 0
+  
+  if is_first_window_tick then
     local max_allowance = window * max
-    log:debugf('Estimated bandwidth: %5.fkb/s'
-      , -1 * (ups/window) * (allowance - max_allowance) / 1024)
-    -- allowance = max_allowance
-    -- Savedata:set_byte_allowance(allowance)
-    
-    Savedata:set_byte_allowance(
-      math.min(allowance + max_allowance, max_allowance)
-      -- Math.limit(0, allowance + max_allowance, max_allowance)
-      )
-    
-    allowance = Savedata:get_byte_allowance()
+    local new_allowance = math.min(allowance + max_allowance, max_allowance)
+    --
+    if new_allowance == max_allowance
+    then
+      -- less or equal max_allowance, exact value
+      log:debugf('Estimated bandwidth: %6.f kb/s'
+        , -1 * (ups/window) * (allowance - max_allowance) / 1024)
+    elseif new_allowance >= 0
+    then
+      -- in balance on average, precise value is unknown
+      log:debugf('Estimated bandwidth: %6.f kb/s'
+      , (ups/window) * max_allowance / 1024)
+    else
+      -- overtaxing, precise value unknown
+      log:debugf('Estimated bandwidth: %6.f kb/s'
+        , -1 * (ups/window) * (allowance - max_allowance) / 1024)
+      end
+    --
+    allowance = Savedata:set_byte_allowance(new_allowance)
     end
-    
-  if allowance < const.network.bytes.packet_median then
-    log:debugf('Byte allowance %7.f bytes, NO PACKET SENT.', allowance)
-    return end
-    
-  local pack_count_this_tick = math.floor(max / const.network.bytes.packet_median)
-  
-  log:debugf('Byte allowance %7.f bytes, %3.f packets.'
-    ,allowance , pack_count_this_tick)
-    
-  local requests = RawEntries.requests
-  
-  if Babelfish.is_packaging_enabled() then
-    -- rejected: multi-tick-packet produces too much overuse
-    -- Packet.send(p, dict, pack_count_this_tick)
-    Packet.send(p, dict, math.floor(0.5*allowance / const.network.bytes.packet_median) )
-    Savedata:substract_byte_allowance(0.5*allowance)
+  --
+  -- Packed (once per window)
+  if Babelfish.is_packaging_enabled()
+  then
+    if is_first_window_tick
+    then
+      if allowance < const.network.bytes.packet_median
+      then
+        log:debugf('Byte allowance     : %6.f bytes, NO PACKET SENT (packed).'
+          , allowance)
+      else
+        local pack_count_this_tick
+          = math.floor(allowance / const.network.bytes.packet_median)
+        log:debugf('Byte allowance     : %6.f bytes, %3.f packets (packed).'
+          ,allowance , pack_count_this_tick)
+        Packet.send(p, dict, pack_count_this_tick)
+        Savedata:substract_byte_allowance(allowance)
+        end
+      end
+  --
+  -- Raw (multiple per tick)
   else
-    local next = dict:iter_requests()
-    local i = 0; repeat i = i + 1
-      local request = next()
-      if not request then break end
-      p.request_translation(request[rindex.lstring])
-      until i >= pack_count_this_tick
+    if allowance < const.network.bytes.packet_median
+    then
+      log:debugf('Byte allowance     : %6.f bytes, NO PACKET SENT.', allowance)
+      return
+    else
+      local pack_count_this_tick
+        = math.floor(max / const.network.bytes.packet_median)
+      log:debugf('Byte allowance     : %6.f bytes, %3.f packets.'
+        ,allowance , pack_count_this_tick)
+      --
+      -- Can not use for-loop due to possibile infinity of pack_count.
+      local next = dict:iter_requests()
+      local i = 0; repeat i = i + 1
+        local request = next()
+        if not request then return end
+        p.request_translation(request[rindex.lstring])
+        until i >= pack_count_this_tick
+      end
     end
-
   end 
 
 -- -------------------------------------------------------------------------- --
@@ -232,7 +260,8 @@ do
     -- Because Babelfish.update_handlers() can not manipulate
     -- global (due to on_load compatibility) this is the 
     -- final place to change Savedata before Babelfish shuts down.
-    if not dict:has_requests() then
+    if not dict:has_requests()
+    then
       Savedata:set_byte_allowance(nil)
       Savedata:purge_packets()
       Savedata:remove_unused_dictionaries()
@@ -254,6 +283,7 @@ do
     bytes = bytes
       + (math.ceil(bytes / const.network.bytes.mtu)
          * const.network.bytes.packet_overhead)
+    log:sayf('Packet size        : %6.f bytes', bytes)
     return bytes end
     
   local function remember_packet_size(bytes)
@@ -265,7 +295,8 @@ do
   function cases.flib_packet(e)
     -- U+292C FALLING DIAGONAL CROSSING RISING DIAGONAL
     -- local flib_seperator = '⤬' -- '\u{292C}'
-    log:debugf('Ignoring flib packet (%5.f kb/s).'
+    log:debugf('FLIB packet ignored: %6.f bytes (≊%5.f kb/s).'
+      , e.bytes
       , e.bytes * Local.ticks_per_second_float() / 1024)
     end
     
@@ -274,6 +305,12 @@ do
     Savedata:set_pdata_lcode(e, nil, e.result)
     Babelfish.raise_on_translation_state_changed(nil, p.index)
     Babelfish.update_handlers()
+    -- Try to start right now. (Fixes SP-Instant-Mode missing of first window.)
+    if Babelfish.is_sp_instant_mode()
+    then
+      Savedata:set_byte_allowance(Babelfish.get_max_bytes_per_tick())
+      Babelfish.request_translations{tick = 0}
+      end
     end
     
   function cases.babelfish_packed_request(e)
@@ -327,11 +364,14 @@ do
       end
     --
     if e.dict then
-      if (len <= 1) or (lstring[1] ~= '') then
+      if (len <= 1) or (lstring[1] ~= '')
+      then
         return 'raw_packet'
       -- babelfish packets
-      elseif lstring[2] == const.network.master_header then
-        if lstring[3] == const.network.packet_header.packed_request then
+      elseif lstring[2] == const.network.master_header
+      then
+        if lstring[3] == const.network.packet_header.packed_request
+        then
           return 'babelfish_packed_request' end
       -- flib packets
       elseif type(lstring[2]) == 'string'
@@ -350,36 +390,17 @@ do
   
 -- -------------------------------------------------------------------------- --
 
-  
-
--- Babelfish.on_runtime_mod_setting_changed = function()
---     local ticks_per_second = 60 * game.speed
---     --
---     if (not game.is_multiplayer())
---     and Setting.get_value('map', const.setting_name.sp_instant_translation)
---     then
---       Savedata.max_bytes_per_tick
---         = math.huge
---     else
---       Savedata.max_bytes_per_tick
---         = (1024 * Setting.get_value('map', const.setting_name.network_rate))
---         / ticks_per_second
---       end
---     Savedata.max_bytes_in_transit
---       = (const.network.transit_window * ticks_per_second)
---       * Savedata.max_bytes_per_tick
---     --
---     log:debug('Updated settings max_bytes_per_tick: ', Savedata.max_bytes_per_tick)
---     log:debug('Updated settings max_bytes_in_transit: ', Savedata.max_bytes_in_transit)
---     end
-
 do
+  
+  -- Todo: This would benefit from a re-settable AutoCache
 
-  -- max_bytes_per_tick
+  local is_sp_instant_mode, f5_clear = Memoize(function()
+    return (not game.is_multiplayer())
+       and Setting.get_value('map', const.setting_name.sp_instant_translation)
+    end)
+
   local max_bytes_per_tick, f1_clear = Memoize(function()
-    if (not game.is_multiplayer())
-    and Setting.get_value('map', const.setting_name.sp_instant_translation)
-    then
+    if is_sp_instant_mode[true] then
       return math.huge
     else
       return (1024 * Setting.get_value('map', const.setting_name.network_rate))
@@ -397,17 +418,22 @@ do
     end)
     
   local is_packaging_enabled, f4_clear = Memoize(function()
-    return 
-     (not game.is_multiplayer()) and (not flag.IS_DEV_MODE)
-      -- and Setting.get_value('map', const.setting_name.sp_instant_translation)
-       or Setting.get_value('map', const.setting_name.enable_packaging)
+    if (not game.is_multiplayer()) and (not flag.IS_DEV_MODE)
+    then
+      return false
+    else
+      return Setting.get_value('map', const.setting_name.enable_packaging)
+      end
     end)
     
+  -- Because there is no event for game.speed changes
+  -- this is also called via on_nth_tick(300).
   Babelfish.on_runtime_mod_setting_changed = function()
     f1_clear()
     f2_clear()
     f3_clear()
     f4_clear()
+    f5_clear()
     end
   
   Babelfish.get_max_bytes_per_tick
@@ -421,6 +447,9 @@ do
       
   Babelfish.is_packaging_enabled
     = function() return is_packaging_enabled[true] end
+    
+  Babelfish.is_sp_instant_mode
+    = function() return is_sp_instant_mode[true] end
     
     end
     

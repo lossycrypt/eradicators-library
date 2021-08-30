@@ -120,6 +120,8 @@ local Private = {}
 local EventPIG
 local generate_event_name
 
+local ENABLE_FULL_LOGGING = log.log_level >= 3
+
 --------------------------------------------------------------------------------
 -- Public methods.
 -- @section
@@ -299,7 +301,8 @@ local OrderedNthTicks = {--[[
 -- Handler Registry (Internal)
 -- -------------------------------------------------------------------------- --
 
-local log_handler_change = (not flag.IS_DEV_MODE) and ercfg.SKIP or
+-- local log_handler_change = (not flag.IS_DEV_MODE) and ercfg.SKIP or
+local log_handler_change = (not ENABLE_FULL_LOGGING) and ercfg.SKIP or
   function(mode, event_name, module_name)
     if (module_name == '(EventManagerLite)')
     and (type(event_name) == 'string') then
@@ -483,7 +486,8 @@ local dontlog = {
 local function make_event_logger(event_name)
   local log_name = reverse_defines[event_name]
   return 
-   ((not flag.IS_DEV_MODE) or (dontlog[event_name]))
+   -- ((not flag.IS_DEV_MODE) or (dontlog[event_name]))
+   ((not ENABLE_FULL_LOGGING) or (dontlog[event_name]))
     and ercfg.SKIP
     or  function (module_name, period)
       return log:debug(log_name, period or ' ', ' → ', module_name)

@@ -33,75 +33,80 @@ local Hydra      = elreq('erlib/lua/Coding/Hydra')()
 -- can't use String because it requires Verificate, which is too large
 -- and Log should be light-weight.
 
-local stop       = Error.Stopper('Logger')
-local assertify  = elreq('erlib/lua/Error'     )().Asserter(stop)
-
-
-local const = {
-
-  level = {
-    ['Errors'     ] =   0, -- Error.Error()
-    ['Warnings'   ] =   1, -- Log.warn()
-    ['Information'] =   2, -- Log.info()
-    ['Everything' ] =   3, -- Log.debug()
-    ['DEV_MODE'   ] =   4, -- Log.tell(), Log.say()
-    },
-    
-  name = {
-    [  0] = 'Errors'     ,
-    [  1] = 'Warnings'   ,
-    [  2] = 'Information',
-    [  3] = 'Everything' ,
-    [  4] = 'DEV_MODE'   ,
-    },
-    
-  method_level = {
-    raw   = 0            ,
-    err   = 0            ,
-    warn  = 1            ,
-    info  = 2            ,
-    debug = 3            ,
-    --
-    debugf= 3            ,
-    --
-    say   = 4            ,
-    tell  = 4            ,
-    header= 4            , --seperator
-    footer= 4            , --seperator
-    },
-
-  log_prefix = {
-    [  0] = '[ERROR]'    ,
-    [  1] = '[WARN ]'    ,
-    [  2] = '[INFO ]'    ,
-    [  3] = '[DEBUG]'    ,
-    [  4] = '[PRINT]'    ,
-    },
-
-  print_prefix = {
-    [  0] = '!?!ERROR'   ,
-    [  1] = ' ! WARN '   ,
-    [  2] = ' ? INFO '   ,
-    [  3] = '>>>DEBUG'   ,
-    [  4] = ' # PRINT'   ,
-    },
-
-  template = {
-    startup_setting_name = 'er:startup-log-level@%s',
-    runtime_setting_name = 'er:runtime-log-level@%s',
-    default_setting_name = 'er:runtime-log-level@eradicators-library'
-    }
-    
-  }
-
-  
-
+-- local stop       = Error.Stopper('Logger')
+-- local assertify  = elreq('erlib/lua/Error'     )().Asserter(stop)
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Log,_Log,_uLocale = {},{},{}
+local Log,_Log,const = {},{},{}
+
+const.level = {
+    ['Errors'     ] =   0, -- Error.Error()
+    ['Warnings'   ] =   1, -- Log.warn()
+    ['Information'] =   2, -- Log.info()
+    ['Everything' ] =   3, -- Log.debug()
+    ['DEV_MODE'   ] =   4, -- Log.tell(), Log.say()
+    }
+    
+const.name = {
+    [  0] = 'Errors'     ,
+    [  1] = 'Warnings'   ,
+    [  2] = 'Information',
+    [  3] = 'Everything' ,
+    [  4] = 'DEV_MODE'   ,
+    
+    -- for setting prototype creation
+    setting = {
+      prefix  = 'erlib:logging-level', -- is also default
+      infix   = '@',
+      hidden  = 'erlib:logging-level-hidden',
+      }
+     
+    }
+    
+const.method_level = {
+    raw   = 0            ,
+    err   = 0            ,
+    warn  = 1            ,
+    info  = 2            ,
+    infof = 2            ,
+    debug = 3            ,
+    debugf= 3            ,
+    --
+    profilerf = 3         ,
+    --
+    say   = 4            ,
+    sayf  = 4            ,
+    tell  = 4            ,
+    header= 4            , --seperator
+    footer= 4            , --seperator
+    }
+
+const.log_prefix = {
+    [  0] = '[ERROR]'    ,
+    [  1] = '[WARN ]'    ,
+    [  2] = '[INFO ]'    ,
+    [  3] = '[DEBUG]'    ,
+    [  4] = '[PRINT]'    ,
+    }
+
+const.print_prefix = {
+    [  0] = '!?!ERROR'   ,
+    [  1] = ' ! WARN '   ,
+    [  2] = ' ? INFO '   ,
+    [  3] = '>>>DEBUG'   ,
+    [  4] = ' # PRINT'   ,
+    }
+
+-- const.template = {
+    -- startup_setting_name = 'er:startup-log-level@%s',
+    -- runtime_setting_name = 'er:runtime-log-level@%s',
+    -- default_setting_name = 'er:runtime-log-level@eradicators-library'
+    -- }
+  
+
 
 -- -------
 -- Nothing.
@@ -200,14 +205,19 @@ local function get_log_level_setting_value(mod_name)
       end
     end
   -- search mod settings
-  local value
-  for _,mode in ipairs{'runtime','startup','default'} do
-    value = try_get_setting_value(
-      mode,
-      const.template[mode .. '_setting_name']:format(mod_name)
-      )
-    if value ~= nil then break end
-    end
+  -- (Can't do runtime because Log module can not have event
+  --  handler to update loggers in each mods lua sandbox.)
+  local value = (function(value)
+    -- for _, mode in ipairs{'runtime', 'startup'} do
+      for _, name in ipairs{
+        const.name.setting.prefix .. const.name.setting.infix .. mod_name,
+        const.name.setting.prefix, -- shared setting
+        } do
+        value = const.level[try_get_setting_value('startup', name)]
+        if value ~= nil then return value end
+        end
+      -- end
+    end)()
   --
   -- print('Log level gotten:'..value)
   -- return value or const.level.Errors
@@ -242,7 +252,7 @@ local function _do_log_raw(stdout,self,level,msg)
     -- so it's always nessecary to include the *executing* file:line.
     (not info) and '' or info.short_src:gsub('__[%a-_]+__/',''):gsub('%.lua$',''):sub(-19),
     (not info) and -1 or info.currentline,
-    self.logger_name, -- Header (nessecary?)
+    self.name, -- Header (nessecary?)
     (rawget(_ENV, 'game') or {}).tick or -1,
     msg
     )
@@ -288,10 +298,8 @@ function Log:do_log_seperator(sep, ...)
 do 
     
   local assert_name = function(name)
-    return assertify(
-      (type(name) == 'string') and (name ~= ''),
-      'Missing logger name.')
-    end
+    assert((type(name) == 'string') and (name ~= ''), 'Missing logger name.')
+    return name end
 
   local new = function(name)
     local log = {}
@@ -372,12 +380,16 @@ function Log:tell  (...) return self:do_log_block(const.level['DEV_MODE'   ],...
 function Log:warnf (...) return self:do_log_line (const.level['Warnings'   ],string.format(...)) end 
 function Log:infof (...) return self:do_log_line (const.level['Information'],string.format(...)) end
 function Log:debugf(...) return self:do_log_line (const.level['Everything' ],string.format(...)) end
+function Log:sayf  (...) return self:do_log_line (const.level['DEV_MODE'   ],string.format(...)) end
+
+
+function Log:profilerf(pf, ...) return log{'', '[Profiler] ', string.format(...), pf} end
 
 local _head, _foot = ('―'):rep(100)..'\n', ('.'):rep(200)..'\n'
 function Log:header(...) return self:do_log_seperator(_head, ...) end
 function Log:footer(...) return self:do_log_seperator(_foot, ...) end
 
-function Log:raw   (...) return log(...) end -- Factorio native logger
+function Log:raw   (...) error('Why log raw?') return log(...) end -- Factorio native logger
 
 -- -------------------------------------------------------------------------- --
 
@@ -385,7 +397,7 @@ function Log:raw   (...) return log(...) end -- Factorio native logger
 -- Should log level be from module or user... or always library?
 -- I thought the point was to try user first and then try library!
 function Log:update_log_level()
-  return Log.set_log_level(self, get_log_level_setting_value(self.module_mod_name))
+  return Log.set_log_level(self, get_log_level_setting_value(self.user_mod_name))
   end
 
 
@@ -458,4 +470,4 @@ do
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
 do (STDOUT or log or print)('  Loaded → erlib.Log') end
-return function() return Log,_Log,_uLocale end
+return function() return Log,_Log,const end

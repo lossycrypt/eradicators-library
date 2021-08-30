@@ -66,7 +66,7 @@ const.network = {
     mtu             = 1452,
     packet_overhead =   18,
     -- dict:dump_statistics()
-    packet_median   =   75, -- better estimate means batter bandwitdh control
+    packet_median   =   85, -- better estimate means batter bandwitdh control
     },
   }
   

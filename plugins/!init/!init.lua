@@ -105,7 +105,7 @@ return function(phase) assert(phase)
       --
       db.default_value  =  value
       db.allowed_values = {value} -- paranoia: block changes
-      log:raw('Recieved request to enable plugin: "'..plugin_name..'".')
+      log:info('Recieved request to enable plugin: "'..plugin_name..'".')
       --
       local f = configurators[plugin_name]
       if f then f(options) end

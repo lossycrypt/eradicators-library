@@ -76,6 +76,9 @@ local flag = shared[5]
 
   flag.VERBOSE_LOGGING = --todo: decided how/what to do with this
     flag.IS_DEV_MODE
+    
+  flag.LOG_FILE_LOADING = --todo: decided how/what to do with this
+    not flag.IS_FACTORIO
   
   flag.DO_TESTS = -- run unit tests 
     does_file_exist('__00-toggle-to-enable-tests__/empty')
@@ -101,7 +104,7 @@ local flag = shared[5]
 
   -- flag.MOD_NAME = -- only for error messages!
     
-
+  flag.PHASE_NAME = debug.traceback():match('^.*\n%s*.*/([^%s]+)%.lua:')
     
 -- -------------------------------------------------------------------------- --
 -- Log Level                                                                  --
@@ -109,23 +112,26 @@ local flag = shared[5]
 -- -------------------------------------------------------------------------- --
 
   -- Mute low-level logging
-  STDOUT = flag.IS_DEV_MODE and print or SKIP
+  STDOUT = flag.LOG_FILE_LOADING and print or SKIP
   STDERR = error
  
-  -- This is the first thing the library will say.
-  if flag.IS_DEV_MODE then
-    print(('―'):rep(100)..'\nshared.lua\n' )
-  else
-    -- log('ErLib is booting now.') -- Just don't. Not Warn or Error -> not important.
-    
-    -- It would be nice to have a method to print a line *once*
-    -- before loading a new save-game even in normal mode. Not
-    -- once per mod, just once for all mods.
-    if flag.IS_LIBRARY_MOD then
-      print(('―'):rep(100))
+  -- It would be nice to have a method to print a line *once*
+  -- before loading a new save-game even in normal mode. Not
+  -- once per mod, just once for all mods.
+  if flag.IS_LIBRARY_MOD then
+    print(('―'):rep(100))
+    if flag.IS_DEV_MODE then
+      print(flag.PHASE_NAME, '\n')
       end
-    
     end
+
+  -- This is the first thing the library will say.
+  if flag.LOG_FILE_LOADING then
+    print(('―'):rep(100)..'\nshared.lua\n' )
+    end
+    
+  -- Just don't. Not Warn or Error -> not important.
+  -- log('ErLib is booting now.')
 
     
   

@@ -167,15 +167,16 @@ Babelfish.update_handlers = function()
     script.on_event   (string_event, Babelfish.on_string_translated)
     script.on_nth_tick(         300, nil)
     script.on_nth_tick(          60, nil)
-    script.on_nth_tick(          20, Babelfish.request_language_codes)
-    script.on_nth_tick(           1, nil)
+    -- script.on_nth_tick(          20, Babelfish.request_language_codes)
+    -- script.on_nth_tick(           1, nil)
+    script.on_nth_tick(           1, Babelfish.request_language_codes)
   elseif update_dicts then
     log:info('Translation started.')
     -- Send out translation requests.
     script.on_event   (string_event, Babelfish.on_string_translated)
     script.on_nth_tick(         300, Babelfish.on_runtime_mod_setting_changed)
     script.on_nth_tick(          60, StatusIndicator.update_all)
-    script.on_nth_tick(          20, nil)
+    -- script.on_nth_tick(          20, nil)
     script.on_nth_tick(           1, Babelfish.request_translations)
   else
     log:info('All translations finished.')
@@ -183,7 +184,7 @@ Babelfish.update_handlers = function()
     script.on_event   (string_event, nil)
     script.on_nth_tick(         300, nil)
     script.on_nth_tick(          60, nil)
-    script.on_nth_tick(          20, nil)
+    -- script.on_nth_tick(          20, nil)
     script.on_nth_tick(           1, nil)
     end
   end
@@ -257,6 +258,8 @@ script.on_config(function(e)
   set_all_lcodes_dirty()
   --
   Babelfish.on_runtime_mod_setting_changed()
+  -- Savedata:set_byte_allowance(Babelfish.get_max_bytes_per_tick())
+  --
   on_load()
   end)
 

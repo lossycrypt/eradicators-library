@@ -29,7 +29,7 @@ local assertify   = elreq('erlib/lua/Error'     )().Asserter(stop)
 -- local verify      = Verificate.verify
                                                 
 local Class       = elreq('erlib/lua/Class'     )()
--- local Filter      = elreq('erlib/lua/Filter'    )()
+local Filter      = elreq('erlib/lua/Filter'    )()
 -- local String      = elreq('erlib/lua/String'    )()
 
 local Table       = elreq('erlib/lua/Table'     )()
@@ -52,6 +52,9 @@ local Locale      = elreq('erlib/factorio/Locale' )()
       -- string_sub
     -- = pairs, pcall, string.find, type, string.gmatch, string.lower, string.gsub,
       -- string.sub
+      
+local string_gsub
+    = string.gsub
       
 local pairs, assert
     = pairs, assert
@@ -193,7 +196,7 @@ function Dictionary.update_n(dict, type)
     -- if there was a change or not. So this must always be raised.
     Babelfish.raise_on_translation_state_changed(dict)
     end
-  return did_n_change_to_max end
+  end
 
   
 -- Clear all invalid data.
@@ -201,7 +204,7 @@ function Dictionary.repair(dict)
   --
   -- Wipe ALL old data.
   Table.clear(dict, SearchTypes.get_requested_array_ref())
-  local old_translations = Table.scopy(dict)
+  local old_translations = Table.scopy(dict) -- only requested types remaining
   Table.clear(dict)
   --
   -- Create empty tables.
@@ -209,12 +212,6 @@ function Dictionary.repair(dict)
   for _, type in SearchTypes.requested_ipairs() do
     dict[type] = {n = 0, max = RawEntries.max_indexes[type]}
     end
-    
-  -- mark all entries dirty
-  -- for _, request in ipairs(RawEntries.requests) do
-    -- dict:set_lstring_translation(request[rindex.lstring], nil, true)
-    -- end
-    
   --
   -- Most mod updates only have minor or no locale changes.
   -- Keep old translations until new ones arrive for a smoother transition.
@@ -233,16 +230,46 @@ function Dictionary.repair(dict)
 -- Translation                                                                --
 -- -------------------------------------------------------------------------- --
   
--- Set a single translation from a single entry
-function Dictionary.set_entry_translation(dict, raw_entry, word)
-  local type = raw_entry[eindex.type]
-  assert(dict[type])[raw_entry[eindex.index]] = {
-    [eindex.word] = word or '',
-    [eindex.name] = raw_entry[eindex.name],
-    }
-  dict:update_n(type)
-  end
+
+do
+
+  local _is_exact_unknown_key_string = function(type, name, word)
+    return word == (
+      'Unknown key: "'..string_gsub(type, '_', '-')..'.'..name..'"'
+      )
+    end
   
+  local _is_description = Filter.string_postfix('_description')
+
+  -- Set a single translation from a single entry
+  function Dictionary.set_entry_translation(dict, raw_entry, word)
+    local type = raw_entry[eindex.type]
+    local name = raw_entry[eindex.name]
+    --
+    -- When using packed requets unknown descriptions are translated as
+    -- "unknown key" but unlike unknown item names vanilla shows them
+    -- as empty. Not storing them saves space and fixes search results.
+    if Babelfish.is_packaging_enabled()
+    and _is_description(type)
+    and _is_exact_unknown_key_string(type, name, word)
+    then
+      -- log:sayf('Empty description: %s %s %s', type, name, word)
+      -- Hackfix: Preserve real length for dump_statistics()
+      word = (not flag.IS_DEV_MODE) and '' or word:rep(#word)
+      end
+    --
+    -- Always create a fresh entry table to avoid table-recycling bugs.
+    dict[type][raw_entry[eindex.index]] = {
+      [eindex.word] = word or '',
+      [eindex.name] = name,
+      }
+    --
+    dict:update_n(type)
+    end
+    
+  end
+    
+    
 -- -------------------------------------------------------------------------- --
   
 -- Must be called EVERY TICK when translating for correct delay handling.
@@ -262,69 +289,6 @@ do
     end
   end
 
-
--- do
--- 
---   local ordered_raw_entries = RawEntries.ordered
---   -- local ordered_types       = SearchTypes.get_requested_array_ref()
---   
---   function Dictionary.iter_untranslated_entries(dict, tick, stable)
---   
---     -- local delay = -1 * const.network.rerequest_delay * Local.ticks_per_second_int()
---     
---     -- must be inside function to be after on_load
--- 
---     -- local itype, type = 1, ordered_types[1]
---     
---     if not stable then -- 
---     
---       local next, arr, key = SearchTypes.requested_ipairs()
---     
---       -- local next = ipairs(ordered_types)
---       -- local type      = next_type()
---       local type
---       
---       local entries
---       -- local n = assert(entries.n)
---       
---       local i = 0
---       
---       return function()
---         while true do
---           if not type then
---             key, type = next(arr, key)
---             if not type then return end
---             end
---           
---           if not entries then
---             entries = assert(dict[type])
---             end
---           
---           if entries[ entries.n + i ] == nil then
---             print(entries.n, entries.max, i, #ordered_raw_entries[type])
---             return assert(ordered_raw_entries[type][entries.n + i])
---           else
---             i = i + 1
---             if i > entries.max then
---               type = nil
---               entries = nil
---               i = 0
---               end
---             end
---           end
---         end
---           
---     else
---       entries.i = assert(entries.i or entries.n)
---       error()
--- 
---       end
--- 
---     end
---   end
-
-
-  
 -- -------------------------------------------------------------------------- --
   
 do
@@ -347,7 +311,7 @@ do
       if nlstring_is_equal(raw_request[rindex.lstring], lstring) then
         --
         if flag.IS_DEV_MODE then
-          local count = uids.n - index + 2
+          local count = uids.n - index + 1
           if count > 1 then log:debugf('Lstring->request took %s trials.', count) end
           end
         --
@@ -369,6 +333,5 @@ do
     
   end
   
-
   
 return Dictionary
