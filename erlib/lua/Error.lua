@@ -215,7 +215,7 @@ local _error = function(prefix,postfix,...)
     Stacktrace.get_pos(3) or '?' --this must be *exactly* 2 above the outside caller
     )
 
-  error(err,0) -- without built-in level info
+  error(err, 0) -- without built-in level info
   end
   
 

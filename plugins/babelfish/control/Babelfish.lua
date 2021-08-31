@@ -263,7 +263,7 @@ do
     if not dict:has_requests()
     then
       Savedata:set_byte_allowance(nil)
-      Savedata:purge_packets()
+      Savedata:clear_packed_packets()
       Savedata:remove_unused_dictionaries()
       StatusIndicator.destroy_all()
       Babelfish.update_handlers()
@@ -305,8 +305,17 @@ do
     Savedata:set_pdata_lcode(e, nil, e.result)
     Babelfish.raise_on_translation_state_changed(nil, p.index)
     Babelfish.update_handlers()
-    -- Try to start right now. (Fixes SP-Instant-Mode missing of first window.)
+    --
+    -- To make SP-Instant-Mode finish during the loading screen
+    -- it must skip waiting for the next translation window.
+    --
+    -- Flow:
+    --  [tick 0] request lcode
+    --  [tick 1] recieve lcode, request full translation
+    --  [tick 2] recieve translation, finalize
+    --
     if Babelfish.is_sp_instant_mode()
+    and Babelfish.should_request_translations()
     then
       Savedata:set_byte_allowance(Babelfish.get_max_bytes_per_tick())
       Babelfish.request_translations{tick = 0}

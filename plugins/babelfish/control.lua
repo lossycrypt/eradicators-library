@@ -153,30 +153,33 @@ PluginManager.manage_savedata  ('babelfish', function(_) Savedata = _ end)
 -- Conditional Events                                                         --
 -- -------------------------------------------------------------------------- --
 
+Babelfish.should_update_lcodes = function()
+  return (not not Savedata:get_lcode_requesters()) end
+  
+Babelfish.should_request_translations = function()
+  return (not Babelfish.should_update_lcodes())
+     and (not not Savedata:get_active_dict())
+  end
+
+
 -- Manages ALL dynamic event de/registration
 -- must be ON_LOAD compatible!
 Babelfish.update_handlers = function()
   local string_event   = defines.events.on_string_translated
   --
-  local update_players = (not not Savedata:get_lcode_requesters()) or nil
-  local update_dicts   = (not not Savedata:get_active_dict     ()) or nil
-  --
-  if update_players then
+  if Babelfish.should_update_lcodes() then
     log:info('Translation suspended while waiting for language codes.')
     -- At least one player is missing an lcode.
     script.on_event   (string_event, Babelfish.on_string_translated)
     script.on_nth_tick(         300, nil)
     script.on_nth_tick(          60, nil)
-    -- script.on_nth_tick(          20, Babelfish.request_language_codes)
-    -- script.on_nth_tick(           1, nil)
     script.on_nth_tick(           1, Babelfish.request_language_codes)
-  elseif update_dicts then
+  elseif Babelfish.should_request_translations() then
     log:info('Translation started.')
     -- Send out translation requests.
     script.on_event   (string_event, Babelfish.on_string_translated)
     script.on_nth_tick(         300, Babelfish.on_runtime_mod_setting_changed)
     script.on_nth_tick(          60, StatusIndicator.update_all)
-    -- script.on_nth_tick(          20, nil)
     script.on_nth_tick(           1, Babelfish.request_translations)
   else
     log:info('All translations finished.')
@@ -184,7 +187,6 @@ Babelfish.update_handlers = function()
     script.on_event   (string_event, nil)
     script.on_nth_tick(         300, nil)
     script.on_nth_tick(          60, nil)
-    -- script.on_nth_tick(          20, nil)
     script.on_nth_tick(           1, nil)
     end
   end
@@ -244,13 +246,18 @@ local function set_all_lcodes_dirty()
 --   mod_startup_settings_changed = false }
 script.on_config(function(e)
   --
+  if Savedata.version ~= const.version.savedata then
+    log:debug('Savedata version obsolete. Resetting.')
+    Savedata:reset_to_default()
+    end
+  --
   RawEntries.precompile()
   -- if did_this_mod_config_change(e) then
     reclassify_all_dictionaries() -- can't dict:update without
     update_all_dictionaries()
     -- end
   --
-  Savedata:purge_packets()
+  Savedata:clear_packed_packets()
   Savedata.version = const.version.savedata
   --
   Savedata:clear_volatile_data()

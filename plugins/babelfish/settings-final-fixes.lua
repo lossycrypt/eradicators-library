@@ -43,8 +43,8 @@ Setting.make {
   const.setting_name.enable_packaging,
   'map', 'bool', true,
   'erlib:3-babelfish-1-3',
-  -- hidden         = (not flag.IS_DEV_MODE),
-  -- forced_value   = true                  , -- only loaded when hidden
+  hidden         = (not flag.IS_DEV_MODE),
+  forced_value   = true                  , -- only loaded when hidden
   }
 
 

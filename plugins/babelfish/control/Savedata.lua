@@ -174,7 +174,7 @@ PluginManager.classify_savedata('babelfish', {
     self.byte_allowance = (self.byte_allowance or 0) - bytes
     end,
     
-  purge_packets = function(self)
+  clear_packed_packets = function(self)
     self.packets = {}
     end,
       

@@ -86,6 +86,9 @@ do end
 --     "er:babelfish-icon-green"
 --     "er:babelfish-icon-red"
 -- 
+-- @usage
+--    LuaGuiElement.add{type = "sprite-button", sprite = "er:babelfish-icon-default"}
+-- 
 -- @table Babelfish.Sprites
 do end
 

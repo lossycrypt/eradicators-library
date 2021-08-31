@@ -178,7 +178,7 @@ function Dictionary:find(types, word, opt)
   verify(opt      , 'table' , 'Babelfish: Invalid "options" format.' )
   verify(opt.limit, 'nil|Integer', 'Babelfish: Invalid limit.' )
   --
-  local n = opt.limit and opt.limit or math.huge
+  local limit = opt.limit or math.huge
   local r = {}
   local exact_word = word
   local status = true
@@ -208,18 +208,19 @@ function Dictionary:find(types, word, opt)
     -- added new prototypes.
     -- if (table_size(self[type]) - 1) ~= self[type].max then status = false end
     if not self:is_type_fully_populated(type) then status = false end
-    -- subtables are created regardless of n
+    -- subtables are created regardless of limit
     local this = {}; r[type] = this
     local entries = self[type]
+    local n = 0
     for i = 1, entries.max do
-      if n <= 0 then break end
+      if limit <= 0 then break end
       local entry = entries[i]
       if entry then -- self[type] is sparse after :update()
         local name = entry[eindex_name]
         if (exact_word == name) -- verbatim internal name match
         -- or matcher(entry[eindex.word], word) then
         or matcher(normalized_word_cache[entry[eindex_word]], word) then
-          n = n - 1
+          limit = limit - 1
           this[name] = (not flag.IS_DEV_MODE) or entry[eindex_word]
           end
         end

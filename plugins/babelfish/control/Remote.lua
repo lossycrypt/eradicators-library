@@ -66,6 +66,8 @@ local Remote = {}
 -- Local Library                                                              --
 -- -------------------------------------------------------------------------- --
 
+local SearchTypes      = import '/control/SearchTypes'
+
 -- -------------------------------------------------------------------------- --
 -- Savedata                                                                   --
 -- -------------------------------------------------------------------------- --
@@ -86,6 +88,35 @@ PluginManager.manage_savedata  ('babelfish', function(_) Savedata = _ end)
 ----------
 -- The remote interface is named `"babelfish`".
 -- @table RemoteInterfaceName
+do end
+
+
+-- -------
+-- Activates search types.  
+-- __This function must be called from an on\_load event handler.__ 
+--
+-- @tparam set types A mapping of @{Babelfish.SearchType|SearchType} strings to true.
+--
+-- @usage
+--   script.on_load(function()
+--     remote.call('babelfish', 'add_search_type', {
+--       item_name   = true,
+--       recipe_name = true,
+--       })
+--     end)
+--
+-- @function Babelfish.add_search_types
+-- function Remote.add_search_types(types)
+--   if nil ~= rawget(_ENV, 'game') then
+--     stop('Babelfish.add_search_type must be called from on_load.')
+--     end
+--   -- Factorio pairs() preserves key order.
+--   for type, entries in pairs(types) do
+--     -- future syntax with custom translations:
+--     -- {recipe_name = {name = lstring, name = lstring}}
+--     SearchTypes.add_type(type, entries)
+--     end
+--   end
 do end
 
   

@@ -144,7 +144,6 @@ return function(phase) assert(phase)
   -- ------------------------------------------------------------------------ --
   -- All Phases                                                               --
   -- ------------------------------------------------------------------------ --
-  
 
   if table_size(get_enabled_plugins(phase)) > 0 then
     Loader.enable_em()
@@ -155,4 +154,24 @@ return function(phase) assert(phase)
   
   Loader.cleanup()
     
+  -- ------------------------------------------------------------------------ --
+  -- Control                                                                  --
+  -- ------------------------------------------------------------------------ --
+
+  if phase == 'control' then
+  
+    -- if flag.IS_DEV_MODE then
+    --   local script = EventManager.get_managed_script('erlib-init')
+    --   local SearchTypes = require 'plugins/babelfish/control/SearchTypes'
+    --   script.on_event({'on_config', 'on_load'}, function()
+    --     remote.call('babelfish', 'add_search_types', 
+    --       SearchTypes.get_supported_set())
+    --     end)
+    --   end
+
+    end
+  
+
+    
+  -- ------------------------------------------------------------------------ --
   end

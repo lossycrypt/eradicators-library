@@ -24,17 +24,22 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 
+local stop  = elreq('erlib/lua/Error')().Stopper('AutoCache')
+
+local Table = elreq('erlib/lua/Table')()
+
+local table_size = Table.size -- factorio C-side if available
+
+local table_insert, table_remove
+    = table.insert, table.remove
+
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 
-local Cache,_Cache,_uLocale = {},{},{}
+local Cache, _Cache = {}, {}
 
-local Error = elreq('erlib/lua/Error')()
-local Table = elreq('erlib/lua/Table')()
 
-local table_size = Table.size -- factorio C-side if available
-local table_insert, table_remove = table.insert, table.remove
 
 
 --------------------------------------------------------------------------------
@@ -58,6 +63,10 @@ local table_insert, table_remove = table.insert, table.remove
 -- way it will cause __desync__s or other weird bugs if you try to do anything
 -- other than reading startup settings or game.*_prototypes. You __must not__
 -- store any LuaObject wrappers, only pure lua values are desync-safe.
+-- 
+-- The constructor will be triggered before the following
+-- @{Metatables and Metamethods|metamethods}:  
+-- `__index`, `__newindex`, `__pairs`, `__ipairs` and `__len`.
 -- 
 -- @tparam function constructor This is called exactly once __with an empty table__
 -- as the only argument. It __must then fill that table__ with the desired values.
@@ -88,15 +97,17 @@ local table_insert, table_remove = table.insert, table.remove
 --        end
 --      end)
 do
-  local Stop = Error.Stopper('AutoCache')
 
   local function read_only_error()
-    Stop('Auto Cache','all auto-caches are read-only')
+    return stop("AutoCache'ed table is read-only.")
     end
     
-  local function fill(self,constructor)
-    if not game then Stop('Auto Cache',' not available outside events.\nThis is a bug in YOUR code.') end
-    setmetatable(self,nil)
+  local function fill(self, constructor)
+    if not rawget(_ENV, 'game') then
+      return stop("AutoCache'ed tables may not be accessed outside of events."
+        ,'\nThis is a bug in *your* code.')
+      end
+    setmetatable(self, nil)
     -- The data has to be stored directly into self by the constructor
     -- to not invalidate external references to the cache table.
     constructor(self)
@@ -112,7 +123,7 @@ do
 --v4.0
 Cache.AutoCache = function(constructor)
   if type(constructor) ~= 'function' then
-    Stop('Auto Cache',' invalid constructor')
+    stop('Auto Cache',' invalid constructor')
     end
   return setmetatable({},{
     -- This metatable is deleted when *either* __index or __pairs
@@ -319,4 +330,4 @@ Cache.TickedCache = function()
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --
 do (STDOUT or log or print)('  Loaded → erlib.Cache') end
-return function() return Cache,_Cache,_uLocale end
+return function() return Cache, _Cache end

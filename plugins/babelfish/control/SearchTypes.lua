@@ -24,10 +24,12 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
--- local log         = elreq('erlib/lua/Log'       )().Logger  'babelfish'
-local stop        = elreq('erlib/lua/Error'     )().Stopper 'babelfish'
-
+local log         = elreq('erlib/lua/Log'          )().Logger  'babelfish'
+local stop        = elreq('erlib/lua/Error'        )().Stopper 'babelfish'
 local assertify   = elreq('erlib/lua/Error'        )().Asserter(stop)
+
+local Verificate  = elreq('erlib/lua/Verificate'   )()
+local verify      = Verificate.verify
 
 local Table       = elreq('erlib/lua/Table'        )()
 local Array       = elreq('erlib/lua/Array'        )()
@@ -71,35 +73,57 @@ function SearchTypes.is_supported(type)
 function SearchTypes.get_supported_array()
   return Array.scopy(supported_array) end
 
+function SearchTypes.get_supported_set()
+  return Set.from_values(supported_array) end
+  
+-- -------------------------------------------------------------------------- --
+-- on_load (remote calls)                                                     --
+-- -------------------------------------------------------------------------- --
+
+-- Failed experiment. Requires using mod to call in
+-- all three events: init/config/load.
+
+-- local requested_array = {}
+-- local requested_set   = {}
+-- 
+-- function SearchTypes.add_type(type, entries)
+--   verify(entries, true, 'Given table was not a <set>.') -- Custom entries are not supported yet.
+--   assertify(SearchTypes.is_supported(type), 'Not a known SearchType: ', type)
+--   --
+--   table.insert(requested_array, type)
+--   SearchTypes.sort(requested_array)
+--   requested_set[type] = true
+--   end
+  
 -- -------------------------------------------------------------------------- --
 -- Control Stage                                                              --
 -- -------------------------------------------------------------------------- --
 
 -- pre-sorted in settings-final-fixes
-local function get_allowed_values()
+local function get_requested_values()
   return Array.scopy(game.mod_setting_prototypes
   [const.setting_name.search_types].allowed_values)
   end
 
 -- {ordered_index -> search_type}
 local requested_array = Cache.AutoCache(function(r)
-  Table.overwrite(r, get_allowed_values())
+  Table.overwrite(r, get_requested_values())
   end)
   
 -- {search_type -> true}
 local requested_set = Cache.AutoCache(function(r)
-  Table.overwrite(r, Set.from_values(get_allowed_values()))
+  Table.overwrite(r, Set.from_values(get_requested_values()))
   end)
   
 -- {ordered_index -> search_type}
-local not_requested_array = Cache.AutoCache(function(r)
-  -- Don't attach Set meta to internal tables.
-  -- (scopy also triggers AutoCache)
-  local supported_set = Set(Table.scopy(supported_set)) 
-  local requested_set = Set(Table.scopy(requested_set))
-  Table.overwrite(r, Table.keys(supported_set - requested_set))
-  SearchTypes.sort(r) -- not currently required
-  end)
+-- local not_requested_array = Cache.AutoCache(function(r)
+--   -- Don't attach Set meta to internal tables.
+--   -- (scopy also triggers AutoCache)
+--   local supported_set = Set(Table.scopy(supported_set)) 
+--   local requested_set = Set(Table.scopy(requested_set))
+--   Table.overwrite(r, Table.keys(supported_set - requested_set))
+--   SearchTypes.sort(r) -- not currently required
+--   end)
   
 --
 function SearchTypes.assert(type)
@@ -113,9 +137,9 @@ function SearchTypes.requested_ipairs()
   end
   
 --
-function SearchTypes.get_not_requested_array()
-  return Array.scopy(not_requested_array)
-  end
+-- function SearchTypes.get_not_requested_array()
+--   return Array.scopy(not_requested_array)
+--   end
 
 --
 function SearchTypes.get_requested_array_ref()
