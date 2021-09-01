@@ -14,7 +14,7 @@ const.name = {
   }
   
 const.gui = {
-  width  = 1600,
+  width  = 1600 + 12, -- +12 fits one more icon
   height =  680,
   sidebar_width = 200,
   }

@@ -1,17 +1,5 @@
 ﻿-- (c) eradicator a.k.a lossycrypt, 2017-2021, not seperately licensable
 -- -------------------------------------------------------------------------- --
-
---[[ Notes:
-  ]]
-
---[[ Annecdotes:
-  ]]
-
---[[ Future:
-  ]]
-  
---[[ Todo:
-  ]]
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -24,27 +12,10 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 local log         = elreq('erlib/lua/Log'          )().Logger  'babelfish'
--- local stop        = elreq('erlib/lua/Error'        )().Stopper 'babelfish'
--- local assertify   = elreq('erlib/lua/Error'        )().Asserter(stop)
-
--- local Verificate  = elreq('erlib/lua/Verificate'   )()
--- local verify      = Verificate.verify
--- local isType      = Verificate.isType
 
 local Table       = elreq('erlib/lua/Table'        )()
--- local Array       = elreq('erlib/lua/Array'        )()
--- local Set         = elreq('erlib/lua/Set'          )()
--- local Filter      = elreq('erlib/lua/Filter'       )()
--- local Vector      = elreq('erlib/lua/Vector'       )()
-
--- local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
--- local dpairs      = elreq('erlib/lua/Iter/dpairs'  )()
--- local sriapi      = elreq('erlib/lua/Iter/sriapi'  )()
 
 local Locale      = elreq('erlib/factorio/Locale'    )()
--- local Setting     = elreq('erlib/factorio/Setting'   )()
--- local Player      = elreq('erlib/factorio/Player'    )()
--- local getp        = Player.get_event_player
 
 local string_gmatch
     = string.gmatch
@@ -62,7 +33,6 @@ local null = '\0'
 
 local RawEntries       = import '/control/RawEntries'
 
-
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
@@ -78,43 +48,42 @@ PluginManager.manage_savedata  ('babelfish', function(_) Savedata = _ end)
 -- Local Library                                                              --
 -- -------------------------------------------------------------------------- --
 
-
+-- Temporary unique id for a packet.
+-- Only valid for one dict. Will be reset after dict is complete.
 function Packet.get_uid()
   Savedata.packets.n = (Savedata.packets.n or 0) + 1
   return Savedata.packets.n
   end
 
-do
-    
-  function Packet.send(p, dict, count)
-    local index = Packet.get_uid()
-    local nlstrings = Table.set(Savedata.packets, {index}, {})
-    --
-    local i, packet = 1, {''}
-    local next = dict:iter_requests()
-    for j=i+1, i+count*2, 2 do
-      local request = next()
-      if not request then break end -- beware count == math.huge!
-      table.insert(nlstrings, request[rindex.lstring])
-      packet[j  ] = null
-      packet[j+1] = request[rindex.lstring]
-      end
-    --
-    if #packet > 1 then -- dict re-request pause
-      p.request_translation{
-        '',
-        -- header
-        const.network.master_header,
-        const.network.packet_header.packed_request,
-        index,
-        -- payload
-        Locale.compress(packet)
-        }
-      end
+
+function Packet.send(p, dict, count)
+  local index = Packet.get_uid()
+  local nlstrings = Table.set(Savedata.packets, {index}, {})
+  --
+  local i, packet = 1, {''}
+  local next = dict:iter_requests()
+  for j=i+1, i+count*2, 2 do
+    local request = next()
+    if not request then break end -- beware count == math.huge!
+    table.insert(nlstrings, request[rindex.lstring])
+    packet[j  ] = null
+    packet[j+1] = request[rindex.lstring]
     end
-    
+  --
+  if #packet > 1 then -- dict re-request pause
+    p.request_translation{
+      '',
+      -- header
+      const.network.master_header,
+      const.network.packet_header.packed_request,
+      index,
+      -- payload
+      Locale.compress(packet)
+      }
+    end
   end
-  
+
+
 function Packet.unpack(dict, e)
   local packet  = e.localised_string
   local results = e.result
@@ -126,7 +95,8 @@ function Packet.unpack(dict, e)
   
   local nlstrings = Table.pop(Savedata.packets, assert(tonumber(packet[4])))
   if not nlstrings then
-    log:debug('Recieved packed request with unknown index.')
+    log:debug('Recieved packed request with unknown index. Ignoring.')
+    return
   else
     local i = 0
     for word in string_gmatch(results, '\0([^\0]*)') do
@@ -137,5 +107,6 @@ function Packet.unpack(dict, e)
     log:debugf('Pack.unpack unpacked %s requests', i)
     end
   end
+
 
 return Packet

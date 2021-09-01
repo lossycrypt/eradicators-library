@@ -4,18 +4,6 @@
 -- Babelfish.
 -- @module Babelfish
 
---[[ Notes:
-  ]]
-
---[[ Annecdotes:
-  ]]
-
---[[ Future:
-  ]]
-  
---[[ Todo:
-  ]]
-  
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
 -- -------------------------------------------------------------------------- --
@@ -30,17 +18,10 @@ local log         = elreq('erlib/lua/Log'          )().Logger  'babelfish'
 local stop        = elreq('erlib/lua/Error'        )().Stopper 'babelfish'
 local assertify   = elreq('erlib/lua/Error'        )().Asserter(stop)
 
--- local Verificate  = elreq('erlib/lua/Verificate'   )()
--- local verify      = Verificate.verify
--- local isType      = Verificate.isType
-
 local Math        = elreq('erlib/lua/Math'           )()
 local Table       = elreq('erlib/lua/Table'          )()
--- local String      = elreq('erlib/lua/String'         )()
 local Memoize     = elreq('erlib/lua/Meta/Memoize'   )()
 local SwitchCase  = elreq('erlib/lua/Meta/SwitchCase')()
-
--- local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
 
 local Setting     = elreq('erlib/factorio/Setting' )()
 local Locale      = elreq('erlib/factorio/Locale'  )()
@@ -58,15 +39,10 @@ local const  = import '/const'
 local rindex = const.index.request
 
 local Local            = import '/locallib'
--- local Dictionary       = import '/control/Dictionary'
 local RawEntries       = import '/control/RawEntries'
 local StatusIndicator  = import '/control/StatusIndicator'
 local Packet           = import '/control/Packet'
 
--- local Lstring          = import '/control/Lstring'
--- local lstring_is_equal = Lstring.is_equal
--- local lstring_ident    = Lstring.ident
--- local nlstring_is_equal = Locale.nlstring_is_equal
 local nlstring_ident    = Locale.nlstring_to_string
 local nlstring_size     = Locale.nlstring_size
 
@@ -76,14 +52,22 @@ local nlstring_size     = Locale.nlstring_size
 local Babelfish = {}
 
 -- -------------------------------------------------------------------------- --
--- Local Library                                                              --
--- -------------------------------------------------------------------------- --
-
--- -------------------------------------------------------------------------- --
 -- Savedata                                                                   --
 -- -------------------------------------------------------------------------- --
 local Savedata
 PluginManager.manage_savedata  ('babelfish', function(_) Savedata = _ end)
+
+-- -------------------------------------------------------------------------- --
+-- Misc Methods                                                               --
+-- -------------------------------------------------------------------------- --
+function Babelfish.force_update(force)
+  -- @future: This can be included in the eventual mini-gui.
+  if (force == true) then
+    -- Has to fix completely broken Savedata/Dictionary state!
+    Savedata:reset_to_default()
+    end
+  script.get_event_handler('on_configuration_changed')()
+  end
 
 -- -------------------------------------------------------------------------- --
 -- Event Raiser                                                               --
@@ -95,13 +79,11 @@ PluginManager.manage_savedata  ('babelfish', function(_) Savedata = _ end)
 --------------------------------------------------------------------------------
 
 ----------
--- Called when SearchType availability changes.
--- SearchTypes can become available or unavailable.
+-- Called when SearchType translation status changes.
 -- 
 -- Mods that want to dynamically adjust their gui or similar must
 -- call @{Babelfish.can_translate|can_translate} during this event to
 -- get the new state. Other mods can safely ignore this event.
--- 
 -- Use @{remotes.events} or @{EventManagerLite.events} to get
 -- the event id.
 -- 
@@ -149,7 +131,7 @@ do
 Babelfish.request_language_codes = function(e)
   local players = Savedata:get_lcode_requesters()
   assert(players, 'Failure to deactivate request_language_codes (no dirty lcodes).')
-
+  --
   for _, p in pairs(players) do
     log:debugf('Sent lcode request to "%s".', p.name)
     assert(p.request_translation(const.lstring.language_code))
@@ -160,36 +142,38 @@ Babelfish.request_language_codes = function(e)
 -- V6
 -- on_nth_tick(1)
 Babelfish.request_translations = function(e)
-
+  --
   -- Try to hide lag-spike in load screen by pre-emptive compilation.
   RawEntries.precompile()
-
+  --
   local dict, p = Savedata:get_active_dict()
   assert(dict, 'Failure to deactivate request_translations (no active dict)')
-  
-  local ups       = Local.ticks_per_second_float()
-  local max       = Babelfish.get_max_bytes_per_tick()
-  local window    = Babelfish.get_transit_window_ticks()
-  local allowance = Savedata:get_byte_allowance()
-  
-  local is_first_window_tick = e.tick % window == 0
-  
+  --
+  local ups                  = Local.ticks_per_second_float()
+  local max                  = Babelfish.get_max_bytes_per_tick()
+  local window               = Babelfish.get_transit_window_ticks()
+  local allowance            = Savedata:get_byte_allowance()
+  local is_first_window_tick = (e.tick % window == 0)
+  --
+  -- allowance
   if is_first_window_tick then
     local max_allowance = window * max
     local new_allowance = math.min(allowance + max_allowance, max_allowance)
     --
+    -- Precise value calculation would need additional Savedata
+    -- and it's not *that* important.
     if new_allowance == max_allowance
     then
-      -- less or equal max_allowance, exact value
+      -- less or equal max_allowance => exact value
       log:debugf('Estimated bandwidth: %6.f kb/s'
         , -1 * (ups/window) * (allowance - max_allowance) / 1024)
     elseif new_allowance >= 0
     then
-      -- in balance on average, precise value is unknown
+      -- in balance on average => precise value is unknown
       log:debugf('Estimated bandwidth: %6.f kb/s'
       , (ups/window) * max_allowance / 1024)
     else
-      -- overtaxing, precise value unknown
+      -- overtaxing => precise value unknown
       log:debugf('Estimated bandwidth: %6.f kb/s'
         , -1 * (ups/window) * (allowance - max_allowance) / 1024)
       end
@@ -207,7 +191,7 @@ Babelfish.request_translations = function(e)
         log:debugf('Byte allowance     : %6.f bytes, NO PACKET SENT (packed).'
           , allowance)
       else
-        local pack_count_this_tick
+        local pack_count_this_tick -- can be math.huge
           = math.floor(allowance / const.network.bytes.packet_median)
         log:debugf('Byte allowance     : %6.f bytes, %3.f packets (packed).'
           ,allowance , pack_count_this_tick)
@@ -223,12 +207,11 @@ Babelfish.request_translations = function(e)
       log:debugf('Byte allowance     : %6.f bytes, NO PACKET SENT.', allowance)
       return
     else
-      local pack_count_this_tick
+      local pack_count_this_tick -- can be math.huge
         = math.floor(max / const.network.bytes.packet_median)
       log:debugf('Byte allowance     : %6.f bytes, %3.f packets.'
         ,allowance , pack_count_this_tick)
       --
-      -- Can not use for-loop due to possibile infinity of pack_count.
       local next = dict:iter_requests()
       local i = 0; repeat i = i + 1
         local request = next()
@@ -243,14 +226,13 @@ Babelfish.request_translations = function(e)
 -- Class Event Handlers                                                       --
 -- -------------------------------------------------------------------------- --
 
+-- -------------------------------------------------------------------------- --
 Babelfish.on_player_language_changed = function(e)
   Savedata:set_pdata_lcode_dirty(e, nil, true)
   Babelfish.update_handlers()
   end
-
   
 -- -------------------------------------------------------------------------- --
-  
 do
   
   local function try_finalize_dictionary(dict)
@@ -387,17 +369,18 @@ do
         and string_find(lstring[2], '^FLIB')
         then
           return 'flib_packet'          
-      -- unidentified packets
+      -- unidentified or unmarked packets
       else
         return 'raw_packet'
         end
       end
     end
-  
+  --
   Babelfish.on_string_translated = SwitchCase(analyzer, cases)
   end
   
 -- -------------------------------------------------------------------------- --
+-- mod settings cache
 
 do
   

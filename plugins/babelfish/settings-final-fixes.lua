@@ -19,16 +19,11 @@ local SearchTypes = require 'plugins/babelfish/control/SearchTypes'
 -- -------------------------------------------------------------------------- --
 -- map
 
-Data.Inscribe{
-  name          = const.setting_name.network_rate,
-  type          = 'double-setting'          ,
-  setting_type  = 'runtime-global'          ,
-  order         = 'erlib:3-babelfish-1-1'   ,
-  default_value = 64                        ,
-  minimum_value = 0.000001                  ,
-  maximum_value = 10000000                  , -- 10GiB/s
+Setting.make{
+  const.setting_name.network_rate,
+  'map', 'double', {0.000001, 64, 10000000}, -- 10GiB/s
+  'erlib:3-babelfish-1-1'
   }
-  
   
 Setting.make {
   const.setting_name.sp_instant_translation,
@@ -38,7 +33,6 @@ Setting.make {
   forced_value   = true                  , -- only loaded when hidden
   }
   
-
 Setting.make {
   const.setting_name.enable_packaging,
   'map', 'bool', true,
@@ -47,19 +41,15 @@ Setting.make {
   forced_value   = true                  , -- only loaded when hidden
   }
 
-
 -- -------------------------------------------------------------------------- --
 -- player
 
-Data.Inscribe{
-  name          = const.setting_name.string_match_type,
-  type          = 'string-setting'          ,
-  setting_type  = 'runtime-per-user'        ,
-  order         = 'erlib:3-babelfish-1-4'   ,
-  default_value = 'plain'                   ,
+Setting.make{
+  const.setting_name.string_match_type,
+  'player', 'string', 'plain',
+  'erlib:3-babelfish-1-4',
   allowed_values= {'plain', 'fuzzy', 'lua'} ,
   }
-
   
 -- -------------------------------------------------------------------------- --
 -- search_types

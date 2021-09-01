@@ -14,7 +14,7 @@
 -- Babelfish must be activated before use by calling the global function 
 -- `erlib_enable_plugin` in __settings.lua__.
 -- You must also activate at __at least one__ @{Babelfish.SearchType|SearchType}
--- by passing an array of search types (see the code box below).
+-- by passing an array of search types (see the code box below for the syntax).
 -- Once a search type has been activated by any mod it can not be deactivated
 -- again. You can call `erlib_enable_plugin` repeatedly to add more search 
 -- types later.
@@ -32,49 +32,27 @@
 do end
 
 ----------
--- What to search. One of the following strings. __This is also the
--- order in which translation occurs.__ Once translation for a type
--- is complete it can be fully searched, regardless of the translation
--- status of the other types.
+-- What to search. One of the following strings. __This is also the priority
+-- order in which translation occurs.__  
 --
--- __Note:__ In vanilla factorio all search functions search only the name,
--- never the description. As descriptions can be very long and thus slow to
--- translate it is recommended to not activate them.
+-- For use with @{Babelfish.translate_prototype_name} you can also activate
+-- each `_description` type. However as most prototypes do not have
+-- a description this is discouraged.
+--
+-- To minimize save, load and translation times you should only activate
+-- the bare minimum types you need.  
 --
 --    "item_name"             
 --    "fluid_name"            
 --    "recipe_name"           
 --    "technology_name"       
---    "item_description"      
---    "fluid_description"     
---    "recipe_description"    
---    "technology_description"
 --    "equipment_name"        
---    "equipment_description" 
 --    "tile_name"             
---    "tile_description"      
 --    "entity_name"           
---    "entity_description"    
 --    "virtual_signal_name"   
 --
 -- @table Babelfish.SearchType
 do end
-
--- -------
--- Identifies a language between different Babelfish function calls.
--- Storing this in your global data will likely produce unexpected results.
--- It's best to always retrieve this shortly before usage.
---
--- Only @{FOBJ LuaPlayer.connected|connected} players have a code, and
--- there is a delay of one "ping" between connection and code
--- assignment.
---
--- The special string `'internal'` can be used to ignore the locale and
--- search prototype names directly.
---
--- @table Babelfish.LanguageCode
-do end
-
 
 ----------
 -- Babelfish built-in sprites. Can be used to decorate mod guis.
@@ -93,13 +71,14 @@ do end
 do end
 
 
-
 --------------------------------------------------------------------------------
 -- TechnicalDescription.  
 -- @section
 --------------------------------------------------------------------------------
 
   
+-- @2021-09-10: Refine? Publish? Too long?
+
 --[[ ------
 A detailed explanation of Babelfish's internal processes.
 
@@ -133,8 +112,7 @@ Because most mod
 updates only change small bits of the locale - if any at all - Babelfish keeps
 all old translations. If no _new_ locale keys have been added then
 all Babelfish API methods will use the old translations until the new ones
-arrive and
-
+arrive. This intermedeate state is not detectable from the API.
 
 
 @table InternalWorkflow

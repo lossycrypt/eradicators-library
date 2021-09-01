@@ -4,20 +4,6 @@
 -- Babelfish.
 -- @module Babelfish
 
-
-
---[[ Notes:
-  ]]
-
---[[ Annecdotes:
-  ]]
-
---[[ Future:
-  ]]
-  
---[[ Todo:
-  ]]
-  
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
 -- -------------------------------------------------------------------------- --
@@ -34,21 +20,10 @@ local assertify   = elreq('erlib/lua/Error'        )().Asserter(stop)
 
 local Verificate  = elreq('erlib/lua/Verificate'   )()
 local verify      = Verificate.verify
--- local isType      = Verificate.isType
 
 local Table       = elreq('erlib/lua/Table'        )()
--- local Array       = elreq('erlib/lua/Array'        )()
--- local Set         = elreq('erlib/lua/Set'          )()
--- local Filter      = elreq('erlib/lua/Filter'       )()
--- local Vector      = elreq('erlib/lua/Vector'       )()
-
--- local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
--- local dpairs      = elreq('erlib/lua/Iter/dpairs'  )()
--- local sriapi      = elreq('erlib/lua/Iter/sriapi'  )()
 
 local Setting     = elreq('erlib/factorio/Setting'   )()
--- local Player      = elreq('erlib/factorio/Player'    )()
--- local getp        = Player.get_event_player
 
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
@@ -57,16 +32,12 @@ local Setting     = elreq('erlib/factorio/Setting'   )()
 local import = PluginManager.make_relative_require 'babelfish'
 local const  = import '/const'
 
+local SearchTypes      = import '/control/SearchTypes'
+
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
 local Remote = {}
-
--- -------------------------------------------------------------------------- --
--- Local Library                                                              --
--- -------------------------------------------------------------------------- --
-
-local SearchTypes      = import '/control/SearchTypes'
 
 -- -------------------------------------------------------------------------- --
 -- Savedata                                                                   --
@@ -74,12 +45,6 @@ local SearchTypes      = import '/control/SearchTypes'
 local Savedata
 PluginManager.manage_savedata  ('babelfish', function(_) Savedata = _ end)
 
--- -------------------------------------------------------------------------- --
--- Events                                                                     --
--- -------------------------------------------------------------------------- --
-
-
-  
 --------------------------------------------------------------------------------
 -- Remote Interface.  
 -- @section
@@ -90,6 +55,9 @@ PluginManager.manage_savedata  ('babelfish', function(_) Savedata = _ end)
 -- @table RemoteInterfaceName
 do end
 
+
+
+-- @2021-09-01: Failed runtime search type activativation experiment
 
 -- -------
 -- Activates search types.  
@@ -133,32 +101,49 @@ do end
 -- @treturn boolean|nil The status code.
 --
 -- @function Babelfish.can_translate
-function Remote.can_translate(pindex, types, options)
-  options = options or {}
-  options.limit = 0
-  return (Remote.find_prototype_names(pindex, types, '', options)) end
-  
+function Remote.can_translate(pindex, types)
+  return (Remote.find_prototype_names(pindex, types, '', {limit = 0})) end
+
 
 ----------
 -- Given a user input, finds prototype names.
--- Can search the localised name and description of all common prototypes
--- to deliver a native search experience.
--- Translation is granular per @{Babelfish.SearchType|SearchType}.
+--
+-- __Search Behavior:__
 --
 -- All searches are conducted in __lower-case__ (as far as @{string.lower}
 -- works in that language). In the SearchType order given,
 -- and in prototype `order` specific order.
 --
--- The search result is identical to vanilla search even for unlocalised
--- names and descriptions (i.e. "Unknown Key:").
--- 
--- With some intentional exceptions:  
--- 1) If `word` is an exact prototype name (i.e. "iron-plate") 
+-- As in vanilla, searching is done only on names, not descriptions. And 
+-- unlocalised names will be found as "Unknown Key:". But there are some
+-- sublte intentional differences to vanilla behavior:
+--
+-- 1. If `word` is an exact prototype name (i.e. "iron-plate") 
 -- that name will _additionally_ be included in the search result.  
--- 2) Babelfish does not filter prototypes. The serch result includes names
--- of all matching prototypes including hidden items, void recipes, etc.  
--- 3) Babelfish understands unicode language spaces (vanilla does _not_).
+-- 2. Babelfish does not filter prototypes. The search result includes names
+-- of all matching prototypes including hidden items, void recipes, explosion entities
+-- and other garbage.
+-- 3. Babelfish understands some unicode whitespace (vanilla does _not_).
 -- 
+-- __Mod Settings:__
+-- 
+-- Some aspects of the search, such as "fuzzy" mode are controlled directly
+-- by each user via mod-settings so you don't have to worry about those.
+-- 
+-- __Performance Tips:__
+-- 
+-- 1. Babelfish searches are highly optimized, but in large modpacks they can
+-- still take a few milliseconds. When called directly from an `on_gui_text_changed`
+-- event handler this can cause noticible lag-spikes due to the high frequency
+-- with which that even occurs while a player is typing. A better solution is
+-- to impose a delay after the last keypress or to use an `on_tick` based
+-- polling solution. It is recommended to search only once per second.
+-- 
+-- 2. Babelfish does not impose a minimum word length. The @{EmptyString} will
+-- match everything. It is recommended to impose a minimum length of
+-- two characters on `word`, or use the `limit` option to reduce the size
+-- of the returned table.
+--
 -- @usage
 -- 
 --   -- First lets make a shortcut.
@@ -169,7 +154,9 @@ function Remote.can_translate(pindex, types, options)
 --   -- For demonstration purposes let's use a player with a German locale.
 --   local ok, results
 --     = babelfind(game.player.index, {'item_name', 'recipe_name'}, 'Kupfer')
---   if ok then print(serpent.block(results)) end
+--   if ok then
+--     print(serpent.block(results))
+--     end
 --   
 --   > {
 --   >   item_name = {
@@ -185,23 +172,22 @@ function Remote.can_translate(pindex, types, options)
 --
 -- @tparam NaturalNumber pindex A @{FOBJ LuaPlayer.index}.
 -- @tparam string|DenseArray types One or more @{Babelfish.SearchType|SearchTypes}.
--- @tparam string word The user input. Interpreted according to the users chosen
--- search mode: plaintext, fuzzy or lua pattern (per-player mod setting).
--- For best performance it is
--- recommended to not search for strings shorter than length 2.
+-- @tparam string word The user input.
 -- @param options (@{table})
--- @tparam[opt=inf] Integer options.limit Search will abort after this many
--- hits and return the (partial) result.
+-- @tparam[opt=inf] Integer options.limit Search will return at most this
+-- many names. This may result in some of the returned sub-tables being empty.
 -- 
 -- @treturn boolean|nil The status code.  
 --
 --   @{nil} means: The language for that player has not been detected yet.
---   This should hardly ever happen in reality. Just try again a second later.
+--   This will hardly ever happen in reality. Just try again a second later.
+--   __The search result is also nil.__
 --
 --   @{false} means: Babelfish is still translating some or all of the requested
---   SearchTypes. A best-effort search result is included but likely to be
---   incomplete. It is recommended to try again after translation is complete.  
---   You can show `{'babelfish.translation-in-progress'}` to the player.
+--   SearchTypes. An incomplete best-effort search result is returned.
+--   You can use that partial result or try again later. If you chose to
+--   inform the player you can use the @{FAPI Concepts LocalisedString}
+--   `{'babelfish.translation-in-progress'}` or a custom message.
 --
 --   @{true} means: No problems occured.  
 --
@@ -210,40 +196,28 @@ function Remote.can_translate(pindex, types, options)
 --
 -- @function Babelfish.find_prototype_names
 function Remote.find_prototype_names(pindex, types, word, options)
-  -- The other mod might send the index of an offline player!
   verify(pindex, 'NaturalNumber', 'No player with given index: ', pindex)
   assertify(game.players[pindex], 'No player with given index: ', pindex)
   verify(options, 'tbl|nil', 'Invalid options.') --future: remove redundant verify
   local dict = Savedata:sget_pdata(nil, pindex).dict
+  if not dict then return nil, nil end -- while waiting for language_code
   --
   options = options or {}
   options.mode = Setting.get_value(pindex, const.setting_name.string_match_type)
   --
-  if options.language_code then
-    stop('Deprecated') -- @future: mod setting? mini-gui?
-    if options.language_code == 'internal' then
-      -- Only created if anybody ever asks for it.
-      dict = Savedata:sget_dict('internal')
-    else
-      dict = Savedata.dicts[options.language_code]
-      end
-    end
-  --
-  if not dict then return nil, nil end -- while waiting for language_code
-  --
-  return dict:find(Table.plural(types), word, options or {}) end
+  return dict:find(Table.plural(types), word, options) end
 
-  
+
 ----------
 -- Retrieves the localised name or description of a single prototype.
 --
 -- @tparam NaturalNumber pindex A @{FOBJ LuaPlayer.index}.
--- @tparam string type A @{Babelfish.SearchType}.
+-- @tparam string type A @{Babelfish.SearchType|SearchType}.
 -- @tparam string name A prototype name.
 -- @treturn string|nil The translation, or nil if that entry is
--- not translated yet, or the name is unknown. Empty descriptions
--- will return an empty string. Empty names return the usual "Unknown key:".
--- The result should be used immediately or it may become outdated.
+-- not translated yet. Unlocalised descriptions
+-- will return an empty string. Unlocalised names return the usual "Unknown key:".
+-- __The result should be used immediately__ or it may become outdated.
 --
 -- @function Babelfish.translate_prototype_name
 function Remote.translate_prototype_name(pindex, type, name)

@@ -2,9 +2,11 @@
 Version: 4.2.4
 Date: 2021-08-31
   Functions:
-    - ?
+    - Breaking change! Changed parameter order for Setting.make table-style
+      default value from {def, min, max} to {min, def, max}.
   Plugins:
     - Babelfish: Translated fully for de, en, ja.
+    - Babelfish: Cleaned up code and documentation.
 ---------------------------------------------------------------------------------------------------
 Version: 4.2.3
 Date: 2021-08-30
@@ -13,8 +15,6 @@ Date: 2021-08-30
       Adapted EventManagerLite to allow logging outside of dev-mode.
     - Added dev-mode only per-mod logging level setting to selectively silence mods.
       List of supported mods is hardcoded until further notice.
-  Plugins:
-    - Babelfish: API finalized.
   Utility Mods:
     - Universal Locale: Fixed auto-generated description headers sometimes
       had the wrong order.

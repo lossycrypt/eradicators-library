@@ -20,6 +20,7 @@
   
   Babelfish only filters names, not prototype properties.
   Hidden/Void/etc items/recipes must be filtered by the mod.
+  => Might have to filter for performance after all.
   
   ]]
   
@@ -39,20 +40,21 @@
     nicht-englischen sprachen auf Unicode umgestellt werden.
     => Für Performance kann man Englisch als einziges lua-nativ lassen?
        Aber nur bei der Suche. Beim Speichern kann mans alles richtig machen.
+       => Wer sagt denn dass in der englischen Locale keine Umlaute drin sind?
   
   ]]
   
 --[[ Related Forum Theads:
     
   + Bug Report ("Won't Fix")
-    https://forums.factorio.com/viewtopic.php?f=58&t=98704
+    https://forums.factorio.com/98704
     Unicode search is case-sensitive in Russian
     => Consider finding a unicode-capable lua library.
     => As the main usecase is string.lower() it would be sufficent
        to grab a bunch of mapping tables and implement it myself.
     
   + Interface Request ("Very unlikely")
-    https://forums.factorio.com/viewtopic.php?f=28&t=98680
+    https://forums.factorio.com/98680
     Read access to interface setting "Fuzzy search"
     
   ]]
@@ -67,29 +69,18 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
--- local log         = elreq('erlib/lua/Log'       )().Logger  'BabelfishDictionary'
--- local stop        = elreq('erlib/lua/Error'     )().Stopper 'BabelfishDictionary'
--- local assertify   = elreq('erlib/lua/Error'     )().Asserter(stop)
+local stop        = elreq('erlib/lua/Error'        )().Stopper 'babelfish'
+local assertify   = elreq('erlib/lua/Error'        )().Asserter(stop)
 
 local Verificate  = elreq('erlib/lua/Verificate')()
 local verify      = Verificate.verify
 
--- local Table       = elreq('erlib/lua/Table'        )()
--- local Array       = elreq('erlib/lua/Array'        )()
 local String      = elreq('erlib/lua/String'       )()
--- local Set         = elreq('erlib/lua/Set'          )()
--- local Filter      = elreq('erlib/lua/Filter'       )()
--- local Vector      = elreq('erlib/lua/Vector'       )()
+local Filter      = elreq('erlib/lua/Filter'       )()
 local Memoize     = elreq('erlib/lua/Meta/Memoize')()
--- local L           = elreq('erlib/lua/Lambda'    )()
 
--- local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
--- local dpairs      = elreq('erlib/lua/Iter/dpairs'  )()
--- local sriapi      = elreq('erlib/lua/Iter/sriapi'  )()
-
--- local Setting     = elreq('erlib/factorio/Setting'   )()
--- local Player      = elreq('erlib/factorio/Player'    )()
--- local getp        = Player.get_event_player
+local string_find
+    = string.find
 
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
@@ -102,6 +93,7 @@ local eindex = const.index.entry
 local SearchTypes      = import '/control/SearchTypes'
 local Utf8             = import '/control/Utf8Dummy'
 local Local            = import '/locallib'
+local RawEntries       = import '/control/RawEntries'
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -113,34 +105,15 @@ local Dictionary       = import '/control/Dictionary'
 -- Local Library                                                              --
 -- -------------------------------------------------------------------------- --
   
--- Pre-processes translated strings and user input
--- into an easy-to-compare form.
-local normalize_word = function(word)
+-- Language agnostic.
+-- Pre-processes translated strings into an easy-to-compare form.
+-- User-input should not be cached to prevent high memory usage or exploits.
+--
+local normalized_word = Memoize(function(word)
   return Utf8.lower(Utf8.remove_rich_text_tags(word))
   -- return utf8(word):remove_rich_text_tags():lower():tostring()
-  end
+  end) 
 
-
--- -------------------------------------------------------------------------- --
--- Find                                                                       --
--- -------------------------------------------------------------------------- --
-
---[[ Notes on wont-implement option ideas:
-
-  + Array result format is not faster than set to construct because
-    to construct an array of *unique* entries a set would be required anyway.
-    And an array with duplicate entries isn't useful.
-
-  + Merging result types is not useful because it would only produce
-    meaningful results for pairs of name+desc types, and complete
-    garbage when used with anything else.
-    
-  ]]
-
--- User-input should not be cached to prevent
--- high memory usage or exploits.
-local normalized_word_cache = Memoize(normalize_word) -- language agnostic!
-  
 -- Some malformed patterns do not fail if they
 -- don't actually have any matches in the input string.
 -- (This very likely still has false positives.)
@@ -159,11 +132,21 @@ local function split_by_space(ustr)
     end
   return String.split(ustr, '%s+') end
 
+-- -------------------------------------------------------------------------- --
+-- Matchers                                                                   --
+-- -------------------------------------------------------------------------- --
+
 local matchers = {}
+
 function matchers.plain (t,ws)
-    for i=1,#ws do if not Utf8.find(t,ws[i],1,true) then return false end end
+    for i=1, #ws do
+      if not Utf8.find(t, ws[i], 1, true) then return false end
+      end
     return true end
   
+-- -------------------------------------------------------------------------- --
+-- Find                                                                       --
+-- -------------------------------------------------------------------------- --
   
 -- @tparams types DenseArray {'item_name', 'recipe_name',...}
 -- @tparams string word The search term.
@@ -204,22 +187,21 @@ function Dictionary:find(types, word, opt)
   for i=1, #types do
     local type = types[i]
     SearchTypes.assert(type)
+    assert(not SearchTypes.is_description(type)
+      , 'Descriptions can not be searched.')
     -- This will only fail on new maps or after an :update()
     -- added new prototypes.
-    -- if (table_size(self[type]) - 1) ~= self[type].max then status = false end
     if not self:is_type_fully_populated(type) then status = false end
     -- subtables are created regardless of limit
     local this = {}; r[type] = this
     local entries = self[type]
-    local n = 0
     for i = 1, entries.max do
       if limit <= 0 then break end
       local entry = entries[i]
       if entry then -- self[type] is sparse after :update()
         local name = entry[eindex_name]
         if (exact_word == name) -- verbatim internal name match
-        -- or matcher(entry[eindex.word], word) then
-        or matcher(normalized_word_cache[entry[eindex_word]], word) then
+        or matcher(normalized_word[entry[eindex_word]], word) then
           limit = limit - 1
           this[name] = (not flag.IS_DEV_MODE) or entry[eindex_word]
           end
@@ -234,7 +216,7 @@ function Dictionary:find(types, word, opt)
   then r.item_name['raw-fish'] = true end
   --
   -- if flag.IS_DEV_MODE then
-    -- log:debug('Cache size: ', table_size(normalized_word_cache))
+    -- log:debug('Cache size: ', table_size(normalized_word))
     -- end
   --
   return status, r end
@@ -243,20 +225,24 @@ function Dictionary:find(types, word, opt)
 -- Translate                                                                  --
 -- -------------------------------------------------------------------------- --
   
--- There is no distinction between "that name isn't translated"
--- and "that is not a prototype name". Even erroring on invalid
--- names would incur a heavy performance penalty on every call.
---
 -- Only translates one name at a time to discourage
 -- authors from mass-caching the results!
+--
 function Dictionary:translate_name(type, name)
   SearchTypes.assert(type)
-  verify(name, 'str', 'Babelfish: Invalid name: ', name)
-  local this = self[type]
-  for i = 1, self[type].max do
-    if this[i] and (this[i][eindex.name] == name) then
-      return this[i][eindex.word]
-      end
-    end
+  verify(name, 'str', 'Babelfish: Invalid name.')
+  
+  -- V1
+  -- local this = self[type]
+  -- for i = 1, self[type].max do
+  --   if this[i] and (this[i][eindex.name] == name) then
+  --     return this[i][eindex.word]
+  --     end
+  --   end
+  
+  -- V2: New structure allows direct lookup
+  local entry = RawEntries.by_name[type][name]
+  assertify(entry, 'Babelfish: Invalid name: ', name)
+  return self[type][entry[eindex.index]][eindex.word]
   end
   

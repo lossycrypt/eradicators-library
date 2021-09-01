@@ -2,7 +2,7 @@
 local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
   local const = require 'plugins/babelfish/const'
   
-  
+-- -------------------------------------------------------------------------- --
   local template = {
     status_indicator = {
       en = 'While Babelfish is translating, a small '
@@ -32,7 +32,9 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       }
     }
   
-  
+-- -------------------------------------------------------------------------- --
+-- mod setting
+
   require(_)('babelfish', {
 
   ['[mod-setting-name]'] = {
@@ -71,7 +73,7 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       -- from core locale "fuzzy-search-enabled"
       en = 'Fuzzy',
       de = 'Unscharf',
-      en = '曖昧',
+      ja = '曖昧',
       },
     [const.setting_name.string_match_type..'-'..'lua'] = {
       en = '_UL:PowerUserSetting_ Lua pattern',
@@ -157,6 +159,10 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
         .. '現在平仮名と片仮名は別文字扱いになっています。'
       },
     },
+    
+
+-- -------------------------------------------------------------------------- --
+-- status indicator + misc
 
   ['[babelfish]'] = {
     
@@ -173,6 +179,9 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       ja = 'バベルフィッシュさんが只今モッドの翻訳に勤しんでいます。',
       },
 
+-- -------------------------------------------------------------------------- --
+-- command
+      
     ['command-only-in-singleplayer'] = {
       en = 'This command can only be used in singleplayer.',
       de = 'Dieser Befehl funktioniert nur im Einzelspielermodus.',
@@ -182,13 +191,13 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
     ['command-only-by-admin'] = {
       en = 'This command can only be used by admins.',
       de = 'Dieser Befehl kann nur von Administratoren benutzt werden.',
-      en = 'そのコマンドは管理者専用です。',
+      ja = 'そのコマンドは管理者専用です。',
       },
 
     ['unknown-command'] = {
       en = 'Unknown command.',
       de = 'Unbekannter Befehl.',
-      en = '不明のコマンドです。',
+      ja = '不明のコマンドです。',
       },
       
     ['command-confirm'] = {
@@ -197,14 +206,17 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       ja = '了解！',
       },
       
-    ['test-string'] = {
-      en = 'This is a test. '
-        .. 'Button: __CONTROL__mine__. '
-        .. 'Complex Button: __ALT_CONTROL__1__build__'
-        .. 'Parameters: __2__ __3__. '
-        .. 'Item Name: __ITEM__iron-plate__. '
-        .. 'Plural: __4__ __plural_for_parameter_4_{1=day|rest=days}__'
-      },
+    -- ['test-string'] = {
+    --   en = 'This is a test. '
+    --     .. 'Button: __CONTROL__mine__. '
+    --     .. 'Complex Button: __ALT_CONTROL__1__build__'
+    --     .. 'Parameters: __2__ __3__. '
+    --     .. 'Item Name: __ITEM__iron-plate__. '
+    --     .. 'Plural: __4__ __plural_for_parameter_4_{1=day|rest=days}__'
+    --   },
+      
+-- -------------------------------------------------------------------------- --
+-- lcode
       
     language_code = (function(r)
       for code, name in pairs(const.native_language_name) do r[code] = code end
@@ -216,15 +228,8 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
 
     },
     
-  -- Replaced by {'babelfish.babelfish'} in prototype.
-  --
-  -- ['[tips-and-tricks-item-name]'] = {
-    -- [const.name.tip_1] = { 
-      -- en = "Babelfish",
-      -- de = "",
-      -- ja = "",
-      -- }
-    -- },
+-- -------------------------------------------------------------------------- --
+-- tips
     
   ['[tips-and-tricks-item-description]'] = {
     [const.name.tip_1] = { 

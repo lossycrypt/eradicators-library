@@ -157,7 +157,7 @@ if Stacktrace.get_load_stage().settings then
   @tparam string prototype.2 @{Setting.setting_type|setting_type}
   @tparam string prototype.3 type `'bool'`, `'int'`, `'string'` or `'double'`
   @tparam boolean|number|string|table prototype.4 default_value  
-  Can also be a table `{default_value, minimum_value, maximum_value}`
+  Can also be a table `{minimum_value, default_value, maximum_value}`
   @tparam string prototype.5 order
   @tparam AnyValue prototype.... Everything else is copied unchanged.
     
@@ -188,8 +188,8 @@ if Stacktrace.get_load_stage().settings then
 
     if type(args.default_value) == 'table' then
       args.maximum_value = args.default_value[3]
-      args.minimum_value = args.default_value[2]
-      args.default_value = args.default_value[1]
+      args.minimum_value = args.default_value[1]
+      args.default_value = args.default_value[2]
       end
       
     for i=1,5 do args[i] = nil end

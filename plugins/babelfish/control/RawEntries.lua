@@ -7,15 +7,6 @@
 
   ]]
 
---[[ Annecdotes:
-  ]]
-
---[[ Future:
-  ]]
-  
---[[ Todo:
-  ]]
-  
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
 -- -------------------------------------------------------------------------- --
@@ -26,34 +17,16 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
--- local log         = elreq('erlib/lua/Log'          )().Logger  'babelfish'
 local stop        = elreq('erlib/lua/Error'        )().Stopper 'babelfish'
--- local assertify   = elreq('erlib/lua/Error'        )().Asserter(stop)
-
--- local Verificate  = elreq('erlib/lua/Verificate'   )()
--- local verify      = Verificate.verify
--- local isType      = Verificate.isType
 
 local Table       = elreq('erlib/lua/Table'        )()
 local Array       = elreq('erlib/lua/Array'        )()
--- local Set         = elreq('erlib/lua/Set'          )()
--- local Filter      = elreq('erlib/lua/Filter'       )()
--- local Vector      = elreq('erlib/lua/Vector'       )()
 local Cache       = elreq('erlib/factorio/Cache'  )()
--- local Memoize     = elreq('erlib/lua/Meta/Memoize')()
 local L           = elreq('erlib/lua/Lambda'    )()
 
--- local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
--- local dpairs      = elreq('erlib/lua/Iter/dpairs'  )()
--- local sriapi      = elreq('erlib/lua/Iter/sriapi'  )()
-
 local Locale      = elreq('erlib/factorio/Locale' )()
--- local Setting     = elreq('erlib/factorio/Setting'   )()
--- local Player      = elreq('erlib/factorio/Player'    )()
--- local getp        = Player.get_event_player
 
 local Prototype   = elreq('erlib/factorio/Prototype')()
-
 
 local ipairs, pairs
     = ipairs, pairs
@@ -73,10 +46,6 @@ local rindex = const.index.request
 local SearchTypes      = import '/control/SearchTypes'
 local Local            = import '/locallib'
 
--- local Lstring          = import '/control/Lstring'
--- local lstring_is_equal = Lstring.is_equal
--- local lstring_ident    = Lstring.ident
--- local nlstring_is_equal = Locale.nlstring_is_equal
 local nlstring_ident    = Locale.nlstring_to_string
 local lstring_norm      = Locale.normalise
 
@@ -119,22 +88,26 @@ local RawEntries = {}
 -- -------------------------------------------------------------------------- --
 -- INIT
 
-local function trigger_auto_cache(key)
-  return assert(nil == RawEntries[key][{}]) end
+do
 
--- Triggers all AutoCaches once to prevent lag-spikes later.
--- MUST NEVER CHANGE THE GAME STATE!
-function RawEntries.precompile()
-  local profile = Local.get_profiler()
-  --
-  RawEntries.precompile = ercfg.SKIP
-  --
-  -- Order is important for correct profiling.
-  for _, key in ipairs{'ordered', 'requests', 'by_name', 'max_indexes'} do
-    trigger_auto_cache(key)
+  local function trigger_auto_cache(key)
+    return assert(nil == RawEntries[key][{}]) end
+
+  -- Triggers all AutoCaches once to prevent lag-spikes later.
+  -- MUST NEVER CHANGE THE GAME STATE!
+  function RawEntries.precompile()
+    local profile = Local.get_profiler()
+    --
+    RawEntries.precompile = ercfg.SKIP
+    --
+    -- Order is important for correct profiling.
+    for _, key in ipairs{'ordered', 'requests', 'by_name', 'max_indexes'} do
+      trigger_auto_cache(key)
+      end
+    --
+    profile('Populating RawEntries.precompile total: ')
     end
-  --
-  profile('Populating RawEntries.precompile total: ')
+    
   end
 
 -- -------------------------------------------------------------------------- --
@@ -200,10 +173,10 @@ RawEntries.ordered = Cache.AutoCache(function(r)
 -- UNIQUE lstring to an array of untranslated entries.
 --
 -- Array {request_uid -> {request ~> {entry, entry, ...} } }
-
+--
 -- Index [1] : Highest priority
 -- Index [n] : Lowest  priority
-
+--
 RawEntries.requests = Cache.AutoCache(function(r)
   local profile = Local.get_profiler()
   --
@@ -216,7 +189,6 @@ RawEntries.requests = Cache.AutoCache(function(r)
         r[uid], lookup[ident]   = request, request
         request[rindex.lstring] = entry[eindex.lstring]
         request[rindex.entries] = {}
-        -- request[rindex.bytes  ] = #ident + TypeBytes[type]
         request[rindex.uid    ] = uid
         return request end){}
       --
@@ -227,11 +199,7 @@ RawEntries.requests = Cache.AutoCache(function(r)
   --
   profile('Populating RawEntries.requests    took: ')
   end)
-  
-  
--- RawEntries.get_entry_request(type, index)
-  -- local uid = RawEntries.ordered[type][index][eindex.request_uid]
-  -- return RawEntries.requests[uid] end
+
   
 -- -------------------------------------------------------------------------- --
 return RawEntries

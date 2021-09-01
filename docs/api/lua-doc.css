@@ -90,6 +90,12 @@ code.block {
     padding: 5px;
 }
 
+code {
+    background-color: #181818;
+    margin: 0 -1px;
+    padding: 0 2px;
+}
+
 .type-name {
     font-family: monospace;
 }

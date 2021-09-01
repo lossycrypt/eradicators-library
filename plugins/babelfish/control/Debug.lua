@@ -52,8 +52,11 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 local import = PluginManager.make_relative_require 'babelfish'
 local const  = import '/const'
 
+local eindex = const.index.entry
+
 local Dictionary       = import '/control/Dictionary'
 local SearchTypes      = import '/control/SearchTypes'
+local Utf8             = import '/control/Utf8Dummy'
  
 -- -------------------------------------------------------------------------- --
 -- Dictionary                                                                 --

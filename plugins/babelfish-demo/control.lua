@@ -31,6 +31,7 @@ local Table       = elreq('erlib/lua/Table'        )()
 local Set         = elreq('erlib/lua/Set'          )()
 
 local Class       = elreq('erlib/lua/Class'        )()
+local Filter      = elreq('erlib/lua/Filter'       )()
 local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
 
 local Remote      = elreq('erlib/factorio/Remote'  )()
@@ -57,6 +58,7 @@ local has_icon = Table.map(babelconst.type_data, function(v)
   return not v.noicon, v.type
   end, {})
   
+local is_name = Filter.string_postfix('_name')
   
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -142,38 +144,65 @@ function Demo:toggle_gui()
   
 function Demo:get_sidebar()
   if not self:get_anchor() then return end
-  return self.anchor.sidebar end
+  if self.anchor and self.anchor.sidebar_frame then
+    self.sidebar = self.anchor.sidebar_frame.sidebar
+    return self.sidebar end
+  
+  -- if self.sidebar and self.sidebar.valid then
+    -- return self.sidebar end
+  -- return self.anchor.sidebar_frame.sidebar end
+  end
+  
+  
+-- local sidebar_layout = {
+  -- {'scroll-pane', 'sidebar'
+    -- direction = 'vertical',
+    -- name 'sidebar',
+    -- styler = {const.gui.sidebar_width, H},
+    -- },
+  -- }
+  
   
 function Demo:sget_sidebar()
   local sidebar = self:get_sidebar()
   -- create bar
   if not sidebar then
     -- print('making sidebar')
-    sidebar = Gui.move(self.anchor.add {
+    
+    local frame = Gui.move(self.anchor.add {
+      name = 'sidebar_frame',
+      type = 'frame',
+      direction = 'vertical'
+      }, const.gui.sidebar_width, H)
+    
+    sidebar = Gui.move(frame.add {
       name = 'sidebar',
       type = 'scroll-pane',
       direction = 'vertical'
       }, const.gui.sidebar_width, H)
     --
     for _, type in SearchTypes.requested_ipairs() do
-      local this = sidebar.add {
-        name = type,
-        type = 'flow',
-        direction = 'horizontal',
-        }
-      this.add {
-        name = 'checkbox',
-        type = 'checkbox',
-        state = true,
-        tags = {[const.tags.is_sidebar] = true}
-        }
-      this.add {
-        name = 'label',
-        type = 'label',
-        caption = type,
-        tags = {[const.tags.is_sidebar] = true}
-        }
+      if is_name(type) then
+        local this = sidebar.add {
+          name = type,
+          type = 'flow',
+          direction = 'horizontal',
+          }
+        this.add {
+          name = 'checkbox',
+          type = 'checkbox',
+          state = true,
+          tags = {[const.tags.is_sidebar] = true}
+          }
+        this.add {
+          name = 'label',
+          type = 'label',
+          caption = type,
+          tags = {[const.tags.is_sidebar] = true}
+          }
+        end
       end
+    self.sidebar = sidebar
     end
   return sidebar end
   
@@ -253,7 +282,8 @@ script.on_event(defines.events.on_gui_text_changed, function(e)
           if last_type ~= full_type then
             last_type = full_type
             pane.add {type = 'label', caption = full_type }
-            tbl = pane.add {type = 'table', column_count = math.floor((W-64)/40)}
+            -- tbl = pane.add {type = 'table', column_count = math.floor((W-64)/40)}
+            tbl = pane.add {type = 'table', column_count = math.floor((W-32-const.gui.sidebar_width)/40)}
             tbl.style.horizontal_spacing = 0
             tbl.style.vertical_spacing = 0
             --

@@ -37,9 +37,9 @@ local Gui         = elreq('erlib/factorio/Gui'  )()
 local import = PluginManager.make_relative_require'babelfish'
 local const  = import '/const'
 
-local button_name   = const.gui_name.status_indicator_button
-local button_width  = 32
-local button_height = 32
+local button_name       = const.gui_name.status_indicator_button
+local button_width      = 32
+local button_height     = 32
 local minimap_width     = 254
 local ups_counter_width = 196
 

@@ -4,20 +4,6 @@
 -- Babelfish.
 -- @module Babelfish
 
-
-
---[[ Notes:
-  ]]
-
---[[ Annecdotes:
-  ]]
-
---[[ Future:
-  ]]
-  
---[[ Todo:
-  ]]
-  
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
 -- -------------------------------------------------------------------------- --
@@ -28,27 +14,14 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
--- local log         = elreq('erlib/lua/Log'          )().Logger  'babelfish'
 local stop        = elreq('erlib/lua/Error'        )().Stopper 'babelfish'
 local assertify   = elreq('erlib/lua/Error'        )().Asserter(stop)
 
 local Verificate  = elreq('erlib/lua/Verificate'   )()
 local verify      = Verificate.verify
--- local isType      = Verificate.isType
 
 local Table       = elreq('erlib/lua/Table'        )()
--- local Array       = elreq('erlib/lua/Array'        )()
--- local Set         = elreq('erlib/lua/Set'          )()
--- local Filter      = elreq('erlib/lua/Filter'       )()
--- local Vector      = elreq('erlib/lua/Vector'       )()
-
 local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
--- local dpairs      = elreq('erlib/lua/Iter/dpairs'  )()
--- local sriapi      = elreq('erlib/lua/Iter/sriapi'  )()
-
--- local Setting     = elreq('erlib/factorio/Setting'   )()
--- local Player      = elreq('erlib/factorio/Player'    )()
--- local getp        = Player.get_event_player
 
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
@@ -62,9 +35,7 @@ local Babelfish        = import '/control/Babelfish'
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
-
 local Command = {}
-
 
 -- -------------------------------------------------------------------------- --
 -- Savedata                                                                   --
@@ -75,66 +46,6 @@ PluginManager.manage_savedata  ('babelfish', function(_) Savedata = _ end)
 -- -------------------------------------------------------------------------- --
 -- Local Library                                                              --
 -- -------------------------------------------------------------------------- --
-local Deprecated = {} -- disabled Remote methods
-
-  
--- -------
--- Retrieves the LanguageCode of a player.
--- 
--- @tparam NaturalNumber pindex A @{FOBJ LuaPlayer.index}.
--- @return (@{Babelfish.LanguageCode|LanguageCode} or @{nil}).
---
--- @function Babelfish.get_player_language_code
-function Deprecated.get_player_language_code(pindex)
-  verify(pindex, 'NaturalNumber', 'Babelfish: Invalid player index.')
-  assertify(game.players[pindex], 'No player with given index: ', pindex)
-  local dict = Savedata:sget_pdata(nil, pindex).dict
-  return (dict and dict.language_code) or nil end
-  
-  
--- -------
--- Retrieves all translation percentages.
--- This is the same data that the built-in status indicator uses.
--- Includes only languages that have been seen on this map at least once.
--- 
--- This is the total percentage intended for GUI visualization only.
--- Use @{Babelfish.can_find_prototype_names} to get the proper per-SearchType status.
--- 
--- @treturn table A mapping (@{Babelfish.LanguageCode|LanguageCode} → @{NaturalNumber})
--- where the number is between 0 and 100 inclusive.
--- 
--- @function Babelfish.get_translation_percentages
-function Deprecated.get_translation_percentages()
-  local r = {}
-  for code, dict in ntuples(2, Savedata.dicts) do
-    r[code] = dict:get_percentage()
-    end
-  return r end
-
-  
--- -------
--- Triggers an internal update.
---
--- This is meant to be used to circumvent the hard engine limitation of
--- no events being raised in Singleplayer when the locale changes but
--- nothing else changed.
---
--- This can also be triggered by the commands `'/babelfish update'`
--- (singleplayer only) and `'/babelfish reset'` (admin only) respectively.
---
--- @tparam[opt=false] boolean reset Completely resets all translations
--- instead of just performing a normal update.
---
--- @function Babelfish.force_update
-function Deprecated.force_update(force)
-  -- @future: This can be included in the eventual mini-gui.
-  if (force == true) then
-    -- Has to fix completely broken Savedata/Dictionary state!
-    Savedata:reset_to_default()
-    end
-  script.get_event_handler('on_configuration_changed')()
-  end
-
 
 --------------------------------------------------------------------------------
 -- Commands.  
@@ -174,7 +85,7 @@ do
       if game.is_multiplayer() then
         p.print {'babelfish.command-only-in-singleplayer'}
       else
-        Deprecated.force_update()
+        Babelfish.force_update()
         return true end
       end,
       
@@ -186,7 +97,7 @@ do
       if game.is_multiplayer() and not p.admin then
         p.print {'babelfish.command-only-by-admin'}
       else
-        Deprecated.force_update(true)
+        Babelfish.force_update(true)
         return true end
       end,
       
@@ -194,8 +105,10 @@ do
     -- `/babelfish demo` Opens a rudimentary demonstration GUI. Just type
     -- in the upper box to start searching. The gui is not optimized so the
     -- generation of the result icons is a bit slow for large modpacks.
+    -- The search may also appear slow if many SearchTypes are activated
+    -- because it searches them all at once.
     -- The sidepanel dynamically shows in red/green which SearchTypes
-    -- are fully translated.
+    -- are currently fully translated.
     --
     -- See also: @{Babelfish.HowToActivateBabelfish|HowToActivateBabelfish}.
     --
@@ -216,12 +129,13 @@ do
       
     ----------
     -- `/babelfish dump` Prints internal statistics to the attached terminal.
+    -- This is meant for library authors and is not useful to players or mod authors.
     -- @table dump
     dump = function(e, pdata, p)
-      if game.is_multiplayer() and not p.admin then
-        p.print {'babelfish.command-only-by-admin'}
-      elseif not flag.IS_DEV_MODE then
+      if not flag.IS_DEV_MODE then
         p.print('Dev mode is required for correct statistics!')
+      elseif game.is_multiplayer() and not p.admin then
+        p.print {'babelfish.command-only-by-admin'}
       else
         print('############ DUMP ############')
         for _, lcode in ipairs{'en', 'de', 'ja'} do
@@ -234,20 +148,17 @@ do
 
     -- -------
     --
-    test = function(e, pdata, p)
-      if p.name == 'eradicator' then
-        --
-        for k, v in pairs(pdata.dict) do
-          if type(v) == 'table' then
-            local holes = 0
-            for i=1, v.max do 
-              if v[i] == nil then holes = holes + 1 end
-              end
-            print(('%s had %s holes'):format(k, holes))
+    test = (not flag.IS_DEV_MODE) and ercfg.SKIP or function(e, pdata, p)
+      for k, v in pairs(pdata.dict) do
+        if type(v) == 'table' then
+          local holes = 0
+          for i=1, v.max do 
+            if v[i] == nil then holes = holes + 1 end
             end
+          print(('%s had %s holes'):format(k, holes))
           end
-        return true end
-      end,
+        end
+      return true end,
       
     }
   end

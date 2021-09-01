@@ -67,8 +67,8 @@ Setting.make {
   'name',
   
   'startup', 'string', 'default_value',
-  'map', 'int', {10,0,1000},
-  'player', 'double', {0.5,0,1},
+  'map', 'int', {0, 10, 1000},
+  'player', 'double', {0, 0.5, 1},
   'player', 'bool', false,
   
   'er:orderstring',

@@ -16,7 +16,7 @@ full_description = ([[
   The [Factorio Api Documentation %s](./api/index.html) and the 
   [Lua 5.2 Reference Manual](./lua-5.2/doc/contents.html) are included
   for convenient offline reading.
-  ]]):format( (function(_) return _,_ end)('1.1.32')  ) -- Factorio Version * 2!
+  ]]):format( (function(_) return _,_ end)('1.1.38')  ) -- Factorio Version * 2!
   
 format = 'markdown'
   

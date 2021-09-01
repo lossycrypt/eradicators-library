@@ -14,6 +14,7 @@ local PluginManager = elreq('erlib/factorio/PluginManagerLite-1')()
 local asset = PluginManager.make_asset_getter('babelfish')
 
 -- -------------------------------------------------------------------------- --
+-- colored info icons
 
 for _, color in pairs{'default', 'red', 'green'} do
   Data.Inscribe{
@@ -26,6 +27,8 @@ for _, color in pairs{'default', 'red', 'green'} do
     }
   end
 
+-- -------------------------------------------------------------------------- --
+-- status indicator
   
 data.raw['gui-style']['default']
   [const.style.status_indicator_button] = { -- from vanilla "transparent_slot"
@@ -42,7 +45,9 @@ data.raw['gui-style']['default']
     left_click_sound = {},
     }
 
-    
+-- -------------------------------------------------------------------------- --
+-- tips
+
 data:extend{{
   type = 'tips-and-tricks-item',
   name = const.name.tip_1,
@@ -54,9 +59,9 @@ data:extend{{
   tag = ('[img=%s] '):format(const.sprite.icon_default),
   order = 'babelfish',
   -- trigger = {
-    -- There is no lua-script based trigger. (base 1.1.34)
-    -- type = "time-elapsed",
-    -- ticks = 60 * 60 * 5, -- 5 minutes
-    -- ticks = 1,
-    -- },
+  --   There is no lua-script based trigger. (base 1.1.34)
+  --   type = "time-elapsed",
+  --   ticks = 60 * 60 * 5, -- 5 minutes
+  --   ticks = 1,
+  --   },
   }}

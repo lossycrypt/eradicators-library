@@ -14,6 +14,10 @@
 --  local events, generate_event_name
 --    = require('__eradicators-library__/erlib/remotes/events')()
 --
+--  script.on_event(events.on_something_happend, function(e)
+--    do_stuff()
+--    end)
+--
 -- @treturn table Stand-alone version of @{EventManagerLite.events}.
 -- @treturn function Stand-alone version of @{EventManagerLite.generate_event_name}.
 --

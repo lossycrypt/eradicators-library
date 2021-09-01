@@ -10,7 +10,6 @@
   
   ]]
 
-
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
 -- -------------------------------------------------------------------------- --
@@ -24,34 +23,16 @@ local log         = elreq('erlib/lua/Log'       )().Logger  'babelfish'
 local stop        = elreq('erlib/lua/Error'     )().Stopper 'babelfish'
 local assertify   = elreq('erlib/lua/Error'     )().Asserter(stop)
 
-
--- local Verificate  = elreq('erlib/lua/Verificate')()
--- local verify      = Verificate.verify
-                                                
 local Class       = elreq('erlib/lua/Class'     )()
-local Filter      = elreq('erlib/lua/Filter'    )()
--- local String      = elreq('erlib/lua/String'    )()
 
 local Table       = elreq('erlib/lua/Table'     )()
 local Array       = elreq('erlib/lua/Array'     )()
--- local Set         = elreq('erlib/lua/Set'       )()
--- local Memoize     = elreq('erlib/lua/Meta/Memoize')()
--- local L           = elreq('erlib/lua/Lambda'    )()
 
 local sriapi      = elreq('erlib/lua/Iter/sriapi' )()
--- local dpairs      = elreq('erlib/lua/Iter/dpairs' )()
-local ntuples     = elreq('erlib/lua/Iter/ntuples')()
+-- local ntuples     = elreq('erlib/lua/Iter/ntuples')()
 local array_pairs = elreq('erlib/lua/Iter/array_pairs')()
 
--- local Cache       = elreq('erlib/factorio/Cache'  )()
 local Locale      = elreq('erlib/factorio/Locale' )()
--- local Setting     = elreq('erlib/factorio/Setting')()
--- local Prototype   = elreq('erlib/factorio/Prototype')()
-
--- local pairs, pcall, string_find, type, string_gmatch, string_lower, string_gsub,
-      -- string_sub
-    -- = pairs, pcall, string.find, type, string.gmatch, string.lower, string.gsub,
-      -- string.sub
       
 local string_gsub
     = string.gsub
@@ -72,11 +53,9 @@ local RawEntries       = import '/control/RawEntries'
 local Babelfish        = import '/control/Babelfish'
 
 local SearchTypes      = import '/control/SearchTypes'
--- local Utf8             = import '/control/Utf8Dummy'
 local Local            = import '/locallib'
                       
 local nlstring_is_equal = Locale.nlstring_is_equal
--- local nlstring_ident    = Locale.nlstring_to_string
 
 -- -------------------------------------------------------------------------- --
 -- Local Library                                                              --
@@ -93,7 +72,6 @@ PluginManager.manage_savedata  ('babelfish', function(_) Savedata = _ end)
 -- -------------------------------------------------------------------------- --
 local Dictionary = Class.SimpleClass(
   -- initializer
-  -- function(language_code)
   function()
     local dict = {
       -- ['requests'  ] = {}, -- DenseArray
@@ -161,6 +139,7 @@ function Dictionary.update(dict)
   profile('Dictionary.update took: ')
   end
 
+  
 -- Sets packet uids sheduled for translation.
 --
 -- @tparam DenseArrayOfNaturalNumber request_uids
@@ -230,7 +209,6 @@ function Dictionary.repair(dict)
 -- Translation                                                                --
 -- -------------------------------------------------------------------------- --
   
-
 do
 
   local _is_exact_unknown_key_string = function(type, name, word)
@@ -238,24 +216,21 @@ do
       'Unknown key: "'..string_gsub(type, '_', '-')..'.'..name..'"'
       )
     end
-  
-  local _is_description = Filter.string_postfix('_description')
 
-  -- Set a single translation from a single entry
+  -- Set a single translation for a single entry.
   function Dictionary.set_entry_translation(dict, raw_entry, word)
     local type = raw_entry[eindex.type]
     local name = raw_entry[eindex.name]
     --
-    -- When using packed requets unknown descriptions are translated as
+    -- When using packed requests unknown descriptions are translated as
     -- "unknown key" but unlike unknown item names vanilla shows them
     -- as empty. Not storing them saves space and fixes search results.
     if Babelfish.is_packaging_enabled()
-    and _is_description(type)
+    and SearchTypes.is_description(type)
     and _is_exact_unknown_key_string(type, name, word)
     then
-      -- log:sayf('Empty description: %s %s %s', type, name, word)
       -- Hackfix: Preserve real length for dump_statistics()
-      word = (not flag.IS_DEV_MODE) and '' or word:rep(#word)
+      word = (not flag.IS_DEV_MODE) and '' or (''):rep(#word)
       end
     --
     -- Always create a fresh entry table to avoid table-recycling bugs.
@@ -268,7 +243,7 @@ do
     end
     
   end
-    
+
     
 -- -------------------------------------------------------------------------- --
   

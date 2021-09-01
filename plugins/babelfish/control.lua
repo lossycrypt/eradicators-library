@@ -3,22 +3,22 @@
 --------------------------------------------------
 -- Localised string search for mods.
 --
--- Babelfish is a caching translator for standard prototype localisations.
--- When it detects changes in the locale it starts a background task to 
--- translate all prototype names and descriptions. In Singleplayer this
+-- Babelfish is a caching __translator for prototype localisations__.
+-- It automatically detects changes in localisation and updates the translation
+-- in the background. In Singleplayer this
 -- process happens during the loading screen and is invisible to the player.
 -- In Multiplayer translation is done gradually in on_tick to prevent
--- network congestion. Each language only needs to be translated once,
--- so even in Multiplayer the process is instant for most users.
+-- network congestion. Each language is only translated once,
+-- so even in Multiplayer the process is instant for most players.
 --
 -- While translation is running a small status indicator in
--- the upper right corner informs each user of the _approximate_ progress. 
--- However there is no such progress information on the API as the real
--- progress is much more complex and prioritized SearchTypes like
+-- the upper right corner informs each user of the _approximate_ total progress. 
+-- However there is no such progress information on the API, as the 
+-- Babelfish uses a SearchTypes priorization system in which i.e. 
 -- `"item_name`" may already be completely translated despite the indicator
--- showing i.e. "10%".
+-- showing a low number like "10%".
 --
--- @{Introduction.DevelopmentStatus|Module Status}: Polishing.
+-- @{Introduction.DevelopmentStatus|Module Status}: Experimental.
 --
 -- @module Babelfish
 
@@ -42,6 +42,7 @@
   
   ? Needs engine support.
     Detect game.speed changes outside of on_runtime_mod_setting_changed.
+    => Replaced by regular polling for now.
   
   ]]
 
@@ -62,7 +63,8 @@
     parameters will return a result with the parameters
     placeholders intact (i.e. "Foo __1__ bar."). If at least one
     parameter is given all parameters are messed up. This makes
-    a lua-side reimplementation theoretically possible.
+    a lua-side reimplementation theoretically possible. But 
+    that's of course way too much work for just reducing traffic a little.
   
   ]]
   
@@ -70,15 +72,20 @@
 
   + Interface Request (Unanswered)
     https://forums.factorio.com/viewtopic.php?f=28&t=98695
-    A method to detect changes in player language in Singleplayer.
+    "A method to detect changes in player language in Singleplayer."
+    
+  + Interface Request (Unanswered)
+    "LuaPlayer::active_locale" (by raiguard)
+    https://forums.factorio.com/99479
     
   + Interface Request (Rejected)
     https://forums.factorio.com/viewtopic.php?f=28&t=98628
-    LuaGameScript.is_headless_server [boolean]	
+    "LuaGameScript.is_headless_server [boolean]"
+    
     
   + Interface Request (Unanswered)
     https://forums.factorio.com/viewtopic.php?f=28&t=98698
-    LuaPlayer.unlock_tips_and_tricks_item(name)
+    "LuaPlayer.unlock_tips_and_tricks_item(name)"
     => May by possible by abusing other trigger types.
     
   ]]
@@ -95,14 +102,11 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
 local log         = elreq('erlib/lua/Log'          )().Logger  'babelfish'
--- local stop        = elreq('erlib/lua/Error'        )().Stopper 'babelfish'
--- local assertify   = elreq('erlib/lua/Error'        )().Asserter(stop)
 
 local Verificate  = elreq('erlib/lua/Verificate'   )()
 local verify      = Verificate.verify
 local isType      = Verificate.isType
 
--- local Table       = elreq('erlib/lua/Table'        )()
 local String      = elreq('erlib/lua/String'       )()
 
 local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
@@ -118,36 +122,30 @@ local import = PluginManager.make_relative_require 'babelfish'
 local const  = import '/const'
 local null   = '\0'
 
-import '/control/Savedata' -- Before all modules!
-
-local Babelfish        = import '/control/Babelfish'
 script.generate_event_name('on_babelfish_translation_state_changed')
 
+-- -------------------------------------------------------------------------- --
+-- Module                                                                     --
+-- -------------------------------------------------------------------------- --
+import '/control/Savedata' -- classify before all other modules!
 
+local Babelfish        = import '/control/Babelfish'
 local Dictionary       = import '/control/Dictionary'
                          import '/control/DictionaryFind'
 local StatusIndicator  = import '/control/StatusIndicator'
 local RawEntries       = import '/control/RawEntries'
 
 local Command          = import '/control/Command'
-
 local Remote           = import '/control/Remote'
 remote.add_interface(const.remote.interface_name, Remote)
 
--- -------------------------------------------------------------------------- --
--- Module                                                                     --
--- -------------------------------------------------------------------------- --
-
 if flag.IS_DEV_MODE then import '/control/Debug' end
-
--- if flag.IS_DEV_MODE then log:set_log_level(0) end
 
 -- -------------------------------------------------------------------------- --
 -- Savedata                                                                   --
 -- -------------------------------------------------------------------------- --
 local Savedata
 PluginManager.manage_savedata  ('babelfish', function(_) Savedata = _ end)
-
   
 -- -------------------------------------------------------------------------- --
 -- Conditional Events                                                         --
@@ -160,7 +158,6 @@ Babelfish.should_request_translations = function()
   return (not Babelfish.should_update_lcodes())
      and (not not Savedata:get_active_dict())
   end
-
 
 -- Manages ALL dynamic event de/registration
 -- must be ON_LOAD compatible!
@@ -213,13 +210,13 @@ local on_load = script.on_load(function(e)
 -- Init / Config                                                              --
 -- -------------------------------------------------------------------------- --
   
-local function did_this_mod_config_change(e)
-  return
-    (not e) or
-    ( (table_size(e.mod_changes) > 0)
-      or e.migration_applied
-      or e.mod_startup_settings_changed )
-  end
+-- local function did_this_mod_config_change(e)
+--   return
+--     (not e) or
+--     ( (table_size(e.mod_changes) > 0)
+--       or e.migration_applied
+--       or e.mod_startup_settings_changed )
+--   end
   
 local function update_all_dictionaries()
   for lcode, dict in ntuples(2, Savedata.dicts) do
@@ -244,6 +241,7 @@ local function set_all_lcodes_dirty()
 -- { migration_applied = false,
 --   mod_changes = {},
 --   mod_startup_settings_changed = false }
+--
 script.on_config(function(e)
   --
   if Savedata.version ~= const.version.savedata then
@@ -252,10 +250,8 @@ script.on_config(function(e)
     end
   --
   RawEntries.precompile()
-  -- if did_this_mod_config_change(e) then
-    reclassify_all_dictionaries() -- can't dict:update without
-    update_all_dictionaries()
-    -- end
+  reclassify_all_dictionaries() -- can't dict:update without
+  update_all_dictionaries()
   --
   Savedata:clear_packed_packets()
   Savedata.version = const.version.savedata
@@ -265,8 +261,6 @@ script.on_config(function(e)
   set_all_lcodes_dirty()
   --
   Babelfish.on_runtime_mod_setting_changed()
-  -- Savedata:set_byte_allowance(Babelfish.get_max_bytes_per_tick())
-  --
   on_load()
   end)
 
@@ -278,7 +272,7 @@ script.on_config(function(e)
 -- -------------------------------------------------------------------------- --
 -- connection status
 
--- Always watch for potential language changes.
+-- Always watch for potential lcode changes.
 script.on_event({
   defines.events. on_player_left_game  ,
   defines.events. on_player_created    ,

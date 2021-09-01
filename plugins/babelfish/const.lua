@@ -52,9 +52,9 @@ const.setting_name = {
   }
   
 const.network = {
-  rerequest_delay = 1.0, -- in seconds
-  transit_window  = 15/60, -- in seconds
-  ticks_per_packet = 2, -- in ticks
+  rerequest_delay  = 1.0, -- in seconds
+  transit_window   = 15/60, -- in seconds
+  
   master_header = '金魚',
   packet_header = {
     packed_request = '箱',
@@ -66,7 +66,7 @@ const.network = {
     mtu             = 1452,
     packet_overhead =   18,
     -- dict:dump_statistics()
-    packet_median   =   85, -- better estimate means batter bandwitdh control
+    packet_median   =   85, -- better estimate means better bandwidth control
     },
   }
   
@@ -148,17 +148,18 @@ const.type_data = {
   {type = "fluid_name"            , longest =   44},             
   {type = "recipe_name"           , longest =   80},             
   {type = "technology_name"       , longest =   59},             
+  {type = "equipment_name"        , longest =   57},             
+  {type = "tile_name"             , longest =   46},          -- max 255
+  {type = "virtual_signal_name"   , longest =   40},             
+  {type = "entity_name"           , longest =   88}, --  8%   -- lots of garbage
+  --
   {type = "item_description"      , longest = 1277}, -- 76%      
   {type = "fluid_description"     , longest =   98}, -- 86%      
   {type = "recipe_description"    , longest =  230}, -- 96%      
   {type = "technology_description", longest =  408},             
-  {type = "equipment_name"        , longest =   57},             
   {type = "equipment_description" , longest =  333}, -- 63%      
-  {type = "tile_name"             , longest =   46},          -- max 255
   {type = "tile_description"      , longest =   92}, -- 98%      
-  {type = "entity_name"           , longest =   88}, --  8%   -- lots of garbage
   {type = "entity_description"    , longest = 1068}, -- 49%      
-  {type = "virtual_signal_name"   , longest =   40},             
   --
   -- Deactivated prototype categories.
   --   This is a list of *all* prototypes with a compatible
@@ -196,7 +197,7 @@ const.type_data = {
   nil and {type = "font_name"                 , longest = 9001, noicon = true},
   }
 
-const.native_language_name = {
+const.native_language_name = { -- AUTHORATIVE
   internal  = 'Internal'           ,
   
   ["af"   ] = "Afrikaans"          ,

@@ -4,7 +4,6 @@
 -- Babelfish.
 -- @module Babelfish
 
-
 --[[ Notes:
 
   All "array" tables *must* be sorted by translation priority!
@@ -34,6 +33,7 @@ local verify      = Verificate.verify
 local Table       = elreq('erlib/lua/Table'        )()
 local Array       = elreq('erlib/lua/Array'        )()
 local Set         = elreq('erlib/lua/Set'          )()
+local Filter      = elreq('erlib/lua/Filter'       )()
 
 local Cache       = elreq('erlib/factorio/Cache'   )()
 
@@ -131,6 +131,10 @@ function SearchTypes.assert(type)
   assertify(not not requested_set[type], 'SearchType not activated: ', type)
   return true end
 
+--
+SearchTypes.is_description = Filter.string_postfix('_description')
+  
+  
 --
 function SearchTypes.requested_ipairs()
   return ipairs(requested_array)

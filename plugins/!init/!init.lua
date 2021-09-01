@@ -129,15 +129,25 @@ return function(phase) assert(phase)
     local enabled_plugins = get_enabled_plugins(phase)
     
     -- Auto-activated dependencies.
+    -- (Plugins can not activate each other due to load order.)
+    
+    if enabled_plugins['babelfish-demo'] then
+      erlib_enable_plugin('babelfish', {
+        search_types = {
+          -- Not too many so mod authors can test demo with
+          -- their own preferred types.
+          --
+          -- Wrong order to test sorting.
+          "recipe_name"    ,  
+          "fluid_name"     ,  
+          "item_name"      ,
+          }
+        })
+      end
     
     if enabled_plugins['babelfish'] then
       erlib_enable_plugin 'on_user_panic'
       end
-    
-    -- Explicit dependencies.
-    
-    assert((not enabled_plugins['babelfish-demo']) or enabled_plugins['babelfish'],
-      'Missing dependency: "babelfish-demo" requires "babelfish".')
       
     end
     
@@ -160,6 +170,8 @@ return function(phase) assert(phase)
 
   if phase == 'control' then
   
+    -- Failed remote interface activation test.
+    -- 
     -- if flag.IS_DEV_MODE then
     --   local script = EventManager.get_managed_script('erlib-init')
     --   local SearchTypes = require 'plugins/babelfish/control/SearchTypes'

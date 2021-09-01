@@ -3,18 +3,6 @@
 --------------------------------------------------------------------------------
 -- Babelfish.
 -- @module Babelfish
-
---[[ Notes:
-  ]]
-
---[[ Annecdotes:
-  ]]
-
---[[ Future:
-  ]]
-  
---[[ Todo:
-  ]]
   
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -30,23 +18,7 @@ local log         = elreq('erlib/lua/Log'          )().Logger  'babelfish'
 local stop        = elreq('erlib/lua/Error'        )().Stopper 'babelfish'
 local assertify   = elreq('erlib/lua/Error'        )().Asserter(stop)
 
--- local Verificate  = elreq('erlib/lua/Verificate'   )()
--- local verify      = Verificate.verify
--- local isType      = Verificate.isType
-
 local Table       = elreq('erlib/lua/Table'        )()
--- local Array       = elreq('erlib/lua/Array'        )()
--- local Set         = elreq('erlib/lua/Set'          )()
--- local Filter      = elreq('erlib/lua/Filter'       )()
--- local Vector      = elreq('erlib/lua/Vector'       )()
-
--- local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
--- local dpairs      = elreq('erlib/lua/Iter/dpairs'  )()
--- local sriapi      = elreq('erlib/lua/Iter/sriapi'  )()
-
--- local Setting     = elreq('erlib/factorio/Setting'   )()
--- local Player      = elreq('erlib/factorio/Player'    )()
--- local getp        = Player.get_event_player
 
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
@@ -56,19 +28,6 @@ local import = PluginManager.make_relative_require 'babelfish'
 local const  = import '/const'
 
 local Dictionary       = import '/control/Dictionary'
--- local Babelfish        = import '/control/Babelfish'
-
-
--- -------------------------------------------------------------------------- --
--- Module                                                                     --
--- -------------------------------------------------------------------------- --
--- local This = {}
-
--- -------------------------------------------------------------------------- --
--- Local Library                                                              --
--- -------------------------------------------------------------------------- --
-
-
 
 -- -------------------------------------------------------------------------- --
 -- Savedata                                                                   --
@@ -181,13 +140,17 @@ PluginManager.classify_savedata('babelfish', {
 -- -------------------------------------------------------------------------- --
 -- event condition
   
-  -- Array of players who need lcode updates.
+  -- Table of online players who need lcode updates.
   get_lcode_requesters = function(self)
     local r = Table.map(
       Table.values(self.players),
-      function(pdata) if pdata.is_lcode_dirty then return pdata.p end end,
+      function(pdata) 
+        if pdata.is_lcode_dirty
+        and pdata.p.connected
+        then return pdata.p end
+        end,
       {})
-    if #r > 0 then return r end
+    if table_size(r) > 0 then return r end
     return nil end,
 
   -- The dictionary that is currently being translated.
@@ -216,4 +179,3 @@ PluginManager.classify_savedata('babelfish', {
   
   })
 
-  
