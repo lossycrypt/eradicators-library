@@ -19,7 +19,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
-local log  = elreq('erlib/Lua/Log'  )().Logger ('Lambda')
+local log  = elreq('erlib/lua/Log'  )().Logger ('Lambda')
 
 local Hydra = elreq('erlib/lua/Coding/Hydra')()
 

@@ -29,7 +29,7 @@ local table_concat
     
     
 local stop = elreq('erlib/lua/Error')().Stopper('Verificate')
-local log  = elreq('erlib/Lua/Log'  )().Logger ('Verificate')
+local log  = elreq('erlib/lua/Log'  )().Logger ('Verificate')
     
 -- local Iter_combinations = elreq('erlib/lua/Iter/combinations')()
 local Iter_permutations = elreq('erlib/lua/Iter/permutations')()

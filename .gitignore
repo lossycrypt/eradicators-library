@@ -8,7 +8,9 @@
 !*/
 
 # Keep these special files
-!licence.txt
+!*licen[sc]e.txt
+!*LICEN[SC]E.txt
+
 !license.txt
 !readme.md
 !changelog.txt

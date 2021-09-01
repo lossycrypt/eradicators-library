@@ -7,7 +7,7 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 
 -- -------------------------------------------------------------------------- --
 
-local log  = elreq('erlib/Lua/Log'  )().Logger ('ULocale')
+local log  = elreq('erlib/lua/Log'  )().Logger ('ULocale')
 
 local string_find, string_match, string_gsub
     = string.find, string.match, string.gsub
