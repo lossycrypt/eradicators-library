@@ -74,7 +74,7 @@ function SearchTypes.get_supported_array()
   return Array.scopy(supported_array) end
 
 function SearchTypes.get_supported_set()
-  return Set.from_values(supported_array) end
+  return Set.of_values(supported_array) end
   
 -- -------------------------------------------------------------------------- --
 -- on_load (remote calls)                                                     --
@@ -112,7 +112,7 @@ local requested_array = Cache.AutoCache(function(r)
   
 -- {search_type -> true}
 local requested_set = Cache.AutoCache(function(r)
-  Table.overwrite(r, Set.from_values(get_requested_values()))
+  Table.overwrite(r, Set.of_values(get_requested_values()))
   end)
   
 -- {ordered_index -> search_type}

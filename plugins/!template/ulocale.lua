@@ -4,8 +4,8 @@
 -- local const  = import '/const'
 -- local hotkey = Locale.format_hotkey_tooltip
 
--- _UL:DevModeSetting_
--- _UL:PowerUserSetting_
+-- _UL:DevSetting_
+-- _UL:AdvancedSetting_
 
 -- -------------------------------------------------------------------------- --
 require(_)('template', {

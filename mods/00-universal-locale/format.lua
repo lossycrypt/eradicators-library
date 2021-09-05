@@ -62,7 +62,8 @@ local function find_description(entry, db)
     -- [mod-setting-name] and [mod-setting-description]
     local desc_header = get_description_header(entry)
     --
-    for _, dbentry in pairs(db) do
+    for i=1, #db do; local dbentry = db[i]
+    -- for _, dbentry in pairs(db) do
       if  (dbentry.header   == desc_header   )
       and (dbentry.key      == entry.key     )
       and (dbentry.language == entry.language)
@@ -80,7 +81,7 @@ local function add_description_header(entry, db, msg)
   --
   
   -- V1:
-  local x; entry.value, x = entry.value:gsub('_UL:NOAUTODESCRIPTION_','')
+  -- local x; entry.value, x = entry.value:gsub('_UL:NOAUTODESCRIPTION_','')
   -- if x > 0 then return false end
   
   -- V2: Now that default values have a seperate info icon color
@@ -219,18 +220,18 @@ local pattern_functions = {
     end,
 
 
-  -- _UL:DevModeSetting_
+  -- _UL:DevSetting_
   make_mod_setting_tagger(
-    '_UL:DevModeSetting_',
+    '_UL:DevSetting_',
     '_UL:ICON_TTIP_DEV_MODE_',
     'pink',
     'dev_mode_setting_description_header'
     ),
     
-  -- _UL:MultiPlayerSetting_
+  -- _UL:NetworkSetting_
   make_mod_setting_tagger(
-    '_UL:MultiPlayerSetting_',
-    '_UL:ICON_TTIP_MULTIPLAYER_',
+    '_UL:NetworkSetting_',
+    '_UL:ICON_TTIP_NETWORK_',
     'purple',
     'multiplayer_setting_description_header'
     ),
@@ -255,9 +256,9 @@ local pattern_functions = {
       end
     end,
 
-  -- _UL:PowerUserSetting_
+  -- _UL:AdvancedSetting_
   make_mod_setting_tagger(
-    '_UL:PowerUserSetting_',
+    '_UL:AdvancedSetting_',
     '_UL:ICON_TTIP_ADVANCED_',
     'blue',
     'power_user_setting_description_header'
@@ -282,12 +283,10 @@ local pattern_functions = {
 local pattern_strings = {
 
   -- colored (i) tags.
-  -- {'_UL:ICON_TOOLTIP_ ?'           , '[img=info]'           },
   {'_UL:ICON_TOOLTIP_ ?'           , '[img=ul:info-white]'  },
-  
   {'_UL:ICON_TTIP_ADVANCED_ ?'     , '[img=developer]'      },
   {'_UL:ICON_TTIP_DEFAULT_VALUE_ ?', '[img=ul:info-default]'},
-  {'_UL:ICON_TTIP_MULTIPLAYER_ ?'  , '[img=ul:info-purple]' },
+  {'_UL:ICON_TTIP_NETWORK_ ?'      , '[img=ul:info-purple]' },
   {'_UL:ICON_TTIP_DEV_MODE_ ?'     , '[img=ul:info-pink]'   },
   
   --hackfix

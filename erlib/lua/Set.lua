@@ -111,20 +111,20 @@ do end
 
 
 ----------
--- Creates a @{Set} that maps all values from the input table to @{true}.
+-- Creates a @{set} that maps all values from the input table to @{true}.
 -- @tparam table tbl
 -- @treturn set
-function Set.from_values(tbl)
+function Set.of_values(tbl)
   local s = {}
   for _,v in pairs(tbl) do s[v] = true end
   -- return _toSet(s) end
   return s end
 
 ----------
--- Creates a @{Set} that maps all keys from the input table to @{true} 
+-- Creates a @{set} that maps all keys from the input table to @{true}.
 -- @tparam table tbl
 -- @treturn set
-function Set.from_keys(tbl)
+function Set.of_keys(tbl)
   local s = {}
   for k   in pairs(tbl) do s[k] = true end
   -- return _toSet(s) end

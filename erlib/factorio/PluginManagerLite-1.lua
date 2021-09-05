@@ -156,8 +156,9 @@ function Public.enable_savedata_management()
     [plugin_name] = {
       path    = {'plugin_manager', 'plugins', plugin_name}
       setter  = function() end
-      want_gc = nil or true
       mt      = {__index = methods}
+      manage_garbage = nil or true
+      manage_version = nil or true
       }
     ]]}
     
@@ -167,7 +168,7 @@ function Public.enable_savedata_management()
   -- Multiple setters can be associated with the same plugin_name.
   -- This allows using local Savedata references in all files used by a plugin.
   --
-  -- Can only be uesd after @{PluginManagerLite.enable_savedata_management}.
+  -- Can only be used after @{PluginManagerLite.enable_savedata_management|enable_savedata_management}.
   --
   -- @tparam string plugin_name
   -- @tparam function setter Will be called setter(Savedata) in on\_load and on\_config.
@@ -194,7 +195,9 @@ function Public.enable_savedata_management()
     this.path    = {'plugin_manager', 'plugins', plugin_name}
     if default ~= nil then
       assert(this.default == nil, 'Savedata default may only be specified once.')
-      this.default = Table.dcopy(default)
+      verify(default.version, 'nil|NaturalNumber', '"version" has wrong data type.')
+      -- this.default = Table.dcopy(default)
+      this.default = default -- direct references == less bugs? ensures there's only one authorative table
       end
     table.insert(Table.sget(this, {'setters'}, {}), setter)
     end
@@ -224,7 +227,7 @@ function Public.enable_savedata_management()
   -- 'players','forces','surfaces' and 'map' if the methods table
   -- has no metatable itself.
   -- 
-  -- Can only be uesd after @{PluginManagerLite.enable_savedata_management}.
+  -- Can only be used after @{PluginManagerLite.enable_savedata_management|enable_savedata_management}.
   -- 
   -- @tparam string plugin_name
   -- @tparam table methods This table will be assigned as the __index metatable
@@ -237,6 +240,10 @@ function Public.enable_savedata_management()
     end
 
   --
+  local function inject_defaults(Savedata, defaults)
+    
+    end
+  
   local function relink_savedatas()
     -- Writing to _ENV.global is not allowed during on_load.
     local is_on_load = not ((rawget(_ENV, 'game') or {}).object_name)
@@ -253,7 +260,7 @@ function Public.enable_savedata_management()
               log:debug(plugin_name, ' default Savedata: ', k, ' = ', v)
               Savedata[k] = Table.dcopy(v) -- guaranteed defaults
             else
-              log:debug(plugin_name, ' default Savedata: ', k, ' (already exists.)')
+              log:say(plugin_name, ' default Savedata: ', k, ' (already exists.)')
               end
             end
           end
@@ -263,9 +270,14 @@ function Public.enable_savedata_management()
         end
       end
     end
+    
+  local function ensure_savedata_root_exists()
+    -- Must be created even if no plugins are registered.
+    assert(Table.sget(_ENV.global, {'plugin_manager', 'plugins'}, {}))
+    end
 
   local function delete_unused_savedatas()
-    local Savedatas = Table.get(_ENV.global,{'plugin_manager', 'plugins'})
+    local Savedatas = Table.get(_ENV.global, {'plugin_manager', 'plugins'})
     for plugin_name, _ in pairs(Savedatas) do
       if not ManagedPlugins[plugin_name] then
         log:debug('delete unknown Savedata: ', plugin_name)
@@ -274,10 +286,26 @@ function Public.enable_savedata_management()
       end
     end
     
-  local function ensure_savedata_root_exists()
-    -- Must be created even if no plugins are registered.
-    assert(Table.sget(_ENV.global, {'plugin_manager', 'plugins'}, {}))
+  -- manage_version
+  local function delete_outdated_savedatas()
+    local Savedatas = Table.get(_ENV.global, {'plugin_manager', 'plugins'})
+    for plugin_name, Savedata in pairs(Savedatas) do
+      local this = assert(ManagedPlugins[plugin_name])
+      if this.manage_version
+      then
+        if (this.default.version ~= Savedata.version)
+        then
+          Savedatas[plugin_name] = nil
+          log:debugf('Savedata version outdated + deleted (v%s => v%s for %s).'
+            , Savedata.version or '<unset>.', this.default.version, plugin_name)
+        else
+          log:debugf('Savedata version ok. (v%s for %s).'
+            , assert(Savedata.version), plugin_name)
+          end
+        end
+      end
     end
+    
     
   script.on_load(function()
     -- print('PM on_load')
@@ -288,11 +316,33 @@ function Public.enable_savedata_management()
     -- print('PM on_init')
     -- print('PM on_config')
     ensure_savedata_root_exists()
-    relink_savedatas()
     delete_unused_savedatas()
+    delete_outdated_savedatas()
+    relink_savedatas()
     end)
 
     
+  ----------
+  -- Automatically deletes all Savedata when outdated.
+  --
+  -- When PluginManagerLite detects that during `on_config`
+  -- the value of `Savedata.version` in a loaded map is not identical with the
+  -- value of `default.version` then
+  -- __all Savedata is unconditionally deleted__ and `default` values are restored.
+  --
+  -- Can only be used after @{PluginManagerLite.manage_savedata|manage_savedata}.  
+  -- Can only be used after @{PluginManagerLite.enable_savedata_management|enable_savedata_management}.  
+  --
+  -- @tparam string plugin_name
+  --
+  -- @function PluginManagerLite.manage_version
+  function Public.manage_version(plugin_name)
+    local this = assert(ManagedPlugins[plugin_name], 'Unknown plugin name.')
+    assert(this.default, 'No default data given.')
+    verify(this.default.version, 'NaturalNumber', 'Invalid version')
+    this.manage_version = true
+    end
+  
   ----------
   -- Automatically deletes player, force and surface related
   -- Savedata when it becomes invalid.
@@ -311,13 +361,14 @@ function Public.enable_savedata_management()
   -- youself. If you create new data with the old index it will still be
   -- deleted at the end of the event.
   -- 
-  -- Can only be uesd after @{PluginManagerLite.enable_savedata_management}.
+  -- Can only be used after @{PluginManagerLite.enable_savedata_management|enable_savedata_management}.
   -- 
   -- @tparam string plugin_name
   -- 
   -- @function PluginManagerLite.manage_garbage
   function Public.manage_garbage(plugin_name)
-    assert(ManagedPlugins[plugin_name], 'Unknown plugin name.').want_gc = true
+    assert(ManagedPlugins[plugin_name], 'Unknown plugin name.')
+      .manage_garbage = true
     end
     
   local script = EventManager.get_managed_script('plugin-manager-gc')
@@ -327,7 +378,7 @@ function Public.enable_savedata_management()
     return function(e)
       -- Removes associated savedata when objects are deleted.
       for plugin_name, this in pairs(ManagedPlugins) do
-        if this.want_gc then
+        if this.manage_garbage then
           local Savedata = assert(Table.get(_ENV.global, this.path))
           if Savedata[data_key] then
             Savedata[data_key][e[event_key]] = nil

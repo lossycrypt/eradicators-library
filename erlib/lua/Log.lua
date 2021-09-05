@@ -153,7 +153,7 @@ local _to_table_of_strings; do
     ['thread'  ] = function( ) return "<thread>"   end,
     ['function'] = function( ) return "<function>" end,
     ['userdata'] = function( ) return "<userdata>" end,
-    ['table'   ] = function(x) return Hydra_serialize(x,hydra_options) end,
+    ['table'   ] = function(x) return Hydra_serialize(x, hydra_options) end,
     }
     
   function _to_table_of_strings (...)

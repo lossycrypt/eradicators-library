@@ -48,7 +48,7 @@ local string_find, string_sub
 -- Set->Table->String->Meta->SwitchCase
 -- local Set = elreq('erlib/lua/Set')()
 
--- local function Set_from_values(tbl)
+-- local function Set_of_values(tbl)
   -- local s = {}
   -- for _,v in pairs(tbl) do s[v] = true end
   -- return s
@@ -173,7 +173,7 @@ function Filter.string_pattern(pattern, init)
 -- @treturn function The filter function f(obj) returns a @{boolean}.
 -- 
 function Filter.true_object_array(sarr)
-  local ok = Set.from_values(sarr)
+  local ok = Set.of_values(sarr)
   return function (obj)
     return not not ok[obj]
     end
@@ -190,7 +190,7 @@ function Filter.true_object_array(sarr)
 -- @treturn function The filter function f(obj) returns a @{boolean}.
 -- 
 function Filter.false_object_array(sarr)
-  local not_ok = Set.from_values(sarr)
+  local not_ok = Set.of_values(sarr)
   return function (obj)
     return not not_ok[obj]
     end
@@ -256,7 +256,7 @@ do
     -- equal(value,ok) or superset(value,ok)
     ['and'] = function(value,ok)
       if type(value) ~= 'table' then return false end
-      value = Set.from_values(value)
+      value = Set.of_values(value)
       local r = true
       for i=2,#ok do -- first ok is "and"
         r = r and value[ ok[i] ]
@@ -319,14 +319,14 @@ function Filter.table_value(spec)
   -- Generic 1-length-paths doesn't need slow Table.get()
   elseif #spec == 1 then
     local ok, key = Table.plural(ok), spec[1]
-    if okToSet[mode] then ok = Set.from_values(ok); ok[mode] = nil end
+    if okToSet[mode] then ok = Set.of_values(ok); ok[mode] = nil end
     return function(obj)
       if type(obj) ~= 'table' then return false end
       return _cmp(obj[key], ok) end    
   -- Generic n-length path
   else
     local ok, path = Table.plural(ok), Array.scopy(spec)
-    if okToSet[mode] then ok = Set.from_values(ok); ok[mode] = nil end
+    if okToSet[mode] then ok = Set.of_values(ok); ok[mode] = nil end
     return function(obj)
       if type(obj) ~= 'table' then return false end
       return _cmp(Table_get(obj,path),ok) end

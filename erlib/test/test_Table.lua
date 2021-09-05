@@ -72,8 +72,8 @@ local function Test()
   do
     local vals = Table.values(tbl1()) -- order of return is undefined behavior (pairs)
     local keys = Table.keys  (tbl1()) -- so they have to be compared as Set.
-    assert(equ(Set.from_values(tbl1()),Set.from_values{'a','b','c','d','e',1,2,3,4,5}))
-    assert(equ(Set.from_values(tbl1()),Set.from_values{'a','b','c','d','e',1,2,3,4,5}))
+    assert(equ(Set.of_values(tbl1()),Set.of_values{'a','b','c','d','e',1,2,3,4,5}))
+    assert(equ(Set.of_values(tbl1()),Set.of_values{'a','b','c','d','e',1,2,3,4,5}))
     end
 
   -- Table.flip

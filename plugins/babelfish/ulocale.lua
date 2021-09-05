@@ -40,16 +40,16 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
   ['[mod-setting-name]'] = {
     -- map
     [const.setting_name.network_rate] = {
-      en = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ Babelfish: Maximum Upload Speed (KiB/s)',
-      de = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ Babelfisch: Maximale Uploadgeschwindigkeit (KiB/s)',
-      ja = '_UL:MultiPlayerSetting_ _UL:PowerUserSetting_ バベルフィッシュ： 最大アップロード速度 （ＫｉＢ／秒）',
+      en = '_UL:NetworkSetting_ _UL:AdvancedSetting_ Babelfish: Maximum Upload Speed (KiB/s)',
+      de = '_UL:NetworkSetting_ _UL:AdvancedSetting_ Babelfisch: Maximale Uploadgeschwindigkeit (KiB/s)',
+      ja = '_UL:NetworkSetting_ _UL:AdvancedSetting_ バベルフィッシュ： 最大アップロード速度 （ＫｉＢ／秒）',
       },
     [const.setting_name.enable_packaging] = {
-      en = '_UL:DevModeSetting_ _UL:MultiPlayerSetting_ _UL:PowerUserSetting_'
+      en = '_UL:DevSetting_ _UL:NetworkSetting_ _UL:AdvancedSetting_'
         .. 'Babelfish: Use large packets',
       },
     [const.setting_name.sp_instant_translation] = {
-      en = '_UL:DevModeSetting_ Babelfish: Singleplayer Instant Translation',
+      en = '_UL:DevSetting_ Babelfish: Singleplayer Instant Translation',
       },
     -- player
     [const.setting_name.string_match_type] = {
@@ -59,7 +59,7 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       },
     -- startup
     [const.setting_name.search_types] = {
-      en = '_UL:DevModeSetting_ Babelfish: Search Types',
+      en = '_UL:DevSetting_ Babelfish: Search Types',
       },
     },
 
@@ -76,9 +76,9 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       ja = '曖昧',
       },
     [const.setting_name.string_match_type..'-'..'lua'] = {
-      en = '_UL:PowerUserSetting_ Lua pattern',
-      de = '_UL:PowerUserSetting_ Lua Zeichenkettenmuster',
-      ja = '_UL:PowerUserSetting_ Lua パターン',
+      en = '_UL:AdvancedSetting_ Lua pattern',
+      de = '_UL:AdvancedSetting_ Lua Zeichenkettenmuster',
+      ja = '_UL:AdvancedSetting_ Lua パターン',
       },    
     },
 
@@ -103,7 +103,7 @@ local _ = '__00-universal-locale__/remote'; if remote.interfaces[_] then
       de = 'Direkte Eingabe von Lua Zeichenkettenmustern. Nicht RegEx.'
         .. '\nFür hoopy Froods die wirklich wissen wo Ihr Handtuch ist.'
         ,
-      -- https://shinoddddd.tumblr.com/post/31196859068/%E9%8A%80%E6%B2%B3%E3%83%92%E3%83%83%E3%83%81%E3%83%8F%E3%82%A4%E3%82%AF%E3%82%AC%E3%82%A4%E3%83%89%E3%81%AB%E3%81%AF%E3%82%BF%E3%82%AA%E3%83%AB%E3%81%AB%E9%96%A2%E3%81%97%E3%81%A6%E3%81%8B%E3%81%AA%E3%82%8A%E3%81%8F%E3%82%8F%E3%81%97%E3%81%84%E8%A8%98%E8%BC%89%E3%81%8C%E3%81%82%E3%82%8B
+      -- https://shinoddddd.tumblr.com/post/31196859068/銀河ヒッチハイクガイドにはタオルに関してかなりくわしい記載がある
       ja = 'ＬＵＡパターン直入力。正規表現にあらず。'
         .. '\n自分のタオルの在りかがちゃんと解かっているフーピイなフルードの為の設定です。'
         ,

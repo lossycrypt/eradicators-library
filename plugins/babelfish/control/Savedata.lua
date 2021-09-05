@@ -33,9 +33,10 @@ local Dictionary       = import '/control/Dictionary'
 -- Savedata                                                                   --
 -- -------------------------------------------------------------------------- --
 local Savedata, DefaultSavedata = nil, {
-  players = {}, dicts = {}, packets = {}, version = const.version.savedata,
+  players = {}, dicts = {}, packets = {}, version = const.version.savedata
   }
 PluginManager.manage_savedata  ('babelfish', function(_) Savedata = _ end, DefaultSavedata)
+PluginManager.manage_version   ('babelfish')
 PluginManager.manage_garbage   ('babelfish')
 PluginManager.classify_savedata('babelfish', {
 

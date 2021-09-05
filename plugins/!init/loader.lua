@@ -78,6 +78,8 @@ return function(log, mod_name)
     if phase:find 'settings' or phase:find 'data' then
       if flag.IS_DEV_MODE then Lock.remove_lock(_ENV) end
       _ENV. PluginManager = nil -- clean up after use
+    elseif phase:find 'control' then
+      GLOBAL('EventManager', nil) -- should only be used during setup
       end
     end
   

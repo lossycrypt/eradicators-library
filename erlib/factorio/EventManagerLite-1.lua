@@ -423,7 +423,7 @@ function Private.on_event(module_name, event_names, f, filters)
   verify(filters, 'nil', 'Filters are not supported by EventManager.')
   verify(event_names, 'Integer|string|NonEmptyTable', 'Missing event names.')
   --
-  event_names = Set.from_values(Table.plural(event_names))
+  event_names = Set.of_values(Table.plural(event_names))
   if event_names['on_config'] then
     event_names['on_config'] = nil
     event_names['on_configuration_changed'] = true

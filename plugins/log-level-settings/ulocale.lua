@@ -4,8 +4,8 @@
 -- local const  = import '/const'
 -- local hotkey = Locale.format_hotkey_tooltip
 
--- _UL:DevModeSetting_
--- _UL:PowerUserSetting_
+-- _UL:DevSetting_
+-- _UL:AdvancedSetting_
 
 -- -------------------------------------------------------------------------- --
 -- Built-In                                                                   --
@@ -22,12 +22,12 @@ require(_)('log-level-settings', {
 
   ['[mod-setting-name]'] = {
     [const.name.setting.prefix] = { 
-      en = "Logging Level _UL:PowerUserSetting_",
-      de = "Welche Logeintrage? _UL:PowerUserSetting_",
-      ja = "何をログに記録しますか？ _UL:PowerUserSetting_",
+      en = "Logging Level _UL:AdvancedSetting_",
+      de = "Welche Logeintrage? _UL:AdvancedSetting_",
+      ja = "何をログに記録しますか？ _UL:AdvancedSetting_",
       },
     [const.name.setting.hidden] = { 
-      en = "Logging Level (__1__) _UL:PowerUserSetting_ _UL:DevModeSetting_",
+      en = "Logging Level (__1__) _UL:AdvancedSetting_ _UL:DevSetting_",
       de = "",
       ja = "",
       },

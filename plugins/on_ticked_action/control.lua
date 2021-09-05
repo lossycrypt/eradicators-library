@@ -196,9 +196,10 @@ function TickedAction.enqueue(module_name, method_name, offsets, parameter)
   --
   if Savedata.next_tick == nil then
     assert(#Savedata.queue == #offsets)
-    update_next_tick()
-    Private.update_handlers()
     end
+  --
+  update_next_tick()
+  Private.update_handlers()
   end
 
 ----------

@@ -49,7 +49,7 @@ local function get_enabled_plugins(phase)
     value = db .value
     end
   --
-  local r = Set.from_values(String.split(assert(value),'|'))
+  local r = Set.of_values(String.split(assert(value),'|'))
   --
   r['none'] = nil -- Remove dummy for correct table_size().
   --

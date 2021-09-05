@@ -244,10 +244,10 @@ local function set_all_lcodes_dirty()
 --
 script.on_config(function(e)
   --
-  if Savedata.version ~= const.version.savedata then
-    log:debug('Savedata version obsolete. Resetting.')
-    Savedata:reset_to_default()
-    end
+  -- if Savedata.version ~= const.version.savedata then
+    -- log:debug('Savedata version obsolete. Resetting.')
+    -- Savedata:reset_to_default()
+    -- end
   --
   RawEntries.precompile()
   reclassify_all_dictionaries() -- can't dict:update without

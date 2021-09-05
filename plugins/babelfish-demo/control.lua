@@ -322,7 +322,7 @@ script.on_event(defines.events.on_gui_text_changed, function(e)
         arr[#arr+1] = word
         end
       print('Full  length: ', #table.concat(arr))
-      print('Dedup length: ', #table.concat(Table.keys(Set.from_values(arr))))
+      print('Dedup length: ', #table.concat(Table.keys(Set.of_values(arr))))
       end
       
     end
