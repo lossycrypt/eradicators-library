@@ -194,12 +194,13 @@ function TickedAction.enqueue(module_name, method_name, offsets, parameter)
     enqueue(module_name, method_name, game.tick + offset, parameter)
     end
   --
-  if Savedata.next_tick == nil then
-    assert(#Savedata.queue == #offsets)
-    end
-  --
+  local is_first = (Savedata.next_tick == nil)
   update_next_tick()
-  Private.update_handlers()
+  --
+  if is_first then
+    assert(#Savedata.queue == #offsets)
+    Private.update_handlers()
+    end
   end
 
 ----------
@@ -224,8 +225,8 @@ function TickedAction.dequeue(module_name, method_name, ticks)
       end
     end
   end
-  
-  
+
+
 -- -------------------------------------------------------------------------- --
 -- Private Events                                                             --
 -- -------------------------------------------------------------------------- --

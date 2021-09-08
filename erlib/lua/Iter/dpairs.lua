@@ -55,6 +55,8 @@ Deep_pairs iterates all sub-tables in a single for-loop.
 This is a non-fixed-path-length fork of @{Iter.ntuples}.
 
 With default options every @{key -> value} pair is iterated exactly once.
+The sub-tables that are being iterated into are never output as the value
+of such a pair.
 
 @usage
   -- Setup the example data.
@@ -146,7 +148,7 @@ With default options every @{key -> value} pair is iterated exactly once.
     end
   
   > Error!
-  > Table recursion detected but now allowed.
+  > Table recursion detected but not allowed.
   > path: {"michiru", "loop"}
   
   -- Notice that "michiru" and "tarou" reference the same sub-table.
@@ -202,7 +204,7 @@ local function dpairs(tbl, opt)
   local function is_loop()
     for j=1, i-1 do if tbl[j] == value then
       if (not ignore_recursion) then
-        stop('Table recursion detected but now allowed.\npath: ', key)
+        stop('Table recursion detected but not allowed.\npath: ', key)
       end
     return true end end end
   --

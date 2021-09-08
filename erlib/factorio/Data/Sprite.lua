@@ -23,6 +23,9 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 local stop        = elreq('erlib/lua/Error'        )().Stopper 'DataSprite'
 local assertify   = elreq('erlib/lua/Error'        )().Asserter(stop)
 
+local dpairs      = elreq('erlib/lua/Iter/dpairs'  )()
+
+
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
 -- -------------------------------------------------------------------------- --
@@ -76,8 +79,45 @@ function Sprite.format_icon(file_path, options)
     }
   end
 
-
-
+----------
+-- Changes scale and shift of all sub-tables.
+-- 
+-- Iterates into the given `prototype` and applies `scale` to the scale and
+-- shift of all seemingly appropriate sub-tables. As factorio prototype
+-- tables are not class-marked this uses a heuristic approach that may
+-- leave some useless scale and shift entries that usually won't do any damage.
+-- 
+-- Should work for:
+-- [Sprite](https://wiki.factorio.com/Types/Sprite),
+-- [Animation](https://wiki.factorio.com/Types/Animation),
+-- [RotatedAnimation](https://wiki.factorio.com/Types/RotatedAnimation), etc..
+-- 
+-- @tparam table prototype A prototype, or sub-table that contains sprites
+-- or animations.
+-- @tparam number scale
+-- 
+-- @treturn table `prototype`
+function Sprite.brute_scale(prototype, scale)
+  local scaled = {}
+  for key, value, tbl in dpairs(prototype) do
+    if not scaled[tbl] then
+      scaled[tbl] = true
+      if (tbl.filename
+        and (not tbl.width_in_frames) -- stripe filename
+        and (not tbl.volume         ) -- sound filename
+        ) 
+      or tbl.filenames
+      or tbl.stripes
+      then
+        tbl.scale = (tbl.scale or 1) * scale
+        tbl.shift = {
+          (tbl.shift or {1,1})[1] * scale,
+          (tbl.shift or {1,1})[2] * scale,
+          }
+        end
+      end
+    end
+  return prototype end
 
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --

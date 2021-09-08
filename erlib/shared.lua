@@ -68,7 +68,7 @@ local shared = {
 local flag = shared[5]
 
   flag.IS_FACTORIO = -- is this a non-factorio lua environment?
-    not (rawget(_ENV,'os') and rawget(_ENV,'io'))
+    not (rawget(_ENV,'os') or rawget(_ENV,'io') or rawget(_ENV,'coroutine'))
 
   flag.IS_DEV_MODE = -- spam the log with garbage, etcpp
     does_file_exist('__00-toggle-to-enable-dev-mode__/empty')

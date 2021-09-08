@@ -25,6 +25,7 @@ if flag.IS_DEV_MODE then
 -- @param log A named erlib logger instance.
 -- @param mod_name A mod name (not root or path!)
 return function(log, mod_name)
+  assert(mod_name ~= 'eradicators-template', 'Please change the template name')
 
   -- V1: Explicit absolute path
   -- local mod_root = '__'..mod_name..'__/'

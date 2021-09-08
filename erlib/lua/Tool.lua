@@ -260,6 +260,99 @@ function Tool.Import(relative_path)
   return chunk
   end
  
+
+----------
+-- Loads other mods files.
+-- Contrary to Factorio's built-in @{FAPI Libraries.require} this works correctly
+-- even if the target file itself uses relative-path requires to load more files.
+-- 
+-- This is a workaround for:
+-- [Minor Issue: Requiring lua scripts from other mods](https://forums.factorio.com/67032)
+-- 
+-- @tparam string path An absolute path to a file in another mod.
+-- @treturn NotNil Whatever the file returned.
+-- 
+-- @function Tool.cross_require
+do
+        
+  local function _is_c_function(f)
+    local info = debug.getinfo(f, 'S')
+    return (info.what == 'C') and (info.source == '=[C]')
+    end
+    
+  local require = _ENV.require
+  assert(_is_c_function(require), 'Non-C require function detected.')
+
+  local function _is_missing_file_error(msg, path)
+    local expected_msg = ('module %s not found;  no such file'):format(path)
+    return expected_msg == msg:sub(1, #expected_msg)
+    end
+    
+  local function _is_absolute_path(path)
+    return not not path:find '^__.+__.+$' end
+
+  -- Factorio does not support explicit relative paths.
+  -- So some basic interpretation is hardcoded.
+  local function _normalise_relative_path(path)
+    return path
+      :gsub('%.lua$'       ,'' ) -- file extension
+      :gsub('%.'           ,'/') -- dot syntax conversion
+      :gsub('/%./'         ,'/') -- relative path same directory
+      :gsub('/+'           ,'/') -- erroneous multi-slash
+      :gsub('^/'           ,'' ) -- erroneous starting slash (from /../ substitution)
+      .. '.lua'
+    end
+  
+  local function try_require(path)
+    local ok, chunk = pcall(require, path)
+    if ok == true then
+      log:debug('Cross require file     found: ', path)
+      return chunk
+    elseif not _is_missing_file_error(chunk, path) then
+      log:debug('Cross require file     error: ', path, chunk)
+      error(chunk)
+    else
+      log:debug('Cross require file not found: ', path)
+      return nil
+      end
+    end
+  
+  -- Emulate factorio require-search behavior as if
+  -- called inside the target mod instead of the calling mod.
+  local function find_and_require(path)
+    assert(flag.IS_FACTORIO, 'Not supported outside of factorio.')
+    if _is_absolute_path(path) then
+      return require(path)
+    else
+      local rel_path = _normalise_relative_path(path)
+      local chunk
+      -- Find first non-pcall line above this function
+      local i=1; repeat; i=i+1; until (debug.getinfo(i,'n').name ~= 'pcall')
+      -- Try relative to running file (doesn't work for scenarios)
+      local root, ok = Stacktrace.get_directory(i)
+      if ok then chunk = try_require(root .. rel_path) end
+      if chunk ~= nil then return chunk end
+      -- Try relative to running mod (doesn't work for scenarios)
+      local root, ok = Stacktrace.get_mod_root(i)
+      if ok then chunk = try_require(root .. rel_path) end
+      if chunk ~= nil then return chunk end
+      -- Try lualib
+      chunk = try_require('__core__/lualib/' .. rel_path)
+      if chunk ~= nil then return chunk end
+      -- Not found anywhere
+      stop('File not found: ', path)
+      end
+    end
+
+  function Tool.cross_require(path)
+    local backup = _ENV.require -- paranoia: preserve in case it was changed.
+    _ENV.require = find_and_require
+    local chunk = find_and_require(path)
+    _ENV.require = backup
+    return chunk end
+    
+  end
+
  
 --------------------------------------------------------------------------------
 -- Draft.
@@ -275,7 +368,7 @@ function Tool.Import(relative_path)
 -- @treturn boolean If the require succeeded.
 -- @treturn AnyValue The return value of the required file.
 function Tool.try_require(path)
-  local ok, chunk = pcall(require,path)
+  local ok, chunk = pcall(require, path)
   if ok == true then
     return true, chunk
   else
@@ -299,7 +392,10 @@ function Tool.try_require(path)
     end
   end
  
+ 
 
+
+ 
 
 -- Python-style "try-except-finally"?
 

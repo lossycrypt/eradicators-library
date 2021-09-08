@@ -1267,6 +1267,19 @@ function Table.clear_meta(tbl)
   return debug_setmetatable(tbl, nil) end
 
   
+----------
+-- Removes and returns the metatable.
+-- Useful for temporarily removing and later reinstating the metatable.
+--
+-- @tparam table tbl
+-- @treturn nil|table The metatable.
+function Table.popmetatable(tbl)
+  local mt = debug.getmetatable(tbl)
+  debug.setmetatable(tbl, nil)
+  return mt end
+  
+  
+  
 --------------------------------------------------------------------------------
 -- Factories.
 -- @section
