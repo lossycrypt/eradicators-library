@@ -393,21 +393,10 @@ do
     end
     
   local function _copy_special_character_properties(source,target)
-  
-    -- target[({[true]='enable_flashlight', [false]='disable_flashlight'
-      -- })[source.is_flashlight_enabled()]]()
-      
-    if source.is_flashlight_enabled () -- on by default
+    -- Flashlight (on by default)
+    if source.is_flashlight_enabled ()
       then target.enable_flashlight ()
       else target.disable_flashlight() end
-    
-  
-    -- if not source.is_flashlight_enabled() then target.disable_flashlight() end -- on by default
-  
-    -- local _
-    -- _ = source.is_flashlight_enabled() and target.
-    
-    
     end
     
     

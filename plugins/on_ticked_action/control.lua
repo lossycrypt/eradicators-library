@@ -199,6 +199,8 @@ function TickedAction.enqueue(module_name, method_name, offsets, parameter)
   --
   if is_first then
     assert(#Savedata.queue == #offsets)
+    -- Could call this every time, but that would trigger the whole
+    -- EML decision tree each time. So for performance only if is_first.
     Private.update_handlers()
     end
   end
