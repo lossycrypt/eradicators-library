@@ -20,8 +20,9 @@
 -- -------------------------------------------------------------------------- --
 -- Constants                                                                  --
 -- -------------------------------------------------------------------------- --
-local script = EventManager .get_managed_script    'on_user_panic'
-local on_user_panic = script.generate_event_name 'on_user_panic'
+local script = EventManager .get_managed_script 'on_user_panic'
+local on_user_panic  = script.generate_event_name 'on_user_panic'
+local on_admin_panic = script.generate_event_name 'on_admin_panic'
 
 -- -------------------------------------------------------------------------- --
 -- Events                                                                     --
@@ -34,9 +35,12 @@ local on_user_panic = script.generate_event_name 'on_user_panic'
 -- 
 -- Commands typed on the server console and commands raised by mods
 -- do not have a `player_index`, making them indistinguishable
--- from each other, so they are filtered out.
+-- from each other, so they are filtered out and do not raise anything.
 -- 
--- Abstract:
+-- If the player is @{FOBJ LuaPlayer.admin|an admin} or the game is
+-- Singleplayer then an additional event `on_admin_panic` is raised.
+-- 
+-- See also:
 -- @{FAPI events on_console_chat}  
 --
 -- @usage
@@ -57,6 +61,10 @@ script.on_event(defines.events.on_console_chat, function(e)
   if e.player_index and (e.message == "DON'T PANIC!") then
     e.calming_words = 'er.dont-panic-calming-words'
     script.raise_event(on_user_panic, e)
+    if (not game.is_multiplayer())
+    or game.players[e.player_index].admin then
+      script.raise_event(on_admin_panic, e)
+      end
     end
   end)
 

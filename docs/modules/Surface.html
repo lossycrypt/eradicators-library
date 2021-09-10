@@ -32,7 +32,7 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Todo">Todo </a></li>
+<li><a href="#Methods">Methods </a></li>
 </ul>
 
 
@@ -54,7 +54,7 @@
   <li><a href="../modules/Remote.html">Remote</a></li>
   <li><a href="../modules/Setting.html">Setting</a></li>
   <li><a href="../modules/Stacktrace.html">Stacktrace</a></li>
-  <li><a href="../modules/Surface.html">Surface</a></li>
+  <li><strong>Surface</strong></li>
   <li><a href="../modules/Train.html">Train</a></li>
   <li><a href="../modules/Wube.html">Wube</a></li>
   <li><a href="../modules/Array.html">Array</a></li>
@@ -73,7 +73,7 @@
   <li><a href="../modules/Logic.html">Logic</a></li>
   <li><a href="../modules/Math.html">Math</a></li>
   <li><a href="../modules/Meta.html">Meta</a></li>
-  <li><strong>Polygon</strong></li>
+  <li><a href="../modules/Polygon.html">Polygon</a></li>
   <li><a href="../modules/Replicate.html">Replicate</a></li>
   <li><a href="../modules/Set.html">Set</a></li>
   <li><a href="../modules/String.html">String</a></li>
@@ -96,27 +96,21 @@
 
 <div id="content">
 
-<h1>Module <code>Polygon</code></h1>
-<p>Description</p>
-
+<h1>Module <code>Surface</code></h1>
+<p>Methods for <a href="../api/LuaSurface.html#LuaSurface.">LuaSurface</a>.</p>
 <p> <a href="../source/Introduction.html#DevelopmentStatus">Module Status</a>: Work in progress.</p>
-<p>
-
-
-
-</p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">local Polygon = require(&apos;__eradicators-library__/erlib/factorio/Polygon&apos;)()
+        <pre class="example">local Surface = require(&apos;__eradicators-library__/erlib/factorio/Surface&apos;)()
 </pre>
     </ul>
 
 
-<h2><a href="#Todo">Todo </a></h2>
+<h2><a href="#Methods">Methods </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#todo1">todo1</a></td>
-	<td class="summary">Nothing.</td>
+	<td class="name" nowrap><a href="#destroy_entities_filtered">destroy_entities_filtered(surface[, parameters])</a></td>
+	<td class="summary">Finds and destroys entities</td>
 	</tr>
 </table>
 
@@ -124,22 +118,29 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Todo"></a>Todo </h2>
+    <h2 class="section-header "><a name="Methods"></a>Methods </h2>
 
     <dl class="function">
     <dt>
-    <a name = "todo1"></a>
-    <strong>todo1</strong>
+    <a name = "destroy_entities_filtered"></a>
+    <strong>destroy_entities_filtered(surface[, parameters])</strong>
     </dt>
     <dd>
-    Nothing.
+    Finds and destroys entities
 
 
+    <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">todo1</span>
+        <li><span class="parameter">surface</span>
+            <span class="types"><a class="type" href="../api/LuaSurface.html">LuaSurface</a></span>
 
 
 
+        </li>
+        <li><span class="parameter">parameters</span>
+            <span class="types"><a class="type" href="../lua-5.2/doc/manual.html#pdf-table">table</a></span>
+         Arguments for <a href="../api/LuaSurface.html#LuaSurface.find_entities_filtered">LuaSurface.find_entities_filtered</a>.
+         (<em>optional</em>)
         </li>
     </ul>
 

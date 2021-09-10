@@ -124,6 +124,14 @@ function Entity.is_real_car(entity)
      and ((prot.effectivity * entity.effectivity_modifier) > 0.001)
   end
 
+  
+----------
+-- Destroys an entity or does nothing.
+-- @tparam[opt] LuaEntity entity
+function Entity.destroy(entity)
+  if entity then entity.destroy() end
+  end
+  
 --------------------------------------------------------------------------------
 -- Inventory.
 -- @section

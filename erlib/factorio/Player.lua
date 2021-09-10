@@ -21,14 +21,13 @@ local say,warn,err,elreq,flag,ercfg=table.unpack(require(elroot..'erlib/shared')
 -- Eradicators Library                                                        --
 -- (Factorio does not allow runtime require!)                                 --
 -- -------------------------------------------------------------------------- --
+local log         = elreq('erlib/lua/Log'         )().Logger  'Player'
+local stop        = elreq('erlib/lua/Error'       )().Stopper 'Player'
+local assertify   = elreq('erlib/lua/Error'       )().Asserter(stop)
 
-local stop        = elreq('erlib/lua/Error'     )().Stopper 'Player'
+local Verificate  = elreq('erlib/lua/Verificate'   )()
+local verify      = Verificate.verify
 
--- local Stacktrace = elreq('erlib/factorio/Stacktrace')()
-
-local Verificate = elreq('erlib/lua/Verificate')()
--- local Verify           , Verify_Or
-    -- = Verificate.verify, Verificate.verify_or
 
 -- local Tool       = elreq('erlib/lua/Tool'      )()
     
@@ -40,6 +39,9 @@ local Table      = elreq('erlib/lua/Table'     )()
 -- local L          = elreq('erlib/lua/Lambda'    )()
 
 local Memoize = elreq('erlib/lua/Meta/Memoize')()
+
+local ntuples     = elreq('erlib/lua/Iter/ntuples' )()
+
 
 -- -------------------------------------------------------------------------- --
 -- Module                                                                     --
@@ -218,6 +220,353 @@ do
     return p.selected end
   end
   
+-- -------------------------------------------------------------------------- --
+
+do
+
+
+  local _copyable_character_properties = {
+    -- some of these will always be nil for characters
+    'active'                                       ,
+    'allow_dispatching_robots'                     ,
+    -- 'auto_trash_filters'                           , -- does not preserve layout
+    'bonus_mining_progress'                        ,
+    'character_additional_mining_categories'       ,
+    'character_build_distance_bonus'               ,
+    'character_crafting_speed_modifier'            ,
+    'character_health_bonus'                       ,
+    'character_inventory_slots_bonus'              ,
+    'character_item_drop_distance_bonus'           ,
+    'character_item_pickup_distance_bonus'         ,
+    -- 'character_logistic_slot_count'                ,
+    'character_loot_pickup_distance_bonus'         ,
+    'character_maximum_following_robot_count_bonus',
+    'character_mining_speed_modifier'              ,
+    'character_personal_logistic_requests_enabled' ,
+    'character_reach_distance_bonus'               ,
+    'character_resource_reach_distance_bonus'      ,
+    'character_running_speed_modifier'             ,
+    'character_trash_slot_count_bonus'             ,
+    -- 'cheat_mode'                                   , -- not on disassociated characters
+    'color'                                        ,
+    'cursor_ghost'                                 ,
+    'destructible'                                 ,
+    'direction'                                    ,
+    'driving'                                      ,
+    'drop_target'                                  ,
+    'energy'                                       ,
+    'fluidbox'                                     ,
+    'force'                                        ,
+    'health'                                       ,
+    'last_user'                                    ,
+    'minable'                                      ,
+    'mining_progress'                              ,
+    'mining_state'                                 ,
+    -- 'opened'                                       , -- doesn't work?
+    'operable'                                     ,
+    'orientation'                                  ,
+    'picking_state'                                ,
+    'render_player'                                ,
+    'render_to_forces'                             ,
+    'repair_state'                                 ,
+    -- 'request_from_buffers'                         , -- only with personal logistics research
+    'riding_state'                                 ,
+    'rotatable'                                    ,
+    'selected'                                     ,
+    'selected_gun_index'                           ,
+    'shooting_state'                               ,
+    'tags'                                         ,
+    'tick_of_last_attack'                          ,
+    'tick_of_last_damage'                          ,
+    'walking_state'                                ,
+    }
+
+  -- local _copyable_combat_robot_properties = {
+  --   'active'                                       ,
+  --   -- 'bonus_mining_progress'                        ,
+  --   'color'                                        ,
+  --   'destructible'                                 ,
+  --   'direction'                                    ,
+  --   -- 'drop_target'                                  ,
+  --   'energy'                                       ,
+  --   -- 'fluidbox'                                     ,
+  --   'force'                                        ,
+  --   'health'                                       ,
+  --   'last_user'                                    ,
+  --   'minable'                                      ,
+  --   -- 'mining_progress'                              ,
+  --   'operable'                                     ,
+  --   'orientation'                                  ,
+  --   -- 'render_player'                                ,
+  --   -- 'render_to_forces'                             ,
+  --   'rotatable'                                    ,
+  --   'tags'                                         ,
+  --   'time_to_live'                                 ,
+  --   }
+    
+
+  local function _safe_copy_inventory(source,target,method,copy_filters)
+  
+    method = method or 'transfer_stack'
+    assert(({set_stack=true, transfer_stack=true})[method]
+      , 'Incompatible method for inventory copy')
+    
+    if not target.is_empty() then --this function only handles 1:1-mapped transfer
+      log:debug('Transfer failed: Target inventory is not empty.')
+      return false end
+  
+    --is it even theoretically possible to transfer the inventory?
+    if #source > #target then
+      log:debugf('Inventory size %s ~= %s.', #source, #target)
+      source.sort_and_merge()
+      for i=#target+1, #source do
+        if source[i].valid_for_read then --no, source is too full
+          log:debug('Transfer failed: Target inventory is too small.')
+          return false
+          end
+        end
+      end
+      
+    --set filters
+    if copy_filters then
+      for i=1,#target do
+        log:debug('copy filter', i)
+        if not target.set_filter(i,source.get_filter(i)) then
+          log:debug('Transfer failed: Could not set filter on target.')
+          return false
+          end
+        end
+      end
+    
+    --try to transfer items (until one stack can't be transferred or it's all done)
+    local i = 0
+    while i < #target do
+      i = i+1
+      log:debug('try transfer stack',i)
+      if not target[i][method](source[i]) then
+        log:debug('Transfer failed: Reverting raw inventory transfer')
+        for j=i,1,-1 do
+          assert(source[i][method](target[i]), 'Reverting failed.')
+          end
+        return false
+        end
+      end
+
+    log:debug('Transfer succeeded.')
+    return true
+    end
+
+    
+  local function _safe_copy_character_inventories(source,target)
+    local inventories = { -- (index = has_filters)
+      {defines.inventory.character_main    , true },
+      {defines.inventory.character_guns    , true },
+      {defines.inventory.character_ammo    , true },
+      {defines.inventory.character_armor   , false}, -- armor last (slot bonus)
+      -- {defines.inventory.character_vehicle , true },
+      {defines.inventory.character_trash   , false},
+      }
+    local i = 0
+    while i < #inventories do
+      log:debug('try transfer inventory',i)
+      i = i+1
+      local s = source.get_inventory(inventories[i][1])
+      local t = target.get_inventory(inventories[i][1])
+      if not _safe_copy_inventory(s,t,'transfer_stack',inventories[i][2]) then
+        log:debug('reverting character inventory transfer')
+        for j=1,1,-1 do
+          local s = source.get_inventory(inventories[j][1])
+          local t = target.get_inventory(inventories[j][1])
+          _safe_copy_inventory(t,s,'transfer_stack',inventories[j][2])
+          end
+        return false
+        end
+      end
+    return true
+    end
+
+  local function _copy_basic_character_properties(source,target)
+    for _,k in pairs(_copyable_character_properties) do
+      log:debug('Copy: ',k)
+      target[k] = source[k]
+      end
+    end
+    
+  local function _copy_special_character_properties(source,target)
+  
+    -- target[({[true]='enable_flashlight', [false]='disable_flashlight'
+      -- })[source.is_flashlight_enabled()]]()
+      
+    if source.is_flashlight_enabled () -- on by default
+      then target.enable_flashlight ()
+      else target.disable_flashlight() end
+    
+  
+    -- if not source.is_flashlight_enabled() then target.disable_flashlight() end -- on by default
+  
+    -- local _
+    -- _ = source.is_flashlight_enabled() and target.
+    
+    
+    end
+    
+    
+  -- @tparam LuaEntity source character
+  -- @tparam LuaEntity target character
+  local function _copy_logistic_slot_layout(source,target)
+    if source.force.character_logistic_requests then --can't touch any of these if not.
+      local source_filters
+        = source.get_logistic_point(
+        defines.logistic_member_index.character_requester).filters
+      for _, filter in ntuples(2, source_filters) do
+        target.set_personal_logistic_slot(
+          filter.index, source.get_personal_logistic_slot(filter.index))
+        end
+      end
+    end
+    
+  -- as of base 1.0.0 the engine does not seem to support 
+  -- reassigning robots to a new character so they are recreated
+  local function _copy_combat_robots(source,target)
+    
+    for _, robot in pairs(source.following_robots) do
+      robot.combat_robot_owner = target
+      end
+    
+    -- if true then return end
+    -- 
+    -- --@future: engine support added in 1.1+
+    -- --https://forums.factorio.com/viewtopic.php?f=65&t=89285
+    -- local create = source.surface.create_entity
+    -- for _,old_robot in pairs(source.following_robots) do
+    --   local new_robot = create{
+    --     name = old_robot.name,
+    --     position = old_robot.position,
+    --     target = target, -- must follow new character
+    --     raise_built = true,
+    --     }
+    --   if new_robot.valid then --let's hope nobody is deleting stuff
+    --     for _,k in pairs(copyable_combat_robot_properties) do
+    --       new_robot[k] = old_robot[k]
+    --       end
+    --     old_robot.destroy{raise_destroy=true}
+    --     end
+    --   end
+    end
+    
+    
+  -- @tparam LuaEntity entity character
+  local function _get_armor_inventory_bonus(entity)
+    local inv = entity.get_inventory(defines.inventory.character_armor)
+    if inv and inv[1].valid_for_read then
+      return inv[1].prototype.inventory_size_bonus
+      end
+    return 0 end
+    
+    
+    
+  local function _store_cursor_stack(p)
+    if p.cursor_stack and p.cursor_stack.valid_for_read then
+      local loc = p.hand_location
+      local inv = game.create_inventory(1)
+      inv[1].transfer_stack(p.cursor_stack)
+      return {inv = inv, loc = loc, p = p}
+      end
+    end
+    
+  local function _restore_cursor_stack(obj)
+    if obj then
+      assert(obj.p.clear_cursor())
+      obj.p.cursor_stack.transfer_stack(obj.inv[1])
+      obj.p.hand_location = obj.loc
+      obj.inv.destroy()
+      end
+    end
+    
+  ----------
+  -- Attaches a new character to a player if possible.
+  --
+  -- If the player has no character then a new one will be attached. 
+  -- If the player has a character then all inventories, logistic requests, etc.
+  -- will be copied to the new character before the old one is destroyed.
+  -- 
+  -- If the target prototype does not have enough inventory slots, logistic slots, 
+  -- etcpp, or the swapping fails for some other reason the original character
+  -- will be kept as is.
+  -- 
+  -- @tparam LuaPlayer p
+  -- @tparam string prototype_name Name of a player character prototype.
+  -- @treturn boolean If the swap was successful.
+  -- @function Player.try_swap_character
+  --
+  function Player.try_swap_character(p, prototype_name)
+    verify(p, 'LuaPlayer')
+    if prototype_name == nil then return false end
+    verify(prototype_name, 'str')
+    local prototype = assert(game.entity_prototypes[prototype_name])
+    assert(prototype.type == 'character')
+    --
+    local target = p.surface.create_entity{
+      name        = prototype_name ,
+      position    = p.position,
+      raise_built = false     ,
+      force       = p.force   ,
+      }
+    --
+    local source = p.character
+    if not source then
+      p.character = target
+      return true end
+    
+    if source.vehicle then
+      log:debug('Can not swap skin while riding a vehicle')
+      return false end
+
+      
+    if target then
+    
+      target.associated_player = p -- doesn't seem to have any effect?
+      
+      --set inventories bonusses etc before inventory transfer!
+      _copy_basic_character_properties  (source,target)
+      _copy_logistic_slot_layout        (source,target)
+      _copy_special_character_properties(source,target)
+      
+      -- Temporarily fake armor bonus before armor transfer.
+      local bonus = _get_armor_inventory_bonus(source)
+      Table.add(target, {'character_inventory_slots_bonus'}, bonus)
+      
+      if _safe_copy_character_inventories(source,target) then
+        _copy_combat_robots(source,target)
+        --
+        local temp_cs = _store_cursor_stack(p)
+        p.character = target
+        _restore_cursor_stack(temp_cs)
+        --
+        -- Remove temporary bonus.
+        Table.add(target, {'character_inventory_slots_bonus'}, -bonus)
+        --
+        source.destroy()
+      else
+        log:warn('SKIN SWAPPING INVENTORY TRANSFER FAILED!')
+        _restore_cursor_stack(temp_cs)
+        target.destroy()
+        return false
+        end
+      
+    else
+      log:warn('Failed to create new character skin entity')
+      return false
+      end
+      
+    return true
+    end --try_swap_skin
+    
+  
+  end
+
+
+
 -- -------------------------------------------------------------------------- --
 -- End                                                                        --
 -- -------------------------------------------------------------------------- --

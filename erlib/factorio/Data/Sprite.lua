@@ -99,7 +99,8 @@ function Sprite.format_icon(file_path, options)
 -- @treturn table `prototype`
 function Sprite.brute_scale(prototype, scale)
   local scaled = {}
-  for key, value, tbl in dpairs(prototype) do
+  -- tbl implicitly has at least one non-table value (dpairs implementation)
+  for _, _, tbl in dpairs(prototype) do
     if not scaled[tbl] then
       scaled[tbl] = true
       if (tbl.filename

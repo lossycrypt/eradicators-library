@@ -12,9 +12,9 @@ require(_)('template', {
 
   ['[header]'] = {
     ['key'] = { 
-      en = "",
-      de = "",
-      ja = "",
+      en = '',
+      -- de = '',
+      -- ja = '',
       }
     },
 

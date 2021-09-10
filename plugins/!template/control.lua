@@ -65,8 +65,9 @@ local script = EventManager .get_managed_script    'template'
 -- Savedata                                                                   --
 -- -------------------------------------------------------------------------- --
 -- local Savedata
--- local SavedataDefaults = {players = {}}
+-- local SavedataDefaults = {players = {}, version = 1}
 -- PluginManager.manage_savedata  ('template', function(_) Savedata = _ end, SavedataDefaults)
+-- PluginManager.manage_version   ('template')
 -- PluginManager.manage_garbage   ('template')
 -- PluginManager.classify_savedata('template', {
 -- 

@@ -306,13 +306,13 @@ do
   local function try_require(path)
     local ok, chunk = pcall(require, path)
     if ok == true then
-      log:debug('Cross require file     found: ', path)
+      log:say('Cross require file     found: ', path)
       return chunk
     elseif not _is_missing_file_error(chunk, path) then
-      log:debug('Cross require file     error: ', path, chunk)
+      log:say('Cross require file     error: ', path, chunk)
       error(chunk)
     else
-      log:debug('Cross require file not found: ', path)
+      log:say('Cross require file not found: ', path)
       return nil
       end
     end

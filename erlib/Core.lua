@@ -119,6 +119,7 @@ local Modules = {
   Train      = control_only 'erlib/factorio/Train' ,
   Gui        = control_only 'erlib/factorio/Gui'   ,
   Prototype  = control_only 'erlib/factorio/Prototype' ,
+  Surface    = control_only 'erlib/factorio/Surface'   ,
   
   Data       = 'erlib/factorio/Data/!init',
   Setting    = 'erlib/factorio/Setting'   ,
